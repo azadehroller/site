@@ -1,0 +1,42 @@
+{
+  "name": "sanity-template-astro-clean",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "deploy-graphql": "sanity graphql deploy",
+    "seed": "tsx scripts/seed-posts.ts",
+    "delete-posts": "tsx scripts/delete-posts.ts"
+  },
+  "keywords": [
+    "sanity"
+  ],
+  "dependencies": {
+    "@sanity/presentation": "^2.0.0",
+    "@sanity/vision": "^4.10.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sanity": "^4.10.2",
+    "styled-components": "^6.1.8"
+  },
+  "devDependencies": {
+    "@sanity/eslint-config-studio": "^5.0.0",
+    "@types/react": "^19.0.0",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.1.6"
+  },
+  "prettier": {
+    "semi": false,
+    "printWidth": 100,
+    "bracketSpacing": false,
+    "singleQuote": true
+  }
+}
