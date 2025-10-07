@@ -20,25 +20,15 @@ export default defineConfig({
     visionTool(),
     presentationTool({
       resolve: {locations, mainDocuments},
-      previewUrl: [
-        // Local development
-        {
-          origin: 'http://localhost:4321',
-          previewMode: {
-            enable: '/api/draft-mode/enable',
-            disable: '/api/draft-mode/disable',
-          }
-        },
-        // Production
-        {
-          origin: 'https://sa-rolls.netlify.app',
-          previewMode: {
-            enable: '/api/draft-mode/enable',
-            disable: '/api/draft-mode/disable',
-          }
+      previewUrl: {
+        origin: typeof window !== 'undefined' && window.location.hostname === 'localhost'
+          ? 'http://localhost:4321'
+          : 'https://sa-rolls.netlify.app',
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+          disable: '/api/draft-mode/disable',
         }
-      ],
-      allowOrigins: ['http://localhost:*', 'https://sa-rolls.netlify.app'],
+      },
     }),
   ],
   schema: {

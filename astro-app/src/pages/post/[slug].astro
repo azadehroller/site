@@ -1,25 +1,24 @@
 ---
-import type { InferGetStaticParamsType } from "astro";
 import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
 import { formatDate } from "../../utils";
 import { urlFor, isImageReady } from "../../utils/image";
-import { getPost, getPosts } from "../../utils/sanity";
+import { getPost } from "../../utils/sanity";
 
 // Disable prerendering to enable SSR for visual editing with draft mode
 export const prerender = false;
 
-export async function getStaticPaths() {
-  const { data: posts } = await getPosts();
-  return posts.map((post) => ({
-    params: { slug: post.slug.current },
-  }));
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/');
 }
 
-type Params = InferGetStaticParamsType<typeof getStaticPaths>;
-const { slug } = Astro.params as Params;
-
 const { data: post } = await getPost(slug, Astro.request);
+
+if (!post) {
+  return Astro.redirect('/');
+}
 ---
 
 <Layout title={post.title!}>
