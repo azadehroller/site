@@ -25,6 +25,16 @@ export async function loadQuery<T>({
   const cookieHeader = request?.headers.get('cookie') || ''
   const isPreview = /\bsanity-preview=true\b/.test(cookieHeader)
 
+  // Debug logging (only in development)
+  if (import.meta.env.DEV) {
+    console.log('[loadQuery] Preview mode:', {
+      isPreview,
+      visualEditingEnabled,
+      hasToken: !!token,
+      cookieHeader: cookieHeader.substring(0, 50) + '...'
+    })
+  }
+
   if (visualEditingEnabled && isPreview && !token) {
     throw new Error(
       'SANITY_API_READ_TOKEN is required to read drafts when Visual Editing is enabled.'
