@@ -20,4 +20,16 @@ export default defineCliConfig({
     appId: 'ibwfcr9lpav9nc8f3h4n2nj3',
     autoUpdates: true,
   },
+  vite: (config: any) => {
+    // Inject environment variables during build
+    return {
+      ...config,
+      define: {
+        ...config.define,
+        'process.env.SANITY_STUDIO_PREVIEW_URL': JSON.stringify(
+          process.env.SANITY_STUDIO_PREVIEW_URL || ''
+        ),
+      },
+    }
+  },
 })

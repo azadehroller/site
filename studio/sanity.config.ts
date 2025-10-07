@@ -21,9 +21,7 @@ export default defineConfig({
     presentationTool({
       resolve: {locations, mainDocuments},
       previewUrl: {
-        origin: typeof window !== 'undefined' && window.location.hostname === 'localhost'
-          ? 'http://localhost:4321'
-          : 'https://sa-rolls.netlify.app',
+        origin: process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4321',
         previewMode: {
           enable: '/api/draft-mode/enable',
           disable: '/api/draft-mode/disable',
