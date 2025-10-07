@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build --workspace=astro-app"
+  publish = "astro-app/dist"
+
+[functions]
+  directory = "astro-app/.netlify/functions"
+
+# Important: Make sure to set these environment variables in Netlify dashboard:
+# - PUBLIC_SANITY_PROJECT_ID
+# - PUBLIC_SANITY_DATASET
+# - PUBLIC_SANITY_VISUAL_EDITING_ENABLED
+# - SANITY_API_READ_TOKEN

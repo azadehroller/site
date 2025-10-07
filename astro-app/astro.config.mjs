@@ -15,7 +15,7 @@ const {
 import sanity from '@sanity/astro'
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
-import vercel from "@astrojs/vercel/serverless";
+import netlify from "@astrojs/netlify";
 
 // Different environments use different variables
 const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID || PUBLIC_SANITY_PROJECT_ID;
@@ -27,9 +27,9 @@ const dataset = PUBLIC_SANITY_STUDIO_DATASET || PUBLIC_SANITY_DATASET;
 
 // https://astro.build/config
 export default defineConfig({
-  // Server output is required to support embedded Sanity Studio
+  // Server output is required for SSR and visual editing
   output: 'server',
-  adapter: vercel(),
+  adapter: netlify(),
   integrations: [
     sanity({
       projectId,
