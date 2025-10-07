@@ -39,8 +39,8 @@ export default defineConfig({
       apiVersion: "2024-12-08", // Set to date of setup to use the latest API version
       // No studioBasePath - using standalone studio
       stega: {
-        // Point to deployed Sanity Studio for production, localhost for dev
-        studioUrl: process.env.PUBLIC_SANITY_STUDIO_URL || 'https://sa-rolls.sanity.studio',
+        // Default to localhost for development, use env var for production
+        studioUrl: process.env.PUBLIC_SANITY_STUDIO_URL || 'http://localhost:3333',
       },
     }),
     react(), // Required for visual editing
