@@ -8,6 +8,7 @@ import {locations, mainDocuments} from './src/lib/presentation/resolve'
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
+const previewUrl = process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4321'
 
 
 export default defineConfig({
@@ -21,7 +22,7 @@ export default defineConfig({
     presentationTool({
       resolve: {locations, mainDocuments},
       previewUrl: {
-        origin: process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4321',
+        origin: previewUrl,
         previewMode: {
           enable: '/api/draft-mode/enable',
           disable: '/api/draft-mode/disable',
