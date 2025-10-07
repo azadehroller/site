@@ -37,11 +37,11 @@ export default defineConfig({
       useCdn: false,
       // `false` if you want to ensure fresh data
       apiVersion: "2024-12-08", // Set to date of setup to use the latest API version
-      studioBasePath: '/admin',
+      // No studioBasePath - using standalone studio at localhost:3333
       stega: {
-        studioUrl: '/admin',
+        studioUrl: 'http://localhost:3333', // Point to standalone studio
       },
     }),
-    react(), // Required for Sanity Studio
+    react(), // Required for visual editing
   ],
 });

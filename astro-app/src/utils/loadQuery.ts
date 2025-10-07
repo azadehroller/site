@@ -33,14 +33,13 @@ export async function loadQuery<T>({
 
   const perspective = isPreview ? 'previewDrafts' : 'published'
 
-  const { result } = await sanityClient.fetch<T>(query, params, {
+  const result = await sanityClient.fetch<T>(query, params ?? {}, {
     perspective,
     stega: visualEditingEnabled,
     // Use token only when you actually need to read drafts
     ...(isPreview && token ? { token } : {}),
     // Prefer fresh data when VE is on; use CDN otherwise
-    useCdn: !(visualEditingEnabled || isPreview),
-    filterResponse: false
+    useCdn: !(visualEditingEnabled || isPreview)
   })
 
   return { data: result, perspective }
