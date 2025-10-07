@@ -21,13 +21,15 @@ export default defineConfig({
     presentationTool({
       resolve: {locations, mainDocuments},
       previewUrl: {
-        origin: 'http://localhost:4321',
+        origin: process.env.NODE_ENV === 'production'
+          ? 'https://sa-rolls.netlify.app'
+          : 'http://localhost:4321',
         previewMode: {
           enable: '/api/draft-mode/enable',
           disable: '/api/draft-mode/disable',
         }
       },
-      allowOrigins: ['http://localhost:*'],
+      allowOrigins: ['http://localhost:*', 'https://sa-rolls.netlify.app'],
     }),
   ],
   schema: {
