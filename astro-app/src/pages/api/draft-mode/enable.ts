@@ -21,17 +21,40 @@ export const GET: APIRoute = async ({ request, redirect, cookies }) => {
   )
 
   if (!isValid) {
-    return new Response('Invalid secret', { status: 401 })
+    const response = new Response('Invalid secret', { status: 401 })
+    response.headers.set('Access-Control-Allow-Origin', 'https://sa-rolls.sanity.studio')
+    response.headers.set('Access-Control-Allow-Credentials', 'true')
+    return response
   }
+
+  // Detect if we're in production (HTTPS)
+  const isProduction = new URL(request.url).protocol === 'https:'
 
   // Set the preview cookie to enable draft mode
   cookies.set('sanity-preview', 'true', {
     path: '/',
     httpOnly: true,
-    sameSite: 'lax',
-    // For HTTPS in production, add: secure: true
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction,
   })
 
-  // Redirect to the requested page
-  return redirect(redirectTo, 307)
+  // Redirect to the requested page with CORS headers
+  const response = redirect(redirectTo, 307)
+  response.headers.set('Access-Control-Allow-Origin', 'https://sa-rolls.sanity.studio')
+  response.headers.set('Access-Control-Allow-Credentials', 'true')
+
+  return response
+}
+
+// Handle preflight requests for CORS
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': 'https://sa-rolls.sanity.studio',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Credentials': 'true',
+    },
+  })
 }

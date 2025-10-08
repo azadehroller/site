@@ -28,6 +28,7 @@ export default defineConfig({
           disable: '/api/draft-mode/disable',
         }
       },
+      allowOrigins: ['http://localhost:*', 'https://sa-rolls.netlify.app', 'https://*.sanity.studio'],
     }),
   ],
   schema: {
