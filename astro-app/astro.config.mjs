@@ -3,6 +3,7 @@
 import { loadEnv } from "vite";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import tailwindcss from '@tailwindcss/vite';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -30,6 +31,9 @@ export default defineConfig({
   // Server output is required for SSR and visual editing
   output: 'server',
   adapter: netlify(),
+  vite: {
+    plugins: [tailwindcss()],
+  },
   integrations: [
     sanity({
       projectId,

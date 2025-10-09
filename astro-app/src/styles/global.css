@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Minimal custom theme configuration */
+@theme {
+  --font-family-sans: Inter, system-ui, sans-serif;
+  --font-family-serif: 'PT Serif', serif;
+}
