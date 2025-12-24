@@ -2,148 +2,921 @@
 import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
 import { formatDate } from "../../utils";
-import { urlFor, isImageReady } from "../../utils/image";
 import { getPost } from "../../utils/sanity";
+import RawHtml from "../../components/RawHtml.astro";
+import ImageBlock from "../../components/ImageBlock.astro";
 
-// Disable prerendering to enable SSR for visual editing with draft mode
+// SSR enabled for preview/draft mode
 export const prerender = false;
 
 const { slug } = Astro.params;
 
 if (!slug) {
-  return Astro.redirect('/');
+  return Astro.redirect("/");
 }
 
 const { data: post } = await getPost(slug, Astro.request);
 
 if (!post) {
-  return Astro.redirect('/');
+  return Astro.redirect("/");
 }
+
+// Helper to clean invisible Unicode characters
+function cleanText(text: string | undefined): string {
+  if (!text) return '';
+  return text.replace(/[\u200B-\u200D\uFEFF\u2060\u180E\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180D\u2000-\u200F\u202A-\u202F\u205F-\u2064\u206A-\u206F\u3000\u3164\uFE00-\uFE0F\uFFA0]/g, '');
+}
+
+// Clean the title
+const cleanTitle = cleanText(post.title);
+const cleanAlt = cleanText(post.featuredImage?.alt) || cleanTitle;
+
+// Use publishedAt or _createdAt as fallback
+const displayDate = post.publishedAt || post._createdAt;
+
+// Get the current page URL for sharing
+const pageUrl = Astro.url.href;
+const encodedUrl = encodeURIComponent(pageUrl);
+
+// Estimate reading time (rough: 200 words per minute)
+function estimateReadingTime(body: any[]): number {
+  let textContent = '';
+  for (const block of body || []) {
+    if (block._type === 'block' && block.children) {
+      textContent += block.children.map((c: any) => c.text || '').join(' ');
+    } else if (block._type === 'rawHtml' && block.html) {
+      textContent += block.html.replace(/<[^>]*>/g, ' ');
+    }
+  }
+  const wordCount = textContent.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(wordCount / 200));
+}
+
+const readingTime = estimateReadingTime(post.body);
 ---
 
-<Layout title={post.title!}>
-  <section class="post">
-    {
-      post.mainImage && isImageReady(post.mainImage) ? (
-        <img
-          class="post__cover"
-          src={urlFor(post.mainImage).url()}
-          alt="Cover image"
-        />
-      ) : (
-        <div class="post__cover--none" />
-      )
-    }
-    <div class="post__container">
-      <h1 class="post__title">{post.title}</h1>
-      <p class="post__excerpt">{post.excerpt}</p>
-      <p class="post__date">
-        {formatDate(post._createdAt)}
-      </p>
-      <div class="post__content">
-        <PortableText value={post.body} />
+<Layout title={cleanTitle || "Blog Post"}>
+  <article class="body-container-wrapper">
+    <!-- Progress bar (hidden for now) -->
+    <!-- <div class="blog-post__progressbar">
+      <div class="progress-container">
+        <div class="progress-bar" id="js-progress-bar"></div>
+      </div>
+    </div> -->
+
+    <div class="blog-post__wrapper">
+      <!-- Header Section -->
+      <div class="blog-post__section">
+        <div class="blog-post__header">
+          <div class="blog-post__header-content">
+            <div class="blog-post__breadcrumbs">
+              <a class="blog-header__tag" href="/blog">Blog</a>
+              <span>/</span>
+              <a class="blog-header__tag" href="/blog">Posts</a>
+            </div>
+            <h1 class="blog-post__title h2">{cleanTitle}</h1>
+            <div class="blog-post__metadata">
+              <div class="blog-post__meta-name">
+                <a href="/blog/author/roller-software">ROLLER Software</a>
+              </div>
+              <div class="blog-post__readingtime">
+                <span class="blog-post__readingtime-icon">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"></path>
+                  </svg>
+                </span>
+                {readingTime} minute read
+              </div>
+              <div class="blog-post__date">
+                <div>
+                  Last updated:
+                  <time datetime={displayDate}>
+                    {formatDate(displayDate)}
+                  </time>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Featured Image -->
+        <div class="blog-post__header-image">
+          {post.featuredImage?.url && (
+            <figure class="blog-post__header-img">
+              <img 
+                src={post.featuredImage.url}
+                class="hs-image-widget" 
+                style="width:820px;border-width:0px;border:0px;" 
+                width="820" 
+                alt={cleanAlt}
+                title={cleanTitle}
+                loading="eager"
+              />
+            </figure>
+          )}
+        </div>
+      </div>
+
+      <!-- Main Content Section -->
+      <div class="blog-post__section">
+        <div class="blog-post">
+          <!-- Article -->
+          <article class="blog-post__article">
+            <div class="blog-post__body">
+              <PortableText
+                value={post.body}
+                components={{
+                  type: {
+                    rawHtml: RawHtml,
+                    imageBlock: ImageBlock
+                  }
+                }}
+              />
+            </div>
+          </article>
+
+          <!-- Sidebar -->
+          <aside class="blog-post__sidebar">
+            <div class="blog-post__sidebar-inner">
+              <div class="blog-post__meta">
+                <a class="blog-post-author" href="#">
+                  <span class="blog-post__meta-name">ROLLER Software</span>
+                </a>
+                <div class="blog-post__meta-bio">
+                  The team at ROLLER collaborates with venue management experts, marketers, and customer experience professionals to bring you insights that help grow and optimize your attraction business. With years of experience working with 1000s of venues globally, we share data-backed tips, industry trends, and practical advice to help you deliver unforgettable guest experiences.
+                </div>
+              </div>
+              
+              <div class="blog-post__meta-wrapper">
+                <div class="blog-post__meta">
+                  <h4>Share it around</h4>
+                  <div class="share-icons">
+                    <a target="_blank" href={`http://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&summary=&source=ROLLER`}>
+                      <span class="share-icons__icon">
+                        <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="24" height="24" rx="12" fill="var(--white, #fff)"></rect>
+                          <path d="M18.662 17.663a48.968 48.968 0 0 0-2.343 0c-.17 0-.207-.038-.207-.207v-4.181c0-.319-.018-.638-.112-.938-.281-.974-1.406-1.33-2.213-.675-.43.338-.6.807-.6 1.37v3.937c0 .168-.018.337 0 .525.02.15-.056.187-.187.169h-2.4c-.15 0-.188-.038-.188-.188.02-1.181.02-2.363.02-3.563 0-1.462 0-2.925-.02-4.368 0-.169.038-.206.188-.206H13c.15 0 .187.037.187.187v.956l.094-.094c.731-1.068 1.763-1.368 2.981-1.18 1.407.224 2.307 1.2 2.532 2.7.056.355.075.712.075 1.068v4.481c0 .15-.038.207-.207.207ZM8.912 13.5v3.937c0 .17-.037.225-.206.225-.787-.018-1.575 0-2.362 0-.15 0-.188-.037-.188-.187v-7.95c0-.131.038-.188.188-.188h2.418c.17 0 .188.057.188.207-.037 1.312-.037 2.625-.037 3.956ZM9.044 7.163c-.188.75-.957 1.18-1.838 1.03-.937-.15-1.462-1.068-1.125-1.968.225-.562.769-.9 1.463-.881 1.05-.019 1.743.825 1.5 1.819Z" fill="#143D82"></path>
+                        </svg>
+                      </span>
+                      <span class="share-icons__label">Linkedin</span>
+                    </a>
+                    <a target="_blank" href={`http://www.facebook.com/share.php?u=${encodedUrl}`}>
+                      <span class="share-icons__icon">
+                        <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="24" height="24" rx="12" fill="var(--white, #fff)"></rect>
+                          <path d="M12.801 20v-7.298h2.45l.367-2.845H12.8V8.041c0-.823.229-1.384 1.41-1.384l1.506-.001V4.112A20.192 20.192 0 0 0 13.522 4c-2.171 0-3.658 1.325-3.658 3.76v2.097H7.408v2.845h2.456V20h2.937Z" fill="#143D82"></path>
+                        </svg>
+                      </span>
+                      <span class="share-icons__label">Facebook</span>
+                    </a>
+                    <a target="_blank" href={`https://twitter.com/share?url=${encodedUrl}`}>
+                      <span class="share-icons__icon">
+                        <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="24" height="24" rx="12" fill="var(--white, #fff)"></rect>
+                          <path d="M17.881 9.406v.375c0 3.881-2.962 8.363-8.362 8.363A8.442 8.442 0 0 1 5 16.83c.225.019.469.038.694.038a5.95 5.95 0 0 0 3.656-1.256 2.91 2.91 0 0 1-2.737-2.044 2.725 2.725 0 0 0 1.33-.057 2.919 2.919 0 0 1-2.362-2.868v-.038c.394.225.844.357 1.331.375A2.944 2.944 0 0 1 5.6 8.525c0-.544.15-1.05.394-1.481a8.363 8.363 0 0 0 6.056 3.075 2.664 2.664 0 0 1-.075-.675A2.937 2.937 0 0 1 14.919 6.5c.843 0 1.612.356 2.137.919a5.974 5.974 0 0 0 1.875-.713 3.03 3.03 0 0 1-1.294 1.631 5.63 5.63 0 0 0 1.688-.468 5.373 5.373 0 0 1-1.444 1.537Z" fill="#143D82"></path>
+                        </svg>
+                      </span>
+                      <span class="share-icons__label">Twitter</span>
+                    </a>
+                    <a id="js-copy-to-clipboard" style="cursor: pointer;">
+                      <span class="share-icons__icon">
+                        <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="24" height="24" rx="12" fill="var(--white, #fff)"></rect>
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M16 5H8c-1.1 0-2 .9-2 2v10h2V7h8V5Zm3 4H10c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2Zm-9 10h9v-8h-9v8Z" fill="#143D82"></path>
+                        </svg>
+                      </span>
+                      <span class="share-icons__label">Copy link</span>
+                      <span class="tooltip" id="js-tooltip">
+                        <span class="tooltip-text">Link copied</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
-  </section>
+  </article>
 </Layout>
 
 <style>
-  .post {
+  /* ===================================
+     HubSpot Blog Post Styles
+     Exact match from roller.software/blog
+     =================================== */
+
+  /* CSS Variables */
+  :root {
+    --primary-50: #0270e0;
+    --iris-50: #6366f1;
+    --neutral-white: #ffffff;
+    --neutral-50: #757382;
+    --white: #ffffff;
+    --gray: #f2f2f2;
+    --cyan: #00b5fa;
+    --dark-gray: #494a52;
+    --shadow-medium: 0 24px 40px 0 rgba(7, 77, 197, 0.1), 0 8px 16px 0 rgba(7, 77, 197, 0.05);
+    --shadow-large: 0 24px 60px 0 rgba(7, 77, 197, 0.2), 0 8px 24px 0 rgba(7, 77, 197, 0.15);
+    --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --heading-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --body-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Body Container */
+  .body-container-wrapper {
+    background-color: var(--white);
+  }
+
+  /* Progress Bar */
+  .blog-post__progressbar {
+    background-color: #f2f2f2;
+    height: 4px;
+    left: 0;
+    position: fixed;
+    top: 0;
     width: 100%;
-    margin: var(--space-1) 0 var(--space-4);
+    z-index: 1000;
+  }
 
-    & .post__cover,
-    & .post__cover--none {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    & .post__cover--none {
-      background: var(--black);
-    }
-
-    & .post__container {
-      padding: 0 var(--space-3);
-    }
-
-    & .post__content {
-      font-family: var(--font-family-serif);
-      font-weight: 400;
-      font-size: var(--font-size-4);
-      line-height: var(--line-height-5);
-      letter-spacing: -0.02em;
-      margin-top: var(--space-6);
-
-      /* Targeting tags in PortableText */
-      & blockquote {
-        border-left: 5px solid var(--black);
-        padding-left: var(--space-3);
-        margin-left: var(--space-4);
-      }
-
-      & a {
-        color: var(--blue-600);
-        text-decoration: none;
-      }
-    }
-
-    & .post__title {
-      font-family: var(--font-family-sans);
-      font-size: var(--font-size-7);
-      line-height: var(--line-height-6);
-      margin: var(--space-4) 0;
-      font-weight: 800;
-    }
-
-    & .post__excerpt {
-      font-family: var(--font-family-serif);
-      font-size: var(--font-size-5);
-      line-height: var(--line-height-4);
-      margin-top: 0;
-      font-weight: 400;
-    }
-
-    & .post__date {
-      font-family: var(--font-family-sans);
-      font-weight: 600;
-      font-size: var(--font-size-1);
-      line-height: var(--line-height-1);
-      margin-top: var(--space-4);
+  @media (min-width: 990px) {
+    .blog-post__progressbar {
+      top: 66px;
     }
   }
 
-  @media (min-width: 800px) {
-    .post {
-      & .post__cover,
-      & .post__cover--none {
-        width: 750px;
-        height: 380px;
-      }
+  .progress-container {
+    background: var(--gray);
+    height: 8px;
+    width: 100%;
+  }
 
-      & .post__title {
-        font-size: var(--font-size-10);
-        line-height: var(--line-height-10);
-        margin: var(--space-6) 0 0;
-        letter-spacing: -0.025em;
-      }
+  .progress-bar {
+    background: linear-gradient(90deg, #033180, var(--iris-50));
+    height: 8px;
+    transition: width 0.1s ease;
+    width: 0;
+  }
 
-      & .post__excerpt {
-        font-size: var(--font-size-5);
-        line-height: var(--line-height-5);
-        margin-top: var(--space-3);
-        margin-bottom: var(--space-3);
-      }
+  /* Blog Post Wrapper */
+  .blog-post__wrapper {
+    background-color: var(--white);
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 0 20px;
+  }
 
-      & .post__date {
-        font-size: var(--font-size-3);
-        line-height: var(--line-height-2);
-        margin-top: var(--space-0);
-      }
+  /* Blog Post Section */
+  .blog-post__section {
+    margin: 0 auto;
+    padding: 0;
+    margin-bottom: 60px;
+  }
 
-      & .post__content {
-        margin-top: var(--space-7);
-      }
+  .blog-post__wrapper > .blog-post__section:first-child {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: 1px solid rgba(2, 49, 128, 0.1);
+    padding-bottom: 32px;
+    margin-bottom: 32px;
+  }
+
+  @media (min-width: 1312px) {
+    .blog-post__section {
+      max-width: 1312px;
     }
+    .blog-post__wrapper > .blog-post__section:first-child {
+      grid-template-columns: 1fr 1fr;
+      padding: 48px 0 32px;
+      gap: 1.6rem;
+    }
+  }
+
+  /* Blog Post Header */
+  .blog-post__header {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1rem;
+    padding: 40px 0 0;
+  }
+
+  @media (min-width: 990px) {
+    .blog-post__header {
+      align-items: center;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .blog-post__header-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Breadcrumbs */
+  .blog-post__breadcrumbs {
+    align-items: center;
+    color: #ff634f;
+    display: flex;
+    font-size: 0.875rem;
+    font-weight: 700;
+    gap: 8px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    padding: 8px 0;
+    text-transform: uppercase;
+  }
+
+  .blog-post__breadcrumbs a,
+  .blog-post__breadcrumbs span {
+    color: #ff290c;
+  }
+
+  .blog-post__breadcrumbs span {
+    padding: 0 0.5em;
+  }
+
+  .blog-header__tag {
+    color: #ff290c;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  .blog-header__tag:hover {
+    text-decoration: underline;
+  }
+
+  /* Title */
+  .blog-post__title {
+    color: #033180;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.6rem;
+  }
+
+  @media (min-width: 992px) {
+    .blog-post__title {
+      font-size: 3.2rem;
+    }
+  }
+
+  /* Metadata */
+  .blog-post__metadata {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .blog-post__metadata .blog-post__meta-avatar,
+  .blog-post__metadata .blog-post__meta-name {
+    display: none;
+  }
+
+  .blog-post__readingtime {
+    align-items: center;
+    display: flex;
+  }
+
+  .blog-post__date,
+  .blog-post__readingtime {
+    color: #033180;
+    font-size: 0.875rem;
+  }
+
+  .blog-post__readingtime-icon {
+    padding: 0 4px 0 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .blog-post__date {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  /* Header Image */
+  .blog-post__header-image {
+    align-items: center;
+    display: flex;
+  }
+
+  .blog-post__header-img {
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .blog-post__header-img img {
+    border-radius: 4px;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: 100% 0;
+  }
+
+  /* Main Blog Post Layout */
+  .blog-post {
+    color: #033180;
+    display: grid;
+    font-size: 18px;
+    gap: 60px;
+    grid-template-columns: 1fr;
+    padding: 0 0 32px;
+  }
+
+  @media (min-width: 1200px) {
+    .blog-post {
+      grid-template-columns: 3fr 1fr;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .blog-post {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+  }
+
+  /* Article */
+  .blog-post__article {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    border-bottom: 1px solid rgba(2, 49, 128, 0.1);
+  }
+
+  @media (min-width: 1200px) {
+    .blog-post__article {
+      width: 100%;
+    }
+  }
+
+  /* Body Content */
+  .blog-post__body {
+    color: #033180;
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  .blog-post__body :global(*),
+  .blog-post__body :global(p),
+  .blog-post__body :global(*:not(a)) {
+    color: #033180;
+  }
+
+  .blog-post__body :global(a *) {
+    color: inherit;
+  }
+
+  .blog-post__body :global(p) {
+    margin-bottom: 24px;
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    .blog-post__body :global(p) {
+      font-size: 18px;
+    }
+  }
+
+  .blog-post__body :global(h2) {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.6rem;
+    margin-top: 48px;
+    color: #033180;
+  }
+
+  @media (min-width: 992px) {
+    .blog-post__body :global(h2) {
+      font-size: 2.4rem;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .blog-post__body :global(h2) {
+      font-size: 2rem;
+    }
+  }
+
+  .blog-post__body :global(h3) {
+    font-size: 1.8rem;
+    line-height: 1.2;
+    margin-bottom: 1.6rem;
+    margin-top: 32px;
+    color: #033180;
+  }
+
+  @media (min-width: 992px) {
+    .blog-post__body :global(h3) {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .blog-post__body :global(h3) {
+      font-size: 1.5rem;
+    }
+  }
+
+  .blog-post__body :global(h4),
+  .blog-post__body :global(h5) {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #033180;
+  }
+
+  .blog-post__body :global(h4),
+  .blog-post__body :global(h6) {
+    font-weight: 700;
+  }
+
+  .blog-post__body :global(h4),
+  .blog-post__body :global(h5),
+  .blog-post__body :global(h6) {
+    margin-bottom: 24px;
+  }
+
+  .blog-post__body :global(h6) {
+    font-size: 1.1rem;
+  }
+
+  .blog-post__body :global(a) {
+    color: #00b5fa;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .blog-post__body :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .blog-post__body :global(ul),
+  .blog-post__body :global(ol) {
+    font-size: 18px;
+    line-height: 32px;
+    margin: 0 0 1.5rem 1.5rem;
+  }
+
+  .blog-post__body :global(ol) {
+    list-style: auto;
+  }
+
+  .blog-post__body :global(ol li),
+  .blog-post__body :global(ul li) {
+    padding: 8px 0;
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    .blog-post__body :global(ol),
+    .blog-post__body :global(ul) {
+      font-size: 18px;
+    }
+  }
+
+  .blog-post__body :global(img) {
+    border-radius: 4px;
+    height: auto;
+    margin: 20px 0;
+    max-width: 100%;
+  }
+
+  .blog-post__body :global(blockquote) {
+    border-left: 4px solid #033180;
+    font-style: italic;
+    margin: 20px 0;
+    padding-left: 20px;
+    font-size: 18px;
+  }
+
+  .blog-post__body :global(strong),
+  .blog-post__body :global(b) {
+    font-weight: 600;
+  }
+
+  /* Tables */
+  .blog-post :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    background-color: #fff;
+    border: 0 !important;
+    display: block;
+    overflow-x: auto;
+    margin-bottom: 2rem;
+  }
+
+  .blog-post :global(table thead) {
+    background-color: #f0f6ff;
+    font-weight: 700;
+  }
+
+  .blog-post :global(table th),
+  .blog-post :global(table td) {
+    border: 1px solid #99acc2;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .blog-post :global(table th p),
+  .blog-post :global(table td p) {
+    margin-bottom: 0;
+  }
+
+  .blog-post :global(table tbody tr:nth-child(even)) {
+    background-color: #f9fbff;
+  }
+
+  @media (max-width: 600px) {
+    .blog-post :global(table) {
+      font-size: 0.85rem;
+    }
+    .blog-post :global(table th),
+    .blog-post :global(table td) {
+      padding: 0.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .blog-post :global(table) {
+      display: block;
+      overflow-x: scroll;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: auto;
+    }
+    .blog-post :global(table::-webkit-scrollbar) {
+      height: 8px;
+    }
+    .blog-post :global(table::-webkit-scrollbar-track) {
+      background: #f0f0f0;
+    }
+    .blog-post :global(table::-webkit-scrollbar-thumb) {
+      background-color: #99acc2;
+      border-radius: 4px;
+    }
+  }
+
+  /* HubSpot Video Widget */
+  .blog-post__body :global(.hs-video-widget) {
+    margin: 2rem 0;
+  }
+
+  .blog-post__body :global(.hs-video-container) {
+    max-width: 100% !important;
+  }
+
+  .blog-post__body :global(.hs-video-wrapper) {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .blog-post__sidebar {
+    align-items: center;
+    min-width: 300px;
+    position: relative;
+  }
+
+  @media (max-width: 1200px) {
+    .blog-post__sidebar {
+      align-items: flex-start;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+  }
+
+  .blog-post__sidebar-inner {
+    width: 100%;
+  }
+
+  @media (min-width: 1200px) {
+    .blog-post__meta-wrapper {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+  }
+
+  .blog-post__sidebar-inner .blog-post__meta-avatar,
+  .blog-post__sidebar-inner .blog-post__meta-avatar img {
+    height: 80px;
+    width: 80px;
+  }
+
+  .blog-post__meta {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.875rem;
+    margin: 0 0 40px;
+    padding: 30px;
+  }
+
+  .blog-post__sidebar-inner .blog-post__meta {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .blog-post__meta h4 {
+    color: #033180;
+    margin: 0 0 24px;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .blog-post-author {
+    text-decoration: none;
+  }
+
+  .blog-post__meta-avatar img {
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+  }
+
+  .blog-post__meta .blog-post__meta-name {
+    font-weight: 700;
+    padding: 0.4rem 0;
+    color: #033180;
+  }
+
+  .blog-post__meta-name a {
+    color: #033180;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 0;
+  }
+
+  .blog-post__meta-bio {
+    border-bottom: 1px solid #cbd7ee;
+    font-size: 14px;
+    line-height: 24px;
+    padding: 0 0 40px;
+  }
+
+  @media (min-width: 768px) {
+    .blog-post__meta-bio {
+      color: #033180;
+    }
+  }
+
+  .blog-post__meta a {
+    color: #494a52;
+    text-decoration: underline;
+  }
+
+  /* Share Icons */
+  .share-icons {
+    display: flex;
+    flex-direction: column;
+    margin-top: 6px;
+    gap: 1rem;
+  }
+
+  .share-icons a {
+    align-items: center;
+    color: #033180;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    grid-template-rows: auto;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 990px) {
+    .share-icons a {
+      width: fit-content;
+    }
+  }
+
+  .share-icons a:hover {
+    background: transparent;
+    color: inherit;
+  }
+
+  .share-icons__icon {
+    align-items: center;
+    background: #033180;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .share-icons__icon :global(svg rect),
+  .share-icons__icon :global(svg path) {
+    fill: #fff;
+  }
+
+  .share-icons__icon :global(svg rect + path) {
+    fill: #033180;
+  }
+
+  .share-icons__label {
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0 0 0 16px;
+  }
+
+  .share-icons a:not(:last-child) {
+    padding-right: 12px;
+  }
+
+  .tooltip {
+    opacity: 0;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .tooltip.show {
+    opacity: 1;
+  }
+
+  .tooltip-text {
+    background-color: var(--dark-gray);
+    display: block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+  }
+
+  /* Image styling from body content */
+  .blog-post__body :global(.my-8) {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .blog-post__body :global(.w-full) {
+    width: 100%;
+  }
+
+  .blog-post__body :global(.h-auto) {
+    height: auto;
+  }
+
+  .blog-post__body :global(.object-cover) {
+    object-fit: cover;
+  }
+
+  .blog-post__body :global(.rounded-lg) {
+    border-radius: 8px;
+  }
+
+  .blog-post__body :global(figure) {
+    margin: 2rem 0;
+  }
+
+  .blog-post__body :global(figcaption) {
+    font-size: 14px;
+    color: #757382;
+    text-align: center;
+    margin-top: 0.5rem;
   }
 </style>
+
+<script>
+  // Progress bar functionality (disabled for now)
+  // window.addEventListener('scroll', () => {
+  //   const progressBar = document.getElementById('js-progress-bar');
+  //   if (progressBar) {
+  //     const scrollTop = window.scrollY;
+  //     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  //     const scrollPercent = (scrollTop / docHeight) * 100;
+  //     progressBar.style.width = scrollPercent + '%';
+  //   }
+  // });
+
+  // Copy to clipboard functionality
+  const copyBtn = document.getElementById('js-copy-to-clipboard');
+  const tooltip = document.getElementById('js-tooltip');
+  
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(() => {
+            tooltip.classList.remove('show');
+          }, 2000);
+        }
+      });
+    });
+  }
+</script>
