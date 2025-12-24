@@ -1,0 +1,57 @@
+---
+import Card from "../../components/Card.astro";
+import Welcome from "../../components/Welcome.astro";
+import Layout from "../../layouts/Layout.astro";
+import Pagination from "../../components/Pagination.astro";
+import { getPosts } from "../../utils/sanity";
+
+interface Props {
+  title?: string;
+  postsPerPage?: number;
+  currentPage?: number;
+  posts?: any[];
+  totalPages?: number;
+  baseUrl?: string;
+}
+
+const { 
+  title = "Blog", 
+  postsPerPage = 9, 
+  currentPage = 1,
+  posts: providedPosts,
+  totalPages: providedTotalPages,
+  baseUrl = "/blog/page",
+} = Astro.props;
+
+// Use provided posts or fetch them
+let posts = providedPosts;
+let totalPages = providedTotalPages;
+
+if (!posts) {
+  const { data: allPosts } = await getPosts(Astro.request);
+  totalPages = Math.ceil(allPosts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  posts = allPosts.slice(startIndex, startIndex + postsPerPage);
+}
+---
+
+<Layout title={title}>
+  <section class="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+    {posts && posts.length ? (
+      <>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => <Card post={post} />)}
+        </div>
+        {totalPages && totalPages > 1 && (
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            baseUrl={baseUrl} 
+          />
+        )}
+      </>
+    ) : (
+      <Welcome />
+    )}
+  </section>
+</Layout>
