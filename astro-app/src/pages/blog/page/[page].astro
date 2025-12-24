@@ -1,0 +1,36 @@
+---
+import BlogLanding from "../../../templates/blog/BlogLanding.astro";
+import { getPosts } from "../../../utils/sanity";
+
+const POSTS_PER_PAGE = 9;
+
+// Get the page number from the URL
+const { page } = Astro.params;
+const currentPage = parseInt(page || '1', 10);
+
+// Redirect page 1 to blog index
+if (currentPage === 1) {
+  return Astro.redirect('/blog');
+}
+
+const { data: allPosts } = await getPosts(Astro.request);
+const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+
+// Handle invalid page numbers
+if (currentPage < 1 || currentPage > totalPages || isNaN(currentPage)) {
+  return Astro.redirect('/blog');
+}
+
+// Get posts for current page
+const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+const posts = allPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+---
+
+<BlogLanding 
+  title={`Blog - Page ${currentPage}`} 
+  currentPage={currentPage} 
+  postsPerPage={POSTS_PER_PAGE}
+  posts={posts}
+  totalPages={totalPages}
+/>
+
