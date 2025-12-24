@@ -15,5 +15,23 @@ export const GET: APIRoute = async ({ request, redirect, cookies }) => {
   const referer = request.headers.get('referer')
   const backTo = referer && referer.startsWith('http') ? referer : '/'
 
-  return redirect(backTo, 307)
+  // Redirect with CORS headers
+  const response = redirect(backTo, 307)
+  response.headers.set('Access-Control-Allow-Origin', 'https://sa-rolls.sanity.studio')
+  response.headers.set('Access-Control-Allow-Credentials', 'true')
+
+  return response
+}
+
+// Handle preflight requests for CORS
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': 'https://sa-rolls.sanity.studio',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Credentials': 'true',
+    },
+  })
 }
