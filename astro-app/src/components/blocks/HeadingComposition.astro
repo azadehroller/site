@@ -1,0 +1,415 @@
+---
+/**
+ * HeadingComposition - A versatile heading and text block component
+ * Converted from HubSpot heading-composition.module
+ * Supports eyebrow, title, text with various themes and styling options
+ */
+import { PortableText } from "astro-portabletext";
+import type { PortableTextBlock } from "@portabletext/types";
+import { cleanStega } from '../../utils/stega';
+import RawHtml from "../RawHtml.astro";
+
+interface Props {
+  // Content
+  eyebrow?: string;
+  title?: string;
+  text?: PortableTextBlock[];
+  // Styles
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  // Unique identifier for animations/targeting
+  id?: string;
+}
+
+const {
+  eyebrow: rawEyebrow,
+  title: rawTitle,
+  text: rawText,
+  theme: rawTheme = 'dark',
+  textAlignment: rawTextAlignment = 'CENTER',
+  eyebrowType: rawEyebrowType = 'div',
+  eyebrowStyle: rawEyebrowStyle = 'none',
+  headingType: rawHeadingType = 'h2',
+  displayType: rawDisplayType = 'h2',
+  textType: rawTextType = 'lg',
+  id,
+} = Astro.props;
+
+// Clean stega from style values (must be clean for CSS class names)
+const theme = cleanStega(rawTheme) || 'dark';
+const textAlignment = cleanStega(rawTextAlignment) || 'CENTER';
+const eyebrowType = cleanStega(rawEyebrowType) || 'div';
+const eyebrowStyle = cleanStega(rawEyebrowStyle) || 'none';
+const headingType = cleanStega(rawHeadingType) || 'h2';
+const displayType = cleanStega(rawDisplayType) || 'h2';
+const textType = cleanStega(rawTextType) || 'lg';
+
+// Keep stega encoding in visible text content for visual editing click-to-edit
+const eyebrow = rawEyebrow;
+const title = rawTitle;
+const text = rawText;
+
+// Theme-based text color classes
+const getTextColorClass = (): string => {
+  switch (theme) {
+    case 'light':
+      return 'text-neutral-white';
+    case 'gxscore':
+      return 'text-gx-80';
+    case 'smb':
+      return 'text-primary-50 items-center';
+    case 'enterprise':
+      return 'text-neutral-white items-center';
+    case 'industry_report':
+      return 'text-neutral-white';
+    case 'industry_report_onlight':
+      return 'text-primary-50';
+    case 'dark':
+    default:
+      return 'text-primary-50';
+  }
+};
+
+// Eyebrow color classes based on style and theme
+const getEyebrowClasses = (): string => {
+  switch (eyebrowStyle) {
+    case 'red':
+      return 'text-secondary-50';
+    case 'blue':
+      return 'text-primary-50';
+    case 'bright_blue':
+      return 'bright-blue';
+    case 'iris':
+      return 'text-iris-50';
+    case 'iris_light':
+      return 'text-iris-40';
+    case 'gradient':
+      return 'gradient-eyebrow';
+    case 'none':
+    default:
+      // Fall back to theme-based colors
+      switch (theme) {
+        case 'gxscore':
+          return 'text-gx-90';
+        case 'smb':
+          return 'text-secondary-50 border-2 border-secondary-50 rounded-full px-4 py-2';
+        case 'enterprise':
+          return 'fancy-button bg-[#011840] text-navy-80 rounded-full px-4 py-2 relative overflow-hidden';
+        case 'industry_report':
+        case 'industry_report_onlight':
+          return 'text-[#0960F6]';
+        default:
+          return 'text-secondary-50';
+      }
+  }
+};
+
+const textColorClass = getTextColorClass();
+const eyebrowClasses = getEyebrowClasses();
+const alignmentClass = `text-${textAlignment.toLowerCase()}`;
+
+// Render the appropriate heading tag dynamically
+const HeadingTag = headingType as keyof HTMLElementTagNameMap;
+const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
+---
+
+<section 
+  class:list={[
+    'heading-composition',
+    'flex flex-col gap-4',
+    alignmentClass,
+    textColorClass,
+  ]}
+  id={id ? cleanStega(id) : undefined}
+>
+  {eyebrow && (
+    <EyebrowTag 
+      class:list={[
+        eyebrowClasses,
+        'uppercase font-extrabold small',
+        theme === 'enterprise' && 'relative',
+      ]}
+    >
+      {theme === 'enterprise' && (
+        <div class="fancy absolute inset-0 pointer-events-none"></div>
+      )}
+      <span class="relative">{eyebrow}</span>
+    </EyebrowTag>
+  )}
+
+  {title && (
+    <div>
+      <HeadingTag 
+        class:list={[
+          displayType && `${displayType}-heading`,
+          'my-0',
+          headingType === 'h1' && 'text-balance',
+        ]}
+      >
+        {title}
+      </HeadingTag>
+    </div>
+  )}
+
+  {text && text.length > 0 && (
+    <div class={`text-${textType} portable-text`}>
+      <PortableText 
+        value={text} 
+        components={{
+          type: {
+            rawHtml: RawHtml,
+          }
+        }}
+      />
+    </div>
+  )}
+</section>
+
+<style>
+  /* Gradient animation properties */
+  @property --gradient-color-1 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(7, 100%, 52%);
+  }
+
+  @property --gradient-color-2 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(265, 90%, 59%);
+  }
+
+  @property --gradient-color-3 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(218, 93%, 50%);
+  }
+
+  @property --gradient-color-4 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(218, 93%, 50%);
+  }
+
+  @property --gradient-color-5 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsla(183, 100%, 61%, 0.6);
+  }
+
+  @property --gradient-color-6 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(183, 100%, 61%);
+  }
+
+  /* Gradient eyebrow text styling */
+  .heading-composition:has(.gradient-eyebrow) .gradient-eyebrow > span {
+    background: linear-gradient(
+      to right in oklch,
+      var(--gradient-color-1) 0%,
+      var(--gradient-color-2) 22%,
+      var(--gradient-color-3) 42%,
+      var(--gradient-color-4) 82%,
+      var(--gradient-color-5) 100%,
+      var(--gradient-color-6) 104%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Bright blue color */
+  .bright-blue {
+    color: #3a80f8;
+  }
+
+  /* Fancy button animation for enterprise theme */
+  .fancy-button .fancy {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    animation: shine 3s infinite;
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Heading display sizes */
+  .h1-heading {
+    font-size: var(--heading-h1, 3.5rem);
+    line-height: 1.1;
+  }
+
+  .h2-heading {
+    font-size: var(--heading-h2, 2.5rem);
+    line-height: 1.2;
+  }
+
+  .h3-heading {
+    font-size: var(--heading-h3, 2rem);
+    line-height: 1.25;
+  }
+
+  .h4-heading {
+    font-size: var(--heading-h4, 1.5rem);
+    line-height: 1.3;
+  }
+
+  .h5-heading {
+    font-size: var(--heading-h5, 1.25rem);
+    line-height: 1.4;
+  }
+
+  .h6-heading {
+    font-size: var(--heading-h6, 1rem);
+    line-height: 1.5;
+  }
+
+  .s8-heading {
+    font-size: var(--heading-s8, 0.875rem);
+    line-height: 1.5;
+  }
+
+  /* Text sizes */
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .text-base {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .text-lg {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .text-2xl {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  /* Small eyebrow text */
+  .small {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Text alignment */
+  .text-left {
+    text-align: left;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+
+  /* Color classes */
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #011840);
+  }
+
+  .text-secondary-50 {
+    color: var(--secondary-50, #ff3800);
+  }
+
+  .text-gx-80 {
+    color: var(--gx-80, #1a3a5c);
+  }
+
+  .text-gx-90 {
+    color: var(--gx-90, #0f2a45);
+  }
+
+  .text-iris-50 {
+    color: var(--iris-50, #6366f1);
+  }
+
+  .text-iris-40 {
+    color: var(--iris-40, #818cf8);
+  }
+
+  .text-navy-80 {
+    color: var(--navy-80, #1e3a5f);
+  }
+
+  /* Text balance for h1 */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Ensure proper margin reset */
+  .my-0 {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  /* Portable Text styles */
+  .portable-text :global(p) {
+    margin: 0 0 0.5em;
+  }
+
+  .portable-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .portable-text :global(a) {
+    color: var(--primary-40, #074DC5);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+  }
+
+  .portable-text :global(a:hover) {
+    color: var(--primary-50, #033180);
+  }
+
+  .portable-text :global(ul),
+  .portable-text :global(ol) {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+  }
+
+  .portable-text :global(li) {
+    margin-bottom: 0.25em;
+  }
+
+  .portable-text :global(strong) {
+    font-weight: 700;
+  }
+
+  .portable-text :global(em) {
+    font-style: italic;
+  }
+</style>
+

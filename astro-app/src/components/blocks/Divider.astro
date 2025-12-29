@@ -1,0 +1,143 @@
+---
+import { cleanStega } from '../../utils/stega';
+import { createBlockEditInfo, createDataSanityAttrs } from '../../utils/visualEditing';
+
+interface Props {
+  showDivider?: boolean;
+  dividerType?: 'tall' | 'short';
+  background?: 'light' | 'dark';
+  // Visual editing props
+  sectionKey?: string;
+  documentId?: string;
+  documentType?: string;
+}
+
+const {
+  showDivider: rawShowDivider = true,
+  dividerType: rawDividerType = 'short',
+  background: rawBackground = 'light',
+  sectionKey,
+  documentId,
+  documentType,
+} = Astro.props;
+
+// Create edit info for this section (for visual editing)
+const sectionEditInfo = documentId && documentType && sectionKey 
+  ? createBlockEditInfo(documentId, documentType, sectionKey)
+  : null;
+
+// Clean stega encoding
+const showDivider = rawShowDivider ?? true;
+const dividerType = cleanStega(rawDividerType) || 'short';
+const background = cleanStega(rawBackground) || 'light';
+
+// Build CSS classes
+const dividerClasses = [
+  'divider',
+  dividerType,
+  background,
+  'w-full',
+  showDivider ? 'block divider-shown' : 'hidden divider-hidden',
+].join(' ');
+---
+
+<div class={dividerClasses} {...createDataSanityAttrs(sectionEditInfo)}>
+  {showDivider && (
+    <img 
+      src="/images/divider.svg" 
+      alt="Divider" 
+      class="w-full h-[2px] block max-w-full" 
+      width="1314" 
+      height="2"
+    />
+  )}
+</div>
+
+<style>
+  /* Utility classes */
+  .w-full {
+    width: 100%;
+  }
+
+  .h-\[2px\] {
+    height: 2px;
+  }
+
+  .block {
+    display: block;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .max-w-full {
+    max-width: 100%;
+  }
+
+  /* Divider base styles */
+  .divider {
+    height: 2px;
+  }
+
+  .divider-line {
+    display: block;
+  }
+
+  /* Background colors */
+  :global(.dnd-section:has(.divider.light)),
+  :global(.dnd-section.divider-bg-light) {
+    background-color: #fff;
+  }
+
+  /* Dark backgrounds - Blue 10 (#011840) */
+  :global(.dnd-section.divider-bg-blue10) {
+    background-color: #011840;
+  }
+
+  /* Dark backgrounds - Blue 30 (#033180) */
+  :global(.dnd-section.divider-bg-blue30) {
+    background-color: #033180;
+  }
+
+  /* Mobile padding (default) */
+  /* Short - smaller padding */
+  :global(.dnd-section:has(.divider.short.divider-shown)) {
+    padding-block: 40px;
+  }
+
+  :global(.dnd-section:has(.divider.short.divider-hidden)) {
+    padding-block: 24px;
+  }
+
+  /* Tall - larger padding */
+  :global(.dnd-section:has(.divider.tall.divider-shown)) {
+    padding-block: 56px;
+  }
+
+  :global(.dnd-section:has(.divider.tall.divider-hidden)) {
+    padding-block: 40px;
+  }
+
+  /* Desktop padding (768px+) */
+  @media (min-width: 768px) {
+    /* Short - smaller padding */
+    :global(.dnd-section:has(.divider.short.divider-shown)) {
+      padding-block: 56px;
+    }
+
+    :global(.dnd-section:has(.divider.short.divider-hidden)) {
+      padding-block: 40px;
+    }
+
+    /* Tall - larger padding */
+    :global(.dnd-section:has(.divider.tall.divider-shown)) {
+      padding-block: 80px;
+    }
+
+    :global(.dnd-section:has(.divider.tall.divider-hidden)) {
+      padding-block: 80px;
+    }
+  }
+</style>
+

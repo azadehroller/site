@@ -1,0 +1,156 @@
+---
+/**
+ * TrustedPartner - A styled card component combining HeadingComposition with WidgetUserReviews
+ * Uses HeadingComposition for the header and WidgetUserReviews for the badges
+ * Features rounded card design with background color/image support
+ */
+import { cleanStega } from '../../utils/stega';
+import { createBlockEditInfo, createDataSanityAttrs } from '../../utils/visualEditing';
+import HeadingComposition from './HeadingComposition.astro';
+import WidgetUserReviews from '../globals/WidgetUserReviews.astro';
+
+interface BadgeItem {
+  _key?: string;
+  image?: {
+    asset?: { _ref?: string; url?: string };
+  };
+  alt?: string;
+  link?: string;
+}
+
+interface Props {
+  // Content (HeadingComposition fields)
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  // Styles (same as HeadingComposition)
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  // Widget User Reviews data (badges only)
+  badges?: BadgeItem[];
+  // Background
+  backgroundColor?: string;
+  customBackgroundColor?: string;
+  backgroundImage?: string;
+  backgroundPosition?: string;
+  backgroundSize?: string;
+  // Spacing
+  cardPadding?: string;
+  borderRadius?: string;
+  // Visual editing
+  sectionKey?: string;
+  documentId?: string;
+  documentType?: string;
+}
+
+const {
+  // Content
+  eyebrow,
+  title,
+  text,
+  // Styles
+  theme = 'light',
+  textAlignment = 'CENTER',
+  eyebrowType = 'div',
+  eyebrowStyle = 'none',
+  headingType = 'h2',
+  displayType = 'h2',
+  textType = 'base',
+  // Badges
+  badges,
+  // Background
+  backgroundColor: rawBackgroundColor = 'var(--blue-10)',
+  customBackgroundColor: rawCustomBackgroundColor,
+  backgroundImage: rawBackgroundImage,
+  backgroundPosition: rawBackgroundPosition = 'center',
+  backgroundSize: rawBackgroundSize = 'cover',
+  // Spacing
+  cardPadding: rawCardPadding = '24px',
+  borderRadius: rawBorderRadius = '32px',
+  // Visual editing
+  sectionKey,
+  documentId,
+  documentType,
+} = Astro.props;
+
+// Create edit info for this section block
+const sectionEditInfo = documentId && documentType && sectionKey
+  ? createBlockEditInfo(documentId, documentType, sectionKey)
+  : null;
+
+// Clean stega from style values for CSS
+const backgroundColor = cleanStega(rawBackgroundColor) || 'var(--blue-10)';
+const customBackgroundColor = cleanStega(rawCustomBackgroundColor);
+const backgroundImage = cleanStega(rawBackgroundImage);
+const backgroundPosition = cleanStega(rawBackgroundPosition) || 'center';
+const backgroundSize = cleanStega(rawBackgroundSize) || 'cover';
+const cardPadding = cleanStega(rawCardPadding) || '24px';
+const borderRadius = cleanStega(rawBorderRadius) || '32px';
+
+// Build card styles
+function buildCardStyles(): string {
+  const styles: string[] = [];
+  
+  // Background color
+  const bgColor = backgroundColor === 'custom' ? customBackgroundColor : backgroundColor;
+  if (bgColor && bgColor !== 'none') {
+    styles.push(`background-color: ${bgColor}`);
+  }
+  
+  // Background image
+  if (backgroundImage) {
+    styles.push(`background-image: url('${backgroundImage}')`);
+    styles.push(`background-position: ${backgroundPosition}`);
+    styles.push(`background-size: ${backgroundSize}`);
+    styles.push('background-repeat: no-repeat');
+  }
+  
+  // Card padding and border radius
+  styles.push(`padding: ${cardPadding}`);
+  styles.push(`border-radius: ${borderRadius}`);
+  
+  return styles.join('; ');
+}
+
+const cardStyles = buildCardStyles();
+---
+
+<section 
+  class="trusted-partner-card box-shadow-onlight-blue-40 flex flex-col gap-6"
+  style={cardStyles}
+  {...createDataSanityAttrs(sectionEditInfo)}
+>
+  <!-- Header using HeadingComposition component -->
+  <HeadingComposition
+    eyebrow={eyebrow}
+    title={title}
+    text={text}
+    theme={theme}
+    textAlignment={textAlignment}
+    eyebrowType={eyebrowType}
+    eyebrowStyle={eyebrowStyle}
+    headingType={headingType}
+    displayType={displayType}
+    textType={textType}
+  />
+  
+  <!-- Badges using WidgetUserReviews component (badges only, no heading/text) -->
+  {badges && badges.length > 0 && (
+    <WidgetUserReviews
+      badges={badges}
+      textAlignment={textAlignment}
+    />
+  )}
+</section>
+
+<style>
+  /* Card shadow */
+  .box-shadow-onlight-blue-40 {
+    box-shadow: 0 4px 24px rgba(1, 24, 64, 0.15);
+  }
+</style>

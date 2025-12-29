@@ -1,0 +1,402 @@
+---
+import { cleanStega } from '../../utils/stega';
+
+interface ButtonLink {
+  href?: string;
+  urlType?: 'EXTERNAL' | 'EMAIL_ADDRESS' | 'CONTENT' | 'FILE';
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface ButtonSettings {
+  buttonText?: string;
+  link?: ButtonLink;
+}
+
+interface ButtonIcon {
+  iconFieldSvg?: string;
+  iconPosition?: 'left' | 'right';
+}
+
+interface ButtonBackground {
+  bgKind?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'gx_score' | 'iris' | 'alternative' | 'bright_blue' | 'transparent';
+}
+
+interface ButtonAlignment {
+  horizontalAlign?: 'LEFT' | 'CENTER' | 'RIGHT';
+  buttonWidth?: 'auto' | 'full';
+}
+
+interface ButtonAnimation {
+  type?: 'none' | 'pulse' | 'scrollto';
+}
+
+interface ButtonStyles {
+  background?: ButtonBackground;
+  alignment?: ButtonAlignment;
+  animation?: ButtonAnimation;
+}
+
+interface Props {
+  settings?: ButtonSettings;
+  btnIcon?: ButtonIcon;
+  styles?: ButtonStyles;
+  id?: string;
+}
+
+const {
+  settings: rawSettings,
+  btnIcon: rawBtnIcon,
+  styles: rawStyles,
+  id,
+} = Astro.props;
+
+// Clean stega encoding for values used in CSS/computation
+// BUT preserve stega in visible text content for visual editing click-to-edit
+const settings = {
+  // PRESERVE stega in buttonText for visual editing
+  buttonText: rawSettings?.buttonText || 'Button',
+  link: {
+    href: cleanStega(rawSettings?.link?.href) || '',
+    urlType: cleanStega(rawSettings?.link?.urlType) || 'EXTERNAL',
+    openInNewTab: rawSettings?.link?.openInNewTab || false,
+    noFollow: rawSettings?.link?.noFollow || false,
+  },
+};
+
+const btnIcon = {
+  iconFieldSvg: cleanStega(rawBtnIcon?.iconFieldSvg) || '',
+  iconPosition: cleanStega(rawBtnIcon?.iconPosition) || 'left',
+};
+
+const styles = {
+  background: {
+    bgKind: cleanStega(rawStyles?.background?.bgKind) || 'primary',
+  },
+  alignment: {
+    horizontalAlign: cleanStega(rawStyles?.alignment?.horizontalAlign) || 'LEFT',
+    buttonWidth: cleanStega(rawStyles?.alignment?.buttonWidth) || 'auto',
+  },
+  animation: {
+    type: cleanStega(rawStyles?.animation?.type) || 'none',
+  },
+};
+
+// Build href
+let href = settings.link.href;
+if (settings.link.urlType === 'EMAIL_ADDRESS' && href && !href.startsWith('mailto:')) {
+  href = `mailto:${href}`;
+}
+
+// Sanitize href to prevent XSS
+if (href) {
+  try {
+    new URL(href, 'https://example.com');
+  } catch {
+    href = '#';
+  }
+}
+
+// Build rel attribute
+const relParts: string[] = [];
+if (settings.link.noFollow) {
+  relParts.push('nofollow');
+}
+if (settings.link.openInNewTab) {
+  relParts.push('noopener');
+}
+const relAttr = relParts.length > 0 ? relParts.join(' ') : undefined;
+
+// Button ID
+const cleanButtonText = cleanStega(rawSettings.buttonText) || 'Button';
+const cleanLabelForId = cleanButtonText.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+const buttonId = id ? `button_${id}` : `button_${cleanLabelForId}`;
+
+// Alignment class
+const getAlignmentClass = (alignment: string): string => {
+  if (alignment === 'LEFT') return 'text-left';
+  if (alignment === 'CENTER') return 'text-center';
+  if (alignment === 'RIGHT') return 'text-right';
+  return 'text-left';
+};
+
+// Button class based on bgKind
+const getButtonClass = (bgKind: string): string => {
+  return `button button-${bgKind}`;
+};
+
+// Button width class
+const getWidthClass = (width: string): string => {
+  return width === 'full' ? 'button-full' : 'button-auto';
+};
+
+const alignmentClass = getAlignmentClass(styles.alignment.horizontalAlign);
+const buttonClass = getButtonClass(styles.background.bgKind);
+const widthClass = getWidthClass(styles.alignment.buttonWidth);
+const animation = styles.animation.type;
+const iconPosition = btnIcon.iconPosition;
+const iconSvg = btnIcon.iconFieldSvg;
+---
+
+<div class={`button-wrapper relative ${alignmentClass}`}>
+  {animation === 'pulse' && (
+    <div class="bg"></div>
+  )}
+  <a 
+    class={`${buttonClass} ${widthClass}`}
+    href={href || '#'}
+    id={buttonId}
+    target={settings.link.openInNewTab ? '_blank' : undefined}
+    rel={relAttr}
+  >
+    {iconSvg && iconPosition === 'left' && (
+      <div class="flex justify-center items-center mr-2" set:html={iconSvg} />
+    )}
+    {animation === 'scrollto' || !animation || animation === 'none' ? (
+      <Fragment>{settings.buttonText}</Fragment>
+    ) : (
+      <span>{settings.buttonText}</span>
+    )}
+    {iconSvg && iconPosition === 'right' && (
+      <div class="flex justify-center items-center mr-0 ml-2 order-1" set:html={iconSvg} />
+    )}
+  </a>
+</div>
+
+<style>
+  /* Button Wrapper */
+  .button-wrapper {
+    position: relative;
+  }
+
+  .button-wrapper.text-left {
+    text-align: left;
+  }
+
+  .button-wrapper.text-center {
+    text-align: center;
+  }
+
+  .button-wrapper.text-right {
+    text-align: right;
+  }
+
+  /* Pulse Animation Background */
+  @keyframes pulse {
+    to {
+      box-shadow: 0 0 0 15px rgba(232, 76, 61, 0);
+    }
+  }
+
+  .bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 1.5rem;
+    animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    background: #ff290c;
+    box-shadow: 0 0 0 0 #ff290c;
+    pointer-events: none;
+  }
+
+  /* Button Base Styles */
+  .button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    appearance: none;
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    border-radius: 1.5rem;
+    width: auto;
+    --bg-color: #0960F6;
+  }
+
+  /* Button Width Variants */
+  .button-auto {
+    width: auto;
+  }
+
+  @media (max-width: 432px) {
+    .button-full {
+      width: 100%;
+    }
+  }
+
+  /* Button Style Variants - Primary */
+  .button-primary {
+    background-color: var(--primary-50, #033180);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-primary:hover {
+    background-color: var(--primary-60, #032663);
+  }
+
+  /* Secondary */
+  .button-secondary {
+    background-color: var(--secondary-50, #ff290c);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-secondary:hover {
+    background-color: var(--secondary-60, #991200);
+  }
+
+  /* Tertiary */
+  .button-tertiary {
+    background-color: transparent;
+    color: var(--primary-50, #033180);
+    border: 2px solid var(--primary-50, #033180);
+  }
+
+  .button-tertiary:hover {
+    background-color: var(--primary-50, #033180);
+    color: var(--neutral-white, #fff);
+  }
+
+  /* Ghost */
+  .button-ghost {
+    background-color: transparent;
+    color: var(--primary-50, #033180);
+  }
+
+  .button-ghost:hover {
+    background-color: var(--primary-10, #cedffd);
+  }
+
+  /* GX Score */
+  .button-gx_score {
+    background-color: var(--iris, #603FF5);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-gx_score:hover {
+    background-color: #4d2fc4;
+  }
+
+  /* Iris */
+  .button-iris {
+    background-color: var(--iris, #603FF5);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-iris:hover {
+    background-color: #4d2fc4;
+  }
+
+  /* Alternative - from HubSpot module.css */
+  .button-alternative {
+    background-color: var(--primary-20, #9ebbfb);
+    color: #011840;
+    border-radius: 980px;
+    padding: 8px 24px;
+  }
+
+  .button-alternative:hover {
+    color: var(--neutral-white, #fff);
+    background-color: var(--bg-color);
+  }
+
+  /* Bright Blue - from HubSpot module.css */
+  .button-bright_blue {
+    background-color: var(--bg-color);
+    color: var(--neutral-white, #fff);
+    border-radius: 980px;
+    padding: 8px 24px;
+  }
+
+  .button-bright_blue:hover {
+    color: #011840;
+    background-color: var(--primary-30, #6697fa);
+  }
+
+  /* Transparent - from HubSpot module.css */
+  .button-transparent {
+    background-color: transparent;
+    color: var(--neutral-white, #fff);
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .button-transparent:hover {
+    color: var(--neutral-white, #fff);
+    background-color: transparent;
+  }
+
+  /* Flex utilities */
+  .flex {
+    display: flex;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .mr-2 {
+    margin-right: 0.5rem;
+  }
+
+  .mr-0 {
+    margin-right: 0;
+  }
+
+  .ml-2 {
+    margin-left: 0.5rem;
+  }
+
+  .order-1 {
+    order: 1;
+  }
+</style>
+
+<script>
+  // Handle anchor links with smooth scroll
+  const buttons = document.querySelectorAll('.button-wrapper a[href^="#"]:not([href="#"])');
+  const header = document.querySelector('.header');
+  
+  const scrollIntoViewWithOffset = (selector: string, offset: number) => {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+      window.scrollBy(0, -offset);
+    }
+  };
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', (e) => {
+      const href = button.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const headerHeight = header ? (header as HTMLElement).clientHeight : 0;
+        scrollIntoViewWithOffset(href, headerHeight + 30);
+      }
+    });
+  });
+
+  // Update button hrefs with URL params
+  const wrapperButtons = document.querySelectorAll('.button-wrapper a');
+  wrapperButtons.forEach((button) => {
+    const href = button.getAttribute('href');
+    if (href && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams && urlParams.toString()) {
+        button.setAttribute('href', `${href}?${urlParams.toString()}`);
+      }
+    }
+  });
+</script>
+

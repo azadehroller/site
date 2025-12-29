@@ -1,0 +1,360 @@
+---
+import { cleanStega } from "../../utils/stega";
+
+interface FeatureItem {
+  _key?: string;
+  // Text content
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  // Image
+  image?: {
+    asset?: { url?: string };
+  };
+  imageAlt?: string;
+  imagePosition?: 'left' | 'right';
+  imageRatio?: 'aspect-square' | 'aspect-video';
+  // Stats
+  showStats?: boolean;
+  statsNumber?: string;
+  statsText?: string;
+  statsIcon?: string;
+  // Quote
+  showQuote?: boolean;
+  quoteText?: string;
+  quoteAuthor?: string;
+  quoteAuthorTitle?: string;
+  quoteImageType?: 'avatar' | 'logo';
+  quoteImage?: {
+    asset?: { url?: string };
+  };
+  quoteImageAlt?: string;
+  // CTA
+  showCta?: boolean;
+  ctaText?: string;
+  ctaLink?: string;
+  ctaOpenInNewTab?: boolean;
+  ctaIcon?: string;
+  ctaIconPosition?: 'left' | 'right';
+  ctaKind?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'gx_score';
+}
+
+interface Props {
+  items?: FeatureItem[];
+  theme?: 'light' | 'dark' | 'gxscore';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: string;
+  eyebrowStyle?: 'red' | 'gradient';
+  headingType?: string;
+  displayType?: string;
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  id?: string;
+}
+
+const {
+  items = [],
+  theme = 'dark',
+  textAlignment = 'LEFT',
+  eyebrowType = 'h2',
+  eyebrowStyle = 'red',
+  headingType = 'h3',
+  displayType = 'h2',
+  textType = 'base',
+  id = 'features-stacked-content'
+} = Astro.props;
+
+// Theme-based text colors
+const getTextColor = (themeColor: string) => {
+  switch (themeColor) {
+    case 'light':
+      return 'text-neutral-white';
+    case 'gxscore':
+      return 'text-gx-80';
+    default:
+      return 'text-primary-50';
+  }
+};
+
+const getEyebrowColor = (themeColor: string) => {
+  switch (themeColor) {
+    case 'gxscore':
+      return 'text-gx-90';
+    default:
+      return 'text-secondary-50';
+  }
+};
+
+const getBorderColor = (themeColor: string) => {
+  switch (themeColor) {
+    case 'gxscore':
+      return 'before:bg-gx-90';
+    default:
+      return 'before:bg-secondary-50';
+  }
+};
+
+// Button style classes based on kind
+const getButtonClasses = (kind?: string) => {
+  const baseClasses = 'relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold text-md transition ease-in-out duration-300 w-full sm:w-auto whitespace-nowrap';
+  
+  switch (kind) {
+    case 'primary':
+      return `${baseClasses} bg-secondary-50 text-neutral-white px-6 py-3 rounded-full hover:bg-secondary-60`;
+    case 'secondary':
+      return `${baseClasses} bg-transparent border-2 border-secondary-50 text-secondary-50 px-6 py-3 rounded-full hover:bg-secondary-50 hover:text-neutral-white`;
+    case 'tertiary':
+      return `${baseClasses} bg-primary-50 text-neutral-white px-6 py-3 rounded-full hover:bg-primary-60`;
+    case 'gx_score':
+      return `${baseClasses} bg-gx-90 text-gx-10 px-6 py-3 rounded-full hover:bg-gx-80`;
+    case 'ghost':
+    default:
+      return `${baseClasses} bg-transparent ${getTextColor(theme)} py-2 font-serif`;
+  }
+};
+
+const textColorClass = getTextColor(theme);
+const eyebrowColorClass = getEyebrowColor(theme);
+const borderColorClass = getBorderColor(theme);
+const alignmentClass = `text-${textAlignment.toLowerCase()}`;
+const eyebrowStyleClass = eyebrowStyle === 'gradient' ? 'gradient' : 'text-secondary-50';
+---
+
+<section id={cleanStega(id)} class="features-stacked-content grid gap-7" data-sanity-edit-target>
+  {items.map((item, index) => {
+    // PRESERVE stega in visible text content for visual editing click-to-edit
+    // Only clean stega for values used in CSS classes, URLs, or HTML attributes
+    const eyebrow = item.eyebrow; // Keep stega for click-to-edit
+    const title = item.title; // Keep stega for click-to-edit
+    const text = item.text; // Keep stega for click-to-edit
+    const imageUrl = item.image?.asset?.url;
+    const cleanImageAlt = cleanStega(item.imageAlt); // Clean for alt attribute
+    const position = cleanStega(item.imagePosition) || 'left'; // Clean for logic
+    const isImageRight = position === 'right';
+    
+    // Dynamic heading tag - clean for HTML tag names
+    const HeadingTag = cleanStega(headingType) || 'h3';
+    const EyebrowTag = cleanStega(eyebrowType) || 'h2';
+    
+    return (
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center" data-sanity-edit-target>
+        <div class={`order-last ${isImageRight ? 'md:order-first' : ''} grid gap-4`}>
+          <header class={`grid gap-4 ${alignmentClass} ${textColorClass}`}>
+            {eyebrow && (
+              <div data-sanity-edit-target>
+                <Fragment set:html={`<${EyebrowTag} class="${eyebrowColorClass} ${eyebrowStyleClass} uppercase font-extrabold small"><span>${eyebrow}</span></${EyebrowTag}>`} />
+              </div>
+            )}
+            {title && (
+              <div data-sanity-edit-target>
+                <Fragment set:html={`<${HeadingTag} class="${displayType}-heading my-0">${title}</${HeadingTag}>`} />
+              </div>
+            )}
+            {text && (
+              <div class={`main-text text-${cleanStega(textType)} [&>ul]:list-disc [&>ul]:list-inside [&>ul]:mt-4`} data-sanity-edit-target>
+                <p>{text}</p>
+              </div>
+            )}
+          </header>
+          
+          {/* Stats Section */}
+          {item.showStats && item.statsNumber && (
+            <div class={`relative before:absolute before:w-[2px] before:h-full ${borderColorClass} before:top-0 before:left-0 pl-3 my-2 md:my-3`} data-sanity-edit-target>
+              <div class="flex items-end gap-x-2">
+                <span class={`font-bold ${textColorClass} text-[40px] leading-10`} data-sanity-edit-target>{item.statsNumber}</span>
+                {item.statsIcon && (
+                  <span set:html={item.statsIcon} />
+                )}
+              </div>
+              {item.statsText && (
+                <div class={`${textColorClass} leading-6`} set:html={item.statsText} data-sanity-edit-target />
+              )}
+            </div>
+          )}
+          
+          {/* Quote Section */}
+          {item.showQuote && item.quoteText && (
+            <div class={`grid gap-3 relative before:absolute before:w-[2px] before:h-full ${borderColorClass} pl-3 my-2 md:my-3`} data-sanity-edit-target>
+              <div class={`${textColorClass} leading-6`} data-sanity-edit-target>{item.quoteText}</div>
+              <div class="flex items-center gap-3">
+                {item.quoteImage?.asset?.url && (
+                  <figure class={item.quoteImageType === 'avatar' 
+                    ? 'w-[72px] h-[72px] rounded-full bg-neutral-white grid items-center overflow-hidden' 
+                    : 'w-[130px] h-[72px] grid items-center'} data-sanity-edit-target>
+                    <img 
+                      src={item.quoteImage.asset.url} 
+                      alt={cleanStega(item.quoteImageAlt) || ''} 
+                      class="object-cover" 
+                      width={item.quoteImageType === 'avatar' ? 72 : 130} 
+                      height={72}
+                      loading="lazy"
+                      data-sanity-edit-target
+                    />
+                  </figure>
+                )}
+                <div class={`font-semibold ${textColorClass}`}>
+                  {item.quoteAuthor && (
+                    <div class="text-base font-semibold block" data-sanity-edit-target>{item.quoteAuthor}</div>
+                  )}
+                  {item.quoteAuthorTitle && (
+                    <div class="text-base font-normal" data-sanity-edit-target>{item.quoteAuthorTitle}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* CTA Section */}
+          {item.showCta && item.ctaLink && (
+            <div class="button-wrapper my-2 md:my-3 [&_a]:justify-start">
+              <a 
+                class={`${getButtonClasses(cleanStega(item.ctaKind))} group`}
+                href={cleanStega(item.ctaLink)}
+                target={item.ctaOpenInNewTab ? '_blank' : undefined}
+                rel={item.ctaOpenInNewTab ? 'noopener' : undefined}
+                data-sanity-edit-target
+              >
+                {item.ctaIcon && cleanStega(item.ctaIconPosition) === 'left' && (
+                  <div class="flex justify-center items-center mr-2">
+                    <Fragment set:html={item.ctaIcon} />
+                  </div>
+                )}
+                <span class="blue-30">{item.ctaText || 'Learn more'}</span>
+                {item.ctaIcon && cleanStega(item.ctaIconPosition) !== 'left' && (
+                  <div class="flex justify-center items-center mr-0 ml-2 order-1">
+                    <Fragment set:html={item.ctaIcon} />
+                  </div>
+                )}
+              </a>
+            </div>
+          )}
+        </div>
+        
+        {/* Feature Image */}
+        {imageUrl && (
+          <figure class={`feature-image-figure [&>img]:${cleanStega(item.imageRatio) || 'aspect-square'} js-slide-in js-slidein-end`} data-sanity-edit-target>
+            {/* Hidden span with stega-encoded imageAlt for visual editing click-to-edit */}
+            <span class="sr-only">{item.imageAlt || 'Feature image'}</span>
+            <img 
+              src={imageUrl} 
+              alt={cleanImageAlt || cleanStega(title) || ''} 
+              class="object-cover w-full h-full"
+              width={612}
+              height={612}
+              loading="lazy"
+              data-sanity-edit-target
+            />
+          </figure>
+        )}
+      </div>
+    );
+  })}
+</section>
+
+<style>
+  @property --gradient-color-1 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(7, 100%, 52%);
+  }
+  
+  @property --gradient-color-2 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(265, 90%, 59%);
+  }
+  
+  @property --gradient-color-3 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(218, 93%, 50%);
+  }
+  
+  @property --gradient-color-4 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(218, 93%, 50%);
+  }
+  
+  @property --gradient-color-5 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsla(183, 100%, 61%, 0.6);
+  }
+  
+  @property --gradient-color-6 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(183, 100%, 61%);
+  }
+  
+  header:has(.gradient) {
+    .gradient > span {
+      background: linear-gradient(
+        to right in oklch,
+        var(--gradient-color-1) 0%,
+        var(--gradient-color-2) 22%,
+        var(--gradient-color-3) 42%,
+        var(--gradient-color-4) 82%,
+        var(--gradient-color-5) 100%,
+        var(--gradient-color-6) 104%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+  }
+  
+  .blue-30 {
+    color: #023180;
+  }
+  
+  .main-text p {
+    font-size: 18px;
+  }
+  
+  .small {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .h2-heading {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    font-weight: 700;
+  }
+  
+  @media (min-width: 768px) {
+    .h2-heading {
+      font-size: 3rem;
+      line-height: 1;
+    }
+  }
+  
+  .js-slide-in {
+    opacity: 1;
+  }
+  
+  .features-stacked-content figure img {
+    border-radius: 0.5rem;
+  }
+  
+  /* For visual editing - figure needs position for sr-only span */
+  .feature-image-figure {
+    position: relative;
+  }
+  
+  /* Screen reader only - visually hidden but accessible for stega detection */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>
+

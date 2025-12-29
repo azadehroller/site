@@ -1,0 +1,582 @@
+---
+import { cleanStega } from '../../utils/stega';
+
+interface ButtonLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface ButtonSettings {
+  modalTrigger?: boolean;
+  modalTriggerVideo?: boolean;
+  formId?: string;
+  videoId?: string;
+  btnLabel?: string;
+  buttonLink?: ButtonLink;
+}
+
+interface ButtonIcon {
+  iconFieldSvg?: string;
+  iconPosition?: 'left' | 'right';
+}
+
+interface ButtonStyles {
+  bgKind?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'primary-inverted' | 'gx_score' | 'gx_score_inverted' | 'industry_report';
+}
+
+interface Button {
+  buttonSettings?: ButtonSettings;
+  btnIcon?: ButtonIcon;
+  buttonStyles?: ButtonStyles;
+}
+
+interface Spacing {
+  marginTop?: string;
+  marginBottom?: string;
+  marginLeft?: string;
+  marginRight?: string;
+}
+
+interface Layout {
+  spacing?: Spacing;
+  alignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+}
+
+interface Animation {
+  type?: 'none' | 'pulse';
+}
+
+interface Styles {
+  layout?: Layout;
+  animation?: Animation;
+}
+
+interface Props {
+  buttonList?: Button[];
+  styles?: Styles;
+}
+
+const {
+  buttonList = [],
+  styles: rawStyles = {},
+} = Astro.props;
+
+// Clean stega encoding
+const styles = {
+  layout: {
+    spacing: {
+      marginTop: cleanStega(rawStyles.layout?.spacing?.marginTop) || '0px',
+      marginBottom: cleanStega(rawStyles.layout?.spacing?.marginBottom) || '0px',
+      marginLeft: cleanStega(rawStyles.layout?.spacing?.marginLeft) || '0px',
+      marginRight: cleanStega(rawStyles.layout?.spacing?.marginRight) || '0px',
+    },
+    alignment: cleanStega(rawStyles.layout?.alignment) || 'CENTER',
+  },
+  animation: {
+    type: cleanStega(rawStyles.animation?.type) || 'none',
+  },
+};
+
+// Build spacing CSS
+const buildSpacingCSS = (spacing: Spacing): string => {
+  const parts: string[] = [];
+  if (spacing.marginTop && spacing.marginTop !== '0px') {
+    parts.push(`margin-top: ${spacing.marginTop}`);
+  }
+  if (spacing.marginBottom && spacing.marginBottom !== '0px') {
+    parts.push(`margin-bottom: ${spacing.marginBottom}`);
+  }
+  if (spacing.marginLeft && spacing.marginLeft !== '0px') {
+    parts.push(`margin-left: ${spacing.marginLeft}`);
+  }
+  if (spacing.marginRight && spacing.marginRight !== '0px') {
+    parts.push(`margin-right: ${spacing.marginRight}`);
+  }
+  return parts.join('; ');
+};
+
+const spacingCSS = buildSpacingCSS(styles.layout.spacing);
+const alignment = styles.layout.alignment;
+const animation = styles.animation.type;
+
+// Helper function to get button class based on bgKind (cleaned)
+const getButtonClass = (bgKind: string = 'primary'): string => {
+  const cleanedKind = cleanStega(bgKind) || 'primary';
+  const baseClass = 'button-all';
+  const kindClass = `button-${cleanedKind}`;
+  return `${baseClass} ${kindClass}`;
+};
+
+// Helper function to build alignment class
+const getAlignmentClass = (alignment: string): string => {
+  const cleaned = cleanStega(alignment) || 'CENTER';
+  if (cleaned === 'LEFT') return 'justify-start';
+  if (cleaned === 'RIGHT') return 'justify-end';
+  return 'justify-center';
+};
+
+// Check if any button has video
+const hasVideo = buttonList.some(
+  (btn) => {
+    const videoId = cleanStega(btn.buttonSettings?.videoId);
+    return btn.buttonSettings?.modalTriggerVideo && videoId;
+  }
+);
+---
+
+<ul
+  id="js-button-stack"
+  class={`flex flex-col list-none sm:flex-row wrap gap-3 ${getAlignmentClass(alignment)} btn-list m-0 w-full md:w-auto`}
+  style={spacingCSS ? spacingCSS : undefined}
+>
+  {buttonList.map((item, index) => {
+    const buttonSettings = item.buttonSettings || {};
+    const btnIcon = item.btnIcon || {};
+    const buttonStyles = item.buttonStyles || {};
+    
+    // Clean stega from values used for CSS/computation
+    // BUT preserve stega in visible text content (btnLabel) for visual editing click-to-edit
+    const modalTrigger = buttonSettings.modalTrigger || false;
+    const modalTriggerVideo = buttonSettings.modalTriggerVideo || false;
+    const formId = cleanStega(buttonSettings.formId);
+    const videoId = cleanStega(buttonSettings.videoId);
+    // PRESERVE stega in btnLabel for visual editing - this enables click-to-edit
+    const btnLabel = buttonSettings.btnLabel || 'Button';
+    // Clean version for ID generation only
+    const cleanBtnLabel = cleanStega(buttonSettings.btnLabel) || 'Button';
+    const buttonLink = buttonSettings.buttonLink;
+    
+    const iconFieldSvg = cleanStega(btnIcon.iconFieldSvg);
+    const iconPosition = cleanStega(btnIcon.iconPosition) || 'left';
+    const bgKind = cleanStega(buttonStyles.bgKind) || 'primary';
+
+    // Build href (cleaned and sanitized)
+    let href = cleanStega(buttonLink?.href) || '#';
+    if (modalTrigger || modalTriggerVideo) {
+      href = '#';
+    } else if (href && href.startsWith('mailto:')) {
+      // Already formatted
+    } else if (href && !href.startsWith('http') && !href.startsWith('/') && !href.startsWith('#') && !href.startsWith('mailto:')) {
+      href = `https://${href}`;
+    }
+    
+    // Sanitize href to prevent XSS
+    try {
+      new URL(href, 'https://example.com');
+    } catch {
+      href = '#';
+    }
+
+    // Build rel attribute
+    const relParts: string[] = [];
+    if (buttonLink?.noFollow) {
+      relParts.push('nofollow');
+    }
+    if (buttonLink?.openInNewTab) {
+      relParts.push('noopener');
+    }
+    const relAttr = relParts.length > 0 ? relParts.join(' ') : undefined;
+
+    // Button ID (use cleaned label for ID generation)
+    const cleanLabelForId = cleanBtnLabel.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    const buttonId = `button_${cleanLabelForId}_${index}`;
+
+    // Modal ID (cleaned and sanitized)
+    const modalId = formId ? `contact-form-${formId.replace(/[^a-z0-9_-]/gi, '')}` : undefined;
+
+    return (
+      <>
+        <li class="ml-0">
+          {videoId && modalTriggerVideo ? (
+            <div
+              class={`wistia_embed wistia_async_${videoId.replace(/[^a-z0-9_-]/gi, '')} popover=true popoverContent=html`}
+              id={`wistia-${videoId.replace(/[^a-z0-9_-]/gi, '')}-${index}`}
+            >
+              <a
+                href={href}
+                class={getButtonClass(bgKind)}
+                id={buttonId}
+                target={buttonLink?.openInNewTab ? '_blank' : undefined}
+                rel={relAttr}
+              >
+                {iconFieldSvg && iconPosition === 'left' && (
+                  <div class="flex justify-center items-center mr-2" set:html={iconFieldSvg} />
+                )}
+                <span id={modalTrigger ? 'js-modal-trigger' : undefined}>
+                  {btnLabel}
+                </span>
+                {iconFieldSvg && iconPosition === 'right' && (
+                  <div class="flex justify-center items-center mr-0 ml-2 order-1" set:html={iconFieldSvg} />
+                )}
+                {animation === 'pulse' && (
+                  <div class="bg"></div>
+                )}
+              </a>
+            </div>
+          ) : (
+            <a
+              href={href}
+              class={getButtonClass(bgKind)}
+              id={buttonId}
+              target={buttonLink?.openInNewTab ? '_blank' : undefined}
+              rel={relAttr}
+              data-reveal-id={modalTrigger && modalId ? modalId : undefined}
+            >
+              {iconFieldSvg && iconPosition === 'left' && (
+                <div class="flex justify-center items-center mr-2" set:html={iconFieldSvg} />
+              )}
+              <span id={modalTrigger ? 'js-modal-trigger' : undefined}>
+                {btnLabel}
+              </span>
+              {iconFieldSvg && iconPosition === 'right' && (
+                <div class="flex justify-center items-center mr-0 ml-2 order-1" set:html={iconFieldSvg} />
+              )}
+              {animation === 'pulse' && (
+                <div class="bg"></div>
+              )}
+            </a>
+          )}
+        </li>
+        {modalTrigger && modalId && (
+          <div id={modalId} class="modal modal--small">
+            <button class="btn close-modal">
+              <span class="material-icons">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+                  <path fill="#000" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/>
+                </svg>
+              </span>
+            </button>
+            <div class="modal-content">
+              <div class="modal-form">
+                {/* HubSpot form will be injected here via JavaScript */}
+                {formId && <div id={`hs-form-${formId.replace(/[^a-z0-9_-]/gi, '')}`}></div>}
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  })}
+</ul>
+
+{hasVideo && (
+  <script
+    charset="ISO-8859-1"
+    src="//fast.wistia.com/assets/external/E-v1.js"
+    async
+  ></script>
+)}
+
+<style>
+  /* Tailwind class equivalents */
+  .flex {
+    display: flex;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .list-none {
+    list-style: none;
+  }
+
+  .wrap {
+    flex-wrap: wrap;
+  }
+
+  .gap-3 {
+    gap: 0.75rem;
+  }
+
+  .justify-start {
+    justify-content: flex-start;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-end {
+    justify-content: flex-end;
+  }
+
+  .m-0 {
+    margin: 0;
+  }
+
+  .ml-0 {
+    margin-left: 0;
+  }
+
+  .mr-0 {
+    margin-right: 0;
+  }
+
+  .mr-2 {
+    margin-right: 0.5rem;
+  }
+
+  .ml-2 {
+    margin-left: 0.5rem;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .order-1 {
+    order: 1;
+  }
+
+  @media (min-width: 640px) {
+    .sm\:flex-row {
+      flex-direction: row;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .md\:w-auto {
+      width: auto;
+    }
+  }
+
+  /* Button Stack Specific Styles */
+  #js-button-stack {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .btn-list {
+    list-style: none;
+  }
+
+  /* Button Base Styles */
+  .button-all {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    appearance: none;
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    border-radius: 1.5rem;
+  }
+
+  /* Button Variants */
+  .button-primary {
+    background-color: var(--primary-50, #033180);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-primary:hover {
+    background-color: var(--primary-60, #032663);
+  }
+
+  .button-secondary {
+    background-color: var(--secondary-50, #ff290c);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-secondary:hover {
+    background-color: var(--secondary-60, #991200);
+  }
+
+  .button-tertiary {
+    background-color: transparent;
+    color: var(--primary-50, #033180);
+    border: 2px solid var(--primary-50, #033180);
+  }
+
+  .button-tertiary:hover {
+    background-color: var(--primary-50, #033180);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-ghost {
+    background-color: transparent;
+    color: var(--primary-50, #033180);
+  }
+
+  .button-ghost:hover {
+    background-color: var(--primary-10, #cedffd);
+  }
+
+  .button-primary-inverted {
+    background-color: var(--neutral-white, #fff);
+    color: var(--primary-50, #033180);
+    border: 1px solid var(--primary-50, #033180);
+  }
+
+  .button-primary-inverted:hover {
+    background-color: var(--neutral-20, #e5e5e4);
+  }
+
+  .button-gx_score {
+    background-color: var(--iris, #603FF5);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-gx_score:hover {
+    background-color: #4d2fc4;
+  }
+
+  .button-gx_score_inverted {
+    background-color: transparent;
+    color: var(--iris, #603FF5);
+    border: 2px solid var(--iris, #603FF5);
+  }
+
+  .button-gx_score_inverted:hover {
+    background-color: var(--iris, #603FF5);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-industry_report {
+    background-color: var(--secondary-50, #ff290c);
+    color: var(--neutral-white, #fff);
+  }
+
+  .button-industry_report:hover {
+    background-color: var(--secondary-60, #991200);
+  }
+
+  /* Pulse Animation */
+  @keyframes pulse {
+    to {
+      box-shadow: 0 0 0 15px rgba(232, 76, 61, 0);
+    }
+  }
+
+  .bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 1.5rem;
+    animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    background: #ff290c;
+    box-shadow: 0 0 0 0 #ff290c;
+    pointer-events: none;
+  }
+
+  /* Wistia Video Styles */
+  .wistia_embed {
+    display: inline;
+  }
+
+  @media (max-width: 624px) {
+    .wistia_embed > div {
+      width: 100% !important;
+    }
+  }
+
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal--small .modal-content {
+    max-width: 600px;
+    margin: 5% auto;
+    background-color: var(--neutral-white, #fff);
+    padding: 2rem;
+    border-radius: 8px;
+    position: relative;
+  }
+
+  .modal-content {
+    position: relative;
+  }
+
+  .close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-modal:hover {
+    opacity: 0.7;
+  }
+
+  .modal-form {
+    margin-top: 1rem;
+  }
+</style>
+
+<script>
+  // Handle anchor links with smooth scroll
+  const buttons = document.querySelectorAll('#js-button-stack a[href^="#"]:not([href="#"])');
+  const header = document.querySelector('.header');
+  
+  const scrollIntoViewWithOffset = (selector: string, offset: number) => {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+      window.scrollBy(0, -offset);
+    }
+  };
+
+  const buttonAnchorElement = (buttons: NodeListOf<HTMLAnchorElement>) => {
+    buttons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        const href = button.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          e.preventDefault();
+          const headerHeight = header ? (header as HTMLElement).clientHeight : 0;
+          scrollIntoViewWithOffset(href, headerHeight + 30);
+        }
+      });
+    });
+  };
+
+  if (buttons.length > 0 && header) {
+    buttonAnchorElement(buttons as NodeListOf<HTMLAnchorElement>);
+  }
+
+  // Update button hrefs with URL params
+  const stackButtons = document.querySelectorAll('#js-button-stack a');
+  const updateButtonHref = (button: HTMLAnchorElement) => {
+    if (button && button.getAttribute('href')) {
+      let href = button.getAttribute('href') || '';
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams && urlParams.toString()) {
+        href = `${href}?${urlParams.toString()}`;
+        button.setAttribute('href', href);
+      }
+    }
+  };
+
+  stackButtons.forEach((button) => {
+    updateButtonHref(button as HTMLAnchorElement);
+  });
+</script>
+

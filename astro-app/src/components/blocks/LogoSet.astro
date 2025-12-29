@@ -1,0 +1,560 @@
+---
+import { cleanStega } from '../../utils/stega';
+import { urlFor } from '../../utils/image';
+
+interface LogoItem {
+  _key?: string;
+  image?: any; // Sanity image object
+  alt?: string;
+}
+
+interface Props {
+  customTitle?: string;
+  amerLogos?: LogoItem[];
+  apacLogos?: LogoItem[];
+  emeaLogos?: LogoItem[];
+  ukLogos?: LogoItem[];
+  theme?: 'light' | 'dark' | 'gxscore';
+  textAlignment?: 'left' | 'center' | 'right';
+  showDivider?: boolean;
+}
+
+const {
+  customTitle: rawCustomTitle,
+  amerLogos: rawAmerLogos = [],
+  apacLogos: rawApacLogos = [],
+  emeaLogos: rawEmeaLogos = [],
+  ukLogos: rawUkLogos = [],
+  theme: rawTheme = 'dark',
+  textAlignment: rawTextAlignment = 'center',
+  showDivider: rawShowDivider = false,
+} = Astro.props;
+
+// PRESERVE stega in visible text content for visual editing click-to-edit
+// Only clean stega from values used for CSS class names
+const customTitle = rawCustomTitle; // Keep stega for click-to-edit
+const amerLogos = rawAmerLogos || [];
+const apacLogos = rawApacLogos || [];
+const emeaLogos = rawEmeaLogos || [];
+const ukLogos = rawUkLogos || [];
+const theme = cleanStega(rawTheme) || 'dark'; // Clean for CSS class
+const textAlignment = cleanStega(rawTextAlignment) || 'center'; // Clean for CSS class
+const showDivider = rawShowDivider ?? false;
+
+// Determine title text - preserve stega in the raw title
+const title = customTitle || 'Trusted by over 3,000 venues worldwide';
+
+// Build text color classes based on theme
+const getTextColorClass = (themeColor: string): string => {
+  switch (themeColor) {
+    case 'light':
+      return 'text-neutral-white';
+    case 'gxscore':
+      return 'text-gx-80';
+    default: // dark (OnLight)
+      return 'text-primary-50';
+  }
+};
+
+const textColorClass = getTextColorClass(theme);
+
+// Helper to get image URL from Sanity image
+const getLogoImageUrl = (logo: LogoItem): string | null => {
+  if (logo.image?.asset) {
+    try {
+      // Use fit('max') to preserve aspect ratio and transparency
+      // Use format('png') to maintain transparency for PNG images
+      return urlFor(logo.image).width(194).fit('max').format('png').url() || null;
+    } catch {
+      return logo.image.asset?.url || null;
+    }
+  }
+  return null;
+};
+---
+
+<div class="logo-set-module" data-country="" style="visibility: hidden;" data-sanity-edit-target>
+  {showDivider && (
+    <div class="mt-3 w-full h-[1px] bg-neutral-white"></div>
+  )}
+  
+  <h2 class={`font-semibold text-lg block ${textColorClass} m-0 text-${textAlignment}`}>
+    <span>{title}</span>
+  </h2>
+  
+  <div class="logo-set__logos--regional">
+    <div class="scroller">
+      {amerLogos.length > 0 && (
+        <div class="scroller__inner" data-logos="amer" style="display: none;">
+          {amerLogos.map((logo) => (
+            <div class="logo-set__logo" data-sanity-edit-target>
+              {/* Hidden span with stega-encoded alt for visual editing click-to-edit */}
+              <span class="sr-only">{logo.alt || 'Logo'}</span>
+              <img 
+                src={getLogoImageUrl(logo) || ''} 
+                alt={cleanStega(logo.alt) || 'Logo'}
+                width="194" 
+                height="106" 
+                loading="lazy"
+                style="aspect-ratio: 194/106;"
+                data-sanity-edit-target
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      {apacLogos.length > 0 && (
+        <div class="scroller__inner" data-logos="apac" style="display: none;">
+          {apacLogos.map((logo) => (
+            <div class="logo-set__logo" data-sanity-edit-target>
+              {/* Hidden span with stega-encoded alt for visual editing click-to-edit */}
+              <span class="sr-only">{logo.alt || 'Logo'}</span>
+              <img 
+                src={getLogoImageUrl(logo) || ''} 
+                alt={cleanStega(logo.alt) || 'Logo'}
+                width="194" 
+                height="106" 
+                loading="lazy"
+                style="aspect-ratio: 194/106;"
+                data-sanity-edit-target
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      {emeaLogos.length > 0 && (
+        <div class="scroller__inner" data-logos="emea" style="display: none;">
+          {emeaLogos.map((logo) => (
+            <div class="logo-set__logo" data-sanity-edit-target>
+              {/* Hidden span with stega-encoded alt for visual editing click-to-edit */}
+              <span class="sr-only">{logo.alt || 'Logo'}</span>
+              <img 
+                src={getLogoImageUrl(logo) || ''} 
+                alt={cleanStega(logo.alt) || 'Logo'}
+                width="194" 
+                height="106" 
+                loading="lazy"
+                style="aspect-ratio: 194/106;"
+                data-sanity-edit-target
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      {ukLogos.length > 0 && (
+        <div class="scroller__inner" data-logos="uk" style="display: none;">
+          {ukLogos.map((logo) => (
+            <div class="logo-set__logo" data-sanity-edit-target>
+              {/* Hidden span with stega-encoded alt for visual editing click-to-edit */}
+              <span class="sr-only">{logo.alt || 'Logo'}</span>
+              <img 
+                src={getLogoImageUrl(logo) || ''} 
+                alt={cleanStega(logo.alt) || 'Logo'}
+                width="194" 
+                height="106" 
+                loading="lazy"
+                style="aspect-ratio: 194/106;"
+                data-sanity-edit-target
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  /* Prevent CLS with explicit dimensions */
+  .logo-set-module .scroller {
+    min-height: 106px;
+    position: relative;
+    contain: layout style;
+    overflow: hidden;
+    -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+    mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+  }
+
+  .logo-set-module .scroller__inner {
+    flex-wrap: nowrap;
+    gap: 2rem;
+    align-items: center;
+    will-change: transform;
+    min-height: 106px;
+  }
+
+  /* Regional logo sets start hidden - JS will show the correct one */
+  .logo-set-module .scroller__inner[data-logos] {
+    display: none;
+  }
+  
+  /* JS adds this class to show the correct region */
+  .logo-set-module .scroller__inner[data-logos].logo-set--visible {
+    display: flex !important;
+  }
+
+  /* Ensure logo containers have consistent dimensions */
+  .logo-set-module .logo-set__logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 194px;
+    height: 106px;
+    background: transparent;
+    position: relative; /* For sr-only span positioning */
+  }
+
+  .logo-set-module .logo-set__logo img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    background-color: transparent;
+  }
+
+  @keyframes scroll {
+    to {
+      transform: translate(calc(-50% - 1rem));
+    }
+  }
+
+  .logo-set-module .scroller[data-animated="true"] .scroller__inner {
+    width: max-content;
+    animation: scroll 40s linear infinite;
+  }
+
+  /* Text alignment classes */
+  .text-left {
+    text-align: left;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+
+  /* Spacing */
+  .mt-3 {
+    margin-top: 0.75rem;
+  }
+
+  .m-0 {
+    margin: 0;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .h-\[1px\] {
+    height: 1px;
+  }
+
+  .block {
+    display: block;
+  }
+
+  /* Font styles */
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  /* Theme color classes */
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+
+  .text-neutral-white {
+    color: var(--neutral-white, #ffffff);
+  }
+
+  .text-gx-80 {
+    color: var(--gx-80, #1a365d);
+  }
+
+  .bg-neutral-white {
+    background-color: var(--neutral-white, #ffffff);
+  }
+
+  /* Screen reader only - visually hidden but accessible for stega detection */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+</style>
+
+<script is:inline>
+(function () {
+  'use strict';
+
+  // Set to true temporarily to debug region detection
+  var DEBUG = true;
+  
+  console.log('[LogoSet] Script loaded and executing...');
+
+  // Country → region (amer|apac|emea|uk)
+  var countryList = [
+    {iso:"af",region:"emea"},{iso:"al",region:"emea"},{iso:"dz",region:"emea"},
+    {iso:"as",region:"apac"},{iso:"ad",region:"emea"},{iso:"ao",region:"emea"},
+    {iso:"ai",region:"amer"},{iso:"aq",region:"apac"},{iso:"ag",region:"amer"},
+    {iso:"ar",region:"amer"},{iso:"am",region:"emea"},{iso:"aw",region:"amer"},
+    {iso:"au",region:"apac"},{iso:"at",region:"emea"},{iso:"az",region:"emea"},
+    {iso:"bs",region:"amer"},{iso:"bh",region:"emea"},{iso:"bd",region:"apac"},
+    {iso:"bb",region:"amer"},{iso:"by",region:"emea"},{iso:"be",region:"emea"},
+    {iso:"bz",region:"amer"},{iso:"bj",region:"emea"},{iso:"bm",region:"amer"},
+    {iso:"bt",region:"apac"},{iso:"bo",region:"amer"},{iso:"ba",region:"emea"},
+    {iso:"bw",region:"emea"},{iso:"br",region:"amer"},{iso:"bn",region:"apac"},
+    {iso:"bg",region:"emea"},{iso:"bf",region:"emea"},{iso:"bi",region:"emea"},
+    {iso:"kh",region:"apac"},{iso:"cm",region:"emea"},{iso:"ca",region:"amer"},
+    {iso:"ky",region:"amer"},{iso:"cf",region:"emea"},{iso:"td",region:"emea"},
+    {iso:"cl",region:"amer"},{iso:"cn",region:"apac"},{iso:"cx",region:"apac"},
+    {iso:"cc",region:"apac"},{iso:"co",region:"amer"},{iso:"km",region:"emea"},
+    {iso:"cg",region:"emea"},{iso:"cd",region:"emea"},{iso:"ck",region:"apac"},
+    {iso:"cr",region:"amer"},{iso:"ci",region:"emea"},{iso:"hr",region:"emea"},
+    {iso:"cu",region:"amer"},{iso:"cw",region:"amer"},{iso:"cy",region:"emea"},
+    {iso:"cz",region:"emea"},{iso:"dk",region:"emea"},{iso:"dj",region:"emea"},
+    {iso:"dm",region:"amer"},{iso:"do",region:"amer"},{iso:"ec",region:"amer"},
+    {iso:"eg",region:"emea"},{iso:"sv",region:"amer"},{iso:"gq",region:"emea"},
+    {iso:"er",region:"emea"},{iso:"ee",region:"emea"},{iso:"sz",region:"emea"},
+    {iso:"et",region:"emea"},{iso:"fk",region:"emea"},{iso:"fo",region:"emea"},
+    {iso:"fj",region:"apac"},{iso:"fi",region:"emea"},{iso:"fr",region:"emea"},
+    {iso:"gf",region:"amer"},{iso:"pf",region:"apac"},{iso:"tf",region:"emea"},
+    {iso:"ga",region:"emea"},{iso:"gm",region:"emea"},{iso:"ge",region:"emea"},
+    {iso:"de",region:"emea"},{iso:"gh",region:"emea"},{iso:"gi",region:"emea"},
+    {iso:"gr",region:"emea"},{iso:"gl",region:"emea"},{iso:"gd",region:"amer"},
+    {iso:"gp",region:"amer"},{iso:"gu",region:"apac"},{iso:"gt",region:"amer"},
+    {iso:"gg",region:"emea"},{iso:"gn",region:"emea"},{iso:"gw",region:"emea"},
+    {iso:"gy",region:"amer"},{iso:"ht",region:"amer"},{iso:"hm",region:"apac"},
+    {iso:"va",region:"emea"},{iso:"hn",region:"amer"},{iso:"hk",region:"apac"},
+    {iso:"hu",region:"emea"},{iso:"is",region:"emea"},{iso:"in",region:"apac"},
+    {iso:"id",region:"apac"},{iso:"ir",region:"emea"},{iso:"iq",region:"emea"},
+    {iso:"ie",region:"emea"},{iso:"im",region:"emea"},{iso:"il",region:"emea"},
+    {iso:"it",region:"emea"},{iso:"jm",region:"amer"},{iso:"jp",region:"apac"},
+    {iso:"je",region:"emea"},{iso:"jo",region:"emea"},{iso:"kz",region:"emea"},
+    {iso:"ke",region:"emea"},{iso:"ki",region:"apac"},{iso:"kp",region:"apac"},
+    {iso:"kr",region:"apac"},{iso:"kw",region:"emea"},{iso:"kg",region:"emea"},
+    {iso:"la",region:"apac"},{iso:"lv",region:"emea"},{iso:"lb",region:"emea"},
+    {iso:"ls",region:"emea"},{iso:"lr",region:"emea"},{iso:"ly",region:"emea"},
+    {iso:"li",region:"emea"},{iso:"lt",region:"emea"},{iso:"lu",region:"emea"},
+    {iso:"mo",region:"apac"},{iso:"mk",region:"emea"},{iso:"mg",region:"emea"},
+    {iso:"mw",region:"emea"},{iso:"my",region:"apac"},{iso:"mv",region:"apac"},
+    {iso:"ml",region:"emea"},{iso:"mt",region:"emea"},{iso:"mh",region:"apac"},
+    {iso:"mq",region:"amer"},{iso:"mr",region:"emea"},{iso:"mu",region:"emea"},
+    {iso:"yt",region:"emea"},{iso:"mx",region:"amer"},{iso:"fm",region:"apac"},
+    {iso:"md",region:"emea"},{iso:"mc",region:"emea"},{iso:"mn",region:"apac"},
+    {iso:"me",region:"emea"},{iso:"ms",region:"amer"},{iso:"ma",region:"emea"},
+    {iso:"mz",region:"emea"},{iso:"mm",region:"apac"},{iso:"na",region:"emea"},
+    {iso:"nr",region:"apac"},{iso:"np",region:"apac"},{iso:"nl",region:"emea"},
+    {iso:"nc",region:"apac"},{iso:"nz",region:"apac"},{iso:"ni",region:"amer"},
+    {iso:"ne",region:"emea"},{iso:"ng",region:"emea"},{iso:"nu",region:"apac"},
+    {iso:"nf",region:"apac"},{iso:"mp",region:"apac"},{iso:"no",region:"emea"},
+    {iso:"om",region:"emea"},{iso:"pk",region:"apac"},{iso:"pw",region:"apac"},
+    {iso:"ps",region:"emea"},{iso:"pa",region:"amer"},{iso:"pg",region:"apac"},
+    {iso:"py",region:"amer"},{iso:"pe",region:"amer"},{iso:"ph",region:"apac"},
+    {iso:"pn",region:"apac"},{iso:"pl",region:"emea"},{iso:"pt",region:"emea"},
+    {iso:"pr",region:"amer"},{iso:"qa",region:"emea"},{iso:"re",region:"emea"},
+    {iso:"ro",region:"emea"},{iso:"ru",region:"emea"},{iso:"rw",region:"emea"},
+    {iso:"bl",region:"amer"},{iso:"sh",region:"emea"},{iso:"kn",region:"amer"},
+    {iso:"lc",region:"amer"},{iso:"mf",region:"amer"},{iso:"pm",region:"amer"},
+    {iso:"vc",region:"amer"},{iso:"ws",region:"apac"},{iso:"sm",region:"emea"},
+    {iso:"st",region:"emea"},{iso:"sa",region:"emea"},{iso:"sn",region:"emea"},
+    {iso:"rs",region:"emea"},{iso:"sc",region:"emea"},{iso:"sl",region:"emea"},
+    {iso:"sg",region:"apac"},{iso:"sx",region:"amer"},{iso:"sk",region:"emea"},
+    {iso:"si",region:"emea"},{iso:"sb",region:"apac"},{iso:"so",region:"emea"},
+    {iso:"za",region:"emea"},{iso:"gs",region:"emea"},{iso:"ss",region:"emea"},
+    {iso:"es",region:"emea"},{iso:"lk",region:"apac"},{iso:"sd",region:"emea"},
+    {iso:"sr",region:"amer"},{iso:"sj",region:"emea"},{iso:"se",region:"emea"},
+    {iso:"ch",region:"emea"},{iso:"sy",region:"emea"},{iso:"tw",region:"apac"},
+    {iso:"tj",region:"emea"},{iso:"tz",region:"emea"},{iso:"th",region:"apac"},
+    {iso:"tl",region:"apac"},{iso:"tg",region:"emea"},{iso:"tk",region:"apac"},
+    {iso:"to",region:"apac"},{iso:"tt",region:"amer"},{iso:"tn",region:"emea"},
+    {iso:"tr",region:"emea"},{iso:"tm",region:"emea"},{iso:"tc",region:"amer"},
+    {iso:"tv",region:"apac"},{iso:"ug",region:"emea"},{iso:"ua",region:"emea"},
+    {iso:"ae",region:"emea"},{iso:"gb",region:"uk"},{iso:"us",region:"amer"},
+    {iso:"uy",region:"amer"},{iso:"uz",region:"emea"},{iso:"vu",region:"apac"},
+    {iso:"ve",region:"amer"},{iso:"vn",region:"apac"},{iso:"vg",region:"amer"},
+    {iso:"vi",region:"amer"},{iso:"wf",region:"apac"},{iso:"eh",region:"emea"},
+    {iso:"ye",region:"emea"},{iso:"zm",region:"emea"},{iso:"zw",region:"emea"}
+  ];
+
+  function countryToRegion(iso2) {
+    iso2 = (iso2 || '').toLowerCase();
+    var found = countryList.find(function (c) { return c.iso === iso2; });
+    return found ? found.region : null;
+  }
+
+  // html[data-location] → region hint
+  var locationToRegion = { us:'amer', ca:'amer', gb:'uk', uk:'uk', au:'apac', nz:'apac', eu:'emea' };
+
+  // region synonyms — we'll match against whatever buckets actually exist in DOM
+  var regionSynonyms = {
+    amer: ['amer','america','americas','na','us','usa','latam','ca'],
+    uk:   ['uk','gb','britain','united-kingdom'],
+    apac: ['apac','asia-pacific','anz','au','nz','oceania','asia'],
+    emea: ['emea','europe','eu','middle-east','me','africa'],
+    default: ['default','global','all']
+  };
+
+  function fallbackCountry() {
+    try {
+      // Priority 1: Timezone is the most reliable indicator of physical location
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      console.log('[LogoSet] Detected timezone:', tz);
+      
+      // Australia/New Zealand
+      if (/sydney|melbourne|brisbane|perth|adelaide|darwin|hobart|canberra/i.test(tz)) return 'au';
+      if (/auckland|wellington|christchurch/i.test(tz)) return 'nz';
+      // UK/Europe
+      if (/london|guernsey|jersey|isle_of_man/i.test(tz)) return 'gb';
+      if (/dublin/i.test(tz)) return 'ie';
+      // Americas
+      if (/new_york|chicago|los_angeles|denver|phoenix|detroit|atlanta|miami|seattle|boston/i.test(tz)) return 'us';
+      if (/toronto|vancouver|montreal|calgary|edmonton/i.test(tz)) return 'ca';
+      // Asia Pacific
+      if (/tokyo/i.test(tz)) return 'jp';
+      if (/singapore/i.test(tz)) return 'sg';
+      if (/hong_kong/i.test(tz)) return 'hk';
+      if (/shanghai|beijing/i.test(tz)) return 'cn';
+      if (/seoul/i.test(tz)) return 'kr';
+      if (/bangkok/i.test(tz)) return 'th';
+      if (/jakarta/i.test(tz)) return 'id';
+      if (/kuala_lumpur/i.test(tz)) return 'my';
+      if (/manila/i.test(tz)) return 'ph';
+      if (/kolkata|mumbai|delhi/i.test(tz)) return 'in';
+      
+      // Priority 2: Fall back to browser language if timezone didn't match
+      var lang = (navigator.language || '').toLowerCase();
+      var maybe = lang.split('-')[1];
+      if (maybe && maybe.length === 2) return maybe;
+    } catch (e) {
+      console.log('[LogoSet] Fallback detection error:', e);
+    }
+    return '';
+  }
+
+  function pickBestBucket(available, desired) {
+    var avail = new Set(available.map(function (s){return s.toLowerCase();}));
+    if (avail.has(desired)) return desired; // exact
+
+    var syns = regionSynonyms[desired] || [];
+    for (var i=0;i<syns.length;i++) if (avail.has(syns[i])) return syns[i];
+
+    var order = ['uk','amer','apac','emea','default'];
+    for (var j=0;j<order.length;j++){
+      var list = regionSynonyms[order[j]] || [];
+      for (var k=0;k<list.length;k++) if (avail.has(list[k])) return list[k];
+    }
+    return available[0] || 'default';
+  }
+
+  function initScrollerAnimation(visibleInner) {
+    if (!visibleInner) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var scroller = visibleInner.closest('.scroller');
+    if (!scroller || scroller.hasAttribute('data-animated')) return;
+
+    if (!visibleInner.querySelector('[aria-hidden="true"]')) {
+      Array.prototype.slice.call(visibleInner.children).forEach(function (child) {
+        var clone = child.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        visibleInner.appendChild(clone);
+      });
+    }
+    requestAnimationFrame(function(){ if (scroller) scroller.setAttribute('data-animated','true'); });
+  }
+
+  function ready(fn) {
+    if (document.readyState !== 'loading') fn();
+    else document.addEventListener('DOMContentLoaded', fn, { once: true });
+  }
+
+  ready(function () {
+    console.log('[LogoSet] DOM ready, initializing...');
+    var htmlLoc = (document.documentElement.getAttribute('data-location') || '').toLowerCase();
+
+    var modules = document.querySelectorAll('.logo-set-module');
+    console.log('[LogoSet] Found ' + modules.length + ' logo-set-module(s)');
+
+    modules.forEach(function (moduleEl, index) {
+      console.log('[LogoSet] Processing module #' + index);
+      try {
+        // Sources of truth priority:
+        // 1) data-country (server personalization)
+        // 2) html[data-location] hint
+        // 3) language/timezone fallback
+        var serverCountry = (moduleEl.getAttribute('data-country') || '').toLowerCase();
+        var hintRegion = (locationToRegion[htmlLoc] || '').toLowerCase();
+        var fbCountry = fallbackCountry();
+        
+        console.log('[LogoSet] Detection - serverCountry:', serverCountry, 'hintRegion:', hintRegion, 'fbCountry:', fbCountry);
+
+        var desiredRegion =
+          countryToRegion(serverCountry) ||
+          hintRegion ||
+          countryToRegion(fbCountry) ||
+          'amer'; // Default to AMER if no region detected
+          
+        console.log('[LogoSet] Desired region:', desiredRegion);
+
+        // Find available buckets in this module
+        var bucketEls = moduleEl.querySelectorAll('[data-logos]');
+        console.log('[LogoSet] Found', bucketEls.length, 'bucket elements with [data-logos]');
+        
+        var buckets = Array.prototype.map.call(bucketEls, function (el) {
+          return (el.getAttribute('data-logos') || '').toLowerCase();
+        }).filter(Boolean);
+        
+        console.log('[LogoSet] Available buckets:', buckets);
+
+        // If there are no data-logos buckets, just show the module
+        if (!buckets.length) {
+          console.log('[LogoSet] No buckets found, showing module as-is');
+          moduleEl.style.visibility = 'visible';
+          return;
+        }
+
+        var chosen = pickBestBucket(buckets, desiredRegion);
+        console.log('[LogoSet] Chosen bucket:', chosen);
+        
+        var chosenEl = null;
+
+        bucketEls.forEach(function (el) {
+          var v = (el.getAttribute('data-logos') || '').toLowerCase();
+          if (v === chosen) {
+            console.log('[LogoSet] Showing:', v);
+            el.classList.add('logo-set--visible');
+            chosenEl = el;
+          } else {
+            console.log('[LogoSet] Hiding:', v);
+            el.classList.remove('logo-set--visible');
+          }
+        });
+
+        moduleEl.style.visibility = 'visible';
+        requestAnimationFrame(function(){ initScrollerAnimation(chosenEl); });
+
+        console.log('[LogoSet] Module processing complete');
+      } catch (e) {
+        console.error('[LogoSet] Error:', e);
+        moduleEl.style.visibility = 'visible';
+      }
+    });
+  });
+})();
+</script>

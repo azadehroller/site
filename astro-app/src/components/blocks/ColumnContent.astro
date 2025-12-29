@@ -1,0 +1,363 @@
+---
+import { PortableText } from "astro-portabletext";
+import ImageVideoModal from "./ImageVideoModal.astro";
+import RotatingText from "./RotatingText.astro";
+import ButtonStack from "./ButtonStack.astro";
+import Button from "./Button.astro";
+import LogoSet from "./LogoSet.astro";
+import StatsSet from "./StatsSet.astro";
+import Quote from "./Quote.astro";
+import WidgetStats from "../globals/WidgetStats.astro";
+import WidgetUserReviews from "../globals/WidgetUserReviews.astro";
+import TestimonialCarousel from "../globals/TestimonialCarousel.astro";
+import FeaturesStackedContent from "./FeaturesStackedContent.astro";
+import HeadingComposition from "./HeadingComposition.astro";
+import AdvancedImage from "./AdvancedImage.astro";
+import TrustedPartner from "./TrustedPartner.astro";
+import HubspotForm from "./HubspotForm.astro";
+import type { ColumnContent as ColumnContentType, TextBlock, ImageBlock, ImageVideoModal as ImageVideoModalType, RotatingTextBlock, ButtonStack as ButtonStackType, SingleButton as SingleButtonType, LogoSet as LogoSetType, StatsSet as StatsSetType, QuoteBlock as QuoteBlockType, WidgetStatsReference, WidgetUserReviewsReference, TestimonialCarouselReference, FeaturesStackedContent as FeaturesStackedContentType, HeadingComposition as HeadingCompositionType, AdvancedImage as AdvancedImageType, TrustedPartner as TrustedPartnerType, HubspotFormReference } from "../../utils/sanity";
+import { urlFor } from "../../utils/image";
+import { cleanStega } from "../../utils/stega";
+import { createBlockEditInfo, createDataSanityAttrs, type SanityEditInfo } from "../../utils/visualEditing";
+
+interface Props {
+  content?: ColumnContentType[];
+  // Visual editing props
+  columnName?: string;
+  sectionKey?: string;
+  documentId?: string;
+  documentType?: string;
+}
+
+const { content, columnName, sectionKey, documentId, documentType } = Astro.props;
+
+// Helper to create edit info for a content block within this column
+function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
+  if (!documentId || !documentType || !sectionKey || !columnName || !itemKey) {
+    return null;
+  }
+  return createBlockEditInfo(documentId, documentType, sectionKey, columnName, itemKey);
+}
+---
+
+<div class="column-content">
+  {content?.map((item) => {
+    // Get edit info for this item (for visual editing click-to-edit)
+    const itemEditInfo = getItemEditInfo(item._key);
+    const editAttrs = createDataSanityAttrs(itemEditInfo);
+    
+    if (item._type === 'textBlock') {
+      const textBlock = item as TextBlock;
+      return textBlock.content ? (
+        <div class="text-block" {...editAttrs}>
+          <PortableText value={textBlock.content} />
+        </div>
+      ) : null;
+    } else if (item._type === 'imageVideoModal') {
+      const modal = item as ImageVideoModalType;
+      const thumbnailUrl = modal.thumbnail?.asset?.url;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <ImageVideoModal
+            thumbnail={{
+              src: thumbnailUrl || '',
+              // PRESERVE stega in alt for visual editing click-to-edit
+              alt: modal.thumbnail?.alt || '',
+            }}
+            // PRESERVE stega in videoId for visual editing
+            videoId={modal.videoId}
+            style={{
+              border: modal.border,
+              lightBackgroundShadow: modal.lightBackgroundShadow,
+            }}
+          />
+        </div>
+      );
+    } else if (item._type === 'rotatingTextBlock') {
+      const block = item as RotatingTextBlock;
+      // Clean stega from style values used in class names (must be clean for CSS)
+      // BUT keep stega in visible text content for click-to-edit
+      const cleanTheme = cleanStega(block.theme) as 'light' | 'dark' | 'gxscore' | undefined;
+      const cleanAlignment = cleanStega(block.textAlignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined;
+      const cleanHeadingType = cleanStega(block.headingType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined;
+      const cleanEyebrowType = cleanStega(block.eyebrowType) as 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined;
+      const cleanDisplayType = cleanStega(block.displayType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8' | undefined;
+      const cleanTextType = cleanStega(block.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined;
+      
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <RotatingText
+            content={{
+              // Keep stega encoding in visible text for click-to-edit
+              eyebrow: block.eyebrow,
+              title: block.title,
+              text: block.text,
+              rotatingText: block.rotatingText
+            }}
+            styles={{
+              rotatingTextLength: block.rotatingTextLength,
+              theme: cleanTheme,
+              textAlignment: cleanAlignment,
+              eyebrowType: cleanEyebrowType,
+              headingType: cleanHeadingType,
+              displayType: cleanDisplayType || undefined,
+              textType: cleanTextType
+            }}
+            id={cleanStega(block._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'image') {
+      const img = item as ImageBlock;
+      const imageUrl = img.asset?.url;
+      return imageUrl ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <img 
+            src={imageUrl} 
+            alt={cleanStega(img.alt)} 
+            class="w-full h-auto rounded-lg"
+            loading="lazy"
+          />
+        </div>
+      ) : null;
+    } else if (item._type === 'advancedImage') {
+      const advImg = item as AdvancedImageType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <AdvancedImage
+            image={advImg.image}
+            alt={advImg.alt}
+            caption={advImg.caption}
+            loading={cleanStega(advImg.loading) as 'lazy' | 'eager' | undefined}
+            fetchpriority={advImg.fetchpriority}
+            responsiveBehavior={cleanStega(advImg.responsiveBehavior) as 'fluid' | 'fixed' | undefined}
+            maxWidth={advImg.maxWidth}
+            customWidth={advImg.customWidth}
+            customHeight={advImg.customHeight}
+            aspectRatio={cleanStega(advImg.aspectRatio) as 'original' | '16/9' | '4/3' | '1/1' | '3/2' | '21/9' | undefined}
+            showButton={advImg.showButton}
+            buttonLink={advImg.buttonLink}
+            buttonText={advImg.buttonText}
+            buttonOpenInNewTab={advImg.buttonOpenInNewTab}
+            alignment={cleanStega(advImg.alignment) as 'left' | 'center' | 'right' | undefined}
+            borderRadius={cleanStega(advImg.borderRadius) as 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full' | undefined}
+            shadow={cleanStega(advImg.shadow) as 'none' | 'sm' | 'md' | 'lg' | 'blue-light' | 'blue-dark' | undefined}
+            objectFit={cleanStega(advImg.objectFit) as 'contain' | 'cover' | 'fill' | 'none' | undefined}
+            id={cleanStega(advImg._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'buttonStack') {
+      const buttonStackData = item as ButtonStackType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <ButtonStack
+            buttonList={buttonStackData.buttonList}
+            styles={buttonStackData.styles}
+          />
+        </div>
+      );
+    } else if (item._type === 'button') {
+      const buttonData = item as SingleButtonType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <Button
+            settings={buttonData.settings}
+            btnIcon={buttonData.btnIcon}
+            styles={buttonData.styles}
+            id={cleanStega(buttonData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'logoSet') {
+      const logoSetData = item as LogoSetType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <LogoSet
+            customTitle={logoSetData.customTitle}
+            amerLogos={logoSetData.amerLogos}
+            apacLogos={logoSetData.apacLogos}
+            emeaLogos={logoSetData.emeaLogos}
+            ukLogos={logoSetData.ukLogos}
+            theme={logoSetData.theme}
+            textAlignment={logoSetData.textAlignment}
+            showDivider={logoSetData.showDivider}
+          />
+        </div>
+      );
+    } else if (item._type === 'statsSet') {
+      const statsSetData = item as StatsSetType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <StatsSet
+            stats={statsSetData.stats}
+            theme={cleanStega(statsSetData.theme) as 'light' | 'dark' | undefined}
+            textType={cleanStega(statsSetData.textType) as '2xl' | 'xl' | 'base' | 'sm' | 'xs' | undefined}
+            spacingStyle={cleanStega(statsSetData.spacingStyle) as 'default' | 'small' | undefined}
+            id={cleanStega(statsSetData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'quoteBlock') {
+      const quoteData = item as QuoteBlockType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <Quote
+            quoteText={quoteData.quoteText}
+            quoteAuthor={quoteData.quoteAuthor}
+            quoteTitle={quoteData.quoteTitle}
+            customerStoryLink={quoteData.customerStoryLink}
+            linkLabel={quoteData.linkLabel}
+            imageType={cleanStega(quoteData.imageType) as 'none' | 'avatar' | 'logo' | undefined}
+            avatar={quoteData.avatar}
+            avatarAlt={quoteData.avatarAlt}
+            logo={quoteData.logo}
+            logoAlt={quoteData.logoAlt}
+            theme={cleanStega(quoteData.theme) as 'light' | 'dark' | 'gxscore' | undefined}
+            styleVariant={cleanStega(quoteData.styleVariant) as 'extrabold' | 'regular' | undefined}
+            id={cleanStega(quoteData._key)}
+            documentId={documentId}
+            documentType={documentType}
+            sectionKey={sectionKey}
+            columnName={columnName}
+            itemKey={quoteData._key}
+          />
+        </div>
+      );
+    } else if (item._type === 'widgetStatsReference') {
+      const widgetStatsRef = item as WidgetStatsReference;
+      const statsData = widgetStatsRef.reference;
+      return statsData ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <WidgetStats
+            eyebrow={statsData.eyebrow}
+            title={statsData.title}
+            blurb={statsData.blurb}
+            stats={statsData.stats}
+            horizontalLayout={statsData.horizontalLayout}
+          />
+        </div>
+      ) : null;
+    } else if (item._type === 'widgetUserReviewsReference') {
+      const widgetUserReviewsRef = item as WidgetUserReviewsReference;
+      const reviewsData = widgetUserReviewsRef.reference;
+      return reviewsData ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <WidgetUserReviews
+            eyebrow={reviewsData.eyebrow}
+            title={reviewsData.title}
+            text={reviewsData.text}
+            badges={reviewsData.badges}
+            theme={cleanStega(reviewsData.theme) as 'light' | 'dark' | 'gxscore' | undefined}
+            textAlignment={cleanStega(reviewsData.textAlignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined}
+            eyebrowType={cleanStega(reviewsData.eyebrowType)}
+            headingType={cleanStega(reviewsData.headingType)}
+            displayType={cleanStega(reviewsData.displayType)}
+            textType={cleanStega(reviewsData.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined}
+          />
+        </div>
+      ) : null;
+    } else if (item._type === 'testimonialCarouselReference') {
+      const testimonialCarouselRef = item as TestimonialCarouselReference;
+      const carouselData = testimonialCarouselRef.reference;
+      return carouselData ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <TestimonialCarousel
+            eyebrow={carouselData.eyebrow}
+            testimonials={carouselData.testimonials}
+          />
+        </div>
+      ) : null;
+    } else if (item._type === 'featuresStackedContent') {
+      const featuresData = item as FeaturesStackedContentType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <FeaturesStackedContent
+            items={featuresData.items}
+            theme={cleanStega(featuresData.theme) as 'light' | 'dark' | 'gxscore' | undefined}
+            textAlignment={cleanStega(featuresData.textAlignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined}
+            eyebrowType={cleanStega(featuresData.eyebrowType)}
+            eyebrowStyle={cleanStega(featuresData.eyebrowStyle) as 'red' | 'gradient' | undefined}
+            headingType={cleanStega(featuresData.headingType)}
+            displayType={cleanStega(featuresData.displayType)}
+            textType={cleanStega(featuresData.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined}
+            id={cleanStega(featuresData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'headingComposition') {
+      const headingData = item as HeadingCompositionType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <HeadingComposition
+            eyebrow={headingData.eyebrow}
+            title={headingData.title}
+            text={headingData.text}
+            theme={cleanStega(headingData.theme) as 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight' | undefined}
+            textAlignment={cleanStega(headingData.textAlignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined}
+            eyebrowType={cleanStega(headingData.eyebrowType) as 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}
+            eyebrowStyle={cleanStega(headingData.eyebrowStyle) as 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient' | undefined}
+            headingType={cleanStega(headingData.headingType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}
+            displayType={cleanStega(headingData.displayType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8' | undefined}
+            textType={cleanStega(headingData.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined}
+            id={cleanStega(headingData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'trustedPartner') {
+      const trustedPartnerData = item as TrustedPartnerType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <TrustedPartner
+            eyebrow={trustedPartnerData.eyebrow}
+            title={trustedPartnerData.title}
+            text={trustedPartnerData.text}
+            theme={cleanStega(trustedPartnerData.theme) as 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight' | undefined}
+            textAlignment={cleanStega(trustedPartnerData.textAlignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined}
+            eyebrowType={cleanStega(trustedPartnerData.eyebrowType) as 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}
+            eyebrowStyle={cleanStega(trustedPartnerData.eyebrowStyle) as 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient' | undefined}
+            headingType={cleanStega(trustedPartnerData.headingType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}
+            displayType={cleanStega(trustedPartnerData.displayType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8' | undefined}
+            textType={cleanStega(trustedPartnerData.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined}
+            badges={trustedPartnerData.userReviews?.badges}
+            backgroundColor={trustedPartnerData.backgroundColor}
+            customBackgroundColor={trustedPartnerData.customBackgroundColor}
+            backgroundImage={trustedPartnerData.backgroundImage?.asset?.url}
+            backgroundPosition={trustedPartnerData.backgroundPosition}
+            backgroundSize={trustedPartnerData.backgroundSize}
+            cardPadding={trustedPartnerData.cardPadding}
+            borderRadius={trustedPartnerData.borderRadius}
+          />
+        </div>
+      );
+    } else if (item._type === 'hubspotFormReference') {
+      const formRef = item as HubspotFormReference;
+      const formData = formRef.form;
+      // Only render if we have the required form data (portalId and formId)
+      return formData && formData.portalId && formData.formId ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <HubspotForm
+            portalId={formData.portalId}
+            formId={formData.formId}
+            region={formData.region}
+            formName={formData.name}
+            theme={cleanStega(formRef.theme) as 'light' | 'dark' | undefined}
+          />
+        </div>
+      ) : null;
+    }
+  })}
+</div>
+
+<style>
+  .column-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Wrapper for content blocks - provides visual editing target */
+  .content-block-wrapper {
+    display: contents;
+  }
+</style>

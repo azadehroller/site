@@ -1,0 +1,395 @@
+---
+interface Props {
+  content: {
+    eyebrow?: string;
+    title: string;
+    text?: string;
+    rotatingText?: { rotatingTextItem: string }[];
+  };
+  styles?: {
+    rotatingTextLength?: number;
+    theme?: 'light' | 'dark' | 'gxscore';
+    textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+    eyebrowType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'div';
+    headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+    displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+    textType?: '2xl' | 'lg' | 'base' | 'sm' | 'xs';
+  };
+  id?: string;
+}
+
+const {
+  content,
+  styles = {},
+  id = `rotating-text-${Math.random().toString(36).substr(2, 9)}`
+} = Astro.props;
+
+// Content
+const eyebrow = content.eyebrow;
+const title = content.title;
+const text = content.text;
+const rotatingTextGroup = content.rotatingText || [];
+
+// Styles with defaults
+const theme = styles.theme ?? 'dark';
+const headingType = styles.headingType ?? 'h3';
+const alignment = styles.textAlignment ?? 'CENTER';
+const textType = styles.textType;
+const eyebrowType = styles.eyebrowType ?? 'div';
+const displayType = styles.displayType;
+const textLength = styles.rotatingTextLength ?? 50;
+
+// Unique class name for scoped styles
+const uniqueName = id?.replace(/[^a-zA-Z0-9]/g, '-') || 'default';
+
+// Helper function to get height classes based on heading type
+function getHeightClasses(tag: string): string {
+  switch (tag) {
+    case 'h1':
+      return 'h-[44px] sm:h-[45px] md:h-[44px] lg:h-[52px]';
+    case 'h2':
+      return 'h-[35px] md:h-[40px] lg:h-auto';
+    case 'h3':
+      return 'h-[35px] md:h-[45px] lg:h-[50px]';
+    case 'h4':
+    case 'h5':
+      return 'h-[20px] md:h-[25px] lg:h-[30px]';
+    case 'h6':
+      return 'h-[20px]';
+    default:
+      return 'h-[35px] md:h-[45px] lg:h-[50px]';
+  }
+}
+
+// Helper function to get text color based on theme
+// theme='dark' means dark background, so use white/light text
+// theme='light' means light background, so use dark text
+function getTextColor(themeColor: string): { header: string; eyebrow: string } {
+  switch (themeColor) {
+    case 'dark':
+      return { header: 'text-neutral-white', eyebrow: 'text-secondary-50' };
+    case 'light':
+      return { header: 'text-primary-50', eyebrow: 'text-secondary-50' };
+    case 'gxscore':
+      return { header: 'text-gx-80', eyebrow: 'text-gx-90' };
+    default:
+      return { header: 'text-neutral-white', eyebrow: 'text-secondary-50' };
+  }
+}
+
+const colors = getTextColor(theme);
+const headerTextColor = colors.header;
+const eyebrowTextColor = colors.eyebrow;
+
+// Filter rotating text items that have content
+const validRotatingItems = rotatingTextGroup.filter(item => item.rotatingTextItem);
+
+// Heading tag element
+const HeadingTag = headingType || 'h3';
+const EyebrowTag = eyebrowType || 'div';
+---
+
+<header 
+  id={id} 
+  class:list={[
+    "grid gap-4",
+    `text-${alignment.toLowerCase()}`,
+    headerTextColor
+  ]}
+>
+  {eyebrow && (
+    <EyebrowTag 
+      id="js-referred-name" 
+      class:list={[
+        eyebrowTextColor,
+        "uppercase font-extrabold",
+        eyebrowType && "small"
+      ]}
+    >
+      {eyebrow}
+    </EyebrowTag>
+  )}
+        
+  <div      
+  class:list={[
+    "flex",
+    alignment === 'CENTER' 
+      ? "is-centered flex-col justify-center items-center gap-0 md:gap-2" 
+      : "flex-col  items-start gap-2 md:gap-3"
+  ]}>
+    <div>
+      <HeadingTag class:list={[
+        displayType && `${displayType}-heading`,
+        "my-0 active",
+        headingType === 'h1' && "text-balance"
+      ]}>
+        {title}
+      </HeadingTag>
+    </div>
+    
+    {validRotatingItems.length > 0 && (
+      <div 
+        class:list={[
+          `rotation-wrapper-${uniqueName}`,
+          getHeightClasses(headingType)
+        ]}
+      >
+        {validRotatingItems.map((item, index) => (
+          <div 
+            class:list={[
+              `js-rotating-text-item-${uniqueName}`,
+              "mt-0 mb-0",
+              `s${index + 1}`,
+              index === 0 && "active"
+            ]}
+          >
+            <HeadingTag class:list={[
+              displayType && `${displayType}-heading`,
+              "my-0",
+              headingType === 'h1' && "text-balance"
+            ]}>
+              {item.rotatingTextItem}
+            </HeadingTag>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+  
+  {text && (
+    <div class={textType ? `text-${textType}` : ''} set:html={text} />
+  )}
+</header>
+
+<style set:html={`
+    /* ===================================
+       Tailwind Utility Fallbacks
+       =================================== */
+    
+    /* Layout */
+    .grid { display: grid; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    @media (min-width: 1024px) {
+        .lg\\:flex-row { flex-direction: row; }
+    }
+    
+    /* Alignment */
+    .items-start { align-items: flex-start; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .is-centered { text-align: center; }
+    
+    /* Gap */
+    .gap-0 { gap: 0; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
+    @media (min-width: 768px) {
+        .md\\:gap-2 { gap: 0.5rem; }
+        .md\\:gap-3 { gap: 0.75rem; }
+    }
+    
+    /* Text alignment */
+    .text-left { text-align: left; }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    
+    /* Text colors - using CSS variables from global.css */
+    .text-neutral-white { color: var(--neutral-white, #fff); }
+    .text-primary-50 { color: var(--primary-50, #033180); }
+    .text-secondary-50 { color: var(--secondary-50, #ff290c); }
+    .text-gx-80 { color: #8B5CF6; }
+    .text-gx-90 { color: #7C3AED; }
+    
+    /* Typography */
+    .uppercase { text-transform: uppercase; }
+    .font-extrabold { font-weight: 800; }
+    .text-balance { text-wrap: balance; }
+    .small { font-size: 0.875rem; }
+    
+    /* Text sizes */
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-base { font-size: 1rem; line-height: 1.5rem; }
+    .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    
+    /* Margin */
+    .my-0 { margin-top: 0; margin-bottom: 0; }
+    .mt-0 { margin-top: 0; }
+    .mb-0 { margin-bottom: 0; }
+    
+    /* Height classes - arbitrary values */
+    .h-\\[44px\\] { height: 44px; }
+    .h-\\[35px\\] { height: 35px; }
+    .h-\\[20px\\] { height: 20px; }
+    @media (min-width: 640px) {
+        .sm\\:h-\\[45px\\] { height: 45px; }
+    }
+    @media (min-width: 768px) {
+        .md\\:h-\\[44px\\] { height: 44px; }
+        .md\\:h-\\[40px\\] { height: 40px; }
+        .md\\:h-\\[45px\\] { height: 45px; }
+        .md\\:h-\\[25px\\] { height: 25px; }
+        .md\\:h-auto { height: auto; }
+    }
+    @media (min-width: 1024px) {
+        .lg\\:h-\\[52px\\] { height: 52px; }
+        .lg\\:h-\\[50px\\] { height: 50px; }
+        .lg\\:h-\\[30px\\] { height: 30px; }
+        .lg\\:h-auto { height: auto; }
+    }
+    
+    /* Heading display classes */
+    .h1-heading {
+        font-size: clamp(2rem, 4vw, 4rem);
+        font-weight: 800;
+        line-height: 1.12;
+    }
+    .h2-heading {
+        font-size: clamp(1.75rem, 3.5vw, 3rem);
+        font-weight: 800;
+        line-height: 1.25;
+    }
+    .h3-heading {
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
+        font-weight: 700;
+        line-height: 1.25;
+    }
+    .h4-heading {
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    .h5-heading {
+        font-size: 1.25rem;
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    .h6-heading {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    .s8-heading {
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    
+    /* ===================================
+       Rotating Text Animation Styles
+       =================================== */
+    
+    .rotation-wrapper-${uniqueName} {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    @media (min-width: 430px) {
+        .rotation-wrapper-${uniqueName} {
+            width: ${alignment === 'CENTER' ? '100%' : `${textLength}%`};
+        }
+    }
+
+    /* CRITICAL: First item is visible by default for LCP */
+    .js-rotating-text-item-${uniqueName} {
+        display: none;
+        position: absolute;
+        left: 0;
+        bottom: ${alignment === 'CENTER' ? '-5px' : '0'};
+        width: ${alignment === 'CENTER' ? '100%' : 'auto'};
+    }
+    
+    /* First item visible immediately without JS */
+    .js-rotating-text-item-${uniqueName}:first-child {
+        display: block;
+        position: relative;
+    }
+    
+    /* After JS loads, all items become absolute and animated */
+    .js-loaded .js-rotating-text-item-${uniqueName} {
+        display: block;
+        position: absolute;
+        opacity: 0;
+        transform: translateY(100%);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    /* Active item is visible */
+    .js-loaded .js-rotating-text-item-${uniqueName}.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Exiting item moves up */
+    .js-loaded .js-rotating-text-item-${uniqueName}.exit {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+
+`}></style>
+
+<script define:vars={{ uniqueName }}>
+  // Defer animation initialization to avoid blocking LCP
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRotation);
+  } else {
+    // DOM already loaded, wait a bit for paint
+    requestAnimationFrame(() => {
+      setTimeout(initRotation, 100);
+    });
+  }
+  
+  function initRotation() {
+    const wrapper = document.querySelector(`.rotation-wrapper-${uniqueName}`);
+    const texts = document.querySelectorAll(`.js-rotating-text-item-${uniqueName}`);
+    const count = texts.length;
+    
+    // Only rotate if there are multiple items
+    if (count <= 1) return;
+    
+    // Small delay to ensure first paint completes
+    setTimeout(() => {
+      // Enable animations
+      if (wrapper) {
+        wrapper.classList.add('js-loaded');
+      }
+      
+      let currentIndex = 0;
+      
+      // Ensure first item is marked as active
+      texts[0].classList.add('active');
+      
+      function rotate() {
+        // Remove active from current
+        texts[currentIndex].classList.remove('active');
+        texts[currentIndex].classList.add('exit');
+        
+        // Move to next index
+        currentIndex = (currentIndex + 1) % count;
+        
+        // Add active to next
+        texts[currentIndex].classList.add('active');
+        texts[currentIndex].classList.remove('exit');
+        
+        // Clean up exit class from previous item after animation
+        setTimeout(() => {
+          texts.forEach((text, idx) => {
+            if (idx !== currentIndex) {
+              text.classList.remove('exit');
+            }
+          });
+        }, 600);
+      }
+      
+      // Start rotating after initial delay
+      setInterval(rotate, 3500);
+      
+    }, 500);
+  }
+</script>
+

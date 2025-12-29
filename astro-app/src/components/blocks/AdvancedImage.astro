@@ -1,0 +1,432 @@
+---
+import { cleanStega } from '../../utils/stega';
+import { isImageReady, urlFor } from '../../utils/image';
+
+export interface Props {
+  image?: any; // Sanity image object
+  alt?: string;
+  caption?: string;
+  // Performance
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: boolean;
+  // Dimensions
+  responsiveBehavior?: 'fluid' | 'fixed';
+  maxWidth?: number;
+  customWidth?: number;
+  customHeight?: number;
+  aspectRatio?: 'original' | '16/9' | '4/3' | '1/1' | '3/2' | '21/9';
+  // Button overlay
+  showButton?: boolean;
+  buttonLink?: string;
+  buttonText?: string;
+  buttonOpenInNewTab?: boolean;
+  // Style
+  alignment?: 'left' | 'center' | 'right';
+  borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  shadow?: 'none' | 'sm' | 'md' | 'lg' | 'blue-light' | 'blue-dark';
+  objectFit?: 'contain' | 'cover' | 'fill' | 'none';
+  // Internal
+  id?: string;
+}
+
+const {
+  image,
+  alt = '',
+  caption,
+  loading = 'lazy',
+  fetchpriority = true,
+  responsiveBehavior = 'fluid',
+  maxWidth,
+  customWidth,
+  customHeight,
+  aspectRatio = 'original',
+  showButton = false,
+  buttonLink = '',
+  buttonText = 'Learn More',
+  buttonOpenInNewTab = true,
+  alignment = 'center',
+  borderRadius = 'none',
+  shadow = 'none',
+  objectFit = 'contain',
+  id = `advanced-image-${Math.random().toString(36).substr(2, 9)}`
+} = Astro.props;
+
+// Clean stega from style values that are used in CSS classes
+const cleanLoading = cleanStega(loading) as 'lazy' | 'eager';
+const cleanAlignment = cleanStega(alignment) as 'left' | 'center' | 'right';
+const cleanBorderRadius = cleanStega(borderRadius) as 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+const cleanShadow = cleanStega(shadow) as 'none' | 'sm' | 'md' | 'lg' | 'blue-light' | 'blue-dark';
+const cleanObjectFit = cleanStega(objectFit) as 'contain' | 'cover' | 'fill' | 'none';
+const cleanResponsiveBehavior = cleanStega(responsiveBehavior) as 'fluid' | 'fixed';
+const cleanAspectRatio = cleanStega(aspectRatio) as 'original' | '16/9' | '4/3' | '1/1' | '3/2' | '21/9';
+
+// Clean stega from alt text - stega characters must NOT appear in HTML attributes
+const cleanAltText = cleanStega(alt) || '';
+// Keep original alt with stega for visual editing overlay (hidden span)
+const altWithStega = alt || '';
+
+// Clean button-related values
+const cleanButtonLink = cleanStega(buttonLink);
+const cleanButtonText = cleanStega(buttonText) || 'Learn More';
+const cleanShowButton = showButton && cleanButtonLink;
+
+// Clean caption
+const cleanCaption = cleanStega(caption);
+
+// Fetch priority is only "high" when loading is eager
+const fetchPriorityAttr = cleanLoading === 'eager' && fetchpriority ? 'high' : undefined;
+
+// Determine dimensions
+const canBuildResponsive = isImageReady(image);
+let width = customWidth || 800;
+let height = customHeight || 600;
+
+// If we have a Sanity image, try to get original dimensions
+if (canBuildResponsive && image.asset?.metadata?.dimensions) {
+  const dims = image.asset.metadata.dimensions;
+  width = customWidth || dims.width || 800;
+  height = customHeight || dims.height || 600;
+}
+
+// Calculate aspect ratio for styling
+function getAspectRatioValue(ratio: string): string | undefined {
+  const ratioMap: Record<string, string> = {
+    '16/9': '16 / 9',
+    '4/3': '4 / 3',
+    '1/1': '1 / 1',
+    '3/2': '3 / 2',
+    '21/9': '21 / 9',
+  };
+  return ratioMap[ratio];
+}
+
+const aspectRatioStyle = cleanAspectRatio !== 'original' ? getAspectRatioValue(cleanAspectRatio) : undefined;
+
+// Build image URL with Sanity's image URL builder for optimal delivery
+const baseWidth = cleanResponsiveBehavior === 'fixed' ? (customWidth || width) : (maxWidth || 1200);
+const baseHeight = cleanResponsiveBehavior === 'fixed' && customHeight 
+  ? customHeight 
+  : Math.round(baseWidth * (height / width));
+
+const src = canBuildResponsive 
+  ? urlFor(image).width(baseWidth).height(baseHeight).auto('format').url()
+  : '';
+
+// Generate responsive srcset for fluid images
+const SRCSET_WIDTHS = [320, 480, 640, 800, 1024, 1280, 1600, 1920];
+const srcset = canBuildResponsive && cleanResponsiveBehavior === 'fluid'
+  ? SRCSET_WIDTHS
+      .filter(w => w <= (maxWidth || 1920))
+      .map((w) => {
+        const h = Math.round(w * (height / width));
+        return `${urlFor(image).width(w).height(h).auto('format').url()} ${w}w`;
+      })
+      .join(', ')
+  : undefined;
+
+// Sizes attribute for responsive images
+const sizes = cleanResponsiveBehavior === 'fluid'
+  ? maxWidth 
+    ? `(max-width: ${maxWidth}px) 100vw, ${maxWidth}px`
+    : '(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px'
+  : undefined;
+
+// Border radius classes
+const borderRadiusClass: Record<string, string> = {
+  'none': '',
+  'sm': 'rounded-lg',
+  'md': 'rounded-2xl',
+  'lg': 'rounded-3xl',
+  'xl': 'rounded-[2rem]',
+  'full': 'rounded-full',
+};
+
+// Shadow classes
+const shadowClass: Record<string, string> = {
+  'none': '',
+  'sm': 'shadow-sm',
+  'md': 'shadow-md',
+  'lg': 'shadow-lg',
+  'blue-light': 'advanced-image--shadow-blue-light',
+  'blue-dark': 'advanced-image--shadow-blue-dark',
+};
+
+// Object fit classes
+const objectFitClass: Record<string, string> = {
+  'contain': 'object-contain',
+  'cover': 'object-cover',
+  'fill': 'object-fill',
+  'none': 'object-none',
+};
+---
+
+{canBuildResponsive ? (
+  <div 
+    id={id}
+    class:list={[
+      "advanced-image-wrapper",
+      `advanced-image-wrapper--align-${cleanAlignment}`,
+      cleanShowButton && "advanced-image-wrapper--has-button"
+    ]}
+    data-sanity-edit-target
+  >
+    <figure 
+      class:list={[
+        "advanced-image-figure",
+        cleanResponsiveBehavior === 'fluid' && "advanced-image-figure--fluid",
+        cleanResponsiveBehavior === 'fixed' && "advanced-image-figure--fixed",
+      ]}
+      style={maxWidth && cleanResponsiveBehavior === 'fluid' ? `max-width: ${maxWidth}px;` : undefined}
+    >
+      <div 
+        class:list={[
+          "advanced-image-container",
+          borderRadiusClass[cleanBorderRadius],
+          shadowClass[cleanShadow],
+        ]}
+        style={aspectRatioStyle ? `aspect-ratio: ${aspectRatioStyle};` : undefined}
+      >
+        <img
+          src={src}
+          alt={cleanAltText}
+          width={cleanResponsiveBehavior === 'fixed' ? customWidth : undefined}
+          height={cleanResponsiveBehavior === 'fixed' ? customHeight : undefined}
+          loading={cleanLoading}
+          fetchpriority={fetchPriorityAttr}
+          decoding="async"
+          srcset={srcset}
+          sizes={sizes}
+          class:list={[
+            "advanced-image",
+            cleanResponsiveBehavior === 'fluid' && "advanced-image--fluid",
+            cleanResponsiveBehavior === 'fixed' && "advanced-image--fixed",
+            objectFitClass[cleanObjectFit],
+            borderRadiusClass[cleanBorderRadius],
+          ]}
+        />
+        {/* Hidden span with stega-encoded alt for visual editing click-to-edit */}
+        <span class="sr-only advanced-image__alt-edit">{altWithStega}</span>
+        
+        {cleanShowButton && (
+          <a 
+            href={cleanButtonLink}
+            target={buttonOpenInNewTab ? "_blank" : undefined}
+            rel={buttonOpenInNewTab ? "noopener noreferrer" : undefined}
+            class="advanced-image-button"
+          >
+            {cleanButtonText}
+          </a>
+        )}
+      </div>
+      
+      {cleanCaption && (
+        <figcaption class="advanced-image-caption">
+          {cleanCaption}
+        </figcaption>
+      )}
+    </figure>
+  </div>
+) : (
+  <div 
+    id={id}
+    class="advanced-image-placeholder"
+    data-sanity-edit-target
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21 15 16 10 5 21"/>
+    </svg>
+    <span>Select an image</span>
+  </div>
+)}
+
+<style>
+  /* ===================================
+     Advanced Image Component Styles
+     =================================== */
+  
+  /* Wrapper - controls alignment */
+  .advanced-image-wrapper {
+    display: block;
+    width: 100%;
+  }
+  
+  .advanced-image-wrapper--align-left {
+    text-align: left;
+  }
+  
+  .advanced-image-wrapper--align-center {
+    text-align: center;
+  }
+  
+  .advanced-image-wrapper--align-right {
+    text-align: right;
+  }
+  
+  /* Figure element */
+  .advanced-image-figure {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .advanced-image-figure--fluid {
+    max-width: 100%;
+  }
+  
+  .advanced-image-figure--fixed {
+    width: auto;
+  }
+  
+  /* Container - holds image and button overlay */
+  .advanced-image-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Image styles */
+  .advanced-image {
+    display: block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  
+  .advanced-image--fluid {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+  
+  .advanced-image--fixed {
+    /* Uses explicit width/height attributes */
+  }
+  
+  /* Hover effect when button is present */
+  .advanced-image-wrapper--has-button .advanced-image {
+    mask-image: linear-gradient(to left, transparent 0%, #fff 90%, #fff 100%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, transparent 0%, #fff 90%, #fff 100%, transparent 100%);
+  }
+  
+  .advanced-image-wrapper--has-button:hover .advanced-image {
+    filter: brightness(0.85);
+    transform: scale(1.02);
+  }
+  
+  /* Button overlay */
+  .advanced-image-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: rgba(9, 96, 246, 0.95);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-decoration: none;
+    border-radius: 9999px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  .advanced-image-button:hover {
+    background-color: #0960F6;
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 8px 24px rgba(9, 96, 246, 0.4);
+  }
+  
+  .advanced-image-button:focus {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  
+  /* Caption */
+  .advanced-image-caption {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+  }
+  
+  /* Shadow variants */
+  .advanced-image--shadow-blue-light {
+    box-shadow: 0 24px 40px 0 rgba(7, 77, 197, 0.10), 0 8px 16px 0 rgba(7, 77, 197, 0.05);
+  }
+  
+  .advanced-image--shadow-blue-dark {
+    box-shadow: 0 24px 40px 0 rgba(1, 24, 64, 0.50), 0 8px 16px 0 rgba(1, 24, 64, 0.25);
+  }
+  
+  /* Placeholder styling */
+  .advanced-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 200px;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 2px dashed #d1d5db;
+    border-radius: 1rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .advanced-image-placeholder svg {
+    opacity: 0.5;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .advanced-image-button {
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+    }
+    
+    .advanced-image-caption {
+      font-size: 0.8125rem;
+    }
+  }
+  
+  /* Loading state */
+  .advanced-image[loading="lazy"] {
+    /* Placeholder styles while loading */
+  }
+  
+  .advanced-image[loading="eager"] {
+    /* Priority loading styles */
+  }
+  
+  /* Screen reader only - visually hidden but accessible for visual editing stega detection */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  /* Alt text hidden element for visual editing */
+  .advanced-image__alt-edit {
+    pointer-events: none;
+  }
+</style>
+

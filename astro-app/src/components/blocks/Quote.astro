@@ -1,0 +1,471 @@
+---
+/**
+ * Quote - A testimonial quote component
+ * Matches the HubSpot quote.module HTML structure
+ * 
+ * Features:
+ * - Quote text with author name and title
+ * - Optional avatar or logo image
+ * - Optional customer story link with arrow button
+ * - Theme options (OnDark, OnLight, GxScore)
+ * - Style variants (Medium - extrabold, Small - regular)
+ * - Visual editing support with stega handling
+ */
+import { cleanStega } from '../../utils/stega';
+import { urlFor } from '../../utils/image';
+import { normalizeDocumentId } from '../../utils/visualEditing';
+
+interface CustomerStoryLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface SanityImageAsset {
+  _ref?: string;
+  url?: string;
+}
+
+interface SanityImage {
+  asset?: SanityImageAsset;
+}
+
+interface Props {
+  quoteText?: string;
+  quoteAuthor?: string;
+  quoteTitle?: string;
+  customerStoryLink?: CustomerStoryLink;
+  linkLabel?: string;
+  imageType?: 'none' | 'avatar' | 'logo';
+  avatar?: SanityImage;
+  avatarAlt?: string;
+  logo?: SanityImage;
+  logoAlt?: string;
+  theme?: 'light' | 'dark' | 'gxscore';
+  styleVariant?: 'extrabold' | 'regular';
+  id?: string;
+  // Visual editing context
+  documentId?: string;
+  documentType?: string;
+  sectionKey?: string;
+  columnName?: string;
+  itemKey?: string;
+}
+
+const {
+  quoteText: rawQuoteText,
+  quoteAuthor: rawQuoteAuthor,
+  quoteTitle: rawQuoteTitle,
+  customerStoryLink,
+  linkLabel: rawLinkLabel = 'Read more',
+  imageType: rawImageType = 'none',
+  avatar,
+  avatarAlt: rawAvatarAlt = 'Quote Image',
+  logo,
+  logoAlt: rawLogoAlt = '',
+  theme: rawTheme = 'dark',
+  styleVariant: rawStyleVariant = 'extrabold',
+  id,
+  // Visual editing context
+  documentId,
+  documentType,
+  sectionKey,
+  columnName,
+  itemKey,
+} = Astro.props;
+
+// Create field-specific edit info for visual editing
+function createFieldEditInfo(fieldName: string): Record<string, string> {
+  if (!documentId || !documentType || !sectionKey || !columnName || !itemKey) {
+    return {};
+  }
+  
+  const normalizedId = normalizeDocumentId(documentId);
+  const path = `sections[_key=="${sectionKey}"].${columnName}[_key=="${itemKey}"].${fieldName}`;
+  
+  return {
+    'data-sanity-edit-target': '',
+    'data-sanity-edit-info': JSON.stringify({
+      id: normalizedId,
+      type: documentType,
+      path
+    })
+  };
+}
+
+// Clean stega from style values for CSS classes (these are used in logic/CSS)
+const theme = cleanStega(rawTheme) || 'dark';
+const styleVariant = cleanStega(rawStyleVariant) || 'extrabold';
+const imageType = cleanStega(rawImageType) || 'none';
+
+// PRESERVE stega in visible text content for visual editing click-to-edit
+// The stega characters are invisible zero-width Unicode and enable Sanity Presentation to detect clicks
+const quoteText = rawQuoteText;
+const quoteAuthor = rawQuoteAuthor;
+const quoteTitle = rawQuoteTitle;
+const linkLabel = rawLinkLabel;
+// Alt text should also preserve stega for editing
+const avatarAlt = rawAvatarAlt;
+const logoAlt = rawLogoAlt;
+
+// Get image URLs - cast to any for urlFor compatibility
+const avatarUrl = avatar?.asset?.url || (avatar?.asset?._ref ? urlFor(avatar as any).width(72).height(72).url() : '');
+const logoUrl = logo?.asset?.url || (logo?.asset?._ref ? urlFor(logo as any).width(148).height(80).url() : '');
+
+// Build href and rel attributes (clean stega from URL since it's used in href attribute)
+const href = cleanStega(customerStoryLink?.href) || '';
+const openInNewTab = customerStoryLink?.openInNewTab || false;
+const noFollow = customerStoryLink?.noFollow || false;
+
+let relValue = '';
+const relParts: string[] = [];
+if (noFollow) relParts.push('nofollow');
+if (openInNewTab) relParts.push('noopener');
+if (relParts.length > 0) relValue = relParts.join(' ');
+
+// Theme-based colors
+function getTextColorClass(): string {
+  if (theme === 'light') return 'text-neutral-white';
+  if (theme === 'gxscore') return 'text-gx-80';
+  return 'text-primary-50';
+}
+
+function getBorderColorClass(): string {
+  if (theme === 'light') return 'bg-secondary-50';
+  if (theme === 'gxscore') return 'bg-gx-90';
+  return 'bg-secondary-50';
+}
+
+function getArrowBgColor(): string {
+  if (theme === 'gxscore') return '#A554FF';
+  return '#ff290c';
+}
+
+const textColorClass = getTextColorClass();
+const borderColorClass = getBorderColorClass();
+const arrowBgColor = getArrowBgColor();
+
+// Check if we have an image
+const hasAvatar = imageType === 'avatar' && avatarUrl;
+const hasLogo = imageType === 'logo' && logoUrl;
+const hasImage = hasAvatar || hasLogo;
+
+// Generate unique ID
+const quoteId = id ? cleanStega(id) : `quote-${Math.random().toString(36).substr(2, 9)}`;
+
+/**
+ * Sanitize HTML to allow only safe tags
+ * Allows: strong, b, em, i, a, br, span
+ */
+function sanitizeHtml(html: string | undefined): string {
+  if (!html) return '';
+  
+  let cleaned = html;
+  
+  // Allow only specific HTML tags, strip everything else
+  const allowedTagsRegex = /<(?!\/?(?:strong|b|em|i|a|br|span)\b)[^>]*>/gi;
+  cleaned = cleaned.replace(allowedTagsRegex, '');
+  
+  
+  return cleaned;
+}
+---
+
+<section id={quoteId} class="quote-module text-left my-2 md:my-3" data-sanity-edit-target>
+  <div class={`quote-module-grid relative before:absolute before:w-[2px] before:h-[100%] ${borderColorClass} before:top-0 before:left-0 pl-3`}>
+    {/* For extrabold variant, show image at the top */}
+    {styleVariant === 'extrabold' && hasImage && (
+      <div class={`flex items-center gap-3`}>
+        {hasAvatar && (
+          <figure class="quote-avatar-container rounded-full overflow-hidden" {...createFieldEditInfo('avatar')}>
+            <img 
+              src={avatarUrl} 
+              alt={cleanStega(avatarAlt) || 'Quote avatar'} 
+              loading="lazy" 
+              class="object-cover w-full h-full" 
+              width="72" 
+              height="72"
+            />
+            {/* Hidden span with stega for visual editing click detection */}
+            <span class="sr-only quote-image__edit">{avatarAlt}</span>
+          </figure>
+        )}
+        {hasLogo && (
+          <figure class="quote-logo-container rounded-lg overflow-hidden" {...createFieldEditInfo('logo')}>
+            <img 
+              src={logoUrl} 
+              alt={cleanStega(logoAlt) || 'Company logo'} 
+              loading="lazy" 
+              class="object-contain w-full h-full" 
+              width="148" 
+              height="80"
+            />
+            {/* Hidden span with stega for visual editing click detection */}
+            <span class="sr-only quote-image__edit">{logoAlt}</span>
+          </figure>
+        )}
+      </div>
+    )}
+    
+    <div class="flex flex-col gap-3">
+      {/* Quote text */}
+      <div 
+        class={`quote-text-container font-${styleVariant} ${textColorClass} ${styleVariant === 'extrabold' ? 'text-2xl leading-7' : 'text-base leading-6'}`}
+        set:html={sanitizeHtml(quoteText)}
+        {...createFieldEditInfo('quoteText')}
+      />
+      
+      {/* Author section */}
+      {quoteAuthor && (
+        <div class={`${textColorClass} ${styleVariant === 'regular' ? 'flex flex-row gap-3 items-center' : ''}`}>
+          {/* For regular variant, show image next to author */}
+          {styleVariant === 'regular' && hasImage && (
+            <div class="block">
+              {hasAvatar && (
+                <figure class="quote-avatar-container rounded-full overflow-hidden" {...createFieldEditInfo('avatar')}>
+                  <img 
+                    src={avatarUrl} 
+                    alt={cleanStega(avatarAlt) || 'Quote avatar'} 
+                    loading="lazy" 
+                    class="object-cover w-full h-full" 
+                    width="72" 
+                    height="72"
+                  />
+                  {/* Hidden span with stega for visual editing click detection */}
+                  <span class="sr-only quote-image__edit">{avatarAlt}</span>
+                </figure>
+              )}
+              {hasLogo && (
+                <figure class="quote-logo-container rounded-lg overflow-hidden" {...createFieldEditInfo('logo')}>
+                  <img 
+                    src={logoUrl} 
+                    alt={cleanStega(logoAlt) || 'Company logo'} 
+                    loading="lazy" 
+                    class="object-contain w-full h-full" 
+                    width="148" 
+                    height="80"
+                  />
+                  {/* Hidden span with stega for visual editing click detection */}
+                  <span class="sr-only quote-image__edit">{logoAlt}</span>
+                </figure>
+              )}
+            </div>
+          )}
+          
+          <div class="quote-author-container min-w-0 flex-1">
+            <div class="text-base font-semibold block" {...createFieldEditInfo('quoteAuthor')}>{quoteAuthor}</div>
+            {quoteTitle && (
+              <div class="text-base font-normal" {...createFieldEditInfo('quoteTitle')}>{quoteTitle}</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+    
+    {/* Customer story link */}
+    {href && (
+      <div class="quote-link-container" {...createFieldEditInfo('customerStoryLink')}>
+        <a 
+          href={href} 
+          class={`mt-auto flex items-center gap-2 font-semibold ${textColorClass}`}
+          target={openInNewTab ? '_blank' : undefined}
+          rel={relValue || undefined}
+        >
+          <span {...createFieldEditInfo('linkLabel')}>{linkLabel}</span>
+          <span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+              <rect width="40" height="40" fill={arrowBgColor} rx="20"/>
+              <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+            </svg>
+          </span>
+        </a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style is:global>
+  /* Quote Module CLS Prevention Styles */
+
+  /* Screen reader only - for visual editing stega */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Ensure consistent image containers with aspect ratios */
+  .quote-avatar-container {
+    aspect-ratio: 1 / 1;
+    width: 72px;
+    height: 72px;
+    position: relative;
+  }
+
+  .quote-logo-container {
+    aspect-ratio: 148 / 80;
+    width: 148px;
+    height: 80px;
+    position: relative;
+  }
+
+  /* Prevent layout shifts during image loading */
+  .quote-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Ensure text containers maintain minimum heights */
+  .quote-text-container {
+    min-height: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .quote-author-container {
+    min-height: 2rem;
+  }
+
+  /* Stable grid layout */
+  .quote-module-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-rows: auto 1fr auto;
+    min-height: 120px;
+  }
+
+  /* Left border using pseudo element */
+  .quote-module-grid::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+
+  /* Border color variants */
+  .quote-module-grid.bg-secondary-50::before {
+    background-color: var(--secondary-50, #9DBFFB);
+  }
+
+  .quote-module-grid.bg-gx-90::before {
+    background-color: var(--gx-90, #D4B3FF);
+  }
+
+  /* Prevent content jumping during conditional rendering */
+  .quote-conditional-content {
+    transition: none;
+  }
+
+  /* Ensure proper image loading states */
+  .quote-module img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Loading state for images */
+  .quote-module img[loading="lazy"] {
+    content-visibility: auto;
+  }
+
+  /* Prevent flash of unstyled content */
+  .quote-module {
+    contain: layout style;
+  }
+
+  /* Ensure consistent spacing regardless of content */
+  .quote-module-grid > * {
+    min-height: 0;
+  }
+
+  /* Stable link container */
+  .quote-link-container {
+    min-height: 2.5rem;
+  }
+
+  /* Prevent text reflow during font loading */
+  .quote-text-container {
+    font-display: swap;
+  }
+
+  .quote-text-container.font-extrabold {
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+  }
+
+  .quote-text-container.font-regular {
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  /* Ensure proper aspect ratios are maintained */
+  .quote-avatar-container,
+  .quote-logo-container {
+    contain: size layout;
+    overflow: hidden;
+  }
+
+  /* Theme text colors */
+  .quote-module .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+
+  .quote-module .text-neutral-white {
+    color: var(--neutral-white, #ffffff);
+  }
+
+  .quote-module .text-gx-80 {
+    color: var(--gx-80, #7C3AED);
+  }
+
+  /* Link styling */
+  .quote-link-container a {
+    text-decoration: none;
+  }
+
+  .quote-link-container a:hover {
+    opacity: 0.8;
+  }
+
+  /* Spacing utilities specific to quote module */
+  .quote-module .my-2 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .quote-module .my-3 {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .quote-module .pl-3 {
+    padding-left: 0.75rem;
+  }
+
+  .quote-module .gap-2 {
+    gap: 0.5rem;
+  }
+
+  .quote-module .gap-3 {
+    gap: 0.75rem;
+  }
+
+  /* Responsive margin */
+  @media (min-width: 768px) {
+    .quote-module.md\:my-3 {
+      margin-top: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+</style>
+

@@ -1,0 +1,349 @@
+---
+import { cleanStega } from '../../utils/stega';
+import { createBlockEditInfo, createDataSanityAttrs } from '../../utils/visualEditing';
+
+interface Props {
+  layout: '1' | '2' | '3' | '4' | '1/3' | '3/1';
+  backgroundColor?: string;
+  customBackgroundColor?: string;
+  backgroundImage?: string;
+  backgroundPosition?: string;
+  backgroundSize?: string;
+  paddingTop?: string;
+  paddingTopMobile?: string;
+  paddingBottom?: string;
+  paddingBottomMobile?: string;
+  paddingLeft?: string;
+  paddingLeftMobile?: string;
+  paddingRight?: string;
+  paddingRightMobile?: string;
+  // Per-column padding (mobile)
+  column1PaddingBottomMobile?: string;
+  column2PaddingBottomMobile?: string;
+  column3PaddingBottomMobile?: string;
+  column4PaddingBottomMobile?: string;
+  // Visual editing props
+  sectionKey?: string;
+  documentId?: string;
+  documentType?: string;
+}
+
+const { 
+  layout,
+  backgroundColor: rawBackgroundColor = 'none',
+  customBackgroundColor: rawCustomBackgroundColor,
+  backgroundImage: rawBackgroundImage,
+  backgroundPosition: rawBackgroundPosition = 'center',
+  backgroundSize: rawBackgroundSize = 'cover',
+  paddingTop: rawPaddingTop = '80px',
+  paddingTopMobile: rawPaddingTopMobile = '48px',
+  paddingBottom: rawPaddingBottom = '0px',
+  paddingBottomMobile: rawPaddingBottomMobile = '32px',
+  paddingLeft: rawPaddingLeft = '0px',
+  paddingLeftMobile: rawPaddingLeftMobile = '0px',
+  paddingRight: rawPaddingRight = '0px',
+  paddingRightMobile: rawPaddingRightMobile = '0px',
+  // Per-column padding (mobile)
+  column1PaddingBottomMobile: rawCol1PaddingBottomMobile = '32px',
+  column2PaddingBottomMobile: rawCol2PaddingBottomMobile = '32px',
+  column3PaddingBottomMobile: rawCol3PaddingBottomMobile = '32px',
+  column4PaddingBottomMobile: rawCol4PaddingBottomMobile = '32px',
+  // Visual editing props
+  sectionKey,
+  documentId,
+  documentType,
+} = Astro.props;
+
+// Create edit info for this section block (for visual editing)
+const sectionEditInfo = documentId && documentType && sectionKey 
+  ? createBlockEditInfo(documentId, documentType, sectionKey)
+  : null;
+
+// Clean stega encoding from all string values
+const backgroundColor = cleanStega(rawBackgroundColor) || 'none';
+const customBackgroundColor = cleanStega(rawCustomBackgroundColor);
+const backgroundImage = cleanStega(rawBackgroundImage);
+const backgroundPosition = cleanStega(rawBackgroundPosition) || 'center';
+const backgroundSize = cleanStega(rawBackgroundSize) || 'cover';
+const paddingTop = cleanStega(rawPaddingTop) || '80px';
+const paddingTopMobile = cleanStega(rawPaddingTopMobile) || '48px';
+const paddingBottom = cleanStega(rawPaddingBottom) || '0px';
+const paddingBottomMobile = cleanStega(rawPaddingBottomMobile) || '32px';
+const paddingLeft = cleanStega(rawPaddingLeft) || '0px';
+const paddingLeftMobile = cleanStega(rawPaddingLeftMobile) || '0px';
+const paddingRight = cleanStega(rawPaddingRight) || '0px';
+const paddingRightMobile = cleanStega(rawPaddingRightMobile) || '0px';
+// Per-column padding (mobile)
+const col1PaddingBottomMobile = cleanStega(rawCol1PaddingBottomMobile) || '32px';
+const col2PaddingBottomMobile = cleanStega(rawCol2PaddingBottomMobile) || '32px';
+const col3PaddingBottomMobile = cleanStega(rawCol3PaddingBottomMobile) || '32px';
+const col4PaddingBottomMobile = cleanStega(rawCol4PaddingBottomMobile) || '32px';
+
+// Helper to normalize padding for CSS
+const normalizePaddingValue = (value: string): string => {
+  if (value === '0' || value === '0px' || value === 'none') return '0';
+  return value;
+};
+
+type ColumnConfig = { span: number; x: number; w: number };
+
+function getColumns(layout: string): ColumnConfig[] {
+  const spans: Record<string, number[]> = {
+    '1': [12],
+    '2': [6, 6],
+    '3': [4, 4, 4],
+    '4': [3, 3, 3, 3],
+    '1/3': [4, 8],
+    '3/1': [8, 4],
+    '1/4': [3, 9],
+    '4/1': [9, 3],
+  };
+  
+  const layoutSpans = spans[layout] || [12];
+  let x = 0;
+  return layoutSpans.map(span => {
+    const col = { span, x, w: span };
+    x += span;
+    return col;
+  });
+}
+
+// Build wrapper styles (background only - padding handled via CSS custom properties)
+function buildWrapperStyles(): string {
+  const styles: string[] = [];
+  
+  // Background color
+  const bgColor = backgroundColor === 'custom' ? customBackgroundColor : backgroundColor;
+  if (bgColor && bgColor !== 'none') {
+    styles.push(`background-color: ${bgColor}`);
+  }
+  
+  // Background image
+  if (backgroundImage) {
+    styles.push(`background-image: url('${backgroundImage}')`);
+    styles.push(`background-position: ${backgroundPosition}`);
+    styles.push(`background-size: ${backgroundSize}`);
+    styles.push('background-repeat: no-repeat');
+  }
+  
+  // CSS custom properties for responsive padding (mobile-first approach)
+  // Helper to normalize padding values ('0' or '0px' becomes '0', undefined/empty uses the value as-is)
+  const normalizePadding = (value: string): string => {
+    if (value === '0' || value === '0px' || value === 'none') return '0';
+    return value;
+  };
+  
+  // Desktop padding (applies at 768px and above)
+  const desktopTop = normalizePadding(paddingTop);
+  const desktopBottom = normalizePadding(paddingBottom);
+  const desktopLeft = normalizePadding(paddingLeft);
+  const desktopRight = normalizePadding(paddingRight);
+  styles.push(`--padding-top-desktop: ${desktopTop}`);
+  styles.push(`--padding-bottom-desktop: ${desktopBottom}`);
+  styles.push(`--padding-left-desktop: ${desktopLeft}`);
+  styles.push(`--padding-right-desktop: ${desktopRight}`);
+  
+  // Mobile padding (default, applies below 768px)
+  const mobileTop = normalizePadding(paddingTopMobile);
+  const mobileBottom = normalizePadding(paddingBottomMobile);
+  const mobileLeft = normalizePadding(paddingLeftMobile);
+  const mobileRight = normalizePadding(paddingRightMobile);
+  styles.push(`--padding-top-mobile: ${mobileTop}`);
+  styles.push(`--padding-bottom-mobile: ${mobileBottom}`);
+  styles.push(`--padding-left-mobile: ${mobileLeft}`);
+  styles.push(`--padding-right-mobile: ${mobileRight}`);
+  
+  return styles.join('; ');
+}
+
+const wrapperStyles = buildWrapperStyles();
+
+const columns = getColumns(layout);
+const hasCol1 = columns.length >= 1;
+const hasCol2 = columns.length >= 2;
+const hasCol3 = columns.length >= 3;
+const hasCol4 = columns.length >= 4;
+---
+
+<div 
+  class="row-fluid-wrapper row-depth-1 dnd-section" 
+  style={wrapperStyles}
+  {...createDataSanityAttrs(sectionEditInfo)}
+>
+<div class="row-fluid ">
+{hasCol1 && (
+<div class={`span${columns[0].span} widget-span widget-type-cell dnd-column`} style={`--col-padding-bottom-mobile: ${normalizePaddingValue(col1PaddingBottomMobile)}`} data-widget-type="cell" data-x={columns[0].x} data-w={columns[0].w}>
+
+<div class="row-fluid-wrapper row-depth-1 dnd-row">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget dnd-module" style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<slot name="col1" />
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+)}
+{hasCol2 && (
+<div class={`span${columns[1].span} widget-span widget-type-cell dnd-column`} style={`--col-padding-bottom-mobile: ${normalizePaddingValue(col2PaddingBottomMobile)}`} data-widget-type="cell" data-x={columns[1].x} data-w={columns[1].w}>
+
+<div class="row-fluid-wrapper row-depth-1 dnd-row">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget dnd-module" style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<slot name="col2" />
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+)}
+{hasCol3 && (
+<div class={`span${columns[2].span} widget-span widget-type-cell dnd-column`} style={`--col-padding-bottom-mobile: ${normalizePaddingValue(col3PaddingBottomMobile)}`} data-widget-type="cell" data-x={columns[2].x} data-w={columns[2].w}>
+
+<div class="row-fluid-wrapper row-depth-1 dnd-row">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget dnd-module" style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<slot name="col3" />
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+)}
+{hasCol4 && (
+<div class={`span${columns[3].span} widget-span widget-type-cell dnd-column`} style={`--col-padding-bottom-mobile: ${normalizePaddingValue(col4PaddingBottomMobile)}`} data-widget-type="cell" data-x={columns[3].x} data-w={columns[3].w}>
+
+<div class="row-fluid-wrapper row-depth-1 dnd-row">
+<div class="row-fluid ">
+<div class="span12 widget-span widget-type-custom_widget dnd-module" style="" data-widget-type="custom_widget" data-x="0" data-w="12">
+<slot name="col4" />
+</div><!--end widget-span -->
+</div><!--end row-->
+</div><!--end row-wrapper -->
+
+</div><!--end widget-span -->
+)}
+</div><!--end row-->
+</div>
+
+<style>
+  /* Column gap variable */
+  :root {
+    --column-gap: 2.13%;
+  }
+
+  /* Row fluid - flex container */
+  .row-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+  }
+
+  .row-fluid [class*='span'] {
+    min-height: 1px;
+    width: 100%;
+  }
+
+  /* Desktop grid - spans become actual widths */
+  @media (min-width: 768px) {
+    .row-fluid {
+      flex-wrap: nowrap;
+      justify-content: space-between;
+    }
+
+    .row-fluid .span12 {
+      width: 100%;
+    }
+
+    .row-fluid .span11 {
+      width: calc(91.66% - var(--column-gap) * 0.0833);
+    }
+
+    .row-fluid .span10 {
+      width: calc(83.33% - var(--column-gap) * 0.166);
+    }
+
+    .row-fluid .span9 {
+      width: calc(75% - (var(--column-gap) * 0.25));
+    }
+
+    .row-fluid .span8 {
+      width: calc(66.66% - var(--column-gap) * 0.333);
+    }
+
+    .row-fluid .span7 {
+      width: calc(58.33% - var(--column-gap) * 0.4166);
+    }
+
+    .row-fluid .span6 {
+      width: calc(50% - var(--column-gap) * 0.5);
+    }
+
+    .row-fluid .span5 {
+      width: calc(41.66% - var(--column-gap) * 0.5833);
+    }
+
+    .row-fluid .span4 {
+      width: calc(33.33% - var(--column-gap) * 0.6668);
+    }
+
+    .row-fluid .span3 {
+      width: calc(25% - var(--column-gap) * 0.75);
+    }
+
+    .row-fluid .span2 {
+      width: calc(16.66% - var(--column-gap) * 0.8333);
+    }
+
+    .row-fluid .span1 {
+      width: calc(8.33% - var(--column-gap) * 0.9166);
+    }
+  }
+
+  /* DND Section styles */
+  .dnd-section > .row-fluid {
+    margin: 0 auto;
+    max-width: var(--container-xl, 1312px);
+  }
+
+  .dnd-section .dnd-column {
+    padding: 0 2rem;
+  }
+
+  @media (max-width: 767px) {
+    .dnd-section .dnd-column {
+      padding: 0 2rem;
+      padding-bottom: var(--col-padding-bottom-mobile, 32px);
+    }
+  }
+
+  /* Widget span base styles */
+  .widget-span {
+    box-sizing: border-box;
+  }
+
+  /* Row fluid wrapper */
+  .row-fluid-wrapper {
+    width: 100%;
+  }
+
+  /* Mobile-first responsive padding */
+  /* Mobile padding applies by default (below 768px) */
+  .row-fluid-wrapper.dnd-section {
+    padding-top: var(--padding-top-mobile, 0);
+    padding-bottom: var(--padding-bottom-mobile, 0);
+    padding-left: var(--padding-left-mobile, 0);
+    padding-right: var(--padding-right-mobile, 0);
+  }
+
+  /* Desktop padding applies at 768px and above */
+  @media (min-width: 768px) {
+    .row-fluid-wrapper.dnd-section {
+      padding-top: var(--padding-top-desktop, 0);
+      padding-bottom: var(--padding-bottom-desktop, 0);
+      padding-left: var(--padding-left-desktop, 0);
+      padding-right: var(--padding-right-desktop, 0);
+    }
+  }
+</style>

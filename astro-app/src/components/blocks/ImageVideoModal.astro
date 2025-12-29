@@ -1,0 +1,348 @@
+---
+import { cleanStega } from '../../utils/stega';
+import { isImageReady, urlFor } from '../../utils/image';
+
+export interface Props {
+  thumbnail: {
+    // Full Sanity image object (preferred, used to generate srcset/sizes)
+    image?: any;
+    // Fallback absolute URL
+    src: string;
+    alt: string;
+    loading?: 'lazy' | 'eager';
+    width?: number;
+    height?: number;
+  };
+  videoId: string;
+  style?: {
+    border?: boolean;
+    lightBackgroundShadow?: boolean;
+  };
+  id?: string;
+}
+
+const { 
+  thumbnail, 
+  videoId, 
+  style = { border: false, lightBackgroundShadow: false },
+  id = `image-video-modal-${Math.random().toString(36).substr(2, 9)}`
+} = Astro.props;
+
+const border = style.border ?? false;
+const shadow = style.lightBackgroundShadow ?? false;
+const width = thumbnail.width ?? 548;
+const height = thumbnail.height ?? 310;
+
+// PRESERVE stega in alt for visual editing - this enables click-to-edit on the image
+const alt = thumbnail.alt || '';
+
+// PRESERVE stega in videoId for visual editing
+// Clean version needed for class names and IDs (must be valid CSS identifiers)
+const cleanVideoId = cleanStega(videoId) || '';
+
+// Loading defaults to lazy. Sanity Visual Editing (stega) can inject invisible chars,
+// so we must clean + normalize to a strict union.
+const rawLoading = thumbnail.loading ?? 'lazy';
+const cleanedLoading = cleanStega(rawLoading);
+const loading: 'lazy' | 'eager' = cleanedLoading === 'eager' ? 'eager' : 'lazy';
+const loadingAttr = loading;
+
+// Fetch priority is only "high" when loading is eager
+const fetchpriority = loading === 'eager' ? 'high' : undefined;
+
+// Build responsive image urls when we have a Sanity image object
+const imageObj = thumbnail.image;
+const canBuildResponsive = isImageReady(imageObj);
+const src =
+  (canBuildResponsive ? urlFor(imageObj).width(width).height(height).url() : '') ||
+  thumbnail.src;
+
+const SRCSET_WIDTHS = [274, 548, 822, 1096, 1370, 1644];
+const aspect = height / width;
+const srcset = canBuildResponsive
+  ? SRCSET_WIDTHS
+      .map((w) => {
+        const h = Math.round(w * aspect);
+        return `${urlFor(imageObj).width(w).height(h).url()} ${w}w`;
+      })
+      .join(', ')
+  : undefined;
+
+const sizes = `(max-width: ${width}px) 100vw, ${width}px`;
+---
+
+<div id={id} class="video-modal" data-sanity-edit-target>
+    {/* Container with max width and relative positioning */}
+    <div class="video-modal__container">
+        {/* Thumbnail image container */}
+        <div>
+            <img 
+                src={src}
+                alt={alt}
+                class:list={[
+                    "w-full",
+                    "relative",
+                    "rounded-3xl",
+                    "video-modal__image",
+                    border && "border border-[#0960F6]",
+                    shadow ? "shadow-on-light" : "box-shadow-ondark-blue-10-nohover"
+                ]}
+                width={width}
+                height={height}
+                loading={loadingAttr}
+                fetchpriority={fetchpriority}
+                decoding="async"
+                srcset={srcset}
+                sizes={sizes}
+            />
+        </div>
+        {/* Video player overlay centered absolutely */}
+        <div 
+            class={`wistia_embed wistia_async_${cleanVideoId} video-modal__overlay popover=true popoverContent=html`}
+            id={`wistia-${cleanVideoId}`}
+            role="button"
+            aria-label="Play video"
+            data-video={cleanVideoId}
+        >
+            {/* Hidden span with stega-encoded videoId for visual editing click-to-edit */}
+            <span class="sr-only video-modal__video-id">{videoId}</span>
+            <span 
+                id={cleanVideoId}
+                class="video-modal__play-button"
+                onclick="return false;"
+            >
+                <svg class="play-icon play-icon--desktop" width="44" height="55" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M42.911 27.933c-.247.584-.963 1.044-2.396 1.963L5.212 52.54c-1.643 1.054-2.465 1.58-3.144 1.532a2.044 2.044 0 0 1-1.49-.818c-.409-.546-.409-1.522-.409-3.476V4.49c0-1.954 0-2.93.409-3.476a2.05 2.05 0 0 1 1.49-.817c.68-.05 1.5.477 3.144 1.53l35.303 22.644c1.433.919 2.15 1.379 2.396 1.963a2.053 2.053 0 0 1 0 1.6v-.002Z" fill="#0960F6"/></svg>
+                <svg class="play-icon play-icon--mobile" width="37" height="46" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.093 23.777c-.206.487-.803.87-1.997 1.636l-29.42 18.87c-1.369.877-2.053 1.316-2.62 1.276a1.704 1.704 0 0 1-1.241-.681c-.34-.455-.34-1.269-.34-2.897V4.243c0-1.629 0-2.442.34-2.897A1.71 1.71 0 0 1 2.057.665c.566-.042 1.25.398 2.62 1.276L34.095 20.81c1.194.766 1.791 1.149 1.997 1.636.18.426.18.906 0 1.332Z" fill="#0960F6"/></svg>
+            </span>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ===================================
+       ImageVideoModal Component Styles
+       =================================== */
+    
+    /* Outer container */
+    .video-modal {
+        display: inline-block;
+    }
+    
+    /* Relative wrapper - contains image and overlay */
+    .video-modal__container {
+        position: relative;
+        max-width: 548px;
+        aspect-ratio: 548 / 310;
+    }
+    
+    /* Image styles */
+    .video-modal__image {
+        width: 100%;
+        position: relative;
+        border-radius: 1.5rem;
+    }
+    
+    .video-modal__image--border {
+        border: 1px solid #0960F6;
+    }
+    
+    /* Wistia overlay - covers the image area, centers content */
+    .video-modal__overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    /* Play button - centered in overlay via flexbox */
+    .video-modal__play-button {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+    }
+    
+    /* Play button background circle (::before) */
+    .video-modal__play-button::before {
+        content: '';
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 9999px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        background-color: rgba(255, 255, 255, 0.4);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: block;
+        transition: all 0.3s ease-in-out;
+        z-index: -1;
+    }
+    
+    /* Hover state */
+    .video-modal__play-button:hover::before {
+        background-color: #fff;
+    }
+    
+    /* ===================
+       Play Icon Styles
+       =================== */
+    
+    /* Base styles for all play icons */
+    .play-icon {
+        position: relative;
+        margin-inline-start: 0.5rem;
+        z-index: 2;
+    }
+    
+    /* Desktop icon - HIDDEN by default (on mobile) */
+    .play-icon--desktop {
+        display: none;
+    }
+    
+    /* Mobile icon - SHOWN by default (on mobile) */
+    .play-icon--mobile {
+        display: block;
+    }
+    
+    /* Desktop (768px and above) */
+    @media (min-width: 768px) {
+        /* Larger play button on desktop */
+        .video-modal__play-button {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .video-modal__play-button::before {
+            width: 120px;
+            height: 120px;
+        }
+        
+        /* Desktop icon - SHOWN on desktop */
+        .play-icon--desktop {
+            display: block;
+        }
+        
+        /* Mobile icon - HIDDEN on desktop */
+        .play-icon--mobile {
+            display: none;
+        }
+    }
+    
+    /* ===================================
+       Wistia Integration
+       =================================== */
+    
+    .wistia_click_to_play { 
+        width: 100%; 
+        height: 100%; 
+    }
+    
+    .wistia_click_to_play:hover span::before { 
+        background: #fff; 
+    }
+    
+    /* ===================================
+       Shadow Styles
+       =================================== */
+    
+    .shadow-on-light {
+        box-shadow: 0 24px 40px 0 rgba(7, 77, 197, 0.10), 0 8px 16px 0 rgba(7, 77, 197, 0.05);
+    }
+    
+    .box-shadow-ondark-blue-10-nohover {
+        box-shadow: 0 24px 40px 0 rgba(1, 24, 64, 0.50), 0 8px 16px 0 rgba(1, 24, 64, 0.25);
+    }
+    
+    /* Screen reader only - visually hidden but accessible for visual editing stega detection */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    
+    /* VideoId hidden element for visual editing */
+    .video-modal__video-id {
+        pointer-events: none;
+    }
+</style>
+
+<script is:inline>
+    // Defer Wistia script loading until first interaction
+    var wistiaLoaded = false;
+    var loadedVideos = new Set();
+
+    function loadWistiaScript() {
+        if (wistiaLoaded) return Promise.resolve();
+        
+        return new Promise(function(resolve) {
+            var script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://fast.wistia.com/assets/external/E-v1.js';
+            script.onload = function() {
+                wistiaLoaded = true;
+                resolve();
+            };
+            document.body.appendChild(script);
+        });
+    }
+
+    document.querySelectorAll('[data-video]').forEach(function(element) {
+        // Preconnect to Wistia on hover for faster loading
+        element.addEventListener('mouseenter', function() {
+            if (!wistiaLoaded) {
+                var link = document.createElement('link');
+                link.rel = 'preconnect';
+                link.href = 'https://fast.wistia.com';
+                document.head.appendChild(link);
+            }
+        }, { once: true });
+        
+        element.addEventListener('click', async function(e) {
+            var target = e.target;
+            if (!target) return;
+            var videoElement = target.closest('[data-video]');
+            if (!videoElement) return;
+            
+            var videoId = videoElement.getAttribute('data-video');
+            
+            if (loadedVideos.has(videoId)) return;
+            
+            videoElement.classList.add('-loading');
+            loadedVideos.add(videoId);
+            
+            // Load Wistia script if not already loaded
+            await loadWistiaScript();
+            
+            // Load the specific video
+            var videoScript = document.createElement('script');
+            videoScript.async = true;
+            videoScript.src = 'https://fast.wistia.com/embed/medias/' + videoId + '.jsonp';
+            document.body.appendChild(videoScript);
+            
+            window._wq = window._wq || [];
+            window._wq.push({
+                id: videoId,
+                onReady: function(video) {
+                    videoElement.classList.remove('-loading');
+                    video.popover.show();
+                    video.play();
+                }
+            });
+        });
+    });
+</script>
