@@ -1,0 +1,13 @@
+---
+/**
+ * Get Started Page Route
+ * Fetches the Get Started singleton from Sanity and renders it
+ */
+import GetStartedTemplate from "../templates/page/GetStarted.astro";
+import { getGetStartedPage } from "../utils/sanity";
+
+const { data: page } = await getGetStartedPage(Astro.request);
+---
+
+<GetStartedTemplate page={page} />
+
