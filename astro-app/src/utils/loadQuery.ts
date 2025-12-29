@@ -45,7 +45,9 @@ export async function loadQuery<T>({
 
   const result = await sanityClient.fetch<T>(query, params ?? {}, {
     perspective,
-    stega: visualEditingEnabled,
+    // Only enable stega when actually in preview mode. Otherwise, it pollutes strings
+    // (e.g. alt text) with invisible Unicode used for click-to-edit.
+    stega: visualEditingEnabled && isPreview,
     // Use token only when you actually need to read drafts
     ...(isPreview && token ? { token } : {}),
     // Prefer fresh data when VE is on; use CDN otherwise
