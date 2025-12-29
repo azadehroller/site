@@ -5,8 +5,16 @@
 [functions]
   directory = "astro-app/.netlify/functions"
 
+# Redirect /admin to Sanity Studio
+[[redirects]]
+  from = "/admin"
+  to = "https://sa-rolls.sanity.studio"
+  status = 302
+  force = true
+
 # Important: Make sure to set these environment variables in Netlify dashboard:
-# - PUBLIC_SANITY_PROJECT_ID
-# - PUBLIC_SANITY_DATASET
-# - PUBLIC_SANITY_VISUAL_EDITING_ENABLED
-# - SANITY_API_READ_TOKEN
+# - PUBLIC_SANITY_PROJECT_ID (e.g., rh0t6x75)
+# - PUBLIC_SANITY_DATASET (e.g., production)
+# - PUBLIC_SANITY_VISUAL_EDITING_ENABLED (set to 'true')
+# - PUBLIC_SANITY_STUDIO_URL (set to 'https://sa-rolls.sanity.studio')
+# - SANITY_API_READ_TOKEN (copy from astro-app/.env file)
