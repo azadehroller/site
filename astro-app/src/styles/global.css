@@ -117,7 +117,7 @@ figure {
   --fontFamily: 'proxima-nova', 'Helvetica Neue', 'Arial', sans-serif;
   --base-font-size: 16px;
   --letter-spacing: -0.01em;
-  --body-text-family: 'Metropolis', sans-serif;
+  --body-text-family: 'Inter', sans-serif;
 
   /* Content offsets */
   --content-offset-desktop: 80px;
@@ -198,6 +198,8 @@ figure {
   --blue-30: #033180;
   --blue-40: #074DC5;
   --blue-50: #0960F6;
+  --blue-90: #CEDFFD;
+  --blue-95: #EBF2FE;
   --blue-99: #f5f8ff;
 
   /* Red colors */
