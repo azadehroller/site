@@ -1,0 +1,80 @@
+---
+// astro-portabletext passes the block data as `node`
+const { node } = Astro.props;
+const url = node?.url || '';
+const alt = node?.alt || '';
+const caption = node?.caption || '';
+const alignment = node?.alignment || 'center';
+
+// Determine the CSS class based on alignment
+const alignmentClass = alignment === 'left' 
+  ? 'image-block--left' 
+  : alignment === 'right' 
+    ? 'image-block--right' 
+    : 'image-block--center';
+---
+
+{url && (
+  <figure class={`image-block ${alignmentClass}`}>
+    <img src={url} alt={alt} loading="lazy" />
+    {caption && <figcaption>{caption}</figcaption>}
+  </figure>
+)}
+
+<style>
+  .image-block {
+    margin: 1.5rem 0;
+  }
+  
+  .image-block img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .image-block figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+    text-align: center;
+  }
+
+  /* Center aligned (default) */
+  .image-block--center {
+    text-align: center;
+  }
+  
+  .image-block--center img {
+    margin: 0 auto;
+    display: block;
+  }
+
+  /* Left aligned - floats left with text wrap */
+  .image-block--left {
+    float: left;
+    margin: 0 1.5rem 1rem 0;
+    max-width: 50%;
+  }
+  
+  .image-block--left img {
+    max-width: 100%;
+  }
+
+  /* Right aligned - floats right with text wrap */
+  .image-block--right {
+    float: right;
+    margin: 0 0 1rem 1.5rem;
+    max-width: 50%;
+  }
+  
+  .image-block--right img {
+    max-width: 100%;
+  }
+
+  /* Clear floats after content */
+  .image-block--left + *,
+  .image-block--right + * {
+    clear: none;
+  }
+</style>
+
