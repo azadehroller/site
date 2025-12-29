@@ -1,5 +1,4 @@
 import {defineType, defineField} from 'sanity'
-import {PlainTextInput} from './PlainTextInput'
 
 /**
  * Quote Block - A component displaying testimonial quotes
@@ -26,11 +25,10 @@ export default defineType({
       name: 'quoteText',
       title: 'Quote Text',
       type: 'text',
-      description: 'The quote text to display. Curly quotes are preserved when pasted.',
+      description: 'The quote text to display',
       group: 'content',
       rows: 4,
       validation: (Rule) => Rule.required(),
-      components: {input: PlainTextInput},
     }),
     defineField({
       name: 'quoteAuthor',
