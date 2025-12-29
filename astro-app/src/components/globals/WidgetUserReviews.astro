@@ -1,0 +1,240 @@
+---
+import { cleanStega } from "../../utils/stega";
+
+interface BadgeItem {
+  _key?: string;
+  image?: {
+    asset?: { _ref?: string; url?: string };
+  };
+  alt?: string;
+  link?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  badges?: BadgeItem[];
+  theme?: 'light' | 'dark' | 'gxscore';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: string;
+  headingType?: string;
+  displayType?: string;
+  textType?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  text,
+  badges,
+  theme = 'dark',
+  textAlignment = 'LEFT',
+  eyebrowType = 'div',
+  headingType = 'div',
+  displayType,
+  textType = 'base',
+} = Astro.props;
+
+// Clean stega from style values used in class names
+const cleanTheme = cleanStega(theme) || 'dark';
+const cleanAlignment = cleanStega(textAlignment) || 'LEFT';
+const cleanEyebrowType = cleanStega(eyebrowType) || 'div';
+const cleanHeadingType = cleanStega(headingType) || 'div';
+const cleanDisplayType = cleanStega(displayType);
+const cleanTextType = cleanStega(textType) || 'base';
+
+// Theme-based text colors
+const getTitleColor = (theme: string) => {
+  switch (theme) {
+    case 'light':
+      return 'text-neutral-white';
+    case 'dark':
+      return 'text-primary-50';
+    case 'gxscore':
+      return 'text-gx-80';
+    default:
+      return 'text-primary-50';
+  }
+};
+
+const getEyebrowColor = (theme: string) => {
+  switch (theme) {
+    case 'light':
+      return 'text-secondary-50';
+    case 'dark':
+      return 'text-secondary-50';
+    case 'gxscore':
+      return 'text-gx-90';
+    default:
+      return 'text-secondary-50';
+  }
+};
+
+const titleColor = getTitleColor(cleanTheme);
+const eyebrowColor = getEyebrowColor(cleanTheme);
+
+// Alignment classes
+const getAlignmentClasses = (alignment: string) => {
+  switch (alignment) {
+    case 'LEFT':
+      return 'items-start';
+    case 'CENTER':
+      return 'items-center';
+    case 'RIGHT':
+      return 'items-end';
+    default:
+      return 'items-start';
+  }
+};
+
+const alignmentClass = getAlignmentClasses(cleanAlignment);
+
+// Display type class for heading size
+const displayClass = cleanDisplayType ? `${cleanDisplayType}-heading` : '';
+
+// Text size class
+const textSizeClass = `text-${cleanTextType}`;
+
+// Heading Tag component
+const HeadingTag = cleanHeadingType as keyof HTMLElementTagNameMap;
+const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
+---
+
+<section class:list={["widget-user-reviews inline-flex flex-col w-full gap-y-4 md:gap-y-1", alignmentClass, `md:${alignmentClass}`]} data-sanity-edit-target>
+  {eyebrow && (
+    <EyebrowTag
+      class:list={[eyebrowColor, "uppercase font-extrabold text-sm"]}
+      data-sanity-edit-target
+    >
+      {eyebrow}
+    </EyebrowTag>
+  )}
+  
+  {title && (
+    <HeadingTag
+      class:list={[titleColor, textSizeClass, "font-semibold", displayClass]}
+      data-sanity-edit-target
+    >
+      {title}
+    </HeadingTag>
+  )}
+  
+  {text && (
+    <div
+      class:list={[titleColor, textSizeClass, "[&>ul]:list-disc [&>ul]:list-inside [&>ul]:mt-4 [&>ul>li]:ml-2"]}
+      data-sanity-edit-target
+    >
+      {text}
+    </div>
+  )}
+  
+  {badges && badges.length > 0 && (
+    <ul class="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-6  lg:flex w-full px-0 gap-x-5 gap-y-3 md:gap-5 list-none" data-sanity-edit-target>
+      {badges.map((badge) => {
+        const imageUrl = badge.image?.asset?.url || '';
+        const badgeLink = cleanStega(badge.link);
+        const badgeAlt = cleanStega(badge.alt) || 'Badge';
+        
+        return imageUrl ? (
+          <li class="user-review-badge flex justify-center items-center w-full lg:w-[80px]">
+            {badgeLink ? (
+              <a 
+                href={badgeLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                aria-label={badgeAlt}
+                class="w-full flex justify-center"
+              >
+                <img
+                  src={imageUrl}
+                  alt={badgeAlt}
+                  class="badge-img object-contain w-[80px] lg:h-[144px]"
+                  loading="lazy"
+                />
+              </a>
+            ) : (
+              <img
+                src={imageUrl}
+                alt={badgeAlt}
+                class="badge-img object-contain w-[80px] lg:h-[144px]"
+                loading="lazy"
+              />
+            )}
+          </li>
+        ) : null;
+      })}
+    </ul>
+  )}
+</section>
+
+<style>
+  .text-primary-50 {
+    color: var(--primary-50, #1e293b);
+  }
+
+  .text-secondary-50 {
+    color: var(--secondary-50, #6366f1);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-gx-80 {
+    color: var(--gx-80, #374151);
+  }
+
+  .text-gx-90 {
+    color: var(--gx-90, #1f2937);
+  }
+
+  /* Heading display sizes */
+  .h1-heading {
+    font-size: 3rem;
+    line-height: 1.1;
+    font-weight: 700;
+  }
+
+  .h2-heading {
+    font-size: 2.25rem;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .h3-heading {
+    font-size: 1.875rem;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .h4-heading {
+    font-size: 1.5rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .h5-heading {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .h6-heading {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .s8-heading {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  /* Badge hover effect */
+  .user-review-badge .badge-img:hover {
+    mix-blend-mode: luminosity;
+  }
+</style>
+

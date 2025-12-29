@@ -1,0 +1,230 @@
+---
+import { cleanStega } from "../../utils/stega";
+
+interface TestimonialLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface TestimonialItem {
+  _key?: string;
+  content?: string;
+  author?: string;
+  position?: string;
+  logo?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+  link?: TestimonialLink;
+}
+
+interface Props {
+  eyebrow?: string;
+  testimonials?: TestimonialItem[];
+}
+
+const { eyebrow, testimonials } = Astro.props;
+
+// Helper to build rel attribute for links
+function buildRel(link?: TestimonialLink): string | undefined {
+  if (!link) return undefined;
+  const rels: string[] = [];
+  if (link.noFollow) rels.push('nofollow');
+  if (link.openInNewTab) rels.push('noopener');
+  return rels.length > 0 ? rels.join(' ') : undefined;
+}
+---
+
+<section 
+  class="testimonial-carousel pt-7 overflow-hidden w-screen relative right-[50%] left-[50%] ml-[-50vw] mr-[-50vw] flex flex-col gap-6"
+  data-sanity-edit-target
+>
+  {eyebrow && (
+    <div class="text-secondary-50 uppercase font-extrabold text-center" data-sanity-edit-target>
+      {eyebrow}
+    </div>
+  )}
+  <div class="testimonial-carousel--wrapper">
+    <div class="testimonial-carousel--wrapper__inner pb-5 inline-flex justify-between gap-5">
+      <ul class="flex list-none">
+        {testimonials?.map((testimonial) => {
+          const logoUrl = testimonial.logo?.asset?.url;
+          const logoAlt = cleanStega(testimonial.logo?.alt) || cleanStega(testimonial.author) || 'Company logo';
+          const href = cleanStega(testimonial.link?.href);
+          const relAttr = buildRel(testimonial.link);
+          const targetAttr = testimonial.link?.openInNewTab ? '_blank' : undefined;
+          
+          return (
+            <li class="text-center bg-neutral-white rounded-[32px] box-shadow-onlight-navy-40 gap-5 mo-card-md relative" data-sanity-edit-target>
+              {href ? (
+                <a 
+                  href={href} 
+                  class="testimonial-carousel--wrapper__inner--link grid gap-5"
+                  target={targetAttr}
+                  rel={relAttr}
+                >
+                  <div class="flex justify-center flex-col items-center gap-2">
+                    <div>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" fill="none">
+                        <path fill="#E7EFFE" d="m11.79 0 5.238 4.248c-4.53 2.973-8.637 8.637-9.062 13.168.142 0 1.133-.142 1.841-.142 3.965 0 6.796 2.974 6.796 7.222C16.604 28.602 13.348 32 9.1 32 4.426 32 .32 28.177.32 21.239.32 12.602 5.276 4.673 11.79 0Zm22.654 0 5.24 4.248c-4.532 2.973-8.497 8.637-9.063 13.168.142 0 1.133-.142 1.84-.142 3.965 0 6.939 2.974 6.939 7.222 0 4.106-3.398 7.504-7.646 7.504-4.673 0-8.779-3.823-8.779-10.761 0-8.637 4.956-16.566 11.47-21.239Z"/>
+                      </svg>
+                    </div>
+                    <div class="text-2xl font-semibold text-primary-50" data-sanity-edit-target>{testimonial.content}</div>
+                  </div>
+                  <div class="flex justify-center flex-col items-center gap-2 text-primary-50">
+                    <div class="text-lg font-semibold" data-sanity-edit-target>{testimonial.author}</div>
+                    <div class="text-lg" data-sanity-edit-target>{testimonial.position}</div>
+                    {logoUrl && (
+                      <div>
+                        <figure class="w-[130px] h-[72px] grid justify-center items-center">
+                          <img 
+                            src={logoUrl} 
+                            alt={logoAlt}
+                            class="object-fill"
+                            loading="lazy"
+                          />
+                        </figure>
+                      </div>
+                    )}
+                    <div class="absolute bottom-4 right-5 testimonial-carousel--wrapper__inner--link__icon">
+                      <svg class="transition duration-150 ease-out" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+                        <rect width="40" height="40" fill="#ff290c" rx="20"></rect>
+                        <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </a>
+              ) : (
+                <div class="testimonial-carousel--wrapper__inner--link grid gap-5">
+                  <div class="flex justify-center flex-col items-center gap-2">
+                    <div>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" fill="none">
+                        <path fill="#E7EFFE" d="m11.79 0 5.238 4.248c-4.53 2.973-8.637 8.637-9.062 13.168.142 0 1.133-.142 1.841-.142 3.965 0 6.796 2.974 6.796 7.222C16.604 28.602 13.348 32 9.1 32 4.426 32 .32 28.177.32 21.239.32 12.602 5.276 4.673 11.79 0Zm22.654 0 5.24 4.248c-4.532 2.973-8.497 8.637-9.063 13.168.142 0 1.133-.142 1.84-.142 3.965 0 6.939 2.974 6.939 7.222 0 4.106-3.398 7.504-7.646 7.504-4.673 0-8.779-3.823-8.779-10.761 0-8.637 4.956-16.566 11.47-21.239Z"/>
+                      </svg>
+                    </div>
+                    <div class="text-2xl font-semibold text-primary-50" data-sanity-edit-target>{testimonial.content}</div>
+                  </div>
+                  <div class="flex justify-center flex-col items-center gap-2 text-primary-50">
+                    <div class="text-lg font-semibold" data-sanity-edit-target>{testimonial.author}</div>
+                    <div class="text-lg" data-sanity-edit-target>{testimonial.position}</div>
+                    {logoUrl && (
+                      <div>
+                        <figure class="w-[130px] h-[72px] grid justify-center items-center">
+                          <img 
+                            src={logoUrl} 
+                            alt={logoAlt}
+                            class="object-fill"
+                            loading="lazy"
+                          />
+                        </figure>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonial-carousel--wrapper__inner {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .testimonial-carousel--wrapper[data-animated="true"] {
+    -webkit-mask: linear-gradient(90deg, transparent, #fff 20%, #fff 80%, transparent);
+    mask: linear-gradient(90deg, transparent, #fff 20%, #fff 80%, transparent);
+  }
+
+  .testimonial-carousel--wrapper[data-animated="true"] .testimonial-carousel--wrapper__inner {
+    width: fit-content;
+    flex-wrap: nowrap;
+    animation: scroll 150s linear infinite;
+  }
+
+  .testimonial-carousel--wrapper[data-animated="true"] .testimonial-carousel--wrapper__inner ul li {
+    width: 47rem;
+    margin: 0 1em;
+  }
+
+  @keyframes scroll {
+    to {
+      transform: translate(calc(-50% - 0.5rem));
+    }
+  }
+  
+  .testimonial-carousel--wrapper__inner--link:hover .testimonial-carousel--wrapper__inner--link__icon svg {
+    transform: scale(1.2) rotate(-45deg);
+  }
+
+  /* Card styling */
+  .mo-card-md {
+    padding: 2rem;
+  }
+
+  /* Background and shadow */
+  .bg-neutral-white {
+    background-color: #ffffff;
+  }
+
+  .box-shadow-onlight-navy-40 {
+    box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
+  }
+
+  /* Text colors */
+  .text-secondary-50 {
+    color: var(--secondary-50, #6366f1);
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #1e293b);
+  }
+
+  /* List styling */
+  .testimonial-carousel--wrapper__inner ul {
+    gap: 1.25rem;
+  }
+
+  .testimonial-carousel--wrapper__inner ul li {
+    min-width: 300px;
+    max-width: 47rem;
+    flex-shrink: 0;
+  }
+</style>
+
+<script>
+  // Testimonial carousel animation script
+  const addTestimonialAnimation = () => {
+    const items = document.querySelectorAll('.testimonial-carousel--wrapper');
+    
+    items.forEach((item) => {
+      item.setAttribute("data-animated", "true");
+
+      const itemInner = item.querySelector(".testimonial-carousel--wrapper__inner");
+      if (!itemInner) return;
+      
+      const itemContent = Array.from(itemInner.children);
+
+      itemContent.forEach((content) => {
+        const duplicatedContent = content.cloneNode(true);
+        if (duplicatedContent instanceof Element) {
+          duplicatedContent.setAttribute("aria-hidden", "true");
+        }
+        itemInner.appendChild(duplicatedContent);
+      });
+    });
+  };
+
+  // Only add animation if user doesn't prefer reduced motion
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    addTestimonialAnimation();
+  }
+</script>
+

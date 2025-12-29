@@ -1,0 +1,936 @@
+---
+/**
+ * Footer Component
+ * Matches the Figma design with HubSpot structure
+ * All content comes from Sanity globals - no hardcoded data
+ * Supports visual editing via Sanity
+ */
+
+interface QuickLink {
+  _key?: string;
+  label: string;
+  url: string;
+  icon?: string;
+  isExternal?: boolean;
+}
+
+interface FooterLink {
+  _key?: string;
+  label: string;
+  url: string;
+  isExternal?: boolean;
+}
+
+interface FooterColumn {
+  _key?: string;
+  title: string;
+  links: FooterLink[];
+}
+
+interface SocialLink {
+  _key?: string;
+  platform: 'linkedin' | 'youtube' | 'facebook' | 'twitter' | 'instagram';
+  url: string;
+  icon?: string;
+}
+
+interface Props {
+  newsletterTitle?: string;
+  newsletterDescription?: string;
+  newsletterButtonText?: string;
+  newsletterPlaceholder?: string;
+  quickLinks?: QuickLink[];
+  columns?: FooterColumn[];
+  copyrightText?: string;
+  legalLinks?: FooterLink[];
+  socialLinks?: SocialLink[];
+  socialText?: string;
+  showFloatingButton?: boolean;
+  floatingButtonUrl?: string;
+  floatingButtonPrimaryText?: string;
+  floatingButtonSecondaryText?: string;
+}
+
+const {
+  newsletterTitle,
+  newsletterDescription,
+  newsletterButtonText,
+  newsletterPlaceholder,
+  quickLinks = [],
+  columns = [],
+  copyrightText,
+  legalLinks = [],
+  socialLinks = [],
+  socialText,
+  showFloatingButton = false,
+  floatingButtonUrl,
+  floatingButtonPrimaryText,
+  floatingButtonSecondaryText,
+} = Astro.props;
+
+const currentYear = new Date().getFullYear();
+
+// Social icon SVGs
+const socialIcons: Record<string, string> = {
+  linkedin: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M100.3 480H7.4V180.9h92.9V480zM53.8 140.1C24.1 140.1 0 115.5 0 85.8 0 56.1 24.1 32 53.8 32c29.7 0 53.8 24.1 53.8 53.8 0 29.7-24.1 54.3-53.8 54.3zM448 480h-92.7V334.4c0-34.7-.7-79.2-48.3-79.2-48.3 0-55.7 37.7-55.7 76.7V480h-92.8V180.9h89.1v40.8h1.3c12.4-23.5 42.7-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3V480z"/></svg>`,
+  youtube: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"/></svg>`,
+  facebook: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264 512" fill="currentColor"><path d="M76.7 512V283H0v-91h76.7v-71.7C76.7 42.4 124.3 0 193.8 0c33.3 0 61.9 2.5 70.2 3.6V85h-48.2c-37.8 0-45.1 18-45.1 44.3V192H256l-11.7 91h-73.6v229"/></svg>`,
+  twitter: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>`,
+  instagram: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>`,
+};
+
+// Check if we have content from Sanity
+const hasContent = newsletterTitle || columns.length > 0;
+---
+
+<style>
+  /* Footer Styles - Matching Figma Design */
+  .site-footer {
+    background-color: #033180;
+    color: #ffffff;
+    font-family: 'Proxima Nova', 'proxima-nova', 'Helvetica Neue', Arial, sans-serif;
+    padding: 32px 0;
+  }
+
+  .footer-container {
+    max-width: 1312px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Empty state */
+  .footer-empty {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .footer-empty p {
+    margin: 0;
+  }
+
+  /* Newsletter Section */
+  .footer-newsletter {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-newsletter__content {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .footer-newsletter__title {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 30px;
+    margin: 0 0 8px 0;
+  }
+
+  .footer-newsletter__title span {
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .footer-newsletter__desc {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.32px;
+    margin: 0;
+    color: #ffffff;
+  }
+
+  /* HubSpot Form Styling */
+  .footer-form-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .footer-form-container form {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin: 0;
+  }
+
+  .footer-form-container .hs_email {
+    flex-direction: row;
+    margin: 0;
+  }
+
+  .footer-form-container .hs-form-field {
+    margin: 0;
+  }
+
+  .footer-form-container label span {
+    display: none;
+  }
+
+  .footer-form-container .input {
+    margin: 0;
+  }
+
+  .footer-form-container input[type="email"] {
+    background: #ffffff;
+    border: 1px solid #033180;
+    border-radius: 980px;
+    padding: 8px 24px;
+    width: 375px;
+    font-size: 16px;
+    line-height: 24px;
+    color: #4d4d4d;
+    box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.05);
+  }
+
+  .footer-form-container input[type="submit"] {
+    background: #ff490c;
+    color: #ffffff;
+    border: none;
+    border-radius: 980px;
+    padding: 8px 24px;
+    font-size: 16px;
+    line-height: 24px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .footer-form-container input[type="submit"]:hover {
+    background: #cc3a0a;
+  }
+
+  /* Divider */
+  .footer-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    width: 100%;
+  }
+
+  /* Quick Links */
+  .footer-quick-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 16px 0;
+  }
+
+  .footer-quick-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 18px;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-quick-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  .footer-quick-link__icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Navigation Columns */
+  .footer-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 32px;
+  }
+
+  .footer-nav-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .footer-nav-column__title {
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 18px;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .footer-nav-column__links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-nav-link {
+    color: #f2f2f2;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 18px;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-nav-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  /* Bottom Row */
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-bottom__left {
+    display: flex;
+    align-items: center;
+    gap: 23px;
+  }
+
+  .footer-copyright {
+    font-size: 14px;
+    line-height: 18px;
+    color: #ffffff;
+  }
+
+  .footer-legal-link {
+    color: #f2f2f2;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 18px;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-legal-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  .footer-bottom__right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .footer-social-text {
+    font-size: 14px;
+    line-height: 18px;
+    color: #ffffff;
+    text-align: right;
+  }
+
+  /* Social Links - HubSpot Structure */
+  .social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .social-links__link {
+    text-decoration: none;
+  }
+
+  .social-links__link:hover {
+    text-decoration: none;
+  }
+
+  .social-links__icon {
+    display: flex;
+    border-radius: 50%;
+    height: 1.75rem;
+    width: 1.75rem;
+    position: relative;
+    margin: 0 0.35rem;
+    fill: #ffffff;
+    color: #ffffff;
+    transition: opacity 0.2s ease;
+  }
+
+  .social-links__icon:hover {
+    opacity: 0.8;
+  }
+
+  .social-links__icon svg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 1.75rem;
+    width: auto;
+    fill: currentColor;
+  }
+
+  /* Floating Button */
+  .floating-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 50px;
+    padding: 0;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    cursor: pointer;
+    overflow: hidden;
+    height: 48px;
+    text-decoration: none;
+  }
+
+  .floating-button-wrap {
+    width: 200px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 8px 0 8px 18px;
+    background: #081B45;
+    border-radius: 50px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    font-size: 16px;
+    line-height: 24px;
+    color: #fff;
+    overflow: hidden;
+    opacity: 1;
+    transform: translateX(0);
+    transition: transform 400ms ease, opacity 300ms ease;
+    will-change: transform, opacity;
+  }
+
+  .floating-button-text {
+    position: relative;
+    width: 100%;
+    height: 24px;
+  }
+
+  .floating-button-text span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-decoration: none;
+    color: inherit;
+    pointer-events: auto;
+    white-space: nowrap;
+  }
+
+  .floating-button-front {
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .floating-button-back {
+    z-index: 0;
+    opacity: 0;
+  }
+
+  @keyframes fadeFrontSeq {
+    0% { opacity: 0; }
+    8% { opacity: 1; }
+    25% { opacity: 1; }
+    33% { opacity: 0; }
+    50% { opacity: 0; }
+    58% { opacity: 1; }
+    75% { opacity: 1; }
+    83% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes fadeBackSeq {
+    0% { opacity: 0; }
+    25% { opacity: 0; }
+    33% { opacity: 1; }
+    50% { opacity: 1; }
+    58% { opacity: 0; }
+    75% { opacity: 0; }
+    83% { opacity: 1; }
+    98% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .floating-button-front {
+    animation: fadeBackSeq 12s linear 1 forwards;
+  }
+
+  .floating-button-back {
+    animation: fadeFrontSeq 12s linear 1 forwards;
+  }
+
+  .floating-button:hover .floating-button-text span {
+    animation: none !important;
+  }
+
+  .floating-button:hover .floating-button-front {
+    opacity: 1 !important;
+    text-decoration: underline;
+  }
+
+  .floating-button:hover .floating-button-back {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .floating-button.finished .floating-button-wrap {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+
+  .floating-button.finished:hover .floating-button-wrap {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .floating-button-icon {
+    position: absolute;
+    right: 0;
+    background: #ff290c;
+    border-radius: 50%;
+    height: 48px;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+  }
+
+  .floating-button:hover .floating-button-icon {
+    background: #B31803;
+  }
+
+  .floating-button-icon svg {
+    fill: #fff;
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .floating-button-front,
+    .floating-button-back {
+      animation: none !important;
+    }
+    .floating-button.finished .floating-button-wrap,
+    .floating-button-wrap {
+      transform: translateX(110%) !important;
+      opacity: 0 !important;
+    }
+    .floating-button:hover .floating-button-wrap {
+      transform: translateX(0) !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* Cookie Settings Button */
+  .cookie-button {
+    background: transparent;
+    border: none;
+    color: #f2f2f2;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .cookie-button:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  /* Responsive Styles */
+  @media (max-width: 1024px) {
+    .footer-nav {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .footer-newsletter {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer-form-container form {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .footer-form-container input[type="email"] {
+      width: 100%;
+    }
+
+    .footer-nav {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer-bottom__left {
+      flex-wrap: wrap;
+    }
+
+    .footer-quick-links {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-container {
+      padding: 0 16px;
+    }
+
+    .footer-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-bottom__right {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  /* Additional HubSpot Footer Styles */
+  .site-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .site-footer ul {
+    list-style-type: none;
+  }
+
+  .site-footer li {
+    margin-left: 0;
+  }
+
+  /* Primary Nav (Navigation Columns) */
+  .footer-nav {
+    font-size: 14px;
+  }
+
+  .footer-nav-column__links a {
+    display: block;
+    line-height: 1.5;
+    padding: 0.125rem 0;
+  }
+
+  .footer-nav-column__title {
+    display: inline-block;
+    cursor: auto;
+    font-weight: 800;
+    margin-bottom: var(--size-3, 12px);
+  }
+
+  .footer-nav-column__title:hover {
+    text-decoration: none;
+  }
+
+  .footer-nav-column__links {
+    margin-bottom: var(--size-3, 12px);
+  }
+
+  /* Secondary Nav (Quick Links) */
+  .footer-quick-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer-quick-links .footer-quick-link {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Tertiary Nav (Legal Links) */
+  .footer-bottom__left {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--size-4, 16px);
+  }
+
+  /* Form Styles */
+  .site-footer form {
+    width: 100%;
+  }
+
+  .site-footer form input[type='email'] {
+    border: 1px solid #4c4eec;
+    border-radius: 980px;
+    font-size: 16px;
+    color: var(--neutral-60, #4d4d4d);
+    padding: 0.45rem 1.5rem;
+  }
+
+  .site-footer form input[type='submit'] {
+    background: var(--secondary-50, #ff490c);
+    color: var(--neutral-white, #ffffff);
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 1.5rem;
+    margin: 0 0 1.5rem;
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .site-footer form input[type='submit']:hover {
+    background: var(--secondary-70, #cc3a0a);
+  }
+
+  @media only screen and (max-width: 320px) {
+    .footer-bottom__left {
+      gap: var(--size-3, 12px);
+    }
+  }
+
+  @media only screen and (min-width: 720px) {
+    .footer-quick-links {
+      display: flex;
+      gap: var(--size-6, 24px);
+    }
+
+    .footer-nav {
+      grid-template-columns: repeat(5, 1fr);
+      font-size: 14px;
+    }
+
+    .footer-nav-column__links a {
+      padding: 0.125rem 0;
+    }
+
+    .site-footer form {
+      display: flex;
+    }
+
+    .site-footer form .hs_email {
+      display: flex;
+      flex: 1;
+    }
+
+    .site-footer form .hs_email .input {
+      width: 100%;
+    }
+
+    .site-footer form input[type='email'] {
+      min-width: 370px;
+    }
+
+    .site-footer form input[type='submit'] {
+      margin: 0 0 0 0.5rem;
+      width: auto;
+    }
+  }
+</style>
+
+<footer id="js-footer" class="site-footer" data-sanity-edit-target>
+  <div class="footer-container">
+    {!hasContent ? (
+      <!-- Empty state when no content from Sanity -->
+      <div class="footer-empty">
+        <p>Footer content not configured. Please add content in Sanity Studio under Globals → Footer.</p>
+      </div>
+    ) : (
+      <>
+        {/* Newsletter Section */}
+        {newsletterTitle && (
+          <div class="footer-newsletter">
+            <div class="footer-newsletter__content">
+              <h2 class="footer-newsletter__title">
+                {newsletterTitle.includes('Sign up') ? (
+                  <>
+                    <span>Sign up</span> {newsletterTitle.replace('Sign up', '').trim()}
+                  </>
+                ) : (
+                  newsletterTitle
+                )}
+              </h2>
+              {newsletterDescription && (
+                <p class="footer-newsletter__desc">{newsletterDescription}</p>
+              )}
+            </div>
+            
+            {/* HubSpot Form Container */}
+            <div class="footer-form-container" id="footer-newsletter-form">
+              {/* HubSpot form will be embedded here */}
+            </div>
+          </div>
+        )}
+
+        {/* Top Divider */}
+        {newsletterTitle && <div class="footer-divider"></div>}
+
+        {/* Quick Links */}
+        {quickLinks.length > 0 && (
+          <>
+            <div class="footer-quick-links">
+              {quickLinks.map((link) => (
+                <a 
+                  href={link.url} 
+                  class="footer-quick-link"
+                  target={link.isExternal ? '_blank' : undefined}
+                  rel={link.isExternal ? 'noopener noreferrer' : undefined}
+                >
+                  {link.icon && (
+                    <span class="footer-quick-link__icon" set:html={link.icon}></span>
+                  )}
+                  {link.label}
+                </a>
+              ))}
+            </div>
+            <div class="footer-divider"></div>
+          </>
+        )}
+
+        {/* Navigation Columns */}
+        {columns.length > 0 && (
+          <nav class="footer-nav" aria-label="Footer Navigation">
+            {columns.map((column) => (
+              <div class="footer-nav-column">
+                <h3 class="footer-nav-column__title">{column.title}</h3>
+                {column.links && column.links.length > 0 && (
+                  <div class="footer-nav-column__links">
+                    {column.links.map((link) => (
+                      <a 
+                        href={link.url} 
+                        class="footer-nav-link"
+                        target={link.isExternal ? '_blank' : undefined}
+                        rel={link.isExternal ? 'noopener noreferrer' : undefined}
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </nav>
+        )}
+
+        {/* Bottom Divider */}
+        <div class="footer-divider"></div>
+
+        {/* Bottom Row */}
+        <div class="footer-bottom">
+          <div class="footer-bottom__left">
+            {copyrightText && (
+              <span class="footer-copyright">© {currentYear} {copyrightText}</span>
+            )}
+            {legalLinks.map((link) => (
+              <a 
+                href={link.url} 
+                class="footer-legal-link"
+                target={link.isExternal ? '_blank' : undefined}
+                rel={link.isExternal ? 'noopener noreferrer' : undefined}
+              >
+                {link.label}
+              </a>
+            ))}
+            <button
+              type="button"
+              id="hs_show_banner_button"
+              class="cookie-button"
+              onclick="(function(){ var _hsp = window._hsp = window._hsp || []; _hsp.push(['showBanner']); })()"
+            >
+              Cookie Settings
+            </button>
+          </div>
+          {(socialText || socialLinks.length > 0) && (
+            <div class="footer-bottom__right">
+              {socialText && <span class="footer-social-text">{socialText}</span>}
+              {socialLinks.length > 0 && (
+                <div class="social-links flex justify-center items-center">
+                  {socialLinks.map((social) => (
+                    <a 
+                      href={social.url} 
+                      class="social-links__link"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      <span 
+                        class="social-links__icon flex rounded-[50%] h-[1.75rem] w-[1.75rem] relative my-0 mx-[0.35rem] fill-neutral-white hover:fill-neutral-white [&>svg]:absolute [&>svg]:left-[50%] [&>svg]:top-[50%] [&>svg]:translate-y-[-50%] [&>svg]:translate-x-[-50%] [&>svg]:h-[1.75rem] [&>svg]:w-auto"
+                        set:html={social.icon || socialIcons[social.platform] || ''}
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Divider */}
+        <div class="footer-divider"></div>
+      </>
+    )}
+  </div>
+</footer>
+
+{/* Floating Button - only show if enabled and has content */}
+{showFloatingButton && floatingButtonUrl && (
+  <a href={floatingButtonUrl} class="floating-button" aria-label={floatingButtonPrimaryText || 'Contact us'}>
+    <div class="floating-button-wrap" aria-live="polite">
+      <div class="floating-button-text">
+        <span class="floating-button-front">{floatingButtonPrimaryText}</span>
+        <span class="floating-button-back">{floatingButtonSecondaryText}</span>
+      </div>
+    </div>
+    <div class="floating-button-icon" aria-hidden="true">
+      <svg width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8.12372 12.5883C9.80372 15.89 12.5104 18.585 15.8121 20.2767L18.3787 17.71C18.6937 17.395 19.1604 17.29 19.5687 17.43C20.8754 17.8617 22.2871 18.095 23.7337 18.095C24.3754 18.095 24.9004 18.62 24.9004 19.2617V23.3333C24.9004 23.975 24.3754 24.5 23.7337 24.5C12.7787 24.5 3.90039 15.6217 3.90039 4.66667C3.90039 4.025 4.42539 3.5 5.06706 3.5H9.15039C9.79206 3.5 10.3171 4.025 10.3171 4.66667C10.3171 6.125 10.5504 7.525 10.9821 8.83167C11.1104 9.24 11.0171 9.695 10.6904 10.0217L8.12372 12.5883Z" fill="white"/>
+      </svg>
+    </div>
+  </a>
+)}
+
+<!-- HubSpot Form Embed Script -->
+<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize HubSpot form if the container exists
+    var formContainer = document.getElementById('footer-newsletter-form');
+    if (formContainer && typeof window.hbspt !== 'undefined') {
+      window.hbspt.forms.create({
+        portalId: "3375779",
+        formId: "efa7bd0a-929a-4ea4-8480-1c6f77843cf2",
+        region: "na1",
+        target: "#footer-newsletter-form"
+      });
+    }
+
+    // Floating button animation handling
+    var floatingBtn = document.querySelector('.floating-button');
+    if (floatingBtn) {
+      // Check for reduced motion preference
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        floatingBtn.classList.add('finished');
+        return;
+      }
+
+      var displayDuration = 12000; // ms
+      
+      setTimeout(function() {
+        floatingBtn.classList.add('finished');
+      }, displayDuration);
+    }
+  });
+</script>

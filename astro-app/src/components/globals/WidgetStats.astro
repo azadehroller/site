@@ -1,0 +1,86 @@
+---
+import type { WidgetStats as WidgetStatsType } from "../../utils/sanity";
+import { cleanStega } from "../../utils/stega";
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  blurb?: string;
+  stats?: Array<{
+    _key?: string;
+    icon?: string;
+    value?: string;
+    label?: string;
+  }>;
+  horizontalLayout?: boolean;
+}
+
+const { eyebrow, title, blurb, stats, horizontalLayout = false } = Astro.props;
+
+// PRESERVE stega in visible text content for visual editing click-to-edit
+// This is a global/referenced document - clicking will open the global WidgetStats document
+---
+
+<section class="widget-stats mx-auto bg-neutral-white box-shadow-onlight rounded-[32px]" data-sanity-edit-target>
+  <div class:list={[
+    "grid grid-cols-1 sm:grid-cols-1 overflow-hidden rounded-2xl",
+    horizontalLayout ? "lg:grid-cols-2" : ""
+  ]}>
+    <div class="flex items-center p-4 md:p-6 bg-[#F5F8FF]">
+      <header class="flex flex-col gap-4">
+        {eyebrow && (
+          <div class="text-secondary-50 font-extrabold uppercase" data-sanity-edit-target>
+            {eyebrow}
+          </div>
+        )}
+        <div class="text-sm font-semibold leading-6 text-primary-50">
+          <h2 class="block mb-0" data-sanity-edit-target>
+            {title}
+          </h2>
+        </div>
+        {blurb && (
+          <div class="text-base text-primary-50" data-sanity-edit-target>
+            {blurb}
+          </div>
+        )}
+      </header>
+    </div>
+    <div class="p-4 md:p-6">
+      <div class="grid gap-3 grid-cols-3 md:gap-y-4 md:gap-x-5 text-primary-50">
+        {stats?.map((stat) => (
+          <div class="flex flex-col" data-sanity-edit-target>
+            {stat.icon && (
+              <div class="text-sm font-semibold" set:html={stat.icon} />
+            )}
+            <div class="text-3xl md:text-5xl font-bold" data-sanity-edit-target>{stat.value}</div>
+            <div class="md:text-base" data-sanity-edit-target>{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .widget-stats {
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+  }
+  
+  .box-shadow-onlight {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+  
+  .bg-neutral-white {
+    background-color: #ffffff;
+  }
+  
+  .text-secondary-50 {
+    color: var(--secondary-50, #6366f1);
+  }
+  
+  .text-primary-50 {
+    color: var(--primary-50, #1e293b);
+  }
+</style>
+
