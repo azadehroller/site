@@ -293,7 +293,7 @@ export default defineType({
         {type: 'advancedImage', title: 'Advanced Image'},
         {type: 'buttonStack', title: 'Button Stack'},
         {type: 'button', title: 'Button'},
-        {type: 'logoSet', title: 'Logo Set'},
+        {type: 'logoSetReference', title: 'Logo Set (Global)'},
         {type: 'statsSet', title: 'Stats Set'},
         {type: 'quoteBlock', title: 'Quote'},
         {type: 'widgetStatsReference', title: 'Widget Stats'},
@@ -302,6 +302,11 @@ export default defineType({
         {type: 'featuresStackedContent', title: 'Features Stacked Content'},
         {type: 'trustedPartner', title: 'Trusted Partner'},
         {type: 'hubspotFormReference', title: 'HubSpot Form'},
+        {type: 'industrySelector', title: 'Industry Selector'},
+        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
+        {type: 'faqs', title: 'FAQs'},
+        {type: 'resultsList', title: 'Results List'},
+        {type: 'comparisonTable', title: 'Comparison Table'},
       ],
       description: 'Add content blocks to this column',
     }),
@@ -340,7 +345,7 @@ export default defineType({
         {type: 'advancedImage', title: 'Advanced Image'},
         {type: 'buttonStack', title: 'Button Stack'},
         {type: 'button', title: 'Button'},
-        {type: 'logoSet', title: 'Logo Set'},
+        {type: 'logoSetReference', title: 'Logo Set (Global)'},
         {type: 'statsSet', title: 'Stats Set'},
         {type: 'quoteBlock', title: 'Quote'},
         {type: 'widgetStatsReference', title: 'Widget Stats'},
@@ -349,6 +354,11 @@ export default defineType({
         {type: 'featuresStackedContent', title: 'Features Stacked Content'},
         {type: 'trustedPartner', title: 'Trusted Partner'},
         {type: 'hubspotFormReference', title: 'HubSpot Form'},
+        {type: 'industrySelector', title: 'Industry Selector'},
+        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
+        {type: 'faqs', title: 'FAQs'},
+        {type: 'resultsList', title: 'Results List'},
+        {type: 'comparisonTable', title: 'Comparison Table'},
       ],
       description: 'Add content blocks to this column',
       hidden: ({parent}) => parent?.layout === '1',
@@ -372,7 +382,15 @@ export default defineType({
         layout: 'radio',
       },
       initialValue: '32px',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const parent = context.parent as {layout?: string}
+          // Only require if field is visible (layout is not '1')
+          if (parent?.layout !== '1' && !value) {
+            return 'Column 2 Padding Bottom (Mobile) is required'
+          }
+          return true
+        }),
       hidden: ({parent}) => parent?.layout === '1',
     }),
     defineField({
@@ -389,7 +407,7 @@ export default defineType({
         {type: 'advancedImage', title: 'Advanced Image'},
         {type: 'buttonStack', title: 'Button Stack'},
         {type: 'button', title: 'Button'},
-        {type: 'logoSet', title: 'Logo Set'},
+        {type: 'logoSetReference', title: 'Logo Set (Global)'},
         {type: 'statsSet', title: 'Stats Set'},
         {type: 'quoteBlock', title: 'Quote'},
         {type: 'widgetStatsReference', title: 'Widget Stats'},
@@ -398,6 +416,11 @@ export default defineType({
         {type: 'featuresStackedContent', title: 'Features Stacked Content'},
         {type: 'trustedPartner', title: 'Trusted Partner'},
         {type: 'hubspotFormReference', title: 'HubSpot Form'},
+        {type: 'industrySelector', title: 'Industry Selector'},
+        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
+        {type: 'faqs', title: 'FAQs'},
+        {type: 'resultsList', title: 'Results List'},
+        {type: 'comparisonTable', title: 'Comparison Table'},
       ],
       description: 'Add content blocks to this column',
       hidden: ({parent}) => !['3', '4'].includes(parent?.layout),
@@ -421,7 +444,15 @@ export default defineType({
         layout: 'radio',
       },
       initialValue: '32px',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const parent = context.parent as {layout?: string}
+          // Only require if field is visible (layout is '3' or '4')
+          if (['3', '4'].includes(parent?.layout || '') && !value) {
+            return 'Column 3 Padding Bottom (Mobile) is required'
+          }
+          return true
+        }),
       hidden: ({parent}) => !['3', '4'].includes(parent?.layout),
     }),
     defineField({
@@ -438,7 +469,7 @@ export default defineType({
         {type: 'advancedImage', title: 'Advanced Image'},
         {type: 'buttonStack', title: 'Button Stack'},
         {type: 'button', title: 'Button'},
-        {type: 'logoSet', title: 'Logo Set'},
+        {type: 'logoSetReference', title: 'Logo Set (Global)'},
         {type: 'statsSet', title: 'Stats Set'},
         {type: 'quoteBlock', title: 'Quote'},
         {type: 'widgetStatsReference', title: 'Widget Stats'},
@@ -447,6 +478,11 @@ export default defineType({
         {type: 'featuresStackedContent', title: 'Features Stacked Content'},
         {type: 'trustedPartner', title: 'Trusted Partner'},
         {type: 'hubspotFormReference', title: 'HubSpot Form'},
+        {type: 'industrySelector', title: 'Industry Selector'},
+        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
+        {type: 'faqs', title: 'FAQs'},
+        {type: 'resultsList', title: 'Results List'},
+        {type: 'comparisonTable', title: 'Comparison Table'},
       ],
       description: 'Add content blocks to this column',
       hidden: ({parent}) => parent?.layout !== '4',
@@ -470,7 +506,15 @@ export default defineType({
         layout: 'radio',
       },
       initialValue: '32px',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const parent = context.parent as {layout?: string}
+          // Only require if field is visible (layout is '4')
+          if (parent?.layout === '4' && !value) {
+            return 'Column 4 Padding Bottom (Mobile) is required'
+          }
+          return true
+        }),
       hidden: ({parent}) => parent?.layout !== '4',
     }),
   ],
@@ -493,7 +537,7 @@ export default defineType({
         advancedImage: 'Advanced Image',
         buttonStack: 'Button Stack',
         button: 'Button',
-        logoSet: 'Logo Set',
+        logoSetReference: 'Logo Set (Global)',
         statsSet: 'Stats Set',
         quoteBlock: 'Quote',
         widgetStatsReference: 'Widget Stats',
@@ -502,6 +546,11 @@ export default defineType({
         featuresStackedContent: 'Features Stacked Content',
         trustedPartner: 'Trusted Partner',
         hubspotFormReference: 'HubSpot Form',
+        industrySelector: 'Industry Selector',
+        featuresSelectorGlobalReference: 'Features Selector (Global)',
+        faqs: 'FAQs',
+        resultsList: 'Results List',
+        comparisonTable: 'Comparison Table',
       }
 
       // Helper to get block labels from a column array

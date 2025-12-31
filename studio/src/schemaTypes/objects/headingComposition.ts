@@ -106,7 +106,7 @@ export default defineType({
         ],
         layout: 'radio',
       },
-      initialValue: 'CENTER',
+      initialValue: 'LEFT',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -147,7 +147,7 @@ export default defineType({
         ],
         layout: 'dropdown',
       },
-      initialValue: 'none',
+      initialValue: 'red',
     }),
     defineField({
       name: 'headingType',
