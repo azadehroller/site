@@ -1,32 +1,26 @@
 ---
-import Card from "../components/Card.astro";
-import Columns from "../components/blocks/Columns.astro";
-import ColumnContent from "../components/blocks/ColumnContent.astro";
-import Layout from "../layouts/Layout.astro";
-import { getPage, getLandingPage, type ColumnsBlock, type Post } from "../utils/sanity";
+import Columns from "../../components/blocks/Columns.astro";
+import ColumnContent from "../../components/blocks/ColumnContent.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getCompetitor, type ColumnsBlock } from "../../utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
 const { slug } = Astro.params;
+const { data: competitor } = await getCompetitor(slug as string, Astro.request);
 
-// First try to find a landing page, then fall back to regular page
-const { data: landingPage } = await getLandingPage(slug as string, Astro.request);
-const { data: regularPage } = landingPage ? { data: null } : await getPage(slug as string, Astro.request);
-
-const page = landingPage || regularPage;
-
-if (!page) {
+if (!competitor) {
   return Astro.redirect('/404');
 }
 
 // Document info for visual editing
-const documentId = page?._id || '';
-const documentType = landingPage ? 'landingPage' : 'page';
+const documentId = competitor?._id || '';
+const documentType = 'competitor';
 ---
 
-<Layout title={page?.title || "Page"}>
-  {page?.sections?.map((section) => {
+<Layout title={competitor?.title || "Competitor"}>
+  {competitor?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;
       const sectionKey = columnsBlock._key;
@@ -42,6 +36,10 @@ const documentType = landingPage ? 'landingPage' : 'page';
           paddingTopMobile={columnsBlock.paddingTopMobile}
           paddingBottom={columnsBlock.paddingBottom}
           paddingBottomMobile={columnsBlock.paddingBottomMobile}
+          paddingLeft={columnsBlock.paddingLeft}
+          paddingLeftMobile={columnsBlock.paddingLeftMobile}
+          paddingRight={columnsBlock.paddingRight}
+          paddingRightMobile={columnsBlock.paddingRightMobile}
           sectionKey={sectionKey}
           documentId={documentId}
           documentType={documentType}
@@ -80,9 +78,8 @@ const documentType = landingPage ? 'landingPage' : 'page';
           />}
         </Columns>
       );
-    } else if (section._type === "post") {
-      const post = section as Post;
-      return <Card post={post} />;
     }
   })}
 </Layout>
+
+

@@ -1,0 +1,22 @@
+---
+import PartnersLanding from "../../templates/partners/PartnersLanding.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getPartnersLandingPage } from "../../utils/sanity";
+
+// SSR enabled for preview/draft mode
+export const prerender = false;
+
+const { data: partnersLanding } = await getPartnersLandingPage(Astro.request);
+
+// Document info for visual editing
+const documentId = partnersLanding?._id || '';
+const documentType = 'partnersLandingPage';
+---
+
+<Layout title={partnersLanding?.title || "Partners"}>
+  <PartnersLanding 
+    partnersLanding={partnersLanding}
+    documentId={documentId}
+    documentType={documentType}
+  />
+</Layout>

@@ -1,0 +1,24 @@
+---
+import CompetitorsLanding from "../../templates/competitors/CompetitorsLanding.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getCompetitorsLandingPage } from "../../utils/sanity";
+
+// SSR enabled for preview/draft mode
+export const prerender = false;
+
+const { data: competitorsLanding } = await getCompetitorsLandingPage(Astro.request);
+
+// Document info for visual editing
+const documentId = competitorsLanding?._id || '';
+const documentType = 'competitorsLandingPage';
+---
+
+<Layout title={competitorsLanding?.title || "Competitors"}>
+  <CompetitorsLanding 
+    competitorsLanding={competitorsLanding}
+    documentId={documentId}
+    documentType={documentType}
+  />
+</Layout>
+
+
