@@ -4,19 +4,23 @@ import { ViewTransitions } from 'astro:transitions';
 import { VisualEditing } from '@sanity/astro/visual-editing';
 import '../styles/global.css';
 import Footer from '../components/globals/Footer.astro';
-import { getFooter } from '../utils/sanity';
+import Header from '../components/globals/Header.astro';
+import { getFooter, getHeader } from '../utils/sanity';
 
 interface Props {
   title: string;
   headDocument?: string;
+  headerTheme?: 'default' | 'dark' | 'light' | 'industry_report';
 }
 
-const { title, headDocument } = Astro.props;
-const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED == 'true'
+const { title, headDocument, headerTheme = 'default' } = Astro.props;
+
+const visualEditingEnabled = true; // Temporarily enabled for testing - was: import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED == 'true'
 // Localhost/dev: disable external trackers (gtag/GTM, Facebook, etc.) that may be blocked by course policy.
 const enableThirdPartyScripts = import.meta.env.PROD;
 
-// Fetch footer data from Sanity
+// Fetch header and footer data from Sanity
+const { data: headerData } = await getHeader(Astro.request);
 const { data: footerData } = await getFooter(Astro.request);
 
 ---
@@ -697,16 +701,17 @@ window.VWO.eB = window._vwoCc && window._vwoCc.dBL ? false : true;
   </head>
   <body class="m-0 bg-white font-sans">
     <div class="main-wrapper">
-      <header class="fixed left-0 right-0 top-0 z-10 border-b border-gray-300 bg-white px-1 sm:relative sm:my-3 sm:border-0 sm:p-0">
-        <a
-          class="my-3 block px-2 text-lg font-extrabold text-black no-underline sm:my-3 sm:mb-2 sm:text-2xl"
-          class="my-3 block px-2 text-lg font-extrabold text-black no-underline sm:my-3 sm:mb-2 sm:text-2xl"
-          href="/"
-          >Astro + Sanity</a
-        >
-      </header>
-      <main class="mt-11 sm:mt-0">
-      <main class="mt-11 sm:mt-0">
+      <Header
+        logo={headerData?.logo}
+        logoDark={headerData?.logoDark}
+        logoAlt={headerData?.logoAlt}
+        logoLink={headerData?.logoLink}
+        navItems={headerData?.navItems}
+        megaMenus={headerData?.megaMenus}
+        buttons={headerData?.buttons}
+        headerTheme={headerTheme}
+      />
+      <main id="main-content" class="mt-11 sm:mt-0">
         <slot />
       </main>
     </div>
