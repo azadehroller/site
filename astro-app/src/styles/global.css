@@ -1,108 +1,19 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Tell Tailwind where to scan for classes */
-@source "../components/**/*.astro";
 @source "../layouts/**/*.astro";
 @source "../pages/**/*.astro";
 @source "../templates/**/*.astro";
+@source "../components/**/*.astro";
 
 /* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Minimal custom theme configuration */
 @theme {
   --font-family-sans: Inter, system-ui, sans-serif;
   --font-family-serif: 'PT Serif', serif;
 }
-
-/* ===================================
-   Global Blog Styles (HubSpot-compatible)
-   =================================== */
-
-/* Base body styling */
-html {
-  font-size: 16px; /* 1rem = 16px */
-  scroll-behavior: smooth;
-}
-body {
-  /* font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; */
-  color: #2d3748;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 1rem;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
-/* HubSpot Video Widget */
-.hs-video-widget {
-  margin: 2rem 0;
-}
-
-.hs-video-container {
-  margin: 0 auto;
-}
-
-.hs-video-wrapper {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.hs-video-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* HubSpot Image Styles */
-.hs-image-widget {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Blog content images */
-.blog-post__body img,
-.blog-post__article img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-/* Anchor styling for HubSpot anchors */
-a[data-hs-anchor="true"] {
-  display: block;
-  position: relative;
-  top: -100px;
-  visibility: hidden;
-}
-
-/* Selection color */
-::selection {
-  background: rgba(3, 49, 128, 0.2);
-}
-
-/* Focus styles */
-a:focus,
-button:focus {
-  outline: 2px solid #033180;
-  outline-offset: 2px;
-}
-
-
-/* Remove default margins on figures */
-figure {
-  margin: 0;
-}
-
-/* ===================================
-   HubSpot Design System Variables
-   =================================== */
-
 :root {
   /* Container widths */
   --container-sm: 544px;
@@ -223,6 +134,497 @@ figure {
   /* Column gap */
   --column-gap: 2.13%;
 }
+/* ===================================
+   Global Blog Styles (HubSpot-compatible)
+   =================================== */
+
+/* Base body styling */
+html {
+  font-size: calc(0.889 * var(--base-font-size)); /* 1rem = 16px */
+  scroll-behavior: smooth;
+}
+.bg-accent-primary-30 {
+  background-color: rgb(206 223 253/30%)
+}
+
+.bg-green-10 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(230 255 240 / var(--tw-bg-opacity,1))
+}
+
+.bg-gx-80 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(60 0 145 / var(--tw-bg-opacity,1))
+}
+
+.bg-gx-90 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(165 84 255 / var(--tw-bg-opacity,1))
+}
+
+.bg-iris-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(96 63 245 / var(--tw-bg-opacity,1))
+}
+
+.bg-neutral-60 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(77 77 77 / var(--tw-bg-opacity,1))
+}
+
+.bg-neutral-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity,1))
+}
+
+.bg-primary-10 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(206 223 253 / var(--tw-bg-opacity,1))
+}
+
+.bg-primary-40 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(7 77 197 / var(--tw-bg-opacity,1))
+}
+
+.bg-primary-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(3 49 128 / var(--tw-bg-opacity,1))
+}
+
+.bg-primary-60 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(3 38 99 / var(--tw-bg-opacity,1))
+}
+
+.bg-primary-70 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(1 19 50 / var(--tw-bg-opacity,1))
+}
+
+.bg-secondary-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 41 12 / var(--tw-bg-opacity,1))
+}
+
+.bg-transparent {
+  background-color: #fff0
+}
+
+.bg-announcement {
+  background-image: linear-gradient(90deg,#0960F6 0%,#ff290c 100%)
+}
+
+.bg-events-default {
+  background-image: url(https://3375779.fs1.hubspotusercontent-na1.net/hub/3375779/event-default-bg.png)
+}
+
+.bg-hero {
+  background-image: linear-gradient(180deg,#033180 29.5%,#022765 100%)
+}
+
+.bg-industry-report {
+  background-image: linear-gradient(to right,#0960F6 0%,#00B8FF 40%,#3EF78B 100%)
+}
+
+.bg-new-design {
+  background-image: linear-gradient(270deg,#C239FB 0%,#3F40F2 10%,#3F40F2 90%,#C239FB 100%);
+}
+
+.bg-new-design-mobile {
+  background-image: linear-gradient(272deg,#C239FB 0%,#3F40F2 27.41%);
+}
+
+.bg-pill-gradient {
+  background-image: linear-gradient(276deg,#ff290c 0%,#074dc5 100%)
+}
+
+.bg-user-review {
+  background-image: url(https://3375779.fs1.hubspotusercontent-na1.net/hubfs/3375779/user-review-widget.png)
+}
+
+.bg-webinar-default {
+  background-image: url(https://3375779.fs1.hubspotusercontent-na1.net/hub/3375779/webinar-default-bg.png)
+}
+
+.bg-widget-group {
+  background-image: linear-gradient(0deg,rgb(229 239 255 / .35),rgb(229 239 255 / .35))
+}
+
+.bg-widget-industries {
+  background-image: linear-gradient(100deg,#FFF 0%,#F5F8FF 61.98%)
+}
+
+.from-primary-50 {
+  --tw-gradient-from: #033180 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(3 49 128 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)
+}
+
+.to-secondary-60 {
+  --tw-gradient-to: #991200 var(--tw-gradient-to-position)
+}
+
+.bg-cover {
+  background-size: cover
+}
+
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text
+}
+
+.fill-neutral-white {
+  fill: #fff
+}
+
+.fill-primary-50 {
+  fill: #033180
+}
+
+.text-left {
+  text-align: left
+}
+
+.text-center {
+  text-align: center
+}
+
+.text-right {
+  text-align: right
+}
+
+.font-body {
+  font-family: proxima-nova,sans-serif
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem
+}
+
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1
+}
+
+.text-\[2\.5rem\] {
+  font-size: 2.5rem
+}
+
+.text-\[2rem\] {
+  font-size: 2rem
+}
+
+.text-\[40px\] {
+  font-size: 40px
+}
+
+.text-\[8px\] {
+  font-size: 8px
+}
+
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem
+}
+
+.text-sm {
+  font-size: .875rem;
+  line-height: 1.25rem
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem
+}
+
+.text-xs {
+  font-size: .75rem;
+  line-height: 1rem
+}
+
+.p-0 {
+  padding: 0
+}
+
+.p-3 {
+  padding: 1rem
+}
+
+.p-4 {
+  padding: 1.5rem
+}
+
+.p-5 {
+  padding: 2rem
+}
+
+.p-6 {
+  padding: 3rem
+}
+
+.px-0 {
+  padding-left: 0;
+  padding-right: 0
+}
+
+.px-2 {
+  padding-left: .5rem;
+  padding-right: .5rem
+}
+
+.px-3 {
+  padding-left: 1rem;
+  padding-right: 1rem
+}
+
+.px-4 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem
+}
+
+.px-5 {
+  padding-left: 2rem;
+  padding-right: 2rem
+}
+
+.px-6 {
+  padding-left: 3rem;
+  padding-right: 3rem
+}
+
+.px-\[32px\] {
+  padding-left: 32px;
+  padding-right: 32px
+}
+
+.py-0 {
+  padding-top: 0;
+  padding-bottom: 0
+}
+
+.py-1 {
+  padding-top: .25rem;
+  padding-bottom: .25rem
+}
+
+.py-2 {
+  padding-top: .5rem;
+  padding-bottom: .5rem
+}
+
+.py-3 {
+  padding-top: 1rem;
+  padding-bottom: 1rem
+}
+
+.py-4 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem
+}
+
+.py-5 {
+  padding-top: 2rem;
+  padding-bottom: 2rem
+}
+
+.py-6 {
+  padding-top: 3rem;
+  padding-bottom: 3rem
+}
+
+.py-\[8px\] {
+  padding-top: 8px;
+  padding-bottom: 8px
+}
+
+.pb-0 {
+  padding-bottom: 0
+}
+
+.pb-2 {
+  padding-bottom: .5rem
+}
+
+.pb-3 {
+  padding-bottom: 1rem
+}
+
+.pb-4 {
+  padding-bottom: 1.5rem
+}
+
+.pb-5 {
+  padding-bottom: 2rem
+}
+
+.pb-7 {
+  padding-bottom: 4rem
+}
+
+.pb-\[3\.8rem\] {
+  padding-bottom: 3.8rem
+}
+
+.pe-3 {
+  padding-inline-end:1rem}
+
+.pe-4 {
+  padding-inline-end:1.5rem}
+
+.pl-0 {
+  padding-left: 0
+}
+
+.pl-3 {
+  padding-left: 1rem
+}
+
+.pl-4 {
+  padding-left: 1.5rem
+}
+
+.pl-6 {
+  padding-left: 3rem
+}
+
+.pr-0 {
+  padding-right: 0
+}
+
+.pr-4 {
+  padding-right: 1.5rem
+}
+
+.ps-3 {
+  padding-inline-start:1rem}
+
+.ps-4 {
+  padding-inline-start:1.5rem}
+
+.pt-0 {
+  padding-top: 0
+}
+
+.pt-2 {
+  padding-top: .5rem
+}
+
+.pt-3 {
+  padding-top: 1rem
+}
+
+.pt-4 {
+  padding-top: 1.5rem
+}
+
+.pt-5 {
+  padding-top: 2rem
+}
+
+.pt-6 {
+  padding-top: 3rem
+}
+
+.pt-7 {
+  padding-top: 4rem
+}
+body {
+  /* font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; */
+  color: #2d3748;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 1rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* HubSpot Video Widget */
+.hs-video-widget {
+  margin: 2rem 0;
+}
+
+.hs-video-container {
+  margin: 0 auto;
+}
+
+.hs-video-wrapper {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.hs-video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* HubSpot Image Styles */
+.hs-image-widget {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Blog content images */
+.blog-post__body img,
+.blog-post__article img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Anchor styling for HubSpot anchors */
+a[data-hs-anchor="true"] {
+  display: block;
+  position: relative;
+  top: -100px;
+  visibility: hidden;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(3, 49, 128, 0.2);
+}
+
+/* Focus styles */
+a:focus,
+button:focus {
+  outline: 2px solid #033180;
+  outline-offset: 2px;
+}
+
+
+/* Remove default margins on figures */
+figure {
+  margin: 0;
+}
+
+/* ===================================
+   HubSpot Design System Variables
+   =================================== */
+
+
 
 /* ===================================
    Typography
