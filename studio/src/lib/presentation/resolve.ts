@@ -59,6 +59,30 @@ export const locations = {
       }
     },
   }),
+  feature: defineLocations({
+    select: {title: 'title', slug: 'slug.current'},
+    resolve: (doc) => ({
+      locations: [
+        {title: doc?.title || 'Feature', href: `/features/${doc?.slug}`},
+      ],
+    }),
+  }),
+  industry: defineLocations({
+    select: {title: 'title', slug: 'slug.current'},
+    resolve: (doc) => ({
+      locations: [
+        {title: doc?.title || 'Industry', href: `/industries/${doc?.slug}`},
+      ],
+    }),
+  }),
+  solution: defineLocations({
+    select: {title: 'title', slug: 'slug.current'},
+    resolve: (doc) => ({
+      locations: [
+        {title: doc?.title || 'Solution', href: `/solutions/${doc?.slug}`},
+      ],
+    }),
+  }),
 }
 
 /**
@@ -81,6 +105,18 @@ export const resolve: DocumentResolver = {
     {
       route: '/post/:slug',
       filter: `_type == "post" && slug.current == $slug`,
+    },
+    {
+      route: '/features/:slug',
+      filter: `_type == "feature" && slug.current == $slug`,
+    },
+    {
+      route: '/industries/:slug',
+      filter: `_type == "industry" && slug.current == $slug`,
+    },
+    {
+      route: '/solutions/:slug',
+      filter: `_type == "solution" && slug.current == $slug`,
     },
     {
       route: '/t',
