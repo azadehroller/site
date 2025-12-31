@@ -12,6 +12,7 @@ export default defineType({
   icon: () => '🎯',
   groups: [
     {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
     {name: 'seo', title: 'SEO'},
   ],
   fields: [
@@ -55,6 +56,24 @@ export default defineType({
           type: 'divider',
         },
       ],
+    }),
+    // Settings
+    defineField({
+      name: 'headerTheme',
+      title: 'Header Theme',
+      type: 'string',
+      group: 'settings',
+      description: 'Set the header theme for this page. This affects the header appearance.',
+      options: {
+        list: [
+          { title: 'Default', value: 'default' },
+          { title: 'Dark', value: 'dark' },
+          { title: 'Light', value: 'light' },
+          { title: 'Industry Report', value: 'industry_report' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'default',
     }),
     // SEO fields
     defineField({

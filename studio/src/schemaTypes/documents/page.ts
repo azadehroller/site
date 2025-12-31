@@ -109,6 +109,24 @@ export default defineType({
       },
       initialValue: 'default',
     }),
+
+    defineField({
+      name: 'headerTheme',
+      title: 'Header Theme',
+      type: 'string',
+      group: 'settings',
+      description: 'Set the header theme for this page. This affects the header appearance.',
+      options: {
+        list: [
+          { title: 'Default', value: 'default' },
+          { title: 'Dark', value: 'dark' },
+          { title: 'Light', value: 'light' },
+          { title: 'Industry Report', value: 'industry_report' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'default',
+    }),
   ],
 
   preview: {

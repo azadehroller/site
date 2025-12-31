@@ -761,5 +761,423 @@ export const featuresSelectorGlobal = defineType({
   },
 })
 
+/**
+ * Header Global Document
+ * A singleton document that contains the header/navigation data
+ * This is edited in one place and used site-wide
+ */
+
+// Mega menu item (sub-item within a dropdown)
+const megaMenuItem = {
+  type: 'object',
+  name: 'megaMenuItem',
+  title: 'Menu Item',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 2,
+    }),
+    defineField({
+      name: 'icon',
+      title: 'Icon (SVG)',
+      type: 'text',
+      rows: 4,
+      description: 'Optional SVG icon code',
+    }),
+    defineField({
+      name: 'link',
+      title: 'Link',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'href',
+          title: 'URL',
+          type: 'string',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'openInNewTab',
+          title: 'Open in New Tab',
+          type: 'boolean',
+          initialValue: false,
+        }),
+      ],
+    }),
+    defineField({
+      name: 'topFeatures',
+      title: 'Top Features',
+      type: 'array',
+      description: 'Optional feature tags (for Features menu type)',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+            }),
+            defineField({
+              name: 'link',
+              title: 'Link',
+              type: 'string',
+            }),
+          ],
+        },
+      ],
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      description: 'description',
+    },
+    prepare({title, description}: {title?: string; description?: string}) {
+      return {
+        title: title || 'Menu Item',
+        subtitle: description?.substring(0, 50) || '',
+      }
+    },
+  },
+}
+
+// Featured item in mega menu
+const megaFeaturedItem = {
+  type: 'object',
+  name: 'megaFeaturedItem',
+  title: 'Featured Item',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'label',
+      title: 'Label',
+      type: 'string',
+      description: 'Small label text (e.g., "Product Update")',
+    }),
+    defineField({
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
+      name: 'link',
+      title: 'Link',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'href',
+          title: 'URL',
+          type: 'string',
+        }),
+        defineField({
+          name: 'openInNewTab',
+          title: 'Open in New Tab',
+          type: 'boolean',
+          initialValue: false,
+        }),
+      ],
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      media: 'image',
+    },
+    prepare({title, media}: {title?: string; media?: any}) {
+      return {
+        title: title || 'Featured Item',
+        media,
+      }
+    },
+  },
+}
+
+// Mega menu dropdown configuration
+const megaMenuDropdown = {
+  type: 'object',
+  name: 'megaMenuDropdown',
+  title: 'Mega Menu',
+  fields: [
+    defineField({
+      name: 'parentLabel',
+      title: 'Parent Label',
+      type: 'string',
+      description: 'The label of the menu item that will have this mega menu (e.g., "Features", "Industries")',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'menuType',
+      title: 'Menu Type',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Why ROLLER?', value: 'why_roller'},
+          {title: 'Features', value: 'features'},
+          {title: 'Industries', value: 'industries'},
+          {title: 'Solutions', value: 'solutions'},
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'features',
+    }),
+    defineField({
+      name: 'introTitle',
+      title: 'Intro Title',
+      type: 'string',
+      description: 'Large title shown on the left side of the dropdown',
+    }),
+    defineField({
+      name: 'introDescription',
+      title: 'Intro Description',
+      type: 'text',
+      rows: 2,
+      description: 'Description shown below the intro title',
+    }),
+    defineField({
+      name: 'items',
+      title: 'Menu Items',
+      type: 'array',
+      of: [megaMenuItem],
+      validation: (Rule) => Rule.max(10),
+    }),
+    defineField({
+      name: 'featuredLabel',
+      title: 'Featured Section Label',
+      type: 'string',
+      description: 'Label for the featured section (e.g., "What\'s New", "Customer Stories")',
+    }),
+    defineField({
+      name: 'featuredItems',
+      title: 'Featured Items',
+      type: 'array',
+      of: [megaFeaturedItem],
+      validation: (Rule) => Rule.max(3),
+    }),
+    defineField({
+      name: 'ctaLabel',
+      title: 'CTA Label',
+      type: 'string',
+      description: 'Label for the "See all" link (e.g., "See all features")',
+    }),
+    defineField({
+      name: 'ctaLink',
+      title: 'CTA Link',
+      type: 'string',
+      description: 'URL for the "See all" link',
+    }),
+  ],
+  preview: {
+    select: {
+      parentLabel: 'parentLabel',
+      menuType: 'menuType',
+    },
+    prepare({parentLabel, menuType}: {parentLabel?: string; menuType?: string}) {
+      return {
+        title: parentLabel || 'Mega Menu',
+        subtitle: menuType || 'No type',
+      }
+    },
+  },
+}
+
+// Header button
+const headerButton = {
+  type: 'object',
+  name: 'headerButton',
+  title: 'Header Button',
+  fields: [
+    defineField({
+      name: 'label',
+      title: 'Label',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'href',
+      title: 'URL',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'variant',
+      title: 'Variant',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Primary', value: 'primary'},
+          {title: 'Secondary', value: 'secondary'},
+          {title: 'Text', value: 'text'},
+        ],
+      },
+      initialValue: 'primary',
+    }),
+    defineField({
+      name: 'openInNewTab',
+      title: 'Open in New Tab',
+      type: 'boolean',
+      initialValue: false,
+    }),
+  ],
+  preview: {
+    select: {
+      label: 'label',
+      variant: 'variant',
+    },
+    prepare({label, variant}: {label?: string; variant?: string}) {
+      return {
+        title: label || 'Button',
+        subtitle: variant || 'primary',
+      }
+    },
+  },
+}
+
+// Main nav item (top-level)
+const mainNavItem = {
+  type: 'object',
+  name: 'mainNavItem',
+  title: 'Navigation Item',
+  fields: [
+    defineField({
+      name: 'label',
+      title: 'Label',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'href',
+      title: 'URL',
+      type: 'string',
+      description: 'Leave empty if this item has a dropdown',
+    }),
+    defineField({
+      name: 'hasMegaMenu',
+      title: 'Has Mega Menu',
+      type: 'boolean',
+      description: 'Enable if this item should open a mega dropdown',
+      initialValue: false,
+    }),
+  ],
+  preview: {
+    select: {
+      label: 'label',
+      hasMegaMenu: 'hasMegaMenu',
+    },
+    prepare({label, hasMegaMenu}: {label?: string; hasMegaMenu?: boolean}) {
+      return {
+        title: label || 'Nav Item',
+        subtitle: hasMegaMenu ? '📂 Has Mega Menu' : '',
+      }
+    },
+  },
+}
+
+export const headerGlobal = defineType({
+  name: 'headerGlobal',
+  title: 'Header',
+  type: 'document',
+  icon: () => '🧭',
+  groups: [
+    {name: 'logo', title: 'Logo', default: true},
+    {name: 'navigation', title: 'Navigation'},
+    {name: 'megaMenus', title: 'Mega Menus'},
+    {name: 'buttons', title: 'Buttons'},
+  ],
+  fields: [
+    // Logo section
+    defineField({
+      name: 'logo',
+      title: 'Logo (Light Background)',
+      type: 'image',
+      group: 'logo',
+      description: 'Logo shown on light/white backgrounds',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
+      name: 'logoDark',
+      title: 'Logo (Dark Background)',
+      type: 'image',
+      group: 'logo',
+      description: 'Logo shown on dark backgrounds',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
+      name: 'logoAlt',
+      title: 'Logo Alt Text',
+      type: 'string',
+      group: 'logo',
+      initialValue: 'Roller Logo',
+    }),
+    defineField({
+      name: 'logoLink',
+      title: 'Logo Link',
+      type: 'string',
+      group: 'logo',
+      initialValue: '/',
+      description: 'URL the logo links to (usually homepage)',
+    }),
+
+    // Navigation items
+    defineField({
+      name: 'navItems',
+      title: 'Navigation Items',
+      type: 'array',
+      of: [mainNavItem],
+      group: 'navigation',
+      description: 'Main navigation menu items',
+      validation: (Rule) => Rule.max(8),
+    }),
+
+    // Mega Menu configurations
+    defineField({
+      name: 'megaMenus',
+      title: 'Mega Menu Configurations',
+      type: 'array',
+      of: [megaMenuDropdown],
+      group: 'megaMenus',
+      description: 'Configure mega menu dropdowns for navigation items',
+    }),
+
+    // Header buttons (CTA)
+    defineField({
+      name: 'buttons',
+      title: 'Header Buttons',
+      type: 'array',
+      of: [headerButton],
+      group: 'buttons',
+      description: 'CTA buttons in the header',
+      validation: (Rule) => Rule.max(3),
+    }),
+  ],
+  preview: {
+    prepare() {
+      return {
+        title: 'Header',
+        subtitle: 'Site-wide header configuration',
+      }
+    },
+  },
+})
+
 export default widgetStats
 
