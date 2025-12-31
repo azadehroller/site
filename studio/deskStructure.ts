@@ -12,10 +12,12 @@ import {
   BulbOutlineIcon,
   EarthGlobeIcon,
   ComponentIcon,
-  StackCompactIcon,
   SparklesIcon,
   BlockElementIcon,
   CloseCircleIcon,
+  UsersIcon,
+  LinkIcon,
+  PresentationIcon,
 } from '@sanity/icons'
 
 export const deskStructure: StructureResolver = (S, context) =>
@@ -81,6 +83,22 @@ export const deskStructure: StructureResolver = (S, context) =>
                     .documentId('industriesLandingPage')
                 ),
               S.listItem()
+                .title('Partners')
+                .icon(LinkIcon)
+                .child(
+                  S.document()
+                    .schemaType('partnersLandingPage')
+                    .documentId('partnersLandingPage')
+                ),
+              S.listItem()
+                .title('Competitors')
+                .icon(UsersIcon)
+                .child(
+                  S.document()
+                    .schemaType('competitorsLandingPage')
+                    .documentId('competitorsLandingPage')
+                ),
+              S.listItem()
                 .title('Not Found Page')
                 .icon(CloseCircleIcon)
                 .child(
@@ -89,6 +107,28 @@ export const deskStructure: StructureResolver = (S, context) =>
                     .documentId('notFoundPage')
                 ),
             ])
+        ),
+
+      // ==========================================
+      // LANDING PAGES - Root-level landing pages
+      // ==========================================
+      S.listItem()
+        .title('Landing Pages')
+        .icon(PresentationIcon)
+        .child(
+          S.documentTypeList('landingPage')
+            .title('Landing Pages')
+        ),
+
+      // ==========================================
+      // GENERAL PAGES - General pages with root-level slugs
+      // ==========================================
+      S.listItem()
+        .title('General Pages')
+        .icon(DocumentsIcon)
+        .child(
+          S.documentTypeList('page')
+            .title('General Pages')
         ),
 
       S.divider(),
@@ -127,14 +167,25 @@ export const deskStructure: StructureResolver = (S, context) =>
         ),
 
       // ==========================================
-      // ROLLER - ROLLER Content
+      // PARTNERS - Partner Pages
       // ==========================================
       S.listItem()
-        .title('ROLLER')
-        .icon(StackCompactIcon)
+        .title('Partners')
+        .icon(LinkIcon)
         .child(
-          S.documentTypeList('roller')
-            .title('ROLLER')
+          S.documentTypeList('partner')
+            .title('Partners')
+        ),
+
+      // ==========================================
+      // COMPETITORS - Competitor Comparison Pages
+      // ==========================================
+      S.listItem()
+        .title('Competitors')
+        .icon(UsersIcon)
+        .child(
+          S.documentTypeList('competitor')
+            .title('Competitors')
         ),
 
       S.divider(),
@@ -200,6 +251,32 @@ export const deskStructure: StructureResolver = (S, context) =>
                   S.document()
                     .schemaType('testimonialCarousel')
                     .documentId('testimonialCarousel')
+                ),
+              S.listItem()
+                .title('Logo Set (Light Background)')
+                .icon(TagIcon)
+                .child(
+                  S.document()
+                    .schemaType('logoSetGlobal')
+                    .documentId('logoSetGlobal')
+                    .title('Logo Set (Light Background)')
+                ),
+              S.listItem()
+                .title('Logo Set (Dark Background)')
+                .icon(TagIcon)
+                .child(
+                  S.document()
+                    .schemaType('logoSetGlobal')
+                    .documentId('logoSetGlobalDark')
+                    .title('Logo Set (Dark Background)')
+                ),
+              S.listItem()
+                .title('Features Selector')
+                .icon(SparklesIcon)
+                .child(
+                  S.document()
+                    .schemaType('featuresSelectorGlobal')
+                    .documentId('featuresSelectorGlobal')
                 ),
             ])
         ),
