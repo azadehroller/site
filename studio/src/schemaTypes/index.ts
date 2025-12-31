@@ -24,16 +24,27 @@ import blogLandingPage from './documents/blogLandingPage'
 import pricingPage from './documents/pricingPage'
 import featuresLandingPage from './documents/featuresLandingPage'
 import industriesLandingPage from './documents/industriesLandingPage'
+import partnersLandingPage from './documents/partnersLandingPage'
+import competitorsLandingPage from './documents/competitorsLandingPage'
 import notFoundPage from './documents/notFoundPage'
 import feature from './documents/feature'
 import industry from './documents/industry'
+import partner from './documents/partner'
+import competitor from './documents/competitor'
 import solution from './documents/solution'
 import roller from './documents/roller'
+import landingPage from './documents/landingPage'
 import { rawHtmlPage } from './documents/rawHtmlPage'
-import { widgetStats, widgetUserReviews, testimonialCarousel } from './documents/globals'
+import { widgetStats, widgetUserReviews, testimonialCarousel, logoSetGlobal, featuresSelectorGlobal } from './documents/globals'
 import testimonialCarouselReference from './objects/testimonialCarouselReference'
+import logoSetReference from './objects/logoSetReference'
 import { hubspotForm } from './documents/formsGlobal'
 import hubspotFormReference from './objects/hubspotFormReference'
+import industrySelector from './objects/industrySelector'
+import featuresSelectorGlobalReference from './objects/featuresSelectorGlobalReference'
+import faqs from './objects/faqs'
+import resultsList from './objects/resultsList'
+import comparisonTable from './objects/comparisonTable'
 
 // Export an array of all the schema types.  This is used in the Sanity Studio configuration. https://www.sanity.io/docs/schema-types
 
@@ -45,12 +56,17 @@ export const schemaTypes = [
   pricingPage,
   featuresLandingPage,
   industriesLandingPage,
+  partnersLandingPage,
+  competitorsLandingPage,
   notFoundPage,
   // Document types - Collections
   feature,
   industry,
+  partner,
+  competitor,
   solution,
   roller,
+  landingPage,
   post,
   page,
   // Block types
@@ -75,6 +91,10 @@ export const schemaTypes = [
   widgetUserReviewsReference,
   testimonialCarousel,
   testimonialCarouselReference,
+  logoSetGlobal,
+  logoSetReference,
+  featuresSelectorGlobal,
+  featuresSelectorGlobalReference,
   rawHtmlPage,
   // Footer types
   footerGlobal,
@@ -85,4 +105,12 @@ export const schemaTypes = [
   // Forms
   hubspotForm,
   hubspotFormReference,
+  // Industry
+  industrySelector,
+  // FAQs
+  faqs,
+  // Results List
+  resultsList,
+  // Comparison Table
+  comparisonTable,
 ]

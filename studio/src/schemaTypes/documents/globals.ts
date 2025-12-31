@@ -457,5 +457,309 @@ export const testimonialCarousel = defineType({
   },
 })
 
+/**
+ * Logo Set Global Document
+ * A singleton document that contains the logo set data
+ * This is edited in one place and can be referenced anywhere in the site
+ */
+
+// Logo item definition for global logo set
+const globalLogoItem = {
+  type: 'object',
+  name: 'globalLogoItem',
+  title: 'Logo',
+  fields: [
+    defineField({
+      name: 'image',
+      title: 'Logo Image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'alt',
+      title: 'Alt Text',
+      type: 'string',
+      description: 'Alternative text for the logo image',
+      validation: (Rule) => Rule.required(),
+    }),
+  ],
+  preview: {
+    select: {
+      alt: 'alt',
+      media: 'image',
+    },
+    prepare({alt, media}: {alt?: string; media?: any}) {
+      return {
+        title: alt || 'Logo',
+        media: media,
+      }
+    },
+  },
+}
+
+export const logoSetGlobal = defineType({
+  name: 'logoSetGlobal',
+  title: 'Logo Set (Global)',
+  type: 'document',
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'style', title: 'Style'},
+    {name: 'amer', title: 'AMER Logos'},
+    {name: 'apac', title: 'APAC Logos'},
+    {name: 'emea', title: 'EMEA Logos'},
+    {name: 'uk', title: 'UK Logos'},
+  ],
+  fields: [
+    // Content group
+    defineField({
+      name: 'customTitle',
+      title: 'Custom Title',
+      type: 'string',
+      description: 'Leave empty to use default: "Trusted by over 3,000 venues worldwide"',
+      group: 'content',
+    }),
+    // Style group
+    defineField({
+      name: 'theme',
+      title: 'Theme',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'OnLight', value: 'dark'},
+          {title: 'OnDark', value: 'light'},
+          {title: 'GxScore', value: 'gxscore'},
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'dark',
+      group: 'style',
+    }),
+    defineField({
+      name: 'textAlignment',
+      title: 'Text Alignment',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Left', value: 'left'},
+          {title: 'Center', value: 'center'},
+          {title: 'Right', value: 'right'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'center',
+      group: 'style',
+    }),
+    defineField({
+      name: 'showDivider',
+      title: 'Show Divider',
+      type: 'boolean',
+      description: 'Show a divider line above the title',
+      initialValue: false,
+      group: 'style',
+    }),
+    // AMER Logos
+    defineField({
+      name: 'amerLogos',
+      title: 'AMER Logos',
+      type: 'array',
+      of: [globalLogoItem],
+      description: 'Logos shown for Americas region',
+      group: 'amer',
+      validation: (Rule) => Rule.min(1),
+    }),
+    // APAC Logos
+    defineField({
+      name: 'apacLogos',
+      title: 'APAC Logos',
+      type: 'array',
+      of: [globalLogoItem],
+      description: 'Logos shown for Asia-Pacific region',
+      group: 'apac',
+      validation: (Rule) => Rule.min(1),
+    }),
+    // EMEA Logos
+    defineField({
+      name: 'emeaLogos',
+      title: 'EMEA Logos',
+      type: 'array',
+      of: [globalLogoItem],
+      description: 'Logos shown for Europe, Middle East, and Africa region',
+      group: 'emea',
+      validation: (Rule) => Rule.min(1),
+    }),
+    // UK Logos
+    defineField({
+      name: 'ukLogos',
+      title: 'UK Logos',
+      type: 'array',
+      of: [globalLogoItem],
+      description: 'Logos shown for United Kingdom',
+      group: 'uk',
+      validation: (Rule) => Rule.min(1),
+    }),
+  ],
+  preview: {
+    select: {
+      customTitle: 'customTitle',
+      theme: 'theme',
+    },
+    prepare({customTitle, theme}: {customTitle?: string; theme?: string}) {
+      const themeLabel = theme === 'light' ? '🌙 Dark Background' : theme === 'gxscore' ? '⭐ GxScore' : '☀️ Light Background'
+      const title = customTitle || 'Trusted by over 3,000 venues worldwide'
+      return {
+        title: `Logo Set (${themeLabel})`,
+        subtitle: title.substring(0, 50) + (title.length > 50 ? '...' : ''),
+      }
+    },
+  },
+})
+
+/**
+ * Features Selector Global Document
+ * A singleton document that contains the features selector data
+ * This is edited in one place and can be referenced anywhere in the site
+ */
+
+// Feature item definition
+const featureItem = {
+  type: 'object',
+  name: 'featureItem',
+  title: 'Feature',
+  fields: [
+    defineField({
+      name: 'icon',
+      title: 'Icon (SVG)',
+      type: 'text',
+      rows: 6,
+      description: 'Paste SVG code for the feature icon',
+    }),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'link',
+      title: 'Link',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'href',
+          title: 'URL',
+          type: 'string',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'openInNewTab',
+          title: 'Open in New Tab',
+          type: 'boolean',
+          initialValue: false,
+        }),
+        defineField({
+          name: 'noFollow',
+          title: 'No Follow',
+          type: 'boolean',
+          initialValue: false,
+        }),
+      ],
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+    },
+    prepare({title}: {title?: string}) {
+      return {
+        title: title || 'Feature Item',
+      }
+    },
+  },
+}
+
+export const featuresSelectorGlobal = defineType({
+  name: 'featuresSelectorGlobal',
+  title: 'Features Selector (Global)',
+  type: 'document',
+  groups: [
+    {name: 'header', title: 'Header', default: true},
+    {name: 'features', title: 'Features'},
+    {name: 'cta', title: 'CTA'},
+  ],
+  fields: [
+    // Header section - uses HeadingComposition component
+    defineField({
+      name: 'heading',
+      title: 'Heading',
+      type: 'headingComposition',
+      group: 'header',
+      description: 'Header section with eyebrow, title, text, and styling options',
+    }),
+
+    // Features array
+    defineField({
+      name: 'features',
+      title: 'Features',
+      type: 'array',
+      of: [featureItem],
+      group: 'features',
+      description: 'Add features to display in the selector',
+      validation: (Rule) => Rule.min(1),
+    }),
+
+    // CTA section
+    defineField({
+      name: 'ctaLabel',
+      title: 'CTA Label',
+      type: 'string',
+      group: 'cta',
+      description: 'Label for the call-to-action link',
+      initialValue: 'See all features',
+    }),
+    defineField({
+      name: 'ctaLink',
+      title: 'CTA Link',
+      type: 'object',
+      group: 'cta',
+      fields: [
+        defineField({
+          name: 'href',
+          title: 'URL',
+          type: 'string',
+          initialValue: '/features',
+        }),
+        defineField({
+          name: 'openInNewTab',
+          title: 'Open in New Tab',
+          type: 'boolean',
+          initialValue: false,
+        }),
+        defineField({
+          name: 'noFollow',
+          title: 'No Follow',
+          type: 'boolean',
+          initialValue: false,
+        }),
+      ],
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'heading.title',
+      features: 'features',
+    },
+    prepare({title, features}: {title?: string; features?: any[]}) {
+      const count = features?.length || 0
+      return {
+        title: 'Features Selector (Global)',
+        subtitle: `${title || 'No title'} • ${count} feature${count !== 1 ? 's' : ''}`,
+      }
+    },
+  },
+})
+
 export default widgetStats
 
