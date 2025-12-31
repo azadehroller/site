@@ -1,0 +1,1518 @@
+---
+/**
+ * Header Component
+ * Site-wide header with mega menu navigation
+ * All content comes from Sanity globals
+ */
+
+interface NavItem {
+  _key?: string;
+  label: string;
+  href?: string;
+  hasMegaMenu?: boolean;
+}
+
+interface MegaMenuItem {
+  _key?: string;
+  title: string;
+  description?: string;
+  icon?: string;
+  link?: {
+    href: string;
+    openInNewTab?: boolean;
+  };
+  topFeatures?: Array<{
+    title: string;
+    link?: string;
+  }>;
+}
+
+interface MegaFeaturedItem {
+  _key?: string;
+  title: string;
+  label?: string;
+  image?: {
+    asset?: {
+      url: string;
+    };
+  };
+  link?: {
+    href: string;
+    openInNewTab?: boolean;
+  };
+}
+
+interface MegaMenuDropdown {
+  _key?: string;
+  parentLabel: string;
+  menuType?: 'why_roller' | 'features' | 'industries' | 'solutions';
+  introTitle?: string;
+  introDescription?: string;
+  items?: MegaMenuItem[];
+  featuredLabel?: string;
+  featuredItems?: MegaFeaturedItem[];
+  ctaLabel?: string;
+  ctaLink?: string;
+}
+
+interface HeaderButton {
+  _key?: string;
+  label: string;
+  href: string;
+  variant?: 'primary' | 'secondary' | 'text';
+  openInNewTab?: boolean;
+}
+
+interface Props {
+  logo?: {
+    asset?: {
+      url: string;
+    };
+  };
+  logoDark?: {
+    asset?: {
+      url: string;
+    };
+  };
+  logoAlt?: string;
+  logoLink?: string;
+  navItems?: NavItem[];
+  megaMenus?: MegaMenuDropdown[];
+  buttons?: HeaderButton[];
+  headerTheme?: 'default' | 'dark' | 'light' | 'industry_report';
+}
+
+const {
+  logo,
+  logoDark,
+  logoAlt = 'Roller Logo',
+  logoLink = '/',
+  navItems = [],
+  megaMenus = [],
+  buttons = [],
+  headerTheme = 'default',
+} = Astro.props;
+
+// Get the theme class for the header
+const getThemeClass = (theme: string): string => {
+  switch (theme) {
+    case 'dark':
+      return 'dark';
+    case 'light':
+      return 'light';
+    case 'industry_report':
+      return 'industry_report';
+    default:
+      return '';
+  }
+};
+
+const themeClass = getThemeClass(headerTheme);
+
+// Strip invisible Unicode characters from a string
+const stripInvisible = (str: string): string => {
+  if (!str) return '';
+  // Remove zero-width and invisible Unicode characters
+  return str.replace(/[\u200B-\u200D\uFEFF\u2060-\u2069\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180D\u200E\u200F\u202A-\u202E]/g, '').trim();
+};
+
+// Find mega menu config for a nav item
+const getMegaMenu = (label: string): MegaMenuDropdown | undefined => {
+  const cleanLabel = stripInvisible(label).toLowerCase();
+  return megaMenus.find(m => stripInvisible(m.parentLabel || '').toLowerCase() === cleanLabel);
+};
+
+// Default logo URLs
+const defaultLogo = 'https://www.roller.software/hubfs/ROLLER%20Logo.svg';
+const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20White.svg';
+---
+
+<style>
+  /* Header Base Styles */
+  .header {
+    position: relative;
+    top: 0;
+    width: 100%;
+    transition: background-color 150ms ease-in-out 0s;
+    z-index: 1000;
+  }
+
+  .header.dark {
+    background: var(--primary-50, #033180);
+  }
+
+  .header.dark .header__logo {
+    display: block;
+  }
+
+  .header.dark .header__logo--secondary {
+    display: none;
+  }
+
+  /* Dark theme - mobile */
+  .header.dark .main-nav__item button,
+  .header.dark .main-nav__item:last-child a {
+    color: var(--primary-50, #033180);
+  }
+
+  /* Dark theme - desktop */
+  @media screen and (min-width: 992px) {
+    .header.dark .main-nav__item button,
+    .header.dark .main-nav__item a,
+    .header.dark .main-nav__item:last-child a {
+      color: var(--neutral-white, #ffffff);
+    }
+    .header.dark .main-nav__item button:hover,
+    .header.dark .main-nav__item a:hover,
+    .header.dark .main-nav__item:last-child a:hover {
+      color: var(--neutral-white, #ffffff);
+    }
+  }
+
+  .header.dark .main-nav__item-icon {
+    fill: var(--neutral-white, #ffffff);
+  }
+
+  .header.dark .header__block-toggle {
+    color: var(--neutral-white, #ffffff);
+  }
+
+  /* Dark theme toggle items - bg-neutral-white class already handles this */
+
+  .header.light .header__logo {
+    display: none;
+  }
+
+  .header.light .header__logo--secondary {
+    display: block;
+  }
+
+  .header.industry_report {
+    background: #011840;
+  }
+
+  .header.industry_report .header__logo {
+    display: block;
+  }
+
+  .header.industry_report .header__logo--secondary {
+    display: none;
+  }
+
+  /* Industry report theme - mobile */
+  .header.industry_report .main-nav__item button,
+  .header.industry_report .main-nav__item:last-child a {
+    color: #011840;
+  }
+
+  /* Industry report theme - desktop */
+  @media screen and (min-width: 992px) {
+    .header.industry_report .main-nav__item button,
+    .header.industry_report .main-nav__item a,
+    .header.industry_report .main-nav__item:last-child a {
+      color: var(--neutral-white, #ffffff);
+    }
+    .header.industry_report .main-nav__item button:hover,
+    .header.industry_report .main-nav__item a:hover,
+    .header.industry_report .main-nav__item:last-child a:hover {
+      color: var(--neutral-white, #ffffff);
+    }
+  }
+
+  .header.industry_report .header__block-toggle {
+    color: var(--neutral-white, #ffffff);
+  }
+
+  /* Industry report theme toggle items - bg-neutral-white class already handles this */
+
+  .header .header__logo {
+    display: none;
+  }
+
+  .header .header__logo--secondary {
+    display: block;
+  }
+
+  .header.is-fixed {
+    background: var(--neutral-white, #ffffff);
+    left: 0;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .header.is-fixed .header__logo {
+    display: none;
+  }
+
+  .header.is-fixed .header__logo--secondary {
+    display: block;
+  }
+
+  .header.is-fixed .main-nav__item a,
+  .header.is-fixed .main-nav__item button {
+    color: var(--primary-50, #033180);
+  }
+
+  .header.is-fixed .main-nav__item-icon {
+    fill: var(--primary-50, #033180);
+  }
+
+  .header.is-fixed .header__block-toggle-item {
+    background-color: var(--primary-50, #033180) !important;
+  }
+
+  /* Logo - using Tailwind classes: w-[160px] mr-2 sm:w-[192px] shrink-0 */
+  .header__logo * ,
+  .header__logo--secondary * {
+    display: block;
+  }
+
+  .header__logo img,
+  .header__logo--secondary img {
+    height: auto;
+    width: 100%;
+  }
+
+  .header__logo a::before,
+  .header__logo--secondary a::before {
+    display: none;
+  }
+
+  /* Skip link */
+  .header__skip {
+    height: 1px;
+    left: -1000px;
+    overflow: hidden;
+    position: absolute;
+    text-align: left;
+    top: -1000px;
+    width: 1px;
+  }
+
+  .header__skip:focus {
+    height: auto;
+    left: 0;
+    overflow: visible;
+    top: 0;
+    width: auto;
+    background: var(--primary-50, #033180);
+    color: white;
+    padding: 8px 16px;
+    z-index: 9999;
+  }
+
+  /* Inner header */
+  .inner-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 1.5rem;
+    padding-top: 1.5rem;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 992px) {
+    .inner-header {
+      padding-bottom: 0.5rem;
+      padding-top: 0.5rem;
+    }
+  }
+
+  /* Header main */
+  .header__main {
+    align-items: center;
+    display: flex;
+    order: 3;
+    margin-left: 0.75rem;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .header__main {
+      order: unset;
+      margin-left: 0;
+    }
+  }
+
+  .header__nav {
+    align-items: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+    display: flex;
+  }
+
+  @media screen and (min-width: 992px) {
+    .header__nav {
+      flex-grow: 1;
+      justify-content: flex-end;
+    }
+  }
+
+  /* Mobile menu toggle */
+  .header__block-toggle {
+    align-items: flex-start;
+    color: var(--primary-50, #033180);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 30px;
+    justify-content: space-around;
+    padding: 3px;
+    transform: translateY(0) rotate(0deg);
+    transition: all 0.3s ease-in-out;
+    width: 30px;
+    background: transparent;
+    border: none;
+  }
+
+  .header__block-toggle-item {
+    height: 2px;
+    transition: all 0.2s ease-in-out;
+    transition-delay: 0.2s;
+    width: 100%;
+  }
+
+  /* Default toggle item background when not using Tailwind class */
+  .header__block-toggle-item:not(.bg-neutral-white) {
+    background-color: var(--primary-50, #033180);
+  }
+
+  /* Toggle reverse animation - X state */
+  .js-header__block-toggle--reverse {
+    transform: rotate(90deg);
+  }
+
+  .js-header__block-toggle--reverse .header__block-toggle-item--s {
+    transform: translateY(6px) scale(0);
+  }
+
+  .js-header__block-toggle--reverse .header__block-toggle-item--l {
+    transform: translateY(0) rotate(45deg);
+  }
+
+  .js-header__block-toggle--reverse .header__block-toggle-item--m {
+    transform: translateY(-8px) rotate(-45deg);
+    width: 100%;
+  }
+
+  /* is-active state (alternate class name) */
+  .header__block-toggle.is-active {
+    transform: rotate(90deg);
+  }
+
+  .header__block-toggle.is-active .header__block-toggle-item--s {
+    transform: translateY(6px) scale(0);
+  }
+
+  .header__block-toggle.is-active .header__block-toggle-item--l {
+    transform: translateY(0) rotate(45deg);
+  }
+
+  .header__block-toggle.is-active .header__block-toggle-item--m {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  @media screen and (min-width: 1024px) {
+    .header__block-toggle {
+      display: none;
+    }
+  }
+
+  /* Header block (mobile menu container) */
+  .header__block {
+    background-color: var(--neutral-white, #ffffff);
+    padding: 0;
+    display: none;
+  }
+
+  .header__block.is-active {
+    display: block;
+  }
+
+  @media screen and (max-width: 1023px) {
+    .header__block {
+      margin: 0;
+      left: 0;
+      overflow-y: auto;
+      padding-top: 1.875rem;
+      padding-bottom: 1.875rem;
+      position: fixed;
+      right: 0;
+      top: 72px;
+      z-index: 20;
+      height: calc(100vh - 72px);
+    }
+  }
+
+  @media screen and (min-width: 1024px) {
+    .header__block {
+      background-color: transparent;
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: space-between;
+      position: static;
+      width: inherit;
+      height: inherit;
+      overflow: inherit;
+    }
+
+    .header__block.is-active {
+      flex-direction: row;
+      height: auto;
+      min-height: auto;
+      justify-content: initial;
+      overflow: initial;
+      padding: 0;
+      position: static;
+    }
+
+    .header__block.is-active .mega-link .main-nav__item-label {
+      color: var(--primary-50, #033180);
+    }
+  }
+
+  /* Main navigation */
+  .main-nav-list {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 992px) {
+    .main-nav-list {
+      background-color: transparent;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      position: static;
+      height: auto;
+    }
+  }
+
+  .main-nav__item {
+    cursor: pointer;
+    flex-grow: 0;
+    margin-left: 0.45em;
+    margin-right: 0.45em;
+    line-height: 1;
+    position: relative;
+    padding: 0.5em 0 0.5em 1em;
+  }
+
+  .main-nav__item,
+  .main-nav__item button {
+    font-size: 1.33rem;
+  }
+
+  @media screen and (min-width: 992px) {
+    .main-nav__item {
+      font-size: 0.89rem;
+      padding: 0.2em 0;
+      margin-left: 1em;
+      margin-right: 1em;
+    }
+
+    .main-nav__item button {
+      font-size: 0.875rem;
+      padding-top: 0.25em;
+      padding-bottom: 0.25em;
+    }
+  }
+
+  .main-nav__item button,
+  .main-nav__item .drop-trigger {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 0;
+    text-align: inherit;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font-weight: 600;
+    fill: var(--header-nav-color, currentColor);
+  }
+
+  .main-nav__item > button {
+    fill: var(--header-nav-color, currentColor);
+  }
+
+  .main-nav__item a {
+    color: var(--primary-50, #033180);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .main-nav__item a:hover,
+  .main-nav__item button:hover {
+    color: var(--secondary-50, #ff290c);
+  }
+
+  .main-nav__item.mega-link {
+    position: static;
+  }
+
+  .main-nav__item-label {
+    font-size: 1.33rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  @media screen and (min-width: 992px) {
+    .main-nav__item-label {
+      font-size: 1rem;
+    }
+  }
+
+  .main-nav__item-icon {
+    display: inline-block;
+    margin-left: 0.2em;
+    width: 1em;
+    transition: transform 0.2s ease;
+    fill: currentColor;
+  }
+
+  /* Icon rotation - mobile: only on is-active */
+  .main-nav__item.is-active .main-nav__item-icon {
+    transform: translateY(1px) rotate(180deg);
+  }
+
+  /* Icon rotation - desktop: also on hover */
+  @media screen and (min-width: 992px) {
+    .main-nav__item:hover .main-nav__item-icon {
+      transform: translateY(1px) rotate(180deg);
+    }
+  }
+
+  /* Mega dropdown panel */
+  .menu-drop-panel {
+    overflow: hidden;
+    transition: all 0.4s ease;
+    height: 0;
+    cursor: auto;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  /* Mobile: dropdown opens ONLY on click via is-active class */
+  .main-nav__item.is-active .menu-drop-panel {
+    height: auto;
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Desktop: dropdown opens on hover OR is-active */
+  @media screen and (min-width: 992px) {
+    .main-nav__item:hover .menu-drop-panel,
+    .main-nav__item.is-active .menu-drop-panel {
+      height: auto;
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  .mega-drop {
+    position: static;
+    width: 100vw;
+  }
+
+  @media screen and (min-width: 992px) {
+    .mega-drop {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      z-index: 9;
+    }
+  }
+
+  .mega-drop-wrapper {
+    background: var(--neutral-white, #ffffff);
+    padding: 1rem;
+  }
+
+  @media screen and (min-width: 992px) {
+    .mega-drop-wrapper {
+      padding: 3rem 2rem 4rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .mega-drop-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1312px;
+    margin: 0 auto;
+  }
+
+  .mega-drop__intro {
+    max-width: 305px;
+    display: none;
+  }
+
+  @media screen and (min-width: 992px) {
+    .mega-drop__intro {
+      display: block;
+    }
+  }
+
+  .mega-drop__intro-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--primary-50, #033180);
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+
+  .mega-drop__intro-desc {
+    font-size: 1rem;
+    color: var(--primary-50, #033180);
+  }
+
+  .mega-drop__items {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media screen and (max-width: 991px) {
+    .mega-drop__items {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .mega-drop__item {
+    display: block;
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+
+  .mega-drop__item:hover {
+    background-color: var(--blue-99, #f5f8ff);
+  }
+
+  .mega-drop__item-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .mega-drop__item-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: none;
+  }
+
+  @media screen and (min-width: 992px) {
+    .mega-drop__item-icon {
+      display: block;
+    }
+  }
+
+  .mega-drop__item-text {
+    flex: 1;
+  }
+
+  .mega-drop__item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-50, #033180);
+    margin-bottom: 0.25rem;
+  }
+
+  .mega-drop__item:hover .mega-drop__item-title {
+    color: var(--secondary-50, #ff290c);
+  }
+
+  .mega-drop__item-desc {
+    font-size: 0.875rem;
+    color: var(--primary-40, #074dc5);
+    display: none;
+  }
+
+  @media screen and (min-width: 992px) {
+    .mega-drop__item-desc {
+      display: block;
+    }
+  }
+
+  .mega-drop__featured {
+    max-width: 256px;
+    display: none;
+  }
+
+  @media screen and (min-width: 992px) {
+    .mega-drop__featured {
+      display: block;
+    }
+  }
+
+  .mega-drop__featured-label {
+    font-weight: 800;
+    color: var(--secondary-50, #ff290c);
+    margin-bottom: 0.75rem;
+  }
+
+  .mega-drop__featured-item {
+    display: block;
+    background: var(--primary-10, #cedffd);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    text-decoration: none;
+    overflow: hidden;
+  }
+
+  .mega-drop__featured-item img {
+    width: 100%;
+    height: auto;
+  }
+
+  .mega-drop__featured-item-content {
+    padding: 0.75rem;
+  }
+
+  .mega-drop__featured-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-50, #033180);
+    margin-bottom: 0.25rem;
+  }
+
+  .mega-drop__featured-item-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary-50, #033180);
+  }
+
+  .mega-drop__cta {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--primary-50, #033180);
+    text-decoration: none;
+    margin-top: 1rem;
+  }
+
+  .mega-drop__cta:hover {
+    color: var(--secondary-50, #ff290c);
+  }
+
+  .mega-drop__cta svg {
+    margin-left: 0.75rem;
+    transition: transform 0.2s ease;
+  }
+
+  .mega-drop__cta:hover svg {
+    transform: translateX(4px);
+  }
+
+  .mega-drop__cta:hover svg path {
+    fill: var(--secondary-50, #ff290c);
+  }
+
+  /* Header CTA buttons */
+  .header__cta {
+    display: none;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  @media screen and (min-width: 768px) {
+    .header__cta {
+      display: flex;
+      flex-shrink: 0;
+    }
+  }
+
+  .header__cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.5rem;
+    border-radius: 980px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .header__cta-btn--primary {
+    background-color: var(--secondary-50, #ff290c);
+    color: var(--neutral-white, #ffffff);
+  }
+
+  .header__cta-btn--primary:hover {
+    background-color: var(--secondary-70, #991200);
+  }
+
+  .header__cta-btn--secondary {
+    background-color: transparent;
+    color: var(--primary-50, #033180);
+    border: 1px solid var(--primary-50, #033180);
+  }
+
+  .header__cta-btn--secondary:hover {
+    background-color: var(--primary-50, #033180);
+    color: var(--neutral-white, #ffffff);
+  }
+
+  .header__cta-btn--text {
+    background-color: transparent;
+    color: var(--primary-50, #033180);
+  }
+
+  .header__cta-btn--text:hover {
+    color: var(--secondary-50, #ff290c);
+  }
+
+  /* Dark theme button overrides */
+  .header.dark .header__cta-btn--secondary {
+    color: var(--neutral-white, #ffffff);
+    border-color: var(--neutral-white, #ffffff);
+  }
+
+  .header.dark .header__cta-btn--secondary:hover {
+    background-color: var(--neutral-white, #ffffff);
+    color: var(--primary-50, #033180);
+  }
+
+  .header.dark .header__cta-btn--text {
+    color: var(--neutral-white, #ffffff);
+  }
+
+  /* No scrollbar utility */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Utility classes */
+  .b-0 {
+    border: 0;
+  }
+  
+  .no-underline {
+    text-decoration: none;
+  }
+  
+  .inline-block {
+    display: inline-block;
+  }
+  
+  .items-center {
+    align-items: center;
+  }
+
+  /* Custom maxmd breakpoint styles (min-width: 992px) */
+  @media screen and (min-width: 992px) {
+    .maxmd\:order-none {
+      order: 0;
+    }
+    .maxmd\:ml-0 {
+      margin-left: 0;
+    }
+    .maxmd\:flex {
+      display: flex;
+    }
+    .maxmd\:h-\[72px\] {
+      height: 72px;
+    }
+    .maxmd\:bg-neutral-white {
+      background-color: var(--neutral-white, #ffffff);
+    }
+    .maxmd\:block {
+      display: block;
+    }
+    .maxmd\:hidden {
+      display: none;
+    }
+    .maxmd\:w-auto {
+      width: auto;
+    }
+    .maxmd\:w-fit {
+      width: fit-content;
+    }
+    .maxmd\:gap-x-0 {
+      column-gap: 0;
+    }
+    .maxmd\:gap-x-1 {
+      column-gap: 0.25rem;
+    }
+    .maxmd\:gap-x-8 {
+      column-gap: 5rem;
+    }
+    .maxmd\:gap-y-0 {
+      row-gap: 0;
+    }
+    .maxmd\:gap-y-2 {
+      row-gap: 0.5rem;
+    }
+    .maxmd\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .maxmd\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .maxmd\:flex-col {
+      flex-direction: column;
+    }
+    .maxmd\:leading-7 {
+      line-height: 1.75rem;
+    }
+    .maxmd\:mb-4 {
+      margin-bottom: 1.5rem;
+    }
+    .maxmd\:my-6 {
+      margin-top: 3rem;
+      margin-bottom: 3rem;
+    }
+    .maxmd\:pl-5 {
+      padding-left: 2rem;
+    }
+    .maxmd\:pr-5 {
+      padding-right: 2rem;
+    }
+    .maxmd\:text-center {
+      text-align: center;
+    }
+    .maxmd\:col-span-1 {
+      grid-column: span 1 / span 1;
+    }
+  }
+
+  /* Utility classes for flex, gap, grid */
+  .flex {
+    display: flex;
+  }
+  
+  .grow {
+    flex-grow: 1;
+  }
+  
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+  
+  .fill-white {
+    fill: white;
+  }
+  
+  .gap-8 {
+    gap: 5rem;
+  }
+  
+  .gap-2 {
+    gap: 0.5rem;
+  }
+  
+  .gap-x-4 {
+    column-gap: 1rem;
+  }
+  
+  .gap-x-8 {
+    column-gap: 2rem;
+  }
+  
+  .gap-y-4 {
+    row-gap: 1rem;
+  }
+  
+  .grid {
+    display: grid;
+  }
+  
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .auto-rows-min {
+    grid-auto-rows: min-content;
+  }
+  
+  .gap-y-0 {
+    row-gap: 0;
+  }
+  
+  .gap-x-0 {
+    column-gap: 0;
+  }
+  
+  @media screen and (min-width: 1280px) {
+    .xl\:gap-x-8 {
+      column-gap: 2rem;
+    }
+  }
+  
+  .relative {
+    position: relative;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  .col-span-full {
+    grid-column: 1 / -1;
+  }
+  
+  .max-w-\[305px\] {
+    max-width: 305px;
+  }
+  
+  .max-w-\[256px\] {
+    max-width: 256px;
+  }
+  
+  .text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+  
+  .font-extrabold {
+    font-weight: 800;
+  }
+  
+  .leading-11 {
+    line-height: 2.75rem;
+  }
+  
+  .mb-3 {
+    margin-bottom: 1rem;
+  }
+  
+  .mb-2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .bg-neutral-white {
+    background-color: var(--neutral-white, #ffffff);
+  }
+
+  .text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+  
+  .text-secondary-50 {
+    color: var(--secondary-50, #ff290c);
+  }
+  
+  .hover\:text-secondary-50:hover {
+    color: var(--secondary-50, #ff290c);
+  }
+  
+  .leading-4 {
+    line-height: 1rem;
+  }
+  
+  .leading-6 {
+    line-height: 1.5rem;
+  }
+  
+  .leading-7 {
+    line-height: 1.75rem;
+  }
+  
+  .font-semibold {
+    font-weight: 600;
+  }
+  
+  .font-serif {
+    font-family: serif;
+  }
+  
+  .bg-primary-10 {
+    background-color: var(--primary-10, #cedffd);
+  }
+  
+  .rounded {
+    border-radius: 0.25rem;
+  }
+  
+  .w-\[170px\] {
+    width: 170px;
+  }
+  
+  .w-\[256px\] {
+    width: 256px;
+  }
+  
+  .flex-col {
+    flex-direction: column;
+  }
+  
+  .p-3 {
+    padding: 1rem;
+  }
+  
+  .m-0 {
+    margin: 0;
+  }
+  
+  .my-3 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .mx-3 {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  
+  /* Pseudo-element for divider line */
+  .after\:absolute::after {
+    content: '';
+    position: absolute;
+  }
+  
+  .after\:w-\[1px\]::after {
+    width: 1px;
+  }
+  
+  .after\:h-\[100\%\]::after {
+    height: 100%;
+  }
+  
+  .after\:bg-primary-40::after {
+    background-color: var(--primary-40, #074dc5);
+  }
+  
+  .after\:top-0::after {
+    top: 0;
+  }
+  
+  .after\:right-\[-40px\]::after {
+    right: -40px;
+  }
+  
+  /* Hover state for SVG path */
+  .\[\&\>svg\>path\]\:hover\:fill-\[red\]:hover > svg > path {
+    fill: red;
+  }
+</style>
+
+<header id="header" class:list={["header", themeClass]}>
+  <a href="#main-content" class="header__skip">Skip to content</a>
+
+  <div class="inner-header container px-0 md:px-5 lg:px-5 py-4">
+    <!-- Logo (Dark Background) -->
+    <div class="header__logo w-[160px] mr-2 sm:w-[192px] shrink-0">
+      <a href={logoLink}>
+        <img 
+          src={logoDark?.asset?.url || defaultLogoDark} 
+          alt={logoAlt}
+          width="187"
+          height="31"
+          loading="eager"
+        />
+      </a>
+    </div>
+    
+    <!-- Logo (Light Background) -->
+    <div class="header__logo--secondary w-[160px] mr-2 sm:w-[192px] shrink-0">
+      <a href={logoLink}>
+        <img 
+          src={logo?.asset?.url || defaultLogo} 
+          alt={logoAlt}
+          width="187"
+          height="31"
+          loading="eager"
+        />
+      </a>
+    </div>
+
+    <div class="header__main order-3 maxmd:order-none ml-3 maxmd:ml-0">
+      <!-- Mobile menu trigger -->
+      <button 
+        id="header__block-toggle" 
+        class="header__block-toggle" 
+        aria-expanded="false" 
+        aria-controls="burger-submenu"
+      >
+        <span class="b-0 h-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px]">Menu</span>
+        <span class="header__block-toggle-item header__block-toggle-item--s bg-neutral-white"></span>
+        <span class="header__block-toggle-item header__block-toggle-item--l bg-neutral-white"></span>
+        <span class="header__block-toggle-item header__block-toggle-item--m bg-neutral-white"></span>
+      </button>
+
+      <!-- Navigation block -->
+      <div id="burger-submenu" class="header__block no-scrollbar">
+        <nav class="header__nav" aria-label="Main menu">
+          <ul role="list" class="main-nav-list" id="main-nav-list">
+            {navItems.map((item) => {
+              const megaMenu = item.hasMegaMenu ? getMegaMenu(item.label) : undefined;
+              const itemClasses = megaMenu 
+                ? 'main-nav__item no-underline inline-block maxmd:flex items-center maxmd:h-[72px] mega-link menu-drop' 
+                : 'main-nav__item no-underline inline-block maxmd:flex items-center maxmd:h-[72px]';
+              
+              return (
+                <li class={itemClasses}>
+                  {megaMenu ? (
+                    <>
+                      <button class="drop-trigger no-underline">
+                        <p class="main-nav__item-label font-semibold mt-0 mb-0 ml-0 mr-2">{item.label}</p>
+                        <svg class="main-nav__item-icon fill-white" viewBox="0 0 19 18" fill="currentColor">
+                          <path d="M9.1878 13.2325L4.1811 8.22575C3.93963 7.98428 3.93963 7.59279 4.1811 7.35135L4.76505 6.7674C5.00611 6.52634 5.39679 6.52588 5.63842 6.76637L9.62501 10.7343L13.6116 6.76637C13.8532 6.52588 14.2439 6.52634 14.4849 6.7674L15.0689 7.35135C15.3104 7.59282 15.3104 7.9843 15.0689 8.22575L10.0622 13.2325C9.82075 13.4739 9.42927 13.4739 9.1878 13.2325Z"/>
+                        </svg>
+                      </button>
+                      <div class="menu-drop-panel mega-drop">
+                        <div class="mega-drop-wrapper maxmd:bg-neutral-white">
+                          <div class="mega-drop-container container">
+                            {/* Intro section */}
+                            {megaMenu.introTitle && (
+                              <div class="mega-drop__intro">
+                                <p class="mega-drop__intro-title">{megaMenu.introTitle}</p>
+                                {megaMenu.introDescription && (
+                                  <p class="mega-drop__intro-desc">{megaMenu.introDescription}</p>
+                                )}
+                              </div>
+                            )}
+                            
+                            {/* Menu items */}
+                            <div class="mega-drop__items">
+                              {megaMenu.items?.map((menuItem) => (
+                                <a 
+                                  href={menuItem.link?.href || '#'} 
+                                  class="mega-drop__item"
+                                  target={menuItem.link?.openInNewTab ? '_blank' : undefined}
+                                >
+                                  <div class="mega-drop__item-content">
+                                    {menuItem.icon && (
+                                      <div class="mega-drop__item-icon" set:html={menuItem.icon}></div>
+                                    )}
+                                    <div class="mega-drop__item-text">
+                                      <p class="mega-drop__item-title">{menuItem.title}</p>
+                                      {menuItem.description && (
+                                        <p class="mega-drop__item-desc">{menuItem.description}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </a>
+                              ))}
+                              
+                              {/* CTA link */}
+                              {megaMenu.ctaLabel && megaMenu.ctaLink && (
+                                <a href={megaMenu.ctaLink} class="mega-drop__cta">
+                                  {megaMenu.ctaLabel}
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
+                                    <path fill="#033180" d="M8 0 6.59 1.41 12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8Z"/>
+                                  </svg>
+                                </a>
+                              )}
+                            </div>
+                            
+                            {/* Featured section */}
+                            {megaMenu.featuredItems && megaMenu.featuredItems.length > 0 && (
+                              <div class="mega-drop__featured">
+                                {megaMenu.featuredLabel && (
+                                  <p class="mega-drop__featured-label">{megaMenu.featuredLabel}</p>
+                                )}
+                                {megaMenu.featuredItems.map((featured) => (
+                                  <a 
+                                    href={featured.link?.href || '#'} 
+                                    class="mega-drop__featured-item"
+                                    target={featured.link?.openInNewTab ? '_blank' : undefined}
+                                  >
+                                    {featured.image?.asset?.url && (
+                                      <img 
+                                        src={featured.image.asset.url} 
+                                        alt={featured.title}
+                                        loading="lazy"
+                                      />
+                                    )}
+                                    <div class="mega-drop__featured-item-content">
+                                      <p class="mega-drop__featured-item-title">{featured.title}</p>
+                                      {featured.label && (
+                                        <p class="mega-drop__featured-item-label">{featured.label}</p>
+                                      )}
+                                    </div>
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <a href={item.href || '#'} class="no-underline">
+                      <span class="font-semibold">{item.label}</span>
+                    </a>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Header CTA buttons -->
+    {buttons.length > 0 && (
+      <div class="header__cta">
+        {buttons.map((button) => (
+          <a 
+            href={button.href}
+            class={`header__cta-btn header__cta-btn--${button.variant || 'primary'}`}
+            target={button.openInNewTab ? '_blank' : undefined}
+            rel={button.openInNewTab ? 'noopener noreferrer' : undefined}
+          >
+            {button.label}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</header>
+
+<script is:inline>
+(() => {
+  const toggle = document.querySelector(".header__block-toggle");
+  const block = document.querySelector(".header__block");
+  const header = document.getElementById("header");
+
+  if (!toggle || !block || !header) return;
+
+  // State management
+  let timeout = null;
+  let rafId = null;
+  const scrollThreshold = 48;
+  const mobileBreakpoint = 992;
+
+  // Check if we're on mobile
+  const isMobile = () => window.innerWidth < mobileBreakpoint;
+
+  const handleScroll = () => {
+    const currentScrollPosition = window.pageYOffset;
+
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        header.classList.toggle("is-fixed", currentScrollPosition > scrollThreshold);
+      });
+    }, 80);
+  };
+
+  const handleClick = () => {
+    const isActive = block.classList.contains("is-active");
+    toggle.classList.toggle("is-active");
+    block.classList.toggle("is-active");
+    document.body.classList.toggle("overflow-hidden", !isActive);
+    toggle.setAttribute("aria-expanded", String(!isActive));
+    
+    // Close all open dropdowns when closing mobile menu
+    if (isActive) {
+      closeAllDropdowns();
+    }
+  };
+
+  // =====================
+  // DROPDOWN CLICK HANDLING (for mobile)
+  // =====================
+  
+  const dropTriggers = document.querySelectorAll(".drop-trigger");
+  const megaLinks = document.querySelectorAll(".main-nav__item.mega-link");
+
+  // Close all dropdowns
+  const closeAllDropdowns = () => {
+    megaLinks.forEach(item => {
+      item.classList.remove("is-active");
+    });
+  };
+
+  // Handle dropdown trigger click
+  const handleDropdownClick = (e) => {
+    // On desktop, let hover handle it - only intercept on mobile
+    if (!isMobile()) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const parentItem = e.currentTarget.closest(".main-nav__item");
+    if (!parentItem) return;
+
+    const isCurrentlyActive = parentItem.classList.contains("is-active");
+
+    // Close all other dropdowns first
+    closeAllDropdowns();
+
+    // Toggle the clicked dropdown
+    if (!isCurrentlyActive) {
+      parentItem.classList.add("is-active");
+    }
+  };
+
+  // Handle click outside to close dropdowns (mobile)
+  const handleDocumentClick = (e) => {
+    if (!isMobile()) return;
+
+    // Don't close if clicking inside a mega menu
+    if (e.target.closest(".main-nav__item.mega-link")) return;
+    if (e.target.closest(".header__block-toggle")) return;
+
+    closeAllDropdowns();
+  };
+
+  // Add event listeners to all dropdown triggers
+  dropTriggers.forEach(trigger => {
+    trigger.addEventListener("click", handleDropdownClick);
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener("click", handleDocumentClick);
+
+  // Event listeners
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  toggle.addEventListener("click", handleClick);
+
+  // Handle window resize - close dropdowns when switching between mobile/desktop
+  let resizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (!isMobile()) {
+        closeAllDropdowns();
+      }
+    }, 150);
+  });
+
+  // Cleanup on page unload
+  window.addEventListener('unload', () => {
+    window.removeEventListener("scroll", handleScroll);
+    toggle.removeEventListener("click", handleClick);
+    document.removeEventListener("click", handleDocumentClick);
+    dropTriggers.forEach(trigger => {
+      trigger.removeEventListener("click", handleDropdownClick);
+    });
+  });
+})();
+</script>
+
