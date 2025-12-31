@@ -1,0 +1,249 @@
+---
+/**
+ * FAQs - An accordion-style FAQ component
+ * Uses embedded HeadingComposition for the header section
+ * Each section (heading & FAQs) has its own independent styling
+ */
+import { cleanStega } from "../../utils/stega";
+import HeadingComposition from "./HeadingComposition.astro";
+import type { PortableTextBlock } from "@portabletext/types";
+
+interface FaqItem {
+  _key?: string;
+  title?: string;
+  content?: string;
+}
+
+interface HeadingData {
+  eyebrow?: string;
+  title?: string;
+  text?: PortableTextBlock[];
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+}
+
+interface Props {
+  // Embedded heading composition
+  heading?: HeadingData;
+  // FAQ items
+  items?: FaqItem[];
+  // FAQ-specific styles (separate from heading styles)
+  theme?: 'light' | 'dark';
+  expandFirst?: boolean;
+  id?: string;
+}
+
+const {
+  heading,
+  items = [],
+  theme: rawTheme = 'light',
+  expandFirst = false,
+  id = 'faq-module'
+} = Astro.props;
+
+// Clean values for CSS/logic (FAQ theme only)
+const theme = cleanStega(rawTheme) || 'light';
+
+// Theme-based classes for FAQ accordion
+const isDarkTheme = theme === 'dark';
+const faqBorderClass = isDarkTheme ? 'border-neutral-white' : 'border-primary-50';
+const faqTextClass = isDarkTheme ? 'text-neutral-white' : 'text-primary-50';
+const iconFillClass = isDarkTheme ? '#ffffff' : '#033180';
+
+// Generate unique ID for component
+const componentId = cleanStega(id) || `faq-module_${Date.now()}`;
+
+// Check if heading has any content
+const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text && heading.text.length > 0));
+---
+
+<section id={componentId} data-sanity-edit-target>
+  <div class="mx-auto max-w-5xl  lg:px-8  ">
+    {/* Embedded HeadingComposition - has its own styling */}
+    {hasHeading && (
+      <div class="mb-8 lg:mb-12" data-sanity-edit-target>
+        <HeadingComposition 
+          eyebrow={heading.eyebrow}
+          title={heading.title}
+          text={heading.text}
+          theme={heading.theme}
+          textAlignment={heading.textAlignment}
+          eyebrowType={heading.eyebrowType}
+          eyebrowStyle={heading.eyebrowStyle}
+          headingType={heading.headingType}
+          displayType={heading.displayType}
+          textType={heading.textType}
+        />
+      </div>
+    )}
+
+    {/* FAQ accordion */}
+    <dl class="mt-2">
+      {items.map((item, index) => {
+        const itemTitle = item.title;
+        const itemContent = item.content;
+        const isFirstAndExpanded = index === 0 && expandFirst;
+        const faqNumber = index + 1;
+        const itemId = `faq-${faqNumber}`;
+        
+        return (
+          <div class={`py-3 border-b ${faqBorderClass}`} data-sanity-edit-target>
+            <dt id="js-faq-heading">
+              <button 
+                type="button" 
+                class={`flex w-full items-center justify-between text-left ${faqTextClass} font-semibold`}
+                aria-controls={itemId}
+                aria-expanded={isFirstAndExpanded ? "true" : "false"}
+                data-sanity-edit-target
+              >
+                <h3 class="text-lg font-semibold leading-7" data-sanity-edit-target>{itemTitle}</h3>
+                <span class="ml-6 flex h-7 items-center">
+                  {/* Plus icon (closed state) */}
+                  <svg 
+                    class={`h-6 w-6 ${isFirstAndExpanded ? 'hidden' : ''}`} 
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path 
+                      fill={iconFillClass}
+                      fill-rule="evenodd" 
+                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm-1 5v4H7v2h4v4h2v-4h4v-2h-4V7h-2Zm-7 5c0 4.41 3.59 8 8 8s8-3.59 8-8-3.59-8-8-8-8 3.59-8 8Z" 
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  {/* Minus icon (open state) */}
+                  <svg 
+                    class={`h-6 w-6 ${isFirstAndExpanded ? '' : 'hidden'}`} 
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path 
+                      fill={iconFillClass}
+                      fill-rule="evenodd" 
+                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2ZM4 12c0 4.41 3.59 8 8 8s8-3.59 8-8-3.59-8-8-8-8 3.59-8 8Zm3-1v2h10v-2H7Z" 
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </span>
+              </button>
+            </dt>
+            <dd 
+              class={`mt-2 pr-12 ${faqTextClass} [&>ul]:list-disc [&>ul]:list-inside [&>ul]:mt-4 [&>ul>li]:text-lg [&>div]:text-lg ${isFirstAndExpanded ? '' : 'hidden'}`} 
+              id={itemId}
+              hidden={!isFirstAndExpanded}
+              data-sanity-edit-target
+            >
+              <p class={`text-lg leading-7 ${faqTextClass}`}>{itemContent}</p>
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  </div>
+</section>
+
+{/* SEO: FAQ structured data */}
+{items.length > 0 && (
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": items.map(item => ({
+      "@type": "Question",
+      "name": cleanStega(item.title) || '',
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": cleanStega(item.content) || ''
+      }
+    }))
+  })} />
+)}
+
+<style>
+  /* Border colors */
+  .border-primary-50 {
+    border-color: var(--primary-50, #033180);
+  }
+
+  .border-neutral-white {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Text colors */
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  /* Button focus state */
+  dt button:focus {
+    outline: 2px solid var(--secondary-50, #cc4400);
+    outline-offset: 2px;
+  }
+
+  dt button:focus-visible {
+    outline: 2px solid var(--secondary-50, #cc4400);
+    outline-offset: 2px;
+  }
+
+  /* Hover state */
+  dt button:hover {
+    opacity: 0.8;
+  }
+</style>
+
+<script is:inline>
+(function() {
+  'use strict';
+
+  function initFaqsAccordion() {
+    const faqButtons = document.querySelectorAll('#js-faq-heading button');
+
+    faqButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        const expanded = button.getAttribute('aria-expanded') === 'true';
+        const contentId = button.getAttribute('aria-controls');
+        const content = document.getElementById(contentId);
+        const icons = button.querySelectorAll('svg');
+        const plusIcon = icons[0];
+        const minusIcon = icons[1];
+
+        if (content) {
+          // Toggle expanded state
+          button.setAttribute('aria-expanded', !expanded);
+          
+          // Toggle content visibility
+          if (expanded) {
+            content.classList.add('hidden');
+            content.hidden = true;
+          } else {
+            content.classList.remove('hidden');
+            content.hidden = false;
+          }
+
+          // Toggle icons
+          if (plusIcon && minusIcon) {
+            plusIcon.classList.toggle('hidden');
+            minusIcon.classList.toggle('hidden');
+          }
+        }
+      });
+    });
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState !== 'loading') {
+    initFaqsAccordion();
+  } else {
+    document.addEventListener('DOMContentLoaded', initFaqsAccordion);
+  }
+})();
+</script>
+

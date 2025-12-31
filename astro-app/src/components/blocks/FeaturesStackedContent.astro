@@ -137,7 +137,7 @@ const eyebrowStyleClass = eyebrowStyle === 'gradient' ? 'gradient' : 'text-secon
     
     return (
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center" data-sanity-edit-target>
-        <div class={`order-last ${isImageRight ? 'md:order-first' : ''} grid gap-4`}>
+        <div class={`order-last ${isImageRight ? 'md:order-first' : 'md:order-last'} grid gap-4`}>
           <header class={`grid gap-4 ${alignmentClass} ${textColorClass}`}>
             {eyebrow && (
               <div data-sanity-edit-target>
@@ -231,7 +231,7 @@ const eyebrowStyleClass = eyebrowStyle === 'gradient' ? 'gradient' : 'text-secon
         
         {/* Feature Image */}
         {imageUrl && (
-          <figure class={`feature-image-figure [&>img]:${cleanStega(item.imageRatio) || 'aspect-square'} js-slide-in js-slidein-end`} data-sanity-edit-target>
+          <figure class={`feature-image-figure [&>img]:${cleanStega(item.imageRatio) || 'aspect-square'} js-slide-in js-slidein-end ${!isImageRight ? 'md:order-first' : ''}`} data-sanity-edit-target>
             {/* Hidden span with stega-encoded imageAlt for visual editing click-to-edit */}
             <span class="sr-only">{item.imageAlt || 'Feature image'}</span>
             <img 
@@ -337,6 +337,27 @@ const eyebrowStyleClass = eyebrowStyle === 'gradient' ? 'gradient' : 'text-secon
   
   .features-stacked-content figure img {
     border-radius: 0.5rem;
+  }
+  
+  /* Text color classes */
+  .text-secondary-50 {
+    color: var(--secondary-50, #ff290c);
+  }
+  
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+  
+  .text-neutral-white {
+    color: var(--neutral-white, #ffffff);
+  }
+  
+  .text-gx-80 {
+    color: #8B5CF6;
+  }
+  
+  .text-gx-90 {
+    color: #7C3AED;
   }
   
   /* For visual editing - figure needs position for sr-only span */

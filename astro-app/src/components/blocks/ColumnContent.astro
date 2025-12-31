@@ -15,7 +15,12 @@ import HeadingComposition from "./HeadingComposition.astro";
 import AdvancedImage from "./AdvancedImage.astro";
 import TrustedPartner from "./TrustedPartner.astro";
 import HubspotForm from "./HubspotForm.astro";
-import type { ColumnContent as ColumnContentType, TextBlock, ImageBlock, ImageVideoModal as ImageVideoModalType, RotatingTextBlock, ButtonStack as ButtonStackType, SingleButton as SingleButtonType, LogoSet as LogoSetType, StatsSet as StatsSetType, QuoteBlock as QuoteBlockType, WidgetStatsReference, WidgetUserReviewsReference, TestimonialCarouselReference, FeaturesStackedContent as FeaturesStackedContentType, HeadingComposition as HeadingCompositionType, AdvancedImage as AdvancedImageType, TrustedPartner as TrustedPartnerType, HubspotFormReference } from "../../utils/sanity";
+import IndustrySelector from "./IndustrySelector.astro";
+import FeaturesSelector from "../globals/FeaturesSelector.astro";
+import FAQs from "./FAQs.astro";
+import ResultsList from "./ResultsList.astro";
+import ComparisonTable from "./ComparisonTable.astro";
+import type { ColumnContent as ColumnContentType, TextBlock, ImageBlock, ImageVideoModal as ImageVideoModalType, RotatingTextBlock, ButtonStack as ButtonStackType, SingleButton as SingleButtonType, LogoSet as LogoSetType, LogoSetReference, StatsSet as StatsSetType, QuoteBlock as QuoteBlockType, WidgetStatsReference, WidgetUserReviewsReference, TestimonialCarouselReference, FeaturesStackedContent as FeaturesStackedContentType, HeadingComposition as HeadingCompositionType, AdvancedImage as AdvancedImageType, TrustedPartner as TrustedPartnerType, HubspotFormReference, IndustrySelector as IndustrySelectorType, FeaturesSelectorGlobalReference, FAQs as FAQsType, ResultsList as ResultsListType, ComparisonTable as ComparisonTableType } from "../../utils/sanity";
 import { urlFor } from "../../utils/image";
 import { cleanStega } from "../../utils/stega";
 import { createBlockEditInfo, createDataSanityAttrs, type SanityEditInfo } from "../../utils/visualEditing";
@@ -185,6 +190,23 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
           />
         </div>
       );
+    } else if (item._type === 'logoSetReference') {
+      const logoSetRef = item as LogoSetReference;
+      const logoSetData = logoSetRef.reference;
+      return logoSetData ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <LogoSet
+            customTitle={logoSetData.customTitle}
+            amerLogos={logoSetData.amerLogos}
+            apacLogos={logoSetData.apacLogos}
+            emeaLogos={logoSetData.emeaLogos}
+            ukLogos={logoSetData.ukLogos}
+            theme={logoSetData.theme}
+            textAlignment={logoSetData.textAlignment}
+            showDivider={logoSetData.showDivider}
+          />
+        </div>
+      ) : null;
     } else if (item._type === 'statsSet') {
       const statsSetData = item as StatsSetType;
       return (
@@ -345,6 +367,72 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
           />
         </div>
       ) : null;
+    } else if (item._type === 'industrySelector') {
+      const selectorData = item as IndustrySelectorType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <IndustrySelector
+            heading={selectorData.heading}
+            headerImage={selectorData.headerImage}
+            headerImageAlt={selectorData.headerImageAlt}
+            industries={selectorData.industries}
+            theme={cleanStega(selectorData.theme) as 'light' | 'dark' | undefined}
+            useAnimations={selectorData.useAnimations}
+            id={cleanStega(selectorData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'featuresSelectorGlobalReference') {
+      const featuresRef = item as FeaturesSelectorGlobalReference;
+      const data = featuresRef.reference;
+      return data ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <FeaturesSelector
+            heading={data.heading}
+            features={data.features}
+            ctaLabel={data.ctaLabel}
+            ctaLink={data.ctaLink}
+            id={cleanStega(data._id)}
+          />
+        </div>
+      ) : null;
+    } else if (item._type === 'faqs') {
+      const faqsData = item as FAQsType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <FAQs
+            heading={faqsData.heading}
+            items={faqsData.items}
+            theme={cleanStega(faqsData.theme) as 'light' | 'dark' | undefined}
+            expandFirst={faqsData.expandFirst}
+            id={cleanStega(faqsData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'resultsList') {
+      const resultsListData = item as ResultsListType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <ResultsList
+            items={resultsListData.items}
+            image={resultsListData.image}
+            imageAlt={resultsListData.imageAlt}
+            theme={cleanStega(resultsListData.theme) as 'light' | 'dark' | 'gxscore' | undefined}
+            useAnimations={resultsListData.useAnimations}
+            id={cleanStega(resultsListData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'comparisonTable') {
+      const comparisonTableData = item as ComparisonTableType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <ComparisonTable
+            columns={comparisonTableData.columns}
+            id={cleanStega(comparisonTableData._key)}
+          />
+        </div>
+      );
     }
   })}
 </div>

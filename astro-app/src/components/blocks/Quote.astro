@@ -172,7 +172,7 @@ function sanitizeHtml(html: string | undefined): string {
 ---
 
 <section id={quoteId} class="quote-module text-left my-2 md:my-3" data-sanity-edit-target>
-  <div class={`quote-module-grid relative before:absolute before:w-[2px] before:h-[100%] ${borderColorClass} before:top-0 before:left-0 pl-3`}>
+  <div class={`quote-module-grid relative before:absolute before:w-[2px] before:h-[100%] before:${borderColorClass} before:top-0 before:left-0 pl-3`}>
     {/* For extrabold variant, show image at the top */}
     {styleVariant === 'extrabold' && hasImage && (
       <div class={`flex items-center gap-3`}>

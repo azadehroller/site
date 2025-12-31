@@ -1,0 +1,286 @@
+---
+/**
+ * Results List - A component for displaying a list of results/features with icons
+ * Based on HubSpot module: results-list.module
+ * 
+ * Features:
+ * - Array of items with icon, title, content, and optional link
+ * - Optional image on the side
+ * - Theme options (light/dark/gxscore)
+ * - Optional Lottie animations
+ */
+import { cleanStega } from "../../utils/stega";
+
+interface ResultItem {
+  _key?: string;
+  icon?: string;
+  animationFile?: string;
+  title?: string;
+  content?: string;
+  linkLabel?: string;
+  link?: {
+    href?: string;
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+}
+
+interface ImageAsset {
+  url?: string;
+}
+
+interface SanityImage {
+  asset?: ImageAsset;
+}
+
+interface Props {
+  items?: ResultItem[];
+  image?: SanityImage;
+  imageAlt?: string;
+  theme?: 'light' | 'dark' | 'gxscore';
+  useAnimations?: boolean;
+  id?: string;
+}
+
+const {
+  items = [],
+  image,
+  imageAlt = '',
+  theme: rawTheme = 'dark',
+  useAnimations: rawUseAnimations = false,
+  id: rawId = 'results-list'
+} = Astro.props;
+
+// Clean values for CSS/logic
+const theme = cleanStega(rawTheme) || 'dark';
+const useAnimations = rawUseAnimations === true;
+const componentId = cleanStega(rawId) || `results-list_${Date.now()}`;
+
+// Check if we have an image
+const hasImage = image?.asset?.url;
+const imageUrl = image?.asset?.url;
+
+// Theme-based classes
+const getIconBgClass = () => {
+  switch (theme) {
+    case 'light': return 'bg-[#0960F6]';
+    case 'gxscore': return 'bg-gx-90';
+    default: return 'bg-primary-10';
+  }
+};
+
+const getTextColorClass = () => {
+  switch (theme) {
+    case 'light': return 'text-neutral-white';
+    case 'gxscore': return 'text-gx-90';
+    default: return 'text-primary-50';
+  }
+};
+
+const iconBgClass = getIconBgClass();
+const textColorClass = getTextColorClass();
+---
+
+<section id={`results-list-${componentId}`} class="py-3 js-resultsItemsSection" data-sanity-edit-target>
+  <div class={`grid grid-flow-row-dense grid-cols-1 ${hasImage ? 'md:grid-cols-3' : 'md:grid-cols-1'} md:gap-3 gap-5`}>
+    <div class={`grid grid-cols-1 ${hasImage ? 'md:grid-cols-2 col-span-2' : 'md:grid-cols-4 col-auto'} gap-4 gap-y-5 md:gap-y-6`}>
+      {items.map((item, index) => {
+        const itemTitle = item.title;
+        const itemContent = item.content;
+        const linkLabel = item.linkLabel;
+        const href = item.link?.href || 'https://www.roller.software/';
+        const openInNewTab = item.link?.openInNewTab;
+        const noFollow = item.link?.noFollow;
+        
+        // Build rel attribute
+        const relParts: string[] = [];
+        if (noFollow) relParts.push('nofollow');
+        if (openInNewTab) relParts.push('noopener');
+        const relAttr = relParts.length > 0 ? relParts.join(' ') : undefined;
+        
+        return (
+          <div class="flex flex-col gap-3 js-resultsItemsLink" data-sanity-edit-target>
+            {useAnimations && item.animationFile ? (
+              <div 
+                id={`js-resultsItemContainer-${componentId}-${index}`} 
+                class="js-resultsItemContainer cursor-pointer flex h-[48px] w-[48px] justify-center overflow-hidden relative"
+                data-lottie={item.animationFile}
+              />
+            ) : (
+              <div class={`${iconBgClass} rounded-lg w-[64px] h-[64px] flex justify-center items-center`}>
+                <Fragment set:html={item.icon} />
+              </div>
+            )}
+            <div class={`${textColorClass} flex flex-col gap-2`}>
+              <h3 class="text-lg font-extrabold" data-sanity-edit-target>{itemTitle}</h3>
+              <div class="text-base" data-sanity-edit-target>{itemContent}</div>
+              <div>
+                {linkLabel && (
+                  <a 
+                    href={href} 
+                    class="mt-auto relative inline-flex items-center gap-2 font-semibold cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 bg-transparent text-primary-50 font-serif group"
+                    target={openInNewTab ? "_blank" : undefined}
+                    rel={relAttr}
+                    data-sanity-edit-target
+                  >
+                    <span>{linkLabel}</span>
+                    <span>
+                      <svg class="transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+                        <rect width="40" height="40" fill="#ff290c" rx="20"/>
+                        <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+                      </svg>
+                    </span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+    {hasImage && (
+      <div class="w-full h-full overflow-hidden [&>img]:object-cover [&>img]:w-full [&>img]:h-full rounded-[42px] hidden md:block">
+        <img 
+          src={imageUrl} 
+          alt={cleanStega(imageAlt) || ''} 
+          loading="lazy"
+        />
+      </div>
+    )}
+  </div>
+</section>
+
+{/* Load Lottie library if animations are enabled */}
+{useAnimations && (
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.8.1/lottie.min.js"></script>
+)}
+
+{/* Animation script */}
+{useAnimations && (
+  <script is:inline define:vars={{ componentId }}>
+    (function() {
+      'use strict';
+
+      function initResultsListAnimations() {
+        const resultsItems = document.querySelectorAll(`#results-list-${componentId} .js-resultsItemsLink`);
+        
+        if (!resultsItems.length) return;
+
+        let currentIndex = 0;
+        const intervalTime = 3000;
+
+        const startAnimations = () => {
+          setInterval(() => {
+            if (resultsItems[currentIndex]) {
+              const resultsItemContainer = resultsItems[currentIndex].querySelector('.js-resultsItemContainer');
+              if (resultsItemContainer && resultsItemContainer.animation) {
+                resultsItemContainer.animation.play();
+                resultsItemContainer.classList.add('disabled');
+              }
+
+              // Stop the previous animation if it's not the first iteration
+              if (currentIndex > 0) {
+                const previousIndex = currentIndex - 1;
+                const previousItemContainer = resultsItems[previousIndex].querySelector('.js-resultsItemContainer');
+                if (previousItemContainer && previousItemContainer.animation) {
+                  previousItemContainer.animation.stop();
+                  previousItemContainer.classList.remove('disabled');
+                }
+              }
+
+              currentIndex = (currentIndex + 1) % resultsItems.length;
+            }
+          }, intervalTime);
+        };
+
+        resultsItems.forEach((resultsItem) => {
+          const resultsItemContainer = resultsItem.querySelector('.js-resultsItemContainer');
+
+          if (resultsItemContainer && typeof lottie !== 'undefined') {
+            const animation = lottie.loadAnimation({
+              container: resultsItemContainer,
+              renderer: 'svg',
+              loop: true,
+              autoplay: false,
+              path: resultsItemContainer.getAttribute('data-lottie'),
+            });
+
+            resultsItemContainer.animation = animation;
+          }
+
+          resultsItem.addEventListener('mouseenter', () => {
+            if (resultsItemContainer && resultsItemContainer.animation) {
+              resultsItemContainer.animation.play();
+              resultsItemContainer.classList.add('disabled');
+            }
+          });
+
+          resultsItem.addEventListener('mouseleave', () => {
+            if (resultsItemContainer && resultsItemContainer.animation) {
+              resultsItemContainer.animation.stop();
+            }
+          });
+        });
+
+        // Intersection Observer to start animation when the section comes into view
+        const section = document.querySelector(`#results-list-${componentId}`);
+
+        if (section) {
+          const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                startAnimations();
+                observer.disconnect();
+              }
+            });
+          });
+
+          observer.observe(section);
+        }
+      }
+
+      // Initialize on DOM ready
+      if (document.readyState !== 'loading') {
+        initResultsListAnimations();
+      } else {
+        document.addEventListener('DOMContentLoaded', initResultsListAnimations);
+      }
+    })();
+  </script>
+)}
+
+<style>
+  /* Icon background colors */
+  .bg-primary-10 {
+    background-color: var(--primary-10, #e6f0ff);
+  }
+  
+  .bg-gx-90 {
+    background-color: var(--gx-90, #1a1a2e);
+  }
+  
+  /* Text colors */
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+  
+  .text-neutral-white {
+    color: #ffffff;
+  }
+  
+  .text-gx-90 {
+    color: var(--gx-90, #1a1a2e);
+  }
+
+  /* Animation container styles */
+  .js-resultsItemContainer {
+    cursor: pointer;
+    display: flex;
+    height: 48px;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    width: 48px;
+  }
+</style>
+

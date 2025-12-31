@@ -1,0 +1,342 @@
+---
+/**
+ * IndustrySelector - A grid of industry links with icons/animations
+ * Uses embedded HeadingComposition for the header section
+ * Each section (heading & industries) has its own independent styling
+ */
+import { cleanStega } from "../../utils/stega";
+import HeadingComposition from "./HeadingComposition.astro";
+import type { PortableTextBlock } from "@portabletext/types";
+
+interface IndustryLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface IndustryItem {
+  _key?: string;
+  icon?: string;
+  animationFile?: string;
+  title?: string;
+  link?: IndustryLink;
+}
+
+interface HeadingData {
+  eyebrow?: string;
+  title?: string;
+  text?: PortableTextBlock[];
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+}
+
+interface Props {
+  // Embedded heading composition
+  heading?: HeadingData;
+  // Header image (for light theme)
+  headerImage?: {
+    asset?: { url?: string };
+  };
+  headerImageAlt?: string;
+  // Industries
+  industries?: IndustryItem[];
+  // Industry selector-specific styles (separate from heading styles)
+  theme?: 'light' | 'dark';
+  useAnimations?: boolean;
+  id?: string;
+}
+
+const {
+  heading,
+  headerImage,
+  headerImageAlt,
+  industries = [],
+  theme: rawTheme = 'dark',
+  useAnimations = false,
+  id = 'industry-selector'
+} = Astro.props;
+
+// Clean values for CSS/logic (industry selector theme only)
+const theme = cleanStega(rawTheme) || 'dark';
+
+// Theme-based classes for industry selector
+const isLightTheme = theme === 'light';
+const containerBgClass = isLightTheme
+  ? 'bg-primary-50 box-shadow-ondark-blue-10 lg:grid lg:grid-cols-3'
+  : 'bg-widget-industries box-shadow-onlight';
+const itemTextClass = isLightTheme
+  ? 'text-neutral-white hover:text-primary-50'
+  : 'text-primary-50';
+
+// Generate unique ID for component
+const componentId = cleanStega(id) || `industry-selector-${Math.random().toString(36).slice(2, 9)}`;
+
+// Helper to get header image URL
+const headerImageUrl = headerImage?.asset?.url;
+
+// Check if heading has any content
+const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text && heading.text.length > 0));
+---
+
+<div 
+  id={componentId}
+  class={`industry-selector mx-auto gap-5 ${containerBgClass} flex flex-col rounded-[32px] py-6 px-6 mb-0 md:mb-4 ${isLightTheme ? 'lg:p-6' : 'lg:p-6'}`}
+  data-sanity-edit-target
+>
+  {/* Embedded HeadingComposition - has its own styling */}
+  {hasHeading && (
+    <header class={`${isLightTheme ? 'flex flex-col' : ''}`} data-sanity-edit-target>
+      <HeadingComposition 
+        eyebrow={heading.eyebrow}
+        title={heading.title}
+        text={heading.text}
+        theme={heading.theme}
+        textAlignment={heading.textAlignment}
+        eyebrowType={heading.eyebrowType}
+        eyebrowStyle={heading.eyebrowStyle}
+        headingType={heading.headingType}
+        displayType={heading.displayType}
+        textType={heading.textType}
+      />
+      {isLightTheme && headerImageUrl && (
+        <figure class="hidden lg:block mt-4" data-sanity-edit-target>
+          <span class="sr-only">{headerImageAlt || heading.title || 'Industry selector'}</span>
+          <img 
+            src={headerImageUrl} 
+            alt={cleanStega(headerImageAlt) || cleanStega(heading.title) || 'Industry selector'} 
+            width="368" 
+            height="368"
+            loading="lazy"
+            data-sanity-edit-target
+          />
+        </figure>
+      )}
+    </header>
+  )}
+
+  {/* Desktop grid view */}
+  <div class={`hidden md:flex flex-wrap gap-3 ms-auto me-auto ${theme} ${isLightTheme ? 'col-span-2' : ''}`}>
+    {industries.map((industry) => {
+      const industryTitle = industry.title;
+      const industryIcon = industry.icon;
+      const animationFile = industry.animationFile;
+      const href = cleanStega(industry.link?.href) || '/';
+      const openInNewTab = industry.link?.openInNewTab;
+      const noFollow = industry.link?.noFollow;
+      
+      return (
+        <a 
+          href={href}
+          class={`industry-item-link flex items-center justify-center gap-2 mo-card-features ${itemTextClass} font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-3xl rounded-2xl`}
+          target={openInNewTab ? '_blank' : undefined}
+          rel={`${noFollow ? 'nofollow' : ''} ${openInNewTab ? 'noopener' : ''}`.trim() || undefined}
+          data-sanity-edit-target
+        >
+          {useAnimations && animationFile ? (
+            <div 
+              class="industry-icon-container" 
+              data-lottie={animationFile}
+              data-sanity-edit-target
+            ></div>
+          ) : industryIcon ? (
+            <span class="industry-icon" set:html={industryIcon} data-sanity-edit-target />
+          ) : null}
+          <span data-sanity-edit-target>{industryTitle}</span>
+        </a>
+      );
+    })}
+  </div>
+
+  {/* Mobile dropdown view */}
+  <div class="grid gap-3 md:hidden dropdown-wrapper">
+    <select 
+      id={`${componentId}-dropdown`}
+      class="industry-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+    >
+      <option value="" selected>Select your industry</option>
+      {industries.map((industry) => {
+        const industryTitle = cleanStega(industry.title);
+        const href = cleanStega(industry.link?.href) || '/';
+        return (
+          <option value={href}>{industryTitle}</option>
+        );
+      })}
+    </select>
+    <button 
+      type="button"
+      class="industry-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 bg-secondary-50 hover:bg-secondary-70 rounded-3xl py-2 px-4 text-neutral-white"
+      data-dropdown-id={`${componentId}-dropdown`}
+    >
+      Discover
+    </button>
+  </div>
+</div>
+
+<style>
+  /* Container shadows */
+  .box-shadow-ondark-blue-10 {
+    box-shadow: 0px 8px 16px 0px rgba(1, 19, 50, 0.25), 0px 24px 40px 0px rgba(1, 19, 50, 0.50);
+  }
+
+  .box-shadow-ondark-blue-10:hover {
+    box-shadow: 0px 8px 16px 0px rgba(1, 19, 50, 0.25), 0px 24px 40px 0px rgba(1, 19, 50, 0.50);
+  }
+
+  .box-shadow-onlight {
+    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  /* Dropdown wrapper with custom arrow */
+  .dropdown-wrapper {
+    position: relative;
+    grid-template-areas: "select";
+    align-items: center;
+  }
+
+  .dropdown-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 24px;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 0.7em;
+    height: 0.4em;
+    background-color: var(--primary-50, #033180);
+    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+    pointer-events: none;
+  }
+
+  /* Industry icon container for animations */
+  .industry-icon-container {
+    cursor: pointer;
+    display: flex;
+    height: 48px;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    width: 48px;
+  }
+
+  /* Industry item cards */
+  .mo-card-features {
+    padding: 0.75rem 1.25rem;
+    min-height: 56px;
+  }
+
+  /* Background colors */
+  .bg-widget-industries {
+    background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
+  }
+
+  /* Shadow on hover */
+  .hover\:shadow-3xl:hover {
+    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  /* Icon container */
+  .industry-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .industry-icon :global(svg) {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Screen reader only - visually hidden but accessible for stega detection */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>
+
+<script is:inline>
+(function() {
+  'use strict';
+
+  // Handle dropdown navigation
+  document.querySelectorAll('.industry-discover-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      console.log('Discover button clicked');
+      const dropdownId = btn.getAttribute('data-dropdown-id');
+      const dropdown = document.getElementById(dropdownId);
+      if (dropdown && dropdown.value) {
+        window.location.assign(dropdown.value);
+      }
+    });
+  });
+
+  // Lottie animation initialization (if lottie is available)
+  // function initLottieAnimations() {
+  //   if (typeof lottie === 'undefined') {
+  //     // Load lottie if not already loaded
+  //     var script = document.createElement('script');
+  //     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js';
+  //     script.onload = setupAnimations;
+  //     document.head.appendChild(script);
+  //   } else {
+  //     setupAnimations();
+  //   }
+  // }
+
+  // function setupAnimations() {
+  //   var containers = document.querySelectorAll('.industry-icon-container[data-lottie]');
+    
+  //   containers.forEach(function(container) {
+  //     var animationPath = container.getAttribute('data-lottie');
+  //     if (!animationPath || container.hasAttribute('data-animation-initialized')) return;
+      
+  //     container.setAttribute('data-animation-initialized', 'true');
+      
+  //     var animation = lottie.loadAnimation({
+  //       container: container,
+  //       renderer: 'svg',
+  //       loop: true,
+  //       autoplay: false,
+  //       path: animationPath
+  //     });
+
+  //     container.animation = animation;
+
+  //     // Find parent link for hover events
+  //     var parentLink = container.closest('.industry-item-link');
+  //     if (parentLink) {
+  //       parentLink.addEventListener('mouseenter', function() {
+  //         if (container.animation) {
+  //           container.animation.play();
+  //           container.classList.add('disabled');
+  //         }
+  //       });
+
+  //       parentLink.addEventListener('mouseleave', function() {
+  //         if (container.animation) {
+  //           container.animation.stop();
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
+
+  // Initialize on DOM ready
+  // if (document.readyState !== 'loading') {
+  //   initLottieAnimations();
+  // } else {
+  //   document.addEventListener('DOMContentLoaded', initLottieAnimations);
+  // }
+})();
+</script>
+
