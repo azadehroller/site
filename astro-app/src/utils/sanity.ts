@@ -3011,6 +3011,7 @@ export async function getPage(slug: string, request?: Request) {
       _id,
       title,
       slug,
+      headerTheme,
       sections[]{
         ...,
         _type == 'columnsBlock' => {
@@ -4606,40 +4607,20 @@ export interface IndustryLink {
 export interface IndustryItem {
   _key?: string;
   icon?: string;
-  animationFile?: string;
   title?: string;
   link?: IndustryLink;
-}
-
-// Embedded heading data for IndustrySelector (same structure as HeadingComposition)
-export interface IndustrySelectorHeadingData {
-  eyebrow?: string;
-  title?: string;
-  text?: PortableTextBlock[];
-  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
-  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
-  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
-  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
 }
 
 export interface IndustrySelector {
   _type: "industrySelector";
   _key?: string;
-  // Embedded heading composition
-  heading?: IndustrySelectorHeadingData;
-  // Header image (for light theme)
-  headerImage?: {
-    asset?: { _ref?: string; url?: string };
-  };
-  headerImageAlt?: string;
+  // Heading - uses HeadingComposition type
+  heading?: HeadingComposition;
   // Industries
   industries?: IndustryItem[];
-  // Industry selector-specific styles (separate from heading styles)
-  theme?: 'light' | 'dark';
-  useAnimations?: boolean;
+  // CTA
+  ctaLabel?: string;
+  ctaLink?: IndustryLink;
 }
 
 // FAQsSelector types
@@ -5168,6 +5149,7 @@ export interface Page {
   _id: string;
   title?: string;
   slug: Slug;
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
   sections?: (ColumnsBlock | Divider | Post)[];
 }
 
@@ -6887,6 +6869,150 @@ export async function getCompetitorsLandingPage(request?: Request) {
             }
           }
         }
+      }
+    }`,
+    request,
+  });
+}
+
+// Header types
+export interface HeaderNavItem {
+  _key?: string;
+  label: string;
+  href?: string;
+  hasMegaMenu?: boolean;
+}
+
+export interface HeaderMegaMenuItem {
+  _key?: string;
+  title: string;
+  description?: string;
+  icon?: string;
+  link?: {
+    href: string;
+    openInNewTab?: boolean;
+  };
+  topFeatures?: Array<{
+    title: string;
+    link?: string;
+  }>;
+}
+
+export interface HeaderMegaFeaturedItem {
+  _key?: string;
+  title: string;
+  label?: string;
+  image?: {
+    asset?: {
+      url: string;
+    };
+  };
+  link?: {
+    href: string;
+    openInNewTab?: boolean;
+  };
+}
+
+export interface HeaderMegaMenu {
+  _key?: string;
+  parentLabel: string;
+  menuType?: 'why_roller' | 'features' | 'industries' | 'solutions';
+  introTitle?: string;
+  introDescription?: string;
+  items?: HeaderMegaMenuItem[];
+  featuredLabel?: string;
+  featuredItems?: HeaderMegaFeaturedItem[];
+  ctaLabel?: string;
+  ctaLink?: string;
+}
+
+export interface HeaderButton {
+  _key?: string;
+  label: string;
+  href: string;
+  variant?: 'primary' | 'secondary' | 'text';
+  openInNewTab?: boolean;
+}
+
+export interface HeaderGlobal {
+  _type: "headerGlobal";
+  _id: string;
+  logo?: {
+    asset?: {
+      url: string;
+    };
+  };
+  logoDark?: {
+    asset?: {
+      url: string;
+    };
+  };
+  logoAlt?: string;
+  logoLink?: string;
+  navItems?: HeaderNavItem[];
+  megaMenus?: HeaderMegaMenu[];
+  buttons?: HeaderButton[];
+}
+
+/**
+ * Fetch header global settings
+ * Returns the header configuration from Sanity
+ */
+export async function getHeader(request?: Request) {
+  return await loadQuery<HeaderGlobal | null>({
+    query: groq`*[_type == "headerGlobal"][0]{
+      _id,
+      _type,
+      logo{ asset->{ url } },
+      logoDark{ asset->{ url } },
+      logoAlt,
+      logoLink,
+      navItems[]{
+        _key,
+        label,
+        href,
+        hasMegaMenu
+      },
+      megaMenus[]{
+        _key,
+        parentLabel,
+        menuType,
+        introTitle,
+        introDescription,
+        items[]{
+          _key,
+          title,
+          description,
+          icon,
+          link{
+            href,
+            openInNewTab
+          },
+          topFeatures[]{
+            title,
+            link
+          }
+        },
+        featuredLabel,
+        featuredItems[]{
+          _key,
+          title,
+          label,
+          image{ asset->{ url } },
+          link{
+            href,
+            openInNewTab
+          }
+        },
+        ctaLabel,
+        ctaLink
+      },
+      buttons[]{
+        _key,
+        label,
+        href,
+        variant,
+        openInNewTab
       }
     }`,
     request,

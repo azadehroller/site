@@ -23,9 +23,11 @@ if (!page) {
 // Document info for visual editing
 const documentId = page?._id || '';
 const documentType = landingPage ? 'landingPage' : 'page';
+// Get header theme from page data (available on both regular pages and landing pages)
+const headerTheme = landingPage?.headerTheme || regularPage?.headerTheme || 'default';
 ---
 
-<Layout title={page?.title || "Page"}>
+<Layout title={page?.title || "Page"} headerTheme={headerTheme}>
   {page?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;
