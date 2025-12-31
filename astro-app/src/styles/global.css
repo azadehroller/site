@@ -885,6 +885,34 @@ form .hs-button:hover {
   z-index: 1000;
 }
 
+/* Header Theme Classes - Set from CMS */
+#header.header-dark {
+  background: var(--primary-50);
+  border-color: transparent;
+}
+
+#header.header-dark a {
+  color: var(--neutral-white);
+}
+
+#header.header-light {
+  background: var(--neutral-white);
+  border-color: var(--neutral-20);
+}
+
+#header.header-light a {
+  color: var(--primary-50);
+}
+
+#header.header-industry-report {
+  background: linear-gradient(to right, #0960F6 0%, #00B8FF 40%, #3EF78B 100%);
+  border-color: transparent;
+}
+
+#header.header-industry-report a {
+  color: var(--neutral-white);
+}
+
 .header__logo * {
   display: block;
 }
