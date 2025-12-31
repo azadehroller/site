@@ -145,6 +145,22 @@ export async function getHomepage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -298,6 +314,80 @@ export async function getHomepage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column2[]{
@@ -421,6 +511,22 @@ export async function getHomepage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -574,6 +680,80 @@ export async function getHomepage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column3[]{
@@ -697,6 +877,22 @@ export async function getHomepage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -850,6 +1046,80 @@ export async function getHomepage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column4[]{
@@ -973,6 +1243,22 @@ export async function getHomepage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -1126,6 +1412,80 @@ export async function getHomepage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           }
         },
@@ -1287,6 +1647,22 @@ export async function getGetStartedPage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -1440,6 +1816,80 @@ export async function getGetStartedPage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column2[]{
@@ -1563,6 +2013,22 @@ export async function getGetStartedPage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -1716,6 +2182,80 @@ export async function getGetStartedPage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column3[]{
@@ -1839,6 +2379,22 @@ export async function getGetStartedPage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -1992,6 +2548,80 @@ export async function getGetStartedPage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column4[]{
@@ -2115,6 +2745,22 @@ export async function getGetStartedPage(request?: Request) {
               textAlignment,
               showDivider
             },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
             _type == 'statsSet' => {
               _type,
               _key,
@@ -2268,6 +2914,80 @@ export async function getGetStartedPage(request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           }
         },
@@ -2412,6 +3132,80 @@ export async function getPage(slug: string, request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column2[]{
@@ -2520,6 +3314,80 @@ export async function getPage(slug: string, request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column3[]{
@@ -2628,6 +3496,80 @@ export async function getPage(slug: string, request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           },
           column4[]{
@@ -2736,6 +3678,80 @@ export async function getPage(slug: string, request?: Request) {
                 region
               },
               theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
             }
           }
         },
@@ -2748,6 +3764,695 @@ export async function getPage(slug: string, request?: Request) {
           mainImage{
             asset->,
             alt
+          }
+        }
+      }
+    }`,
+    params: { slug },
+    request,
+  });
+}
+
+export async function getFeature(slug: string, request?: Request) {
+  return await loadQuery<Feature | null>({
+    query: groq`*[_type == "feature" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1PaddingBottomMobile,
+          column2PaddingBottomMobile,
+          column3PaddingBottomMobile,
+          column4PaddingBottomMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset-> },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            }
+          }
+        },
+        _type == 'featuresStackedContent' => {
+          _type,
+          _key,
+          theme,
+          textAlignment,
+          eyebrowType,
+          eyebrowStyle,
+          headingType,
+          displayType,
+          textType,
+          items[]{
+            _key,
+            eyebrow,
+            title,
+            text,
+            image{ asset-> },
+            imageAlt,
+            imagePosition,
+            imageRatio,
+            showStats,
+            statsNumber,
+            statsText,
+            statsIcon,
+            showQuote,
+            quoteText,
+            quoteAuthor,
+            quoteAuthorTitle,
+            quoteImageType,
+            quoteImage{ asset-> },
+            quoteImageAlt,
+            showCta,
+            ctaText,
+            ctaLink,
+            ctaOpenInNewTab,
+            ctaIcon,
+            ctaIconPosition,
+            ctaKind
           }
         }
       }
@@ -2891,7 +4596,136 @@ export interface HubspotFormReference {
   theme?: 'light' | 'dark';
 }
 
-export type ColumnContent = TextBlock | RotatingTextBlock | ImageVideoModal | ImageBlock | AdvancedImage | ButtonStack | SingleButton | LogoSet | StatsSet | QuoteBlock | WidgetStatsReference | WidgetUserReviewsReference | TestimonialCarouselReference | FeaturesStackedContent | HeadingComposition | TrustedPartner | HubspotFormReference;
+// IndustrySelector types
+export interface IndustryLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+export interface IndustryItem {
+  _key?: string;
+  icon?: string;
+  animationFile?: string;
+  title?: string;
+  link?: IndustryLink;
+}
+
+// Embedded heading data for IndustrySelector (same structure as HeadingComposition)
+export interface IndustrySelectorHeadingData {
+  eyebrow?: string;
+  title?: string;
+  text?: PortableTextBlock[];
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+}
+
+export interface IndustrySelector {
+  _type: "industrySelector";
+  _key?: string;
+  // Embedded heading composition
+  heading?: IndustrySelectorHeadingData;
+  // Header image (for light theme)
+  headerImage?: {
+    asset?: { _ref?: string; url?: string };
+  };
+  headerImageAlt?: string;
+  // Industries
+  industries?: IndustryItem[];
+  // Industry selector-specific styles (separate from heading styles)
+  theme?: 'light' | 'dark';
+  useAnimations?: boolean;
+}
+
+// FAQsSelector types
+export interface FaqItem {
+  _key?: string;
+  title?: string;
+  content?: string;
+}
+
+// Embedded heading data for FAQs (same structure as HeadingComposition but without _type)
+export interface FaqsHeadingData {
+  eyebrow?: string;
+  title?: string;
+  text?: PortableTextBlock[];
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+}
+
+export interface FAQs {
+  _type: "faqs";
+  _key?: string;
+  // Embedded HeadingComposition for header
+  heading?: FaqsHeadingData;
+  // FAQ items
+  items?: FaqItem[];
+  // FAQ-specific styles (separate from heading styles)
+  theme?: 'light' | 'dark';
+  expandFirst?: boolean;
+}
+
+// Results List types
+export interface ResultItem {
+  _key?: string;
+  icon?: string;
+  animationFile?: string;
+  title?: string;
+  content?: string;
+  linkLabel?: string;
+  link?: {
+    href?: string;
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+}
+
+export interface ResultsList {
+  _type: "resultsList";
+  _key?: string;
+  // Items
+  items?: ResultItem[];
+  // Optional side image
+  image?: {
+    asset?: { _ref?: string; url?: string };
+  };
+  imageAlt?: string;
+  // Style options
+  theme?: 'light' | 'dark' | 'gxscore';
+  // Settings
+  useAnimations?: boolean;
+}
+
+// Comparison Table types
+export interface ComparisonItem {
+  _key?: string;
+  text?: string;
+}
+
+export interface ComparisonColumn {
+  _key?: string;
+  isCompetitor?: boolean;
+  title?: string;
+  items?: ComparisonItem[];
+}
+
+export interface ComparisonTable {
+  _type: "comparisonTable";
+  _key?: string;
+  columns?: ComparisonColumn[];
+}
+
+export type ColumnContent = TextBlock | RotatingTextBlock | ImageVideoModal | ImageBlock | AdvancedImage | ButtonStack | SingleButton | LogoSet | LogoSetReference | StatsSet | QuoteBlock | WidgetStatsReference | WidgetUserReviewsReference | TestimonialCarouselReference | FeaturesStackedContent | HeadingComposition | TrustedPartner | HubspotFormReference | IndustrySelector | FeaturesSelectorGlobalReference | FAQs | ResultsList | ComparisonTable;
 
 // Button Stack types
 export interface ButtonLink {
@@ -3024,6 +4858,27 @@ export interface LogoSet {
   showDivider?: boolean;
 }
 
+// LogoSetGlobal - Global document for Logo Set
+export interface LogoSetGlobal {
+  _type: "logoSetGlobal";
+  _id?: string;
+  customTitle?: string;
+  amerLogos?: LogoItem[];
+  apacLogos?: LogoItem[];
+  emeaLogos?: LogoItem[];
+  ukLogos?: LogoItem[];
+  theme?: 'light' | 'dark' | 'gxscore';
+  textAlignment?: 'left' | 'center' | 'right';
+  showDivider?: boolean;
+}
+
+// LogoSetReference - Reference to global LogoSet document
+export interface LogoSetReference {
+  _type: "logoSetReference";
+  _key?: string;
+  reference?: LogoSetGlobal;
+}
+
 // StatsSet types
 export interface StatItemData {
   _key?: string;
@@ -3091,6 +4946,35 @@ export interface WidgetStatsReference {
   _type: "widgetStatsReference";
   _key?: string;
   reference?: WidgetStats;
+}
+
+// Features Selector Global types
+export interface FeatureSelectorLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+export interface FeatureSelectorItem {
+  _key?: string;
+  icon?: string;
+  title?: string;
+  link?: FeatureSelectorLink;
+}
+
+export interface FeaturesSelectorGlobal {
+  _type: "featuresSelectorGlobal";
+  _id?: string;
+  heading?: HeadingComposition;
+  features?: FeatureSelectorItem[];
+  ctaLabel?: string;
+  ctaLink?: FeatureSelectorLink;
+}
+
+export interface FeaturesSelectorGlobalReference {
+  _type: "featuresSelectorGlobalReference";
+  _key?: string;
+  reference?: FeaturesSelectorGlobal;
 }
 
 // Widget User Reviews types
@@ -3287,6 +5171,882 @@ export interface Page {
   sections?: (ColumnsBlock | Divider | Post)[];
 }
 
+export interface Feature {
+  _type: "feature";
+  _id: string;
+  title?: string;
+  slug: Slug;
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+}
+
+export interface Industry {
+  _type: "industry";
+  _id: string;
+  title?: string;
+  slug: Slug;
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+}
+
+export async function getIndustry(slug: string, request?: Request) {
+  return await loadQuery<Industry | null>({
+    query: groq`*[_type == "industry" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1PaddingBottomMobile,
+          column2PaddingBottomMobile,
+          column3PaddingBottomMobile,
+          column4PaddingBottomMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                eyebrow,
+                title,
+                blurb,
+                horizontalLayout,
+                stats[]{ _key, statsNumber, statsText }
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType,
+                badges[]{
+                  _key,
+                  image{ asset->{ _ref, url } },
+                  alt
+                }
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                eyebrow,
+                testimonials[]{
+                  _key,
+                  quoteText,
+                  quoteAuthor,
+                  quoteTitle,
+                  avatar{ asset->{ _ref, url } }
+                }
+              }
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                customTitle,
+                amerLogos[]{ alt, image{ asset->{ _ref, url } } },
+                apacLogos[]{ alt, image{ asset->{ _ref, url } } },
+                emeaLogos[]{ alt, image{ asset->{ _ref, url } } },
+                ukLogos[]{ alt, image{ asset->{ _ref, url } } },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews{
+                badges[]{
+                  _key,
+                  image{ asset->{ _ref, url } },
+                  alt
+                }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset->{ _ref, url } },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading{
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset->{ _ref, url } },
+              headerImageAlt,
+              industries[]{
+                _key,
+                icon,
+                animationFile,
+                title,
+                link{
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading{
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{
+                _key,
+                title,
+                content
+              },
+              theme,
+              expandFirst
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              items[]{
+                _key,
+                icon,
+                animationFile,
+                title,
+                content,
+                linkLabel,
+                link{
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              image{ asset->{ _ref, url } },
+              imageAlt,
+              theme,
+              useAnimations
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                eyebrow,
+                title,
+                blurb,
+                horizontalLayout,
+                stats[]{ _key, statsNumber, statsText }
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType,
+                badges[]{
+                  _key,
+                  image{ asset->{ _ref, url } },
+                  alt
+                }
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                eyebrow,
+                testimonials[]{
+                  _key,
+                  quoteText,
+                  quoteAuthor,
+                  quoteTitle,
+                  avatar{ asset->{ _ref, url } }
+                }
+              }
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                customTitle,
+                amerLogos[]{ alt, image{ asset->{ _ref, url } } },
+                apacLogos[]{ alt, image{ asset->{ _ref, url } } },
+                emeaLogos[]{ alt, image{ asset->{ _ref, url } } },
+                ukLogos[]{ alt, image{ asset->{ _ref, url } } },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews{
+                badges[]{
+                  _key,
+                  image{ asset->{ _ref, url } },
+                  alt
+                }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset->{ _ref, url } },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading{
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset->{ _ref, url } },
+              headerImageAlt,
+              industries[]{
+                _key,
+                icon,
+                animationFile,
+                title,
+                link{
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              theme,
+              useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading{
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{
+                _key,
+                title,
+                content
+              },
+              theme,
+              expandFirst
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              items[]{
+                _key,
+                icon,
+                animationFile,
+                title,
+                content,
+                linkLabel,
+                link{
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              image{ asset->{ _ref, url } },
+              imageAlt,
+              theme,
+              useAnimations
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              items[]{
+                _key,
+                icon,
+                animationFile,
+                title,
+                content,
+                linkLabel,
+                link{
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              image{ asset->{ _ref, url } },
+              imageAlt,
+              theme,
+              useAnimations
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              items[]{
+                _key,
+                icon,
+                animationFile,
+                title,
+                content,
+                linkLabel,
+                link{
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              image{ asset->{ _ref, url } },
+              imageAlt,
+              theme,
+              useAnimations
+            }
+          }
+        },
+        _type == 'divider' => {
+          _type,
+          _key,
+          size,
+          sizeMobile
+        }
+      }
+    }`,
+    params: { slug },
+    request,
+  });
+}
+
+export interface Partner {
+  _type: "partner";
+  _id: string;
+  title?: string;
+  slug: Slug;
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+}
+
+export interface PartnersLandingPage {
+  _type: "partnersLandingPage";
+  _id: string;
+  title?: string;
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+}
+
+export interface Competitor {
+  _type: "competitor";
+  _id: string;
+  title?: string;
+  slug: Slug;
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+}
+
+export interface CompetitorsLandingPage {
+  _type: "competitorsLandingPage";
+  _id: string;
+  title?: string;
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+}
+
 export interface Post {
   _type: "post";
   _id: string;
@@ -3346,6 +6106,794 @@ export interface FooterGlobal {
 }
 
 /**
+ * Fetch a single partner by slug
+ */
+export async function getPartner(slug: string, request?: Request) {
+  return await loadQuery<Partner | null>({
+    query: groq`*[_type == "partner" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          }
+        }
+      }
+    }`,
+    params: { slug },
+    request,
+  });
+}
+
+/**
+ * Fetch partners landing page
+ */
+export async function getPartnersLandingPage(request?: Request) {
+  return await loadQuery<PartnersLandingPage | null>({
+    query: groq`*[_type == "partnersLandingPage"][0]{
+      _id,
+      title,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          }
+        }
+      }
+    }`,
+    request,
+  });
+}
+
+/**
+ * Fetch a single competitor by slug
+ */
+export async function getCompetitor(slug: string, request?: Request) {
+  return await loadQuery<Competitor | null>({
+    query: groq`*[_type == "competitor" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          }
+        }
+      }
+    }`,
+    params: { slug },
+    request,
+  });
+}
+
+/**
+ * Fetch competitors landing page
+ */
+export async function getCompetitorsLandingPage(request?: Request) {
+  return await loadQuery<CompetitorsLandingPage | null>({
+    query: groq`*[_type == "competitorsLandingPage"][0]{
+      _id,
+      title,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            }
+          }
+        }
+      }
+    }`,
+    request,
+  });
+}
+
+/**
  * Fetch footer global settings
  * Returns the footer configuration from Sanity
  */
@@ -3389,6 +6937,709 @@ export async function getFooter(request?: Request) {
       floatingButtonPrimaryText,
       floatingButtonSecondaryText
     }`,
+    request,
+  });
+}
+
+/**
+ * Fetch Features Selector Global
+ * Returns the global features selector configuration from Sanity
+ */
+export async function getFeaturesSelectorGlobal(request?: Request) {
+  return await loadQuery<FeaturesSelectorGlobal | null>({
+    query: groq`*[_type == "featuresSelectorGlobal"][0]{
+      _id,
+      _type,
+      eyebrow,
+      title,
+      text,
+      features[]{
+        _key,
+        icon,
+        title,
+        link{
+          href,
+          openInNewTab,
+          noFollow
+        }
+      },
+      ctaLabel,
+      ctaLink{
+        href,
+        openInNewTab,
+        noFollow
+      },
+      theme,
+      textAlignment,
+      eyebrowType,
+      headingType,
+      displayType,
+      textType
+    }`,
+    request,
+  });
+}
+
+// Landing Page type for root-level landing pages
+export interface LandingPage {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
+export async function getLandingPage(slug: string, request?: Request) {
+  return await loadQuery<LandingPage | null>({
+    query: groq`*[_type == "landingPage" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      description,
+      seoTitle,
+      seoDescription,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1PaddingBottomMobile,
+          column2PaddingBottomMobile,
+          column3PaddingBottomMobile,
+          column4PaddingBottomMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              image{ asset->{ _ref, url } },
+              theme,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              textAlignment
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                stats[]{ _key, value, label, prefix, suffix },
+                theme
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                reviews[]{ _key, source, rating, text },
+                theme
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                testimonials[]{
+                  _key,
+                  text,
+                  author,
+                  role,
+                  venue,
+                  avatar{ asset->{ _ref, url } },
+                  logo{ asset->{ _ref, url } }
+                },
+                theme
+              }
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                formId,
+                portalId,
+                region,
+                title
+              }
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading,
+              industries[]{
+                _key,
+                name,
+                icon,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                features[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading,
+              description,
+              items[]{ _key, question, answer },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              heading,
+              results[]{
+                _key,
+                title,
+                description,
+                image{ asset->{ _ref, url } }
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'comparisonTable' => {
+              _type,
+              _key,
+              heading,
+              rollerColumnHeading,
+              competitorColumnHeading,
+              rows[]{
+                _key,
+                feature,
+                rollerSupport,
+                competitorSupport
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              image{ asset->{ _ref, url } },
+              theme,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              textAlignment
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                stats[]{ _key, value, label, prefix, suffix },
+                theme
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                reviews[]{ _key, source, rating, text },
+                theme
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                testimonials[]{
+                  _key,
+                  text,
+                  author,
+                  role,
+                  venue,
+                  avatar{ asset->{ _ref, url } },
+                  logo{ asset->{ _ref, url } }
+                },
+                theme
+              }
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                formId,
+                portalId,
+                region,
+                title
+              }
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading,
+              industries[]{
+                _key,
+                name,
+                icon,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                features[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading,
+              description,
+              items[]{ _key, question, answer },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              heading,
+              results[]{
+                _key,
+                title,
+                description,
+                image{ asset->{ _ref, url } }
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'comparisonTable' => {
+              _type,
+              _key,
+              heading,
+              rollerColumnHeading,
+              competitorColumnHeading,
+              rows[]{
+                _key,
+                feature,
+                rollerSupport,
+                competitorSupport
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            }
+          }
+        },
+        _type == 'divider' => {
+          _type,
+          _key,
+          style,
+          marginTop,
+          marginBottom
+        }
+      }
+    }`,
+    params: { slug },
     request,
   });
 }
