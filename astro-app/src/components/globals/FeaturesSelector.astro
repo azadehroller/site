@@ -1,0 +1,265 @@
+---
+/**
+ * FeaturesSelector - A global grid of feature links with icons
+ * Based on HubSpot module: features-selector-global.module
+ * Uses HeadingComposition for the header section
+ */
+import { cleanStega } from "../../utils/stega";
+import HeadingComposition from "../blocks/HeadingComposition.astro";
+import type { PortableTextBlock } from "@portabletext/types";
+import type { HeadingComposition as HeadingCompositionType } from "../../utils/sanity";
+
+interface FeatureLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface FeatureItem {
+  _key?: string;
+  icon?: string;
+  title?: string;
+  link?: FeatureLink;
+}
+
+interface Props {
+  // Heading - uses HeadingComposition type with all its fields
+  heading?: HeadingCompositionType;
+  // Features
+  features?: FeatureItem[];
+  // CTA
+  ctaLabel?: string;
+  ctaLink?: FeatureLink;
+  id?: string;
+}
+
+const {
+  heading,
+  features = [],
+  ctaLabel = 'See all features',
+  ctaLink,
+  id = 'features-selector'
+} = Astro.props;
+
+// Generate unique ID for component
+const componentId = cleanStega(id) || `features-selector-${Math.random().toString(36).slice(2, 9)}`;
+
+// Check if heading has any content
+const hasHeading = heading?.eyebrow || heading?.title || (heading?.text && heading.text.length > 0);
+
+// CTA link data
+const ctaHref = cleanStega(ctaLink?.href) || '/features';
+const ctaOpenInNewTab = ctaLink?.openInNewTab;
+const ctaNoFollow = ctaLink?.noFollow;
+
+// Build rel attribute for CTA
+const ctaRelParts: string[] = [];
+if (ctaNoFollow) ctaRelParts.push('nofollow');
+if (ctaOpenInNewTab) ctaRelParts.push('noopener');
+const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
+---
+
+<div 
+  id={componentId}
+  class="features-selector mx-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col lg:p-6 rounded-[32px] py-6 px-6 mb-0 md:mb-4"
+  data-sanity-edit-target
+>
+  {/* Header Section using HeadingComposition */}
+  {hasHeading && heading && (
+    <header class="text-primary-50 grid gap-4" data-sanity-edit-target>
+      <HeadingComposition 
+        eyebrow={heading.eyebrow}
+        title={heading.title}
+        text={heading.text}
+        theme={heading.theme}
+        textAlignment={heading.textAlignment}
+        eyebrowType={heading.eyebrowType}
+        eyebrowStyle={heading.eyebrowStyle}
+        headingType={heading.headingType}
+        displayType={heading.displayType}
+        textType={heading.textType}
+      />
+    </header>
+  )}
+
+  {/* Desktop grid view */}
+  <div class="hidden md:flex flex-wrap gap-3 ms-auto me-auto dark">
+    {features.map((feature) => {
+      const featureTitle = feature.title;
+      const featureIcon = feature.icon;
+      const href = cleanStega(feature.link?.href) || '/';
+      const openInNewTab = feature.link?.openInNewTab;
+      const noFollow = feature.link?.noFollow;
+      
+      // Build rel attribute
+      const relParts: string[] = [];
+      if (noFollow) relParts.push('nofollow');
+      if (openInNewTab) relParts.push('noopener');
+      const rel = relParts.length > 0 ? relParts.join(' ') : undefined;
+      
+      return (
+        <a 
+          href={href}
+          class="feature-item-link flex items-center justify-center gap-2 mo-card-features text-primary-50 font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-3xl rounded-2xl"
+          target={openInNewTab ? '_blank' : undefined}
+          rel={rel}
+          data-sanity-edit-target
+        >
+          {featureIcon && (
+            <span class="feature-icon" set:html={featureIcon} data-sanity-edit-target />
+          )}
+          <span data-sanity-edit-target>{featureTitle}</span>
+        </a>
+      );
+    })}
+  </div>
+
+  {/* Mobile dropdown view */}
+  <div class="grid gap-3 md:hidden dropdown-wrapper">
+    <select 
+      id={`${componentId}-dropdown`}
+      class="feature-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+    >
+      <option value="" selected>Select a feature</option>
+      {features.map((feature) => {
+        const featureTitle = cleanStega(feature.title);
+        const href = cleanStega(feature.link?.href) || '/';
+        return (
+          <option value={href}>{featureTitle}</option>
+        );
+      })}
+    </select>
+    <button 
+      type="button"
+      class="feature-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 bg-secondary-50 hover:bg-secondary-70 rounded-3xl py-2 px-4 text-neutral-white"
+      data-dropdown-id={`${componentId}-dropdown`}
+    >
+      Discover
+    </button>
+  </div>
+
+  {/* CTA Link */}
+  {ctaLabel && ctaHref && (
+    <div data-sanity-edit-target>
+      <a 
+        href={ctaHref}
+        target={ctaOpenInNewTab ? '_blank' : undefined}
+        rel={ctaRel}
+        class="relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold bg-transparent text-primary-50 font-serif group"
+      >
+        <span class="flex justify-center items-center mr-0 ml-2 order-1">
+          <svg class="transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+            <rect width="40" height="40" fill="#ff290c" rx="20"></rect>
+            <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"></path>
+          </svg>
+        </span>
+        <span>{ctaLabel}</span>
+      </a>
+    </div>
+  )}
+</div>
+
+<style>
+  /* Container shadows */
+  .box-shadow-onlight {
+    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  /* Dropdown wrapper with custom arrow */
+  .dropdown-wrapper {
+    position: relative;
+    grid-template-areas: "select";
+    align-items: center;
+  }
+
+  .dropdown-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 24px;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 0.7em;
+    height: 0.4em;
+    background-color: var(--primary-50, #033180);
+    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+    pointer-events: none;
+  }
+
+  /* Feature item cards */
+  .mo-card-features {
+    padding: 0.75rem 1.25rem;
+    min-height: 56px;
+  }
+
+  /* Background colors */
+  .bg-widget-industries {
+    background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
+  }
+
+  /* Shadow on hover */
+  .hover\:shadow-3xl:hover {
+    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  /* Icon container */
+  .feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .feature-icon :global(svg) {
+    width: 64px;
+    height: 64px;
+  }
+
+  /* Dropdown styles */
+  .feature-dropdown {
+    border: none;
+    outline: none;
+  }
+
+  .feature-dropdown:focus {
+    box-shadow: 0 0 0 2px var(--primary-40, #074DC5);
+  }
+
+  /* Button styles */
+  .bg-secondary-50 {
+    background-color: var(--secondary-50, #ff3800);
+  }
+
+  .hover\:bg-secondary-70:hover {
+    background-color: var(--secondary-70, #cc2d00);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #011840);
+  }
+
+  /* Font-serif for CTA */
+  .font-serif {
+    font-family: var(--font-serif, Georgia, serif);
+  }
+</style>
+
+<script is:inline>
+(function() {
+  'use strict';
+
+  // Handle dropdown navigation
+  document.querySelectorAll('.feature-discover-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const dropdownId = btn.getAttribute('data-dropdown-id');
+      const dropdown = document.getElementById(dropdownId);
+      if (dropdown && dropdown.value) {
+        window.location.assign(dropdown.value);
+      }
+    });
+  });
+})();
+</script>
+
