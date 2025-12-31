@@ -1,12 +1,13 @@
 ---
 /**
- * IndustrySelector - A grid of industry links with icons/animations
- * Uses embedded HeadingComposition for the header section
- * Each section (heading & industries) has its own independent styling
+ * IndustrySelector - A grid of industry links with icons
+ * Based on FeaturesSelector structure
+ * Uses HeadingComposition for the header section
  */
 import { cleanStega } from "../../utils/stega";
 import HeadingComposition from "./HeadingComposition.astro";
 import type { PortableTextBlock } from "@portabletext/types";
+import type { HeadingComposition as HeadingCompositionType } from "../../utils/sanity";
 
 interface IndustryLink {
   href?: string;
@@ -17,80 +18,55 @@ interface IndustryLink {
 interface IndustryItem {
   _key?: string;
   icon?: string;
-  animationFile?: string;
   title?: string;
   link?: IndustryLink;
 }
 
-interface HeadingData {
-  eyebrow?: string;
-  title?: string;
-  text?: PortableTextBlock[];
-  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
-  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  eyebrowStyle?: 'none' | 'red' | 'bright_blue' | 'blue' | 'iris' | 'iris_light' | 'gradient';
-  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
-  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
-}
-
 interface Props {
-  // Embedded heading composition
-  heading?: HeadingData;
-  // Header image (for light theme)
-  headerImage?: {
-    asset?: { url?: string };
-  };
-  headerImageAlt?: string;
+  // Heading - uses HeadingComposition type with all its fields
+  heading?: HeadingCompositionType;
   // Industries
   industries?: IndustryItem[];
-  // Industry selector-specific styles (separate from heading styles)
-  theme?: 'light' | 'dark';
-  useAnimations?: boolean;
+  // CTA
+  ctaLabel?: string;
+  ctaLink?: IndustryLink;
   id?: string;
 }
 
 const {
   heading,
-  headerImage,
-  headerImageAlt,
   industries = [],
-  theme: rawTheme = 'dark',
-  useAnimations = false,
+  ctaLabel = 'See all industries',
+  ctaLink,
   id = 'industry-selector'
 } = Astro.props;
-
-// Clean values for CSS/logic (industry selector theme only)
-const theme = cleanStega(rawTheme) || 'dark';
-
-// Theme-based classes for industry selector
-const isLightTheme = theme === 'light';
-const containerBgClass = isLightTheme
-  ? 'bg-primary-50 box-shadow-ondark-blue-10 lg:grid lg:grid-cols-3'
-  : 'bg-widget-industries box-shadow-onlight';
-const itemTextClass = isLightTheme
-  ? 'text-neutral-white hover:text-primary-50'
-  : 'text-primary-50';
 
 // Generate unique ID for component
 const componentId = cleanStega(id) || `industry-selector-${Math.random().toString(36).slice(2, 9)}`;
 
-// Helper to get header image URL
-const headerImageUrl = headerImage?.asset?.url;
-
 // Check if heading has any content
-const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text && heading.text.length > 0));
+const hasHeading = heading?.eyebrow || heading?.title || (heading?.text && heading.text.length > 0);
+
+// CTA link data
+const ctaHref = cleanStega(ctaLink?.href) || '/industries';
+const ctaOpenInNewTab = ctaLink?.openInNewTab;
+const ctaNoFollow = ctaLink?.noFollow;
+
+// Build rel attribute for CTA
+const ctaRelParts: string[] = [];
+if (ctaNoFollow) ctaRelParts.push('nofollow');
+if (ctaOpenInNewTab) ctaRelParts.push('noopener');
+const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
 ---
 
 <div 
   id={componentId}
-  class={`industry-selector mx-auto gap-5 ${containerBgClass} flex flex-col rounded-[32px] py-6 px-6 mb-0 md:mb-4 ${isLightTheme ? 'lg:p-6' : 'lg:p-6'}`}
+  class="industry-selector mx-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col lg:p-6 rounded-[32px] py-6 px-6 mb-0 md:mb-4"
   data-sanity-edit-target
 >
-  {/* Embedded HeadingComposition - has its own styling */}
-  {hasHeading && (
-    <header class={`${isLightTheme ? 'flex flex-col' : ''}`} data-sanity-edit-target>
+  {/* Header Section using HeadingComposition */}
+  {hasHeading && heading && (
+    <header class="text-primary-50 grid gap-4" data-sanity-edit-target>
       <HeadingComposition 
         eyebrow={heading.eyebrow}
         title={heading.title}
@@ -103,60 +79,47 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
         displayType={heading.displayType}
         textType={heading.textType}
       />
-      {isLightTheme && headerImageUrl && (
-        <figure class="hidden lg:block mt-4" data-sanity-edit-target>
-          <span class="sr-only">{headerImageAlt || heading.title || 'Industry selector'}</span>
-          <img 
-            src={headerImageUrl} 
-            alt={cleanStega(headerImageAlt) || cleanStega(heading.title) || 'Industry selector'} 
-            width="368" 
-            height="368"
-            loading="lazy"
-            data-sanity-edit-target
-          />
-        </figure>
-      )}
     </header>
   )}
 
   {/* Desktop grid view */}
-  <div class={`hidden md:flex flex-wrap gap-3 ms-auto me-auto ${theme} ${isLightTheme ? 'col-span-2' : ''}`}>
+  <div class="hidden md:flex flex-wrap gap-3 ms-auto me-auto dark">
     {industries.map((industry) => {
       const industryTitle = industry.title;
       const industryIcon = industry.icon;
-      const animationFile = industry.animationFile;
       const href = cleanStega(industry.link?.href) || '/';
       const openInNewTab = industry.link?.openInNewTab;
       const noFollow = industry.link?.noFollow;
       
+      // Build rel attribute
+      const relParts: string[] = [];
+      if (noFollow) relParts.push('nofollow');
+      if (openInNewTab) relParts.push('noopener');
+      const rel = relParts.length > 0 ? relParts.join(' ') : undefined;
+      
       return (
         <a 
           href={href}
-          class={`industry-item-link flex items-center justify-center gap-2 mo-card-features ${itemTextClass} font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-3xl rounded-2xl`}
+          class="industry-item-link flex items-center justify-center gap-2 mo-card-features text-primary-50 font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-3xl rounded-2xl"
           target={openInNewTab ? '_blank' : undefined}
-          rel={`${noFollow ? 'nofollow' : ''} ${openInNewTab ? 'noopener' : ''}`.trim() || undefined}
+          rel={rel}
           data-sanity-edit-target
         >
-          {useAnimations && animationFile ? (
-            <div 
-              class="industry-icon-container" 
-              data-lottie={animationFile}
-              data-sanity-edit-target
-            ></div>
-          ) : industryIcon ? (
+          {industryIcon && (
             <span class="industry-icon" set:html={industryIcon} data-sanity-edit-target />
-          ) : null}
+          )}
           <span data-sanity-edit-target>{industryTitle}</span>
         </a>
       );
     })}
   </div>
 
-  {/* Mobile dropdown view */}
-  <div class="grid gap-3 md:hidden dropdown-wrapper">
+  {/* Mobile dropdown view - data-sanity-ignore prevents Visual Editing from intercepting clicks */}
+  <div class="grid gap-3 md:hidden dropdown-wrapper" data-sanity-ignore>
     <select 
       id={`${componentId}-dropdown`}
       class="industry-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+      data-sanity-ignore
     >
       <option value="" selected>Select your industry</option>
       {industries.map((industry) => {
@@ -175,27 +138,28 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
       Discover
     </button>
   </div>
+
 </div>
 
 <style>
   /* Container shadows */
-  .box-shadow-ondark-blue-10 {
-    box-shadow: 0px 8px 16px 0px rgba(1, 19, 50, 0.25), 0px 24px 40px 0px rgba(1, 19, 50, 0.50);
-  }
-
-  .box-shadow-ondark-blue-10:hover {
-    box-shadow: 0px 8px 16px 0px rgba(1, 19, 50, 0.25), 0px 24px 40px 0px rgba(1, 19, 50, 0.50);
-  }
-
   .box-shadow-onlight {
     box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  .box-shadow-onlight-navy-40 {
+    box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
+  }
+
+  .bg-neutral-white {
+    background-color: #ffffff;
   }
 
   /* Dropdown wrapper with custom arrow */
   .dropdown-wrapper {
     position: relative;
-    grid-template-areas: "select";
-    align-items: center;
+    isolation: isolate;
+    z-index: 9999;
   }
 
   .dropdown-wrapper::after {
@@ -209,17 +173,16 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
     background-color: var(--primary-50, #033180);
     clip-path: polygon(100% 0%, 0 0%, 50% 100%);
     pointer-events: none;
+    z-index: 0;
   }
 
-  /* Industry icon container for animations */
-  .industry-icon-container {
-    cursor: pointer;
-    display: flex;
-    height: 48px;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    width: 48px;
+  /* Disable Sanity Visual Editing overlays on dropdown */
+  .dropdown-wrapper :global([data-sanity-overlay]),
+  .dropdown-wrapper :global([class*="StyledBox"]),
+  .dropdown-wrapper :global([class*="StyledCard"]),
+  .dropdown-wrapper :global([class*="sc-"]) {
+    pointer-events: none !important;
+    display: none !important;
   }
 
   /* Industry item cards */
@@ -246,21 +209,46 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
   }
 
   .industry-icon :global(svg) {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
   }
 
-  /* Screen reader only - visually hidden but accessible for stega detection */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
+  /* Dropdown styles */
+  .industry-dropdown {
+    border: none;
+    outline: none;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto !important;
+    transform: translateZ(0);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  .industry-dropdown:focus {
+    box-shadow: 0 0 0 2px var(--primary-40, #074DC5);
+  }
+
+  /* Button styles */
+  .bg-secondary-50 {
+    background-color: var(--secondary-50, #ff3800);
+  }
+
+  .hover\:bg-secondary-70:hover {
+    background-color: var(--secondary-70, #cc2d00);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #011840);
+  }
+
+  /* Font-serif for CTA */
+  .font-serif {
+    font-family: var(--font-serif, Georgia, serif);
   }
 </style>
 
@@ -271,7 +259,6 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
   // Handle dropdown navigation
   document.querySelectorAll('.industry-discover-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      console.log('Discover button clicked');
       const dropdownId = btn.getAttribute('data-dropdown-id');
       const dropdown = document.getElementById(dropdownId);
       if (dropdown && dropdown.value) {
@@ -280,63 +267,46 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
     });
   });
 
-  // Lottie animation initialization (if lottie is available)
-  // function initLottieAnimations() {
-  //   if (typeof lottie === 'undefined') {
-  //     // Load lottie if not already loaded
-  //     var script = document.createElement('script');
-  //     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js';
-  //     script.onload = setupAnimations;
-  //     document.head.appendChild(script);
-  //   } else {
-  //     setupAnimations();
-  //   }
-  // }
+  // Fix for Sanity Visual Editing blocking select elements
+  // Create a transparent overlay that captures clicks and opens the select
+  document.querySelectorAll('.industry-dropdown').forEach(function(select) {
+    const wrapper = select.closest('.dropdown-wrapper');
+    if (!wrapper) return;
 
-  // function setupAnimations() {
-  //   var containers = document.querySelectorAll('.industry-icon-container[data-lottie]');
+    // Create an invisible button overlay
+    const overlay = document.createElement('button');
+    overlay.type = 'button';
+    overlay.className = 'select-click-overlay';
+    overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 48px; background: transparent; border: none; cursor: pointer; z-index: 10001;';
+    overlay.setAttribute('aria-label', 'Open dropdown');
     
-  //   containers.forEach(function(container) {
-  //     var animationPath = container.getAttribute('data-lottie');
-  //     if (!animationPath || container.hasAttribute('data-animation-initialized')) return;
+    wrapper.style.position = 'relative';
+    wrapper.insertBefore(overlay, select);
+
+    overlay.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
       
-  //     container.setAttribute('data-animation-initialized', 'true');
-      
-  //     var animation = lottie.loadAnimation({
-  //       container: container,
-  //       renderer: 'svg',
-  //       loop: true,
-  //       autoplay: false,
-  //       path: animationPath
-  //     });
-
-  //     container.animation = animation;
-
-  //     // Find parent link for hover events
-  //     var parentLink = container.closest('.industry-item-link');
-  //     if (parentLink) {
-  //       parentLink.addEventListener('mouseenter', function() {
-  //         if (container.animation) {
-  //           container.animation.play();
-  //           container.classList.add('disabled');
-  //         }
-  //       });
-
-  //       parentLink.addEventListener('mouseleave', function() {
-  //         if (container.animation) {
-  //           container.animation.stop();
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
-
-  // Initialize on DOM ready
-  // if (document.readyState !== 'loading') {
-  //   initLottieAnimations();
-  // } else {
-  //   document.addEventListener('DOMContentLoaded', initLottieAnimations);
-  // }
+      // Try showPicker() for modern browsers
+      if (typeof select.showPicker === 'function') {
+        try {
+          select.showPicker();
+        } catch (err) {
+          // Fallback: focus and simulate click
+          select.focus();
+        }
+      } else {
+        // Fallback for older browsers
+        select.focus();
+        // Create and dispatch a mouse event
+        const event = new MouseEvent('mousedown', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        select.dispatchEvent(event);
+      }
+    });
+  });
 })();
 </script>
-

@@ -114,11 +114,12 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     })}
   </div>
 
-  {/* Mobile dropdown view */}
-  <div class="grid gap-3 md:hidden dropdown-wrapper">
+  {/* Mobile dropdown view - data-sanity-ignore prevents Visual Editing from intercepting clicks */}
+  <div class="grid gap-3 md:hidden dropdown-wrapper" data-sanity-ignore>
     <select 
       id={`${componentId}-dropdown`}
       class="feature-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+      data-sanity-ignore
     >
       <option value="" selected>Select a feature</option>
       {features.map((feature) => {
@@ -165,11 +166,19 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
   }
 
+  .box-shadow-onlight-navy-40 {
+    box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
+  }
+
+  .bg-neutral-white {
+    background-color: #ffffff;
+  }
+
   /* Dropdown wrapper with custom arrow */
   .dropdown-wrapper {
     position: relative;
-    grid-template-areas: "select";
-    align-items: center;
+    isolation: isolate;
+    z-index: 9999;
   }
 
   .dropdown-wrapper::after {
@@ -183,6 +192,16 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     background-color: var(--primary-50, #033180);
     clip-path: polygon(100% 0%, 0 0%, 50% 100%);
     pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Disable Sanity Visual Editing overlays on dropdown */
+  .dropdown-wrapper :global([data-sanity-overlay]),
+  .dropdown-wrapper :global([class*="StyledBox"]),
+  .dropdown-wrapper :global([class*="StyledCard"]),
+  .dropdown-wrapper :global([class*="sc-"]) {
+    pointer-events: none !important;
+    display: none !important;
   }
 
   /* Feature item cards */
@@ -217,6 +236,12 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
   .feature-dropdown {
     border: none;
     outline: none;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto !important;
+    transform: translateZ(0);
+    -webkit-appearance: none;
+    -moz-appearance: none;
   }
 
   .feature-dropdown:focus {
@@ -257,6 +282,48 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
       const dropdown = document.getElementById(dropdownId);
       if (dropdown && dropdown.value) {
         window.location.assign(dropdown.value);
+      }
+    });
+  });
+
+  // Fix for Sanity Visual Editing blocking select elements
+  // Create a transparent overlay that captures clicks and opens the select
+  document.querySelectorAll('.feature-dropdown').forEach(function(select) {
+    const wrapper = select.closest('.dropdown-wrapper');
+    if (!wrapper) return;
+
+    // Create an invisible button overlay
+    const overlay = document.createElement('button');
+    overlay.type = 'button';
+    overlay.className = 'select-click-overlay';
+    overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 48px; background: transparent; border: none; cursor: pointer; z-index: 10001;';
+    overlay.setAttribute('aria-label', 'Open dropdown');
+    
+    wrapper.style.position = 'relative';
+    wrapper.insertBefore(overlay, select);
+
+    overlay.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Try showPicker() for modern browsers
+      if (typeof select.showPicker === 'function') {
+        try {
+          select.showPicker();
+        } catch (err) {
+          // Fallback: focus and simulate click
+          select.focus();
+        }
+      } else {
+        // Fallback for older browsers
+        select.focus();
+        // Create and dispatch a mouse event
+        const event = new MouseEvent('mousedown', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        select.dispatchEvent(event);
       }
     });
   });

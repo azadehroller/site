@@ -373,11 +373,9 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
         <div class="content-block-wrapper" {...editAttrs}>
           <IndustrySelector
             heading={selectorData.heading}
-            headerImage={selectorData.headerImage}
-            headerImageAlt={selectorData.headerImageAlt}
             industries={selectorData.industries}
-            theme={cleanStega(selectorData.theme) as 'light' | 'dark' | undefined}
-            useAnimations={selectorData.useAnimations}
+            ctaLabel={selectorData.ctaLabel}
+            ctaLink={selectorData.ctaLink}
             id={cleanStega(selectorData._key)}
           />
         </div>
