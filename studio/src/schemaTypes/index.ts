@@ -35,7 +35,7 @@ import solution from './documents/solution'
 import roller from './documents/roller'
 import landingPage from './documents/landingPage'
 import { rawHtmlPage } from './documents/rawHtmlPage'
-import { widgetStats, widgetUserReviews, testimonialCarousel, logoSetGlobal, featuresSelectorGlobal } from './documents/globals'
+import { widgetStats, widgetUserReviews, testimonialCarousel, logoSetGlobal, featuresSelectorGlobal, headerGlobal } from './documents/globals'
 import testimonialCarouselReference from './objects/testimonialCarouselReference'
 import logoSetReference from './objects/logoSetReference'
 import { hubspotForm } from './documents/formsGlobal'
@@ -95,6 +95,7 @@ export const schemaTypes = [
   logoSetReference,
   featuresSelectorGlobal,
   featuresSelectorGlobalReference,
+  headerGlobal,
   rawHtmlPage,
   // Footer types
   footerGlobal,

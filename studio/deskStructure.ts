@@ -214,6 +214,14 @@ export const deskStructure: StructureResolver = (S, context) =>
             .title('Global Components')
             .items([
               S.listItem()
+                .title('Header')
+                .icon(TagIcon)
+                .child(
+                  S.document()
+                    .schemaType('headerGlobal')
+                    .documentId('headerGlobal')
+                ),
+              S.listItem()
                 .title('Footer')
                 .icon(TagIcon)
                 .child(
