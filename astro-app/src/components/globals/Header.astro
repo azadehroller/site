@@ -1283,77 +1283,113 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
                         </svg>
                       </button>
                       <div class="menu-drop-panel mega-drop">
-                        <div class="mega-drop-wrapper maxmd:bg-neutral-white">
-                          <div class="mega-drop-container container">
-                            {/* Intro section */}
-                            {megaMenu.introTitle && (
-                              <div class="mega-drop__intro">
-                                <p class="mega-drop__intro-title">{megaMenu.introTitle}</p>
-                                {megaMenu.introDescription && (
-                                  <p class="mega-drop__intro-desc">{megaMenu.introDescription}</p>
-                                )}
-                              </div>
-                            )}
-                            
-                            {/* Menu items */}
-                            <div class="mega-drop__items">
-                              {megaMenu.items?.map((menuItem) => (
-                                <a 
-                                  href={menuItem.link?.href || '#'} 
-                                  class="mega-drop__item"
-                                  target={menuItem.link?.openInNewTab ? '_blank' : undefined}
-                                >
-                                  <div class="mega-drop__item-content">
-                                    {menuItem.icon && (
-                                      <div class="mega-drop__item-icon" set:html={menuItem.icon}></div>
-                                    )}
+                        <div class="mega-drop-wrapper bg-neutral-white">
+                          <div class="flex gap-8 container">
+                            <div class="flex gap-y-4 gap-x-8 maxmd:gap-x-0 xl:gap-x-8 container relative after:absolute after:w-[1px] after:h-[100%] after:bg-primary-40 after:top-0 after:right-[-40px]">
+                                {/* Intro section */}
+                                {megaMenu.introTitle && (
+                                  <div class="maxmd:block max-w-[305px]">
                                     <div class="mega-drop__item-text">
-                                      <p class="mega-drop__item-title">{menuItem.title}</p>
-                                      {menuItem.description && (
-                                        <p class="mega-drop__item-desc">{menuItem.description}</p>
+                                      <p class="text-primary-50 text-4xl font-extrabold leading-11 mb-3">{megaMenu.introTitle}</p>
+                                      {megaMenu.introDescription && (
+                                        <p class="text-base text-primary-50">{megaMenu.introDescription}</p>
                                       )}
                                     </div>
+
                                   </div>
-                                </a>
-                              ))}
-                              
-                              {/* CTA link */}
-                              {megaMenu.ctaLabel && megaMenu.ctaLink && (
-                                <a href={megaMenu.ctaLink} class="mega-drop__cta">
-                                  {megaMenu.ctaLabel}
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
-                                    <path fill="#033180" d="M8 0 6.59 1.41 12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8Z"/>
-                                  </svg>
-                                </a>
-                              )}
+                                )}
+                                
+                                {/* Menu items */}
+                                <div class="grow flex flex-col md:grid md:grid-cols-2">
+                                  {megaMenu.items?.map((menuItem) => (
+                                    <div class="mega-drop__item mb-2 maxmd:mb-4 w-[170px] maxmd:w-auto">
+                                      <div class="mega-drop__item-text flex items-center gap-x-4 maxmd:gap-x-1 xl:gap-x-4">
+                                          {menuItem.icon && (
+                                                <div class="maxmd:block" set:html={menuItem.icon}></div>
+                                              )}
+                                              <div class="grow">
+
+                                                <a 
+                                                  href={menuItem.link?.href || '#'}           
+                                                  target={menuItem.link?.openInNewTab ? '_blank' : undefined}
+                                                >
+                                                      <p class="text-base text-primary-50 hover:text-secondary-50 leading-4 maxmd:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
+
+                                                </a>
+                                                <div class="maxmd:flex text-sm text-primary-50">
+                                                  {menuItem.description && (
+                                                    <p class="mr-1 flex items-center">{menuItem.description}</p>
+                                                  )}
+                                                  
+                                                  {Array.isArray(menuItem.topFeatures) && menuItem.topFeatures.length > 0 && (
+                                                    <>
+                                                      {menuItem.topFeatures.map((feature, i) => {
+                                                        const href = feature.link || feature.link|| '#';
+                                                        // Try .link.href (Sanity object), fallback to .link (string)
+                                                        if ((feature.link|| feature.link) && feature.title) {
+                                                          return (
+                                                            <a
+                                                              href={feature.link|| feature.link}
+                                                              class="flex items-center text-sm text-left maxmd:text-center xl:text-left text-primary-40 mx-1 bg-primary-10 font-semibold py-1 px-2 rounded-[980px] hover:bg-[#6ba0fa] transition ease-in-out duration-300"
+                                                            >
+                                                              {feature.title}
+                                                            </a>
+                                                          );
+                                                        }
+                                                        return null;
+                                                      })}
+                                                    </>
+                                                  )}
+                                                </div>
+                                              </div>
+
+                                      </div>
+                                    </div>
+                                  ))}
+                                  
+                                  {/* CTA link */}
+                                  {megaMenu.ctaLabel && megaMenu.ctaLink && (
+                                    <a href={megaMenu.ctaLink} class="mega-drop__cta">
+                                      {megaMenu.ctaLabel}
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
+                                        <path fill="#033180" d="M8 0 6.59 1.41 12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8Z"/>
+                                      </svg>
+                                    </a>
+                                  )}
+                                </div>
+
                             </div>
                             
                             {/* Featured section */}
                             {megaMenu.featuredItems && megaMenu.featuredItems.length > 0 && (
-                              <div class="mega-drop__featured">
+                              <div class="maxmd:block min-w-[256px]">
                                 {megaMenu.featuredLabel && (
-                                  <p class="mega-drop__featured-label">{megaMenu.featuredLabel}</p>
+                                  <p class="font-extrabold text-secondary-50 leading-7 mb-3">{megaMenu.featuredLabel}</p>
                                 )}
                                 {megaMenu.featuredItems.map((featured) => (
-                                  <a 
-                                    href={featured.link?.href || '#'} 
-                                    class="mega-drop__featured-item"
-                                    target={featured.link?.openInNewTab ? '_blank' : undefined}
-                                  >
-                                    {featured.image?.asset?.url && (
-                                      <img 
-                                        src={featured.image.asset.url} 
-                                        alt={featured.title}
-                                        loading="lazy"
-                                      />
-                                    )}
-                                    <div class="mega-drop__featured-item-content">
-                                      <p class="mega-drop__featured-item-title">{featured.title}</p>
-                                      {featured.label && (
-                                        <p class="mega-drop__featured-item-label">{featured.label}</p>
+                                  <div class="block bg-primary-10 rounded mb-3 w-[256px]">
+                                    <a 
+                                      href={featured.link?.href || '#'} 
+                                      class="font-serif"
+                                      target={featured.link?.openInNewTab ? '_blank' : undefined}
+                                    >
+                                      {featured.image?.asset?.url && (
+                                        <img 
+                                          src={featured.image.asset.url} 
+                                          class="card__image"
+                                          alt={featured.title}
+                                          loading="lazy"
+                                        />
                                       )}
-                                    </div>
-                                  </a>
+                                      <div class="flex flex-col gap-2 p-3">
+                                        <p class="text-primary-50 leading-6 m-0 font-semibold">{featured.title}</p>
+                                        {featured.label && (
+                                          <p class="text-primary-50 text-xs m-0 font-semibold">{featured.label}</p>
+                                        )}
+                                      </div>
+                                    </a>
+
+                                  </div>
                                 ))}
                               </div>
                             )}
