@@ -62,7 +62,8 @@ export async function getHomepage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -428,7 +429,8 @@ export async function getHomepage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -794,7 +796,8 @@ export async function getHomepage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -1160,7 +1163,8 @@ export async function getHomepage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -1564,7 +1568,8 @@ export async function getGetStartedPage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -1930,7 +1935,8 @@ export async function getGetStartedPage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -2296,7 +2302,8 @@ export async function getGetStartedPage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -2662,7 +2669,8 @@ export async function getGetStartedPage(request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -3065,7 +3073,8 @@ export async function getPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -3247,7 +3256,8 @@ export async function getPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -3429,7 +3439,8 @@ export async function getPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -3611,7 +3622,8 @@ export async function getPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -3842,7 +3854,8 @@ export async function getFeature(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -4092,7 +4105,8 @@ export async function getFeature(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -4341,7 +4355,8 @@ export async function getFeature(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'logoSetReference' => {
               _type,
@@ -4397,7 +4412,8 @@ export async function getFeature(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'logoSetReference' => {
               _type,
@@ -4577,6 +4593,7 @@ export interface HeadingComposition {
   headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
   textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  addBorderLine?: boolean;
 }
 
 // HubSpot Form types
@@ -5239,7 +5256,8 @@ export async function getIndustry(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -5553,7 +5571,8 @@ export async function getIndustry(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -5867,7 +5886,8 @@ export async function getIndustry(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -5957,7 +5977,8 @@ export async function getIndustry(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'resultsList' => {
               _type,
@@ -7187,7 +7208,8 @@ export async function getLandingPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -7433,7 +7455,8 @@ export async function getLandingPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'statsSet' => {
               _type,
@@ -7678,7 +7701,8 @@ export async function getLandingPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,
@@ -7735,7 +7759,8 @@ export async function getLandingPage(slug: string, request?: Request) {
               eyebrowStyle,
               headingType,
               displayType,
-              textType
+              textType,
+              addBorderLine
             },
             _type == 'buttonStack' => {
               _type,

@@ -206,6 +206,14 @@ export default defineType({
       },
       initialValue: 'lg',
     }),
+    defineField({
+      name: 'addBorderLine',
+      title: 'Add Border Line',
+      type: 'boolean',
+      description: 'Add a red border line on the left side',
+      group: 'styles',
+      initialValue: false,
+    }),
   ],
   preview: {
     select: {

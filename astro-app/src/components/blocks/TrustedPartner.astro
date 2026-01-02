@@ -31,6 +31,7 @@ interface Props {
   headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
   textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  addBorderLine?: boolean;
   // Widget User Reviews data (badges only)
   badges?: BadgeItem[];
   // Background
@@ -61,6 +62,7 @@ const {
   headingType = 'h2',
   displayType = 'h2',
   textType = 'base',
+  addBorderLine = false,
   // Badges
   badges,
   // Background
@@ -137,6 +139,7 @@ const cardStyles = buildCardStyles();
     headingType={headingType}
     displayType={displayType}
     textType={textType}
+    addBorderLine={addBorderLine}
   />
   
   <!-- Badges using WidgetUserReviews component (badges only, no heading/text) -->

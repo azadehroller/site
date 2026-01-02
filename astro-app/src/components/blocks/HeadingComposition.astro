@@ -22,6 +22,7 @@ interface Props {
   headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
   textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  addBorderLine?: boolean;
   // Unique identifier for animations/targeting
   id?: string;
 }
@@ -37,6 +38,7 @@ const {
   headingType: rawHeadingType = 'h2',
   displayType: rawDisplayType = 'h2',
   textType: rawTextType = 'lg',
+  addBorderLine = false,
   id,
 } = Astro.props;
 
@@ -121,9 +123,11 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
 <section 
   class:list={[
     'heading-composition',
+    'custom-text-wrapper',
     'flex flex-col gap-4',
     alignmentClass,
     textColorClass,
+    addBorderLine && 'add-border',
   ]}
   id={id ? cleanStega(id) : undefined}
 >
@@ -171,6 +175,12 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
 </section>
 
 <style>
+  /* Border line style - applied when addBorderLine is true */
+  :global(.dnd-column:has(.custom-text-wrapper.add-border)) {
+    border-left: 2px solid #ff280c;
+    margin-left: 2rem;
+  }
+
   /* Gradient animation properties */
   @property --gradient-color-1 {
     syntax: "<color>";

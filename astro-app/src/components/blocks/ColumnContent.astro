@@ -322,6 +322,7 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
             headingType={cleanStega(headingData.headingType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}
             displayType={cleanStega(headingData.displayType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8' | undefined}
             textType={cleanStega(headingData.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined}
+            addBorderLine={headingData.addBorderLine}
             id={cleanStega(headingData._key)}
           />
         </div>
