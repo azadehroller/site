@@ -908,6 +908,32 @@ const megaFeaturedItem = {
   },
 }
 
+// Sub intro item for mega menu (mobile section headers)
+const subIntroItem = {
+  type: 'object',
+  name: 'subIntroItem',
+  title: 'Sub Intro',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      description: 'The text to display (e.g., "Why ROLLER?")',
+      validation: (Rule) => Rule.required(),
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+    },
+    prepare({title}: {title?: string}) {
+      return {
+        title: title || 'Sub Intro',
+      }
+    },
+  },
+}
+
 // Mega menu dropdown configuration
 const megaMenuDropdown = {
   type: 'object',
@@ -935,6 +961,22 @@ const megaMenuDropdown = {
         layout: 'dropdown',
       },
       initialValue: 'features',
+    }),
+    defineField({
+      name: 'useAlternateLayout',
+      title: 'Use Alternate Layout',
+      type: 'boolean',
+      description: 'Enable to use the second/alternate mega menu structure with sub-intros instead of intro title',
+      initialValue: false,
+    }),
+    // Sub Intros array - displayed on mobile before menu items
+    defineField({
+      name: 'subIntros',
+      title: 'Sub Intros',
+      type: 'array',
+      of: [subIntroItem],
+      description: 'Optional section headers shown on mobile (e.g., "Why ROLLER?", "Features")',
+      validation: (Rule) => Rule.max(5),
     }),
     defineField({
       name: 'introTitle',
