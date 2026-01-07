@@ -1,0 +1,140 @@
+---
+/**
+ * BlogVideoBlock - Renders an embedded video (Wistia, YouTube, Vimeo)
+ * Supports visual editing in Sanity
+ */
+
+interface BlogVideoData {
+  _type: 'blogVideoBlock';
+  _key: string;
+  label?: string;
+  videoType: 'wistia' | 'youtube' | 'vimeo';
+  videoId: string;
+  title?: string;
+  aspectRatio?: '16:9' | '4:3' | '1:1';
+  maxWidth?: string;
+  autoplay?: boolean;
+}
+
+interface Props {
+  node?: BlogVideoData;
+  value?: BlogVideoData;
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+
+const videoType = blockData?.videoType || 'wistia';
+const videoId = blockData?.videoId || '';
+const title = blockData?.title;
+const aspectRatio = blockData?.aspectRatio || '16:9';
+const maxWidth = blockData?.maxWidth || '100%';
+const autoplay = blockData?.autoplay || false;
+
+// Calculate padding based on aspect ratio
+const getPaddingBottom = (ratio: string) => {
+  switch (ratio) {
+    case '4:3': return '75%';
+    case '1:1': return '100%';
+    case '16:9':
+    default: return '56.25%';
+  }
+};
+
+const paddingBottom = getPaddingBottom(aspectRatio);
+---
+
+{videoId && (
+  <div class="blog-video-block" style={`max-width: ${maxWidth}; margin: 2rem auto;`}>
+    {title && <h3 class="video-title">{title}</h3>}
+    
+    <div class="video-wrapper" style={`padding-bottom: ${paddingBottom};`}>
+      {videoType === 'wistia' && (
+        <Fragment>
+          <script src={`https://fast.wistia.com/embed/medias/${videoId}.jsonp`} async></script>
+          <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
+          <div class="wistia_responsive_padding" style={`padding: ${paddingBottom} 0 0 0; position: relative;`}>
+            <div class="wistia_responsive_wrapper" style="height: 100%; left: 0; position: absolute; top: 0; width: 100%;">
+              <span 
+                class={`wistia_embed wistia_async_${videoId} popover=true videoFoam=true ${autoplay ? 'autoPlay=true' : ''}`}
+                style="display: inline-block; height: 100%; position: relative; width: 100%;"
+              >&nbsp;</span>
+            </div>
+          </div>
+        </Fragment>
+      )}
+      
+      {videoType === 'youtube' && (
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}${autoplay ? '?autoplay=1&mute=1' : ''}`}
+          title={title || 'YouTube video'}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      )}
+      
+      {videoType === 'vimeo' && (
+        <iframe
+          src={`https://player.vimeo.com/video/${videoId}${autoplay ? '?autoplay=1&muted=1' : ''}`}
+          title={title || 'Vimeo video'}
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      )}
+    </div>
+  </div>
+)}
+
+<style>
+  .blog-video-block {
+    display: block;
+    margin: 2rem auto;
+  }
+  
+  .video-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #033180;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+  }
+  
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  /* Wistia specific styles */
+  .video-wrapper :global(.wistia_responsive_padding) {
+    position: relative;
+  }
+  
+  .video-wrapper :global(.wistia_responsive_wrapper) {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+  
+  .video-wrapper :global(.wistia_embed) {
+    display: inline-block;
+    height: 100%;
+    position: relative;
+    width: 100%;
+  }
+</style>
+

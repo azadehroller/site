@@ -1,0 +1,20 @@
+---
+/**
+ * PortableTextLink - Renders links within Portable Text content
+ * 
+ * astro-portabletext passes mark data as 'node' prop
+ * The children are passed via the default slot
+ */
+
+// Get props - astro-portabletext may pass data in different ways
+const props = Astro.props as any;
+const markData = props.node || props.value || props;
+
+const href = markData?.href || '#';
+const openInNewTab = markData?.openInNewTab || false;
+const target = openInNewTab ? '_blank' : undefined;
+const rel = openInNewTab ? 'noopener noreferrer' : undefined;
+---
+
+<a href={href} target={target} rel={rel}><slot /></a>
+

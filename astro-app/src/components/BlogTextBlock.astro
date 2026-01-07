@@ -1,0 +1,145 @@
+---
+/**
+ * BlogTextBlock - Renders a text block section with rich text content
+ * Supports visual editing in Sanity
+ * Handles inline images with preserved styling
+ */
+import { PortableText } from "astro-portabletext";
+import SanityImage from "./SanityImage.astro";
+import InlineImage from "./InlineImage.astro";
+import PortableTextLink from "./PortableTextLink.astro";
+
+interface Props {
+  node?: {
+    _type: 'blogTextBlock';
+    _key: string;
+    label?: string;
+    content?: any[];
+  };
+  value?: {
+    _type: 'blogTextBlock';
+    _key: string;
+    label?: string;
+    content?: any[];
+  };
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+const content = blockData?.content || [];
+
+// Custom components for PortableText
+// Note: astro-portabletext uses 'type' (singular) and 'mark' (singular)
+const components = {
+  type: {
+    image: SanityImage,
+    inlineImage: InlineImage,
+  },
+  mark: {
+    link: PortableTextLink,
+  },
+};
+---
+
+{content.length > 0 && (
+  <div class="blog-text-block">
+    <PortableText value={content} components={components} />
+  </div>
+)}
+
+<style>
+  .blog-text-block {
+    /* Text block inherits blog post body styles */
+  }
+  
+  .blog-text-block :global(h2) {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 1.6rem;
+    margin-top: 48px;
+    font-weight: 700;
+    color: #033180;
+  }
+  
+  .blog-text-block :global(h3) {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 1.6rem;
+    margin-top: 32px;
+    font-weight: 600;
+    color: #033180;
+  }
+  
+  .blog-text-block :global(h4) {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #033180;
+  }
+  
+  .blog-text-block :global(p) {
+    margin-bottom: 24px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #033180;
+  }
+  
+  .blog-text-block :global(ul),
+  .blog-text-block :global(ol) {
+    font-size: 18px;
+    line-height: 32px;
+    margin: 0 0 1.5rem 1.5rem;
+    color: #033180;
+  }
+  
+  .blog-text-block :global(li) {
+    padding: 8px 0;
+    font-size: 18px;
+  }
+  
+  .blog-text-block :global(blockquote) {
+    border-left: 4px solid #033180;
+    font-style: italic;
+    margin: 20px 0;
+    padding-left: 20px;
+    font-size: 18px;
+    color: #033180;
+  }
+  
+  .blog-text-block :global(a) {
+    color: #00b5fa;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .blog-text-block :global(a:hover) {
+    text-decoration: underline;
+  }
+  
+  .blog-text-block :global(strong) {
+    font-weight: 700;
+  }
+  
+  .blog-text-block :global(em) {
+    font-style: italic;
+  }
+  
+  .blog-text-block :global(.inline-image) {
+    max-width: 100%;
+    height: auto;
+    margin: 0.5rem 0;
+  }
+  
+  /* Floated inline images */
+  .blog-text-block :global(img[style*="float: right"]),
+  .blog-text-block :global(img[style*="float:right"]) {
+    margin-left: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .blog-text-block :global(img[style*="float: left"]),
+  .blog-text-block :global(img[style*="float:left"]) {
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+  }
+</style>
+

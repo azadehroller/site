@@ -1,7 +1,15 @@
 ---
+/**
+ * SanityImage component for rendering native Sanity image assets
+ * Used for images that have been uploaded to Sanity's CDN
+ */
+import { urlFor } from '../utils/image';
+
 // astro-portabletext passes the block data as `node`
 const { node } = Astro.props;
-const url = node?.url || '';
+
+// Sanity image has asset._ref pointing to the image asset
+const asset = node?.asset;
 const alt = node?.alt || '';
 const caption = node?.caption || '';
 const inlineStyle = node?.inlineStyle || '';
@@ -9,7 +17,6 @@ const width = node?.width || '';
 const height = node?.height || '';
 
 // Detect alignment from inline style if not explicitly set
-// Check for float in inline style (HubSpot often uses inline styles for float)
 let alignment = node?.alignment || 'center';
 if (!node?.alignment && inlineStyle) {
   if (inlineStyle.includes('float: right') || inlineStyle.includes('float:right')) {
@@ -23,14 +30,26 @@ if (!node?.alignment && inlineStyle) {
 const isFloated = alignment === 'left' || alignment === 'right' || 
   inlineStyle.includes('float:') || inlineStyle.includes('float ');
 
+// Generate the URL using Sanity's image builder
+let imageUrl = '';
+if (asset?._ref) {
+  try {
+    // If we have a width specified, use that; otherwise default to 800
+    const imgWidth = width ? parseInt(width.replace('px', '').replace('%', '')) : 800;
+    imageUrl = urlFor(node).width(imgWidth > 0 && imgWidth < 2000 ? imgWidth : 800).auto('format').url();
+  } catch (e) {
+    console.error('Failed to generate Sanity image URL:', e);
+  }
+}
+
 // Determine the CSS class based on alignment
 const alignmentClass = alignment === 'left' 
-  ? 'image-block--left' 
+  ? 'sanity-image--left' 
   : alignment === 'right' 
-    ? 'image-block--right' 
-    : 'image-block--center';
+    ? 'sanity-image--right' 
+    : 'sanity-image--center';
 
-// Build the style string - prioritize the original inline style from HubSpot
+// Build the style string from width/height or use the original inline style
 let imgStyle = inlineStyle;
 if (!imgStyle) {
   const styleParts: string[] = [];
@@ -44,11 +63,11 @@ const containerStyle = isFloated ? imgStyle : undefined;
 const imageStyle = isFloated ? undefined : imgStyle;
 ---
 
-{url && isFloated ? (
+{imageUrl && isFloated ? (
   <!-- Floated images: apply style directly to a span wrapper to preserve float behavior -->
-  <span class={`image-block-inline ${alignmentClass}`} style={containerStyle}>
+  <span class={`sanity-image-inline ${alignmentClass}`} style={containerStyle}>
     <img 
-      src={url} 
+      src={imageUrl} 
       alt={alt} 
       loading="lazy"
       width={width ? width.replace('px', '').replace('%', '') : undefined}
@@ -56,33 +75,32 @@ const imageStyle = isFloated ? undefined : imgStyle;
     />
     {caption && <span class="image-caption">{caption}</span>}
   </span>
-) : url && (
-  <figure class={`image-block ${alignmentClass}`}>
+) : imageUrl && (
+  <figure class={`sanity-image ${alignmentClass}`}>
     <img 
-      src={url} 
+      src={imageUrl} 
       alt={alt} 
-      loading="lazy" 
+      loading="lazy"
       style={imageStyle || undefined}
-      width={width ? width.replace('px', '').replace('%', '') : undefined}
-      height={height ? height.replace('px', '').replace('%', '') : undefined}
+      width={!imageStyle && width ? width.replace('px', '') : undefined}
+      height={!imageStyle && height ? height.replace('px', '') : undefined}
     />
     {caption && <figcaption>{caption}</figcaption>}
   </figure>
 )}
 
 <style>
-  /* Block-level images (centered, no float) */
-  .image-block {
+  .sanity-image {
     margin: 1.5rem 0;
   }
   
-  .image-block img {
+  .sanity-image img {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
   }
   
-  .image-block figcaption {
+  .sanity-image figcaption {
     margin-top: 0.5rem;
     font-size: 0.875rem;
     color: #666;
@@ -90,27 +108,48 @@ const imageStyle = isFloated ? undefined : imgStyle;
   }
 
   /* Center aligned (default) */
-  .image-block--center {
+  .sanity-image--center {
     text-align: center;
   }
   
-  .image-block--center img {
+  .sanity-image--center img {
     margin: 0 auto;
     display: block;
   }
 
+  /* Block-level floated images */
+  .sanity-image.sanity-image--left {
+    float: left;
+    margin: 0 1.5rem 1rem 0;
+    max-width: 50%;
+  }
+  
+  .sanity-image.sanity-image--left img {
+    max-width: 100%;
+  }
+
+  .sanity-image.sanity-image--right {
+    float: right;
+    margin: 0 0 1rem 1.5rem;
+    max-width: 50%;
+  }
+  
+  .sanity-image.sanity-image--right img {
+    max-width: 100%;
+  }
+
   /* Inline floated images - uses original HubSpot styles */
-  .image-block-inline {
+  .sanity-image-inline {
     display: inline-block;
   }
   
-  .image-block-inline img {
+  .sanity-image-inline img {
     max-width: 100%;
     height: auto;
     border-radius: 4px;
   }
   
-  .image-block-inline .image-caption {
+  .sanity-image-inline .image-caption {
     display: block;
     margin-top: 0.5rem;
     font-size: 0.875rem;
@@ -119,35 +158,20 @@ const imageStyle = isFloated ? undefined : imgStyle;
   }
 
   /* Fallback float styles if inline style not applied */
-  .image-block-inline.image-block--left {
+  .sanity-image-inline.sanity-image--left {
     float: left;
     margin: 0 1.5rem 1rem 0;
   }
   
-  .image-block-inline.image-block--right {
+  .sanity-image-inline.sanity-image--right {
     float: right;
     margin: 0 0 1rem 1.5rem;
   }
 
-  /* Block-level floated images (legacy) */
-  .image-block.image-block--left {
-    float: left;
-    margin: 0 1.5rem 1rem 0;
-    max-width: 50%;
-  }
-  
-  .image-block.image-block--left img {
-    max-width: 100%;
-  }
-
-  .image-block.image-block--right {
-    float: right;
-    margin: 0 0 1rem 1.5rem;
-    max-width: 50%;
-  }
-  
-  .image-block.image-block--right img {
-    max-width: 100%;
+  /* Clear floats after content */
+  .sanity-image--left + *,
+  .sanity-image--right + * {
+    clear: none;
   }
 </style>
 

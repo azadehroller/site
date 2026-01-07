@@ -1,0 +1,66 @@
+---
+/**
+ * InlineImage - Renders inline images within text blocks
+ * Preserves float and margin styles from HubSpot migration
+ * 
+ * Data structure from migration:
+ * { _type: 'inlineImage', url, alt, width, height, style }
+ */
+
+// Clean stega encoding (invisible Unicode characters from Sanity visual editing)
+function cleanStega(text: string | undefined | null): string {
+  if (!text) return '';
+  return String(text).replace(/[\u200B-\u200D\uFEFF\u2060\u180E\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180D\u2000-\u200F\u202A-\u202F\u205F-\u2064\u206A-\u206F\u3000\u3164\uFE00-\uFE0F\uFFA0]/g, '');
+}
+
+// astro-portabletext passes the block data as `node` (same as SanityImage)
+const { node } = Astro.props;
+
+// Extract values from node
+const url = cleanStega(node?.url);
+const alt = cleanStega(node?.alt) || '';
+const style = cleanStega(node?.style) || '';
+const width = node?.width;
+const height = node?.height;
+
+// Detect if this is a floated image
+const isFloated = style.includes('float:') || style.includes('float ');
+---
+
+{url && isFloated ? (
+  <!-- Floated inline image: wrap in span to preserve float behavior -->
+  <span class="inline-image-wrapper" style={style}>
+    <img 
+      src={url} 
+      alt={alt} 
+      width={width}
+      height={height}
+      loading="lazy" 
+      class="inline-image" 
+    />
+  </span>
+) : url ? (
+  <!-- Non-floated inline image -->
+  <img 
+    src={url} 
+    alt={alt} 
+    width={width}
+    height={height}
+    style={style || undefined}
+    loading="lazy" 
+    class="inline-image" 
+  />
+) : null}
+
+<style>
+  .inline-image-wrapper {
+    display: inline-block;
+  }
+  
+  .inline-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+</style>
+

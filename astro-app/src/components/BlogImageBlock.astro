@@ -1,0 +1,186 @@
+---
+/**
+ * BlogImageBlock - STANDALONE image section for blog posts
+ * Renders Sanity CDN images or external URL images
+ */
+import { urlFor } from '../utils/image';
+
+interface BlogImageData {
+  _type: 'blogImageBlock';
+  _key: string;
+  label?: string;
+  image?: {
+    asset?: { _ref: string };
+    alt?: string;
+  };
+  externalUrl?: string;
+  alt?: string;
+  caption?: string;
+  alignment?: 'left' | 'center' | 'right';
+  size?: 'small' | 'medium' | 'large' | 'full';
+  inlineStyle?: string;
+  width?: number;
+  height?: number;
+}
+
+interface Props {
+  node?: BlogImageData;
+  value?: BlogImageData;
+}
+
+// Clean stega encoding (invisible Unicode characters from Sanity visual editing)
+function cleanStega(text: string | undefined): string {
+  if (!text) return '';
+  return text.replace(/[\u200B-\u200D\uFEFF\u2060\u180E\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180D\u2000-\u200F\u202A-\u202F\u205F-\u2064\u206A-\u206F\u3000\u3164\uFE00-\uFE0F\uFFA0]/g, '');
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+
+// Determine image source
+let imageUrl = '';
+const externalUrl = blockData?.externalUrl ? cleanStega(blockData.externalUrl) : '';
+const sanityImage = blockData?.image;
+
+if (externalUrl) {
+  imageUrl = externalUrl;
+} else if (sanityImage?.asset?._ref) {
+  try {
+    const sizeValue = cleanStega(blockData?.size);
+    const width = sizeValue === 'small' ? 400 : 
+                  sizeValue === 'medium' ? 600 : 
+                  sizeValue === 'large' ? 800 : 1200;
+    imageUrl = urlFor(sanityImage).width(width).auto('format').url();
+  } catch (e) {
+    console.error('Failed to generate Sanity image URL:', e);
+  }
+}
+
+const alt = cleanStega(sanityImage?.alt || blockData?.alt || '');
+const caption = cleanStega(blockData?.caption || '');
+const alignmentRaw = cleanStega(blockData?.alignment || 'center');
+const sizeRaw = cleanStega(blockData?.size || 'large');
+const inlineStyle = cleanStega(blockData?.inlineStyle || '');
+
+// Validate alignment value
+const alignment = ['left', 'center', 'right'].includes(alignmentRaw) ? alignmentRaw : 'center';
+// Validate size value
+const size = ['small', 'medium', 'large', 'full'].includes(sizeRaw) ? sizeRaw : 'large';
+
+const alignmentClass = alignment === 'left' 
+  ? 'blog-image-block--left' 
+  : alignment === 'right' 
+    ? 'blog-image-block--right' 
+    : 'blog-image-block--center';
+
+const sizeClass = `blog-image-block--${size}`;
+
+// Handle inline styles (float, margins from HubSpot)
+const hasFloatStyle = inlineStyle.includes('float:') || inlineStyle.includes('float :');
+const imgStyle = inlineStyle || undefined;
+---
+
+{imageUrl && (
+  hasFloatStyle ? (
+    <span class="blog-image-inline" style={imgStyle}>
+      <img 
+        src={imageUrl} 
+        alt={alt} 
+        loading="lazy"
+        width={blockData?.width}
+        height={blockData?.height}
+      />
+      {caption && <span class="blog-image-caption">{caption}</span>}
+    </span>
+  ) : (
+    <figure class={`blog-image-block ${alignmentClass} ${sizeClass}`}>
+      <img 
+        src={imageUrl} 
+        alt={alt} 
+        loading="lazy"
+        style={imgStyle}
+        width={blockData?.width}
+        height={blockData?.height}
+      />
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  )
+)}
+
+<style>
+  .blog-image-block {
+    margin: 2rem 0;
+  }
+  
+  .blog-image-block img {
+    display: block;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .blog-image-block figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Alignment */
+  .blog-image-block--center {
+    text-align: center;
+  }
+  
+  .blog-image-block--center img {
+    margin: 0 auto;
+  }
+  
+  .blog-image-block--left {
+    text-align: left;
+  }
+  
+  .blog-image-block--right {
+    text-align: right;
+  }
+  
+  .blog-image-block--right img {
+    margin-left: auto;
+  }
+  
+  /* Sizes */
+  .blog-image-block--small img {
+    max-width: 400px;
+  }
+  
+  .blog-image-block--medium img {
+    max-width: 600px;
+  }
+  
+  .blog-image-block--large img {
+    max-width: 800px;
+  }
+  
+  .blog-image-block--full img {
+    width: 100%;
+    max-width: none;
+  }
+  
+  /* Inline floated images (inside text blocks) */
+  .blog-image-inline {
+    display: inline-block;
+  }
+  
+  .blog-image-inline img {
+    height: auto;
+    max-width: 100%;
+    border-radius: 8px;
+  }
+  
+  .blog-image-caption {
+    display: block;
+    font-size: 0.875rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 0.5rem;
+  }
+</style>
+
