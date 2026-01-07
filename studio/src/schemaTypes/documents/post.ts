@@ -4,11 +4,18 @@ export default defineType({
   name: 'post',
   title: 'Post',
   type: 'document',
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'metadata', title: 'Metadata'},
+    {name: 'seo', title: 'SEO'},
+    {name: 'hubspot', title: 'HubSpot Data'},
+  ],
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'content',
     }),
 
     defineField({
@@ -20,6 +27,7 @@ export default defineType({
         source: 'title',
         maxLength: 96,
       },
+      group: 'content',
     }),
 
     defineField({
@@ -27,6 +35,7 @@ export default defineType({
       title: 'Excerpt',
       type: 'text',
       rows: 4,
+      group: 'content',
     }),
 
     // External image support
@@ -34,6 +43,7 @@ export default defineType({
       name: 'featuredImage',
       title: 'Featured Image',
       type: 'object',
+      group: 'content',
       fields: [
         defineField({
           name: 'url',
@@ -52,142 +62,116 @@ export default defineType({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
+      group: 'metadata',
     }),
 
-    // Body content - supports both rich text and raw HTML
+    // Updated At - for "Last updated" display
+    defineField({
+      name: 'updatedAt',
+      title: 'Updated At',
+      type: 'datetime',
+      group: 'metadata',
+      description: 'Last update date (from HubSpot or manual)',
+    }),
+
+    // Topics / Categories
+    defineField({
+      name: 'topics',
+      title: 'Topics',
+      type: 'array',
+      group: 'metadata',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'blogTopic'}],
+        },
+      ],
+      description: 'Blog topics/categories for filtering and related articles',
+    }),
+
+    // Author reference
+    defineField({
+      name: 'author',
+      title: 'Author',
+      type: 'reference',
+      to: [{type: 'blogAuthor'}],
+      group: 'metadata',
+    }),
+
+    // Tags (simple string array for additional tagging)
+    defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      group: 'metadata',
+      of: [{type: 'string'}],
+      options: {
+        layout: 'tags',
+      },
+    }),
+
+    // HubSpot reference ID for matching
+    defineField({
+      name: 'hubspotId',
+      title: 'HubSpot Post ID',
+      type: 'string',
+      group: 'hubspot',
+      readOnly: true,
+      description: 'Original HubSpot post ID (used for data matching and syncing)',
+    }),
+
+    // HubSpot URL for reference
+    defineField({
+      name: 'hubspotUrl',
+      title: 'HubSpot URL',
+      type: 'url',
+      group: 'hubspot',
+      readOnly: true,
+      description: 'Original HubSpot URL',
+    }),
+
+    // SEO Title (custom title for search engines)
+    defineField({
+      name: 'seoTitle',
+      title: 'SEO Title',
+      type: 'string',
+      group: 'seo',
+      description: 'Custom title for search engines (if different from post title)',
+    }),
+
+    // Meta description for SEO
+    defineField({
+      name: 'metaDescription',
+      title: 'Meta Description',
+      type: 'text',
+      rows: 3,
+      group: 'seo',
+      description: 'SEO meta description (max 160 characters)',
+      validation: (rule) => rule.max(300),
+    }),
+
+    // Body content - STANDALONE modular blocks (not nested)
     defineField({
       name: 'body',
-      title: 'Body',
+      title: 'Body Content',
       type: 'array',
+      group: 'content',
+      description: 'Add content sections. Each block is standalone.',
       of: [
-        // Standard rich text blocks (for new/editable content)
-        {
-          type: 'block',
-          styles: [
-            {title: 'Normal', value: 'normal'},
-            {title: 'H2', value: 'h2'},
-            {title: 'H3', value: 'h3'},
-            {title: 'H4', value: 'h4'},
-            {title: 'Quote', value: 'blockquote'},
-          ],
-          lists: [
-            {title: 'Bullet', value: 'bullet'},
-            {title: 'Numbered', value: 'number'},
-          ],
-          marks: {
-            decorators: [
-              {title: 'Bold', value: 'strong'},
-              {title: 'Italic', value: 'em'},
-              {title: 'Underline', value: 'underline'},
-            ],
-            annotations: [
-              {
-                name: 'link',
-                type: 'object',
-                title: 'Link',
-                fields: [
-                  {
-                    name: 'href',
-                    type: 'url',
-                    title: 'URL',
-                    validation: (rule) =>
-                      rule.uri({
-                        scheme: ['http', 'https', 'mailto', 'tel'],
-                        allowRelative: true,
-                      }),
-                  },
-                  {
-                    name: 'openInNewTab',
-                    type: 'boolean',
-                    title: 'Open in new tab',
-                    initialValue: false,
-                  },
-                ],
-              },
-            ],
-          },
-        },
-        // Raw HTML blocks (for migrated HubSpot content)
-        {
-          type: 'object',
-          name: 'rawHtml',
-          title: 'Raw HTML (Migrated Content)',
-          options: {
-            collapsible: false, // Always show expanded
-          },
-          fields: [
-            defineField({
-              name: 'html',
-              title: 'HTML Code (Click to edit)',
-              type: 'text',
-              rows: 30,
-              description: 'Raw HTML content migrated from HubSpot. Click in the text area above to edit the HTML directly.',
-            }),
-          ],
-          preview: {
-            select: {
-              html: 'html',
-            },
-            prepare({html}: {html?: string}) {
-              const stripped = html
-                ? html.replace(/<[^>]*>/g, '').substring(0, 80)
-                : 'Empty HTML block';
-              return {
-                title: '🔧 Raw HTML Block (Click to Edit)',
-                subtitle: stripped + '...',
-              };
-            },
-          },
-        },
-        // Image block for adding images
-        {
-          type: 'object',
-          name: 'imageBlock',
-          title: 'Image',
-          fields: [
-            defineField({
-              name: 'url',
-              title: 'Image URL',
-              type: 'url',
-            }),
-            defineField({
-              name: 'alt',
-              title: 'Alt Text',
-              type: 'string',
-            }),
-            defineField({
-              name: 'caption',
-              title: 'Caption',
-              type: 'string',
-            }),
-            defineField({
-              name: 'alignment',
-              title: 'Alignment',
-              type: 'string',
-              options: {
-                list: [
-                  {title: 'Left', value: 'left'},
-                  {title: 'Center', value: 'center'},
-                  {title: 'Right', value: 'right'},
-                ],
-              },
-              initialValue: 'center',
-            }),
-          ],
-          preview: {
-            select: {
-              url: 'url',
-              alt: 'alt',
-              alignment: 'alignment',
-            },
-            prepare({url, alt, alignment}: {url?: string; alt?: string; alignment?: string}) {
-              return {
-                title: '🖼️ ' + (alt || 'Image') + (alignment ? ` (${alignment})` : ''),
-                subtitle: url || 'No URL set',
-              };
-            },
-          },
-        },
+        // Text Block - rich text section with inline images (standalone)
+        {type: 'blogTextBlock'},
+        
+        // Video Block - embedded video (standalone)
+        {type: 'blogVideoBlock'},
+        
+        // Image Block - image section (standalone)
+        {type: 'blogImageBlock'},
+        
+        // Table Block - HTML table (standalone)
+        {type: 'blogTableBlock'},
+        
+        // Raw HTML Block - for complex content (standalone)
+        {type: 'blogRawHtmlBlock'},
       ],
     }),
   ],
