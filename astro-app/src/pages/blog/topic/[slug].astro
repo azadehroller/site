@@ -1,0 +1,127 @@
+---
+/**
+ * Blog Topic Template Page
+ * Displays posts filtered by topic
+ */
+import Layout from "../../../layouts/Layout.astro";
+import { formatDate } from "../../../utils";
+import { getPostsByTopic, getTopic } from "../../../utils/sanity";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/blog");
+}
+
+// Get topic info
+const { data: topic } = await getTopic(slug, Astro.request);
+
+if (!topic) {
+  return Astro.redirect("/blog");
+}
+
+// Get posts for this topic
+const { data: posts } = await getPostsByTopic(slug, Astro.request);
+
+const title = `${topic.name} - Blog`;
+const description = topic.description || `Articles about ${topic.name}`;
+---
+
+<Layout title={title}>
+  <div class="body-container-wrapper">
+    <div class="body-container body-container--blog">
+      
+      <!-- Topic Header -->
+      <div class="blog-topic-header">
+        <nav class="blog-post__breadcrumbs">
+          <a class="blog-header__tag" href="/blog">Blog</a>
+          <span>/</span>
+          <span class="blog-header__tag blog-header__tag--active">{topic.name}</span>
+        </nav>
+        
+        <h1 class="blog-topic-title">{topic.name}</h1>
+        
+        {topic.description && (
+          <p class="blog-topic-description">{topic.description}</p>
+        )}
+        
+        <p class="blog-topic-count">{posts?.length || 0} articles</p>
+      </div>
+      
+      <!-- Posts Grid -->
+      <div class="blog-index">
+        {posts && posts.length > 0 ? (
+          posts.map((post) => {
+            const postDate = post.publishedAt || post._createdAt;
+            return (
+              <article class="blog-index__post">
+                {post.featuredImage?.url && (
+                  <a href={`/blog/${post.slug.current}`} class="blog-index__post-image">
+                    <img 
+                      src={post.featuredImage.url} 
+                      alt={post.featuredImage.alt || post.title || ''} 
+                      loading="lazy"
+                    />
+                  </a>
+                )}
+                <div class="blog-index__post-content">
+                  <a class="blog-header__tag" href={`/blog/topic/${slug}`}>
+                    {topic.name}
+                  </a>
+                  <h2 class="blog-index__post-title">
+                    <a href={`/blog/${post.slug.current}`}>{post.title}</a>
+                  </h2>
+                  {post.excerpt && (
+                    <p class="blog-index__post-excerpt">{post.excerpt}</p>
+                  )}
+                  <div class="blog-index__post-content-meta">
+                    <span>{formatDate(postDate)}</span>
+                  </div>
+                </div>
+              </article>
+            );
+          })
+        ) : (
+          <p class="blog-no-posts">No articles found for this topic.</p>
+        )}
+      </div>
+      
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .blog-topic-header {
+    text-align: center;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+  }
+  
+  .blog-topic-title {
+    font-size: 2.5rem;
+    color: #033180;
+    margin: 1rem 0 0.5rem;
+  }
+  
+  .blog-topic-description {
+    font-size: 1.125rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto 1rem;
+  }
+  
+  .blog-topic-count {
+    font-size: 0.875rem;
+    color: #999;
+  }
+  
+  .blog-no-posts {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+  }
+</style>
+

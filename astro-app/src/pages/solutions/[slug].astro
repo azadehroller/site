@@ -1,34 +1,26 @@
 ---
-import Card from "../components/Card.astro";
-import Columns from "../components/blocks/Columns.astro";
-import ColumnContent from "../components/blocks/ColumnContent.astro";
-import Layout from "../layouts/Layout.astro";
-import { getPage, getLandingPage, type ColumnsBlock, type Post } from "../utils/sanity";
+import Columns from "../../components/blocks/Columns.astro";
+import ColumnContent from "../../components/blocks/ColumnContent.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getSolution, type ColumnsBlock } from "../../utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
 const { slug } = Astro.params;
+const { data: solution } = await getSolution(slug as string, Astro.request);
 
-// First try to find a landing page, then fall back to regular page
-const { data: landingPage } = await getLandingPage(slug as string, Astro.request);
-const { data: regularPage } = landingPage ? { data: null } : await getPage(slug as string, Astro.request);
-
-const page = landingPage || regularPage;
-
-if (!page) {
+if (!solution) {
   return Astro.redirect('/404');
 }
 
 // Document info for visual editing
-const documentId = page?._id || '';
-const documentType = landingPage ? 'landingPage' : 'page';
-// Get header theme from page data (available on both regular pages and landing pages)
-const headerTheme = landingPage?.headerTheme || regularPage?.headerTheme || 'default';
+const documentId = solution?._id || '';
+const documentType = 'solution';
 ---
 
-<Layout title={page?.title || "Page"} headerTheme={headerTheme}>
-  {page?.sections?.map((section) => {
+<Layout title={solution?.title || "Solution"}>
+  {solution?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;
       const sectionKey = columnsBlock._key;
@@ -47,6 +39,10 @@ const headerTheme = landingPage?.headerTheme || regularPage?.headerTheme || 'def
           paddingTopMobile={columnsBlock.paddingTopMobile}
           paddingBottom={columnsBlock.paddingBottom}
           paddingBottomMobile={columnsBlock.paddingBottomMobile}
+          paddingLeft={columnsBlock.paddingLeft}
+          paddingLeftMobile={columnsBlock.paddingLeftMobile}
+          paddingRight={columnsBlock.paddingRight}
+          paddingRightMobile={columnsBlock.paddingRightMobile}
           sectionKey={sectionKey}
           documentId={documentId}
           documentType={documentType}
@@ -85,9 +81,7 @@ const headerTheme = landingPage?.headerTheme || regularPage?.headerTheme || 'def
           />}
         </Columns>
       );
-    } else if (section._type === "post") {
-      const post = section as Post;
-      return <Card post={post} />;
     }
   })}
 </Layout>
+

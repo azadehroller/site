@@ -2,9 +2,12 @@
 import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
 import { formatDate } from "../../utils";
-import { getPost } from "../../utils/sanity";
-import RawHtml from "../../components/RawHtml.astro";
-import ImageBlock from "../../components/ImageBlock.astro";
+import { getPost, getRelatedPosts } from "../../utils/sanity";
+import BlogTextBlock from "../../components/BlogTextBlock.astro";
+import BlogVideoBlock from "../../components/BlogVideoBlock.astro";
+import BlogImageBlock from "../../components/BlogImageBlock.astro";
+import BlogTableBlock from "../../components/BlogTableBlock.astro";
+import BlogRawHtmlBlock from "../../components/BlogRawHtmlBlock.astro";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
@@ -34,6 +37,11 @@ const cleanAlt = cleanText(post.featuredImage?.alt) || cleanTitle;
 // Use publishedAt or _createdAt as fallback
 const displayDate = post.publishedAt || post._createdAt;
 
+// Use updatedAt if it's later than publishedAt
+const lastUpdated = post.updatedAt && post.publishedAt && new Date(post.updatedAt) > new Date(post.publishedAt)
+  ? post.updatedAt
+  : post.publishedAt || post._createdAt;
+
 // Get the current page URL for sharing
 const pageUrl = Astro.url.href;
 const encodedUrl = encodeURIComponent(pageUrl);
@@ -52,7 +60,25 @@ function estimateReadingTime(body: any[]): number {
   return Math.max(1, Math.ceil(wordCount / 200));
 }
 
-const readingTime = estimateReadingTime(post.body);
+const readingTime = estimateReadingTime(post.body || []);
+
+// Get first topic for breadcrumb (filter out null references)
+const firstTopic = post.topics?.filter(t => t != null)?.[0];
+
+// Get author (use from post or fall back to default)
+const author = post.author || {
+  name: 'ROLLER Software',
+  bio: 'The team at ROLLER collaborates with venue management experts, marketers, and customer experience professionals to bring you insights that help grow and optimize your attraction business.',
+  slug: { current: 'roller-software' },
+};
+
+// Fetch related articles based on topics (filter out null references)
+const topicIds = post.topics?.filter(t => t != null).map(t => t._id) || [];
+let relatedPosts: typeof post[] = [];
+if (topicIds.length > 0) {
+  const { data: related } = await getRelatedPosts(topicIds, post._id, 3, Astro.request);
+  relatedPosts = related || [];
+}
 ---
 
 <Layout title={cleanTitle || "Blog Post"}>
@@ -72,12 +98,21 @@ const readingTime = estimateReadingTime(post.body);
             <div class="blog-post__breadcrumbs">
               <a class="blog-header__tag" href="/blog">Blog</a>
               <span>/</span>
-              <a class="blog-header__tag" href="/blog">Posts</a>
+              {firstTopic ? (
+                <a class="blog-header__tag" href={`/blog/topic/${firstTopic.slug?.current}`}>{firstTopic.name}</a>
+              ) : (
+                <a class="blog-header__tag" href="/blog">Posts</a>
+              )}
             </div>
             <h1 class="blog-post__title h2">{cleanTitle}</h1>
             <div class="blog-post__metadata">
+              {author.avatar?.url && (
+                <div class="blog-post__meta-avatar">
+                  <img src={author.avatar.url} alt={author.name} />
+                </div>
+              )}
               <div class="blog-post__meta-name">
-                <a href="/blog/author/roller-software">ROLLER Software</a>
+                <a href={`/blog/author/${author.slug?.current || 'roller-software'}`}>{author.name}</a>
               </div>
               <div class="blog-post__readingtime">
                 <span class="blog-post__readingtime-icon">
@@ -90,8 +125,8 @@ const readingTime = estimateReadingTime(post.body);
               <div class="blog-post__date">
                 <div>
                   Last updated:
-                  <time datetime={displayDate}>
-                    {formatDate(displayDate)}
+                  <time datetime={lastUpdated}>
+                    {formatDate(lastUpdated)}
                   </time>
                 </div>
               </div>
@@ -127,8 +162,12 @@ const readingTime = estimateReadingTime(post.body);
                 value={post.body}
                 components={{
                   type: {
-                    rawHtml: RawHtml,
-                    imageBlock: ImageBlock
+                    // Standalone blog section blocks
+                    blogTextBlock: BlogTextBlock,
+                    blogVideoBlock: BlogVideoBlock,
+                    blogImageBlock: BlogImageBlock,
+                    blogTableBlock: BlogTableBlock,
+                    blogRawHtmlBlock: BlogRawHtmlBlock,
                   }
                 }}
               />
@@ -139,12 +178,19 @@ const readingTime = estimateReadingTime(post.body);
           <aside class="blog-post__sidebar">
             <div class="blog-post__sidebar-inner">
               <div class="blog-post__meta">
-                <a class="blog-post-author" href="#">
-                  <span class="blog-post__meta-name">ROLLER Software</span>
+                {author.avatar?.url && (
+                  <div class="blog-post__meta-avatar">
+                    <img src={author.avatar.url} alt={author.name} />
+                  </div>
+                )}
+                <a class="blog-post-author" href={`/blog/author/${author.slug?.current || 'roller-software'}`}>
+                  <span class="blog-post__meta-name">{author.name}</span>
                 </a>
-                <div class="blog-post__meta-bio">
-                  The team at ROLLER collaborates with venue management experts, marketers, and customer experience professionals to bring you insights that help grow and optimize your attraction business. With years of experience working with 1000s of venues globally, we share data-backed tips, industry trends, and practical advice to help you deliver unforgettable guest experiences.
-                </div>
+                {author.bio && (
+                  <div class="blog-post__meta-bio">
+                    {author.bio}
+                  </div>
+                )}
               </div>
               
               <div class="blog-post__meta-wrapper">
@@ -197,6 +243,87 @@ const readingTime = estimateReadingTime(post.body);
           </aside>
         </div>
       </div>
+
+      {/* Related Articles Section */}
+      {relatedPosts.length > 0 && (
+        <div class="blog-related blog-related__wrapper">
+          <div class="blog-post__section">
+            <h2>Related articles</h2>
+            <div class="blog-index">
+              {relatedPosts.map((relatedPost) => {
+                const relatedTopic = relatedPost.topics?.filter(t => t != null)?.[0];
+                const relatedDate = relatedPost.publishedAt || relatedPost._createdAt;
+                return (
+                  <article class="blog-index__post">
+                    {relatedPost.featuredImage?.url && (
+                      <a href={`/blog/${relatedPost.slug.current}`} class="blog-index__post-image">
+                        <img 
+                          src={relatedPost.featuredImage.url} 
+                          alt={relatedPost.featuredImage.alt || relatedPost.title || ''} 
+                          loading="lazy"
+                        />
+                      </a>
+                    )}
+                    <div class="blog-index__post-content">
+                      {relatedTopic && (
+                        <a class="blog-header__tag" href={`/blog/topic/${relatedTopic.slug?.current}`}>
+                          {relatedTopic.name}
+                        </a>
+                      )}
+                      <h3 class="blog-index__post-title">
+                        <a href={`/blog/${relatedPost.slug.current}`}>{relatedPost.title}</a>
+                      </h3>
+                      <div class="blog-index__post-content-meta">
+                        <span>{formatDate(relatedDate)}</span>
+                        <span> | </span>
+                        <span class="blog-post__readingtime">
+                          <span class="blog-post__readingtime-icon">
+                            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180" />
+                            </svg>
+                          </span>
+                          {estimateReadingTime(relatedPost.body || [])} min
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Newsletter Subscribe Section */}
+      <div class="blog-post__section" style="overflow: hidden;">
+        <div class="blog-post__subscribe">
+          <div class="blog-post__subscribe-inner">
+            <div class="blog-post__subscribe-content text-light">
+              <h2>Enhance your guest experience</h2>
+              <p>
+                Get free education, tips and inspiration to help you run a successful venue.
+              </p>
+              <div class="form--primary">
+                {/* HubSpot form will be loaded here - using the newsletter form ID */}
+                <div class="hs-form-target" 
+                  data-portal-id="22392890" 
+                  data-form-id="efa7bd0a-929a-4ea4-8480-1c6f77843cf2" 
+                  data-region="na1">
+                </div>
+              </div>
+            </div>
+            <div class="blog-post__subscribe-illustration">
+              <img 
+                src="https://22392890.fs1.hubspotusercontent-na1.net/hubfs/22392890/website-theme-assets/blog_subscribe_illustration.svg" 
+                alt="ROLLER - Subscribe Blog Notifications" 
+                width="450" 
+                height="450"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </article>
 </Layout>
@@ -889,6 +1016,181 @@ const readingTime = estimateReadingTime(post.body);
     text-align: center;
     margin-top: 0.5rem;
   }
+
+  /* Related Articles Section */
+  .blog-related__wrapper {
+    padding: 0;
+    background: transparent;
+  }
+
+  .blog-related__wrapper .blog-post__section {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .blog-related__wrapper .blog-post__section h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #033180;
+    margin-bottom: 30px;
+  }
+
+  @media (min-width: 992px) {
+    .blog-related__wrapper .blog-post__section h2 {
+      font-size: 26px;
+    }
+  }
+
+  .blog-related__wrapper .blog-index {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 20px 0 40px;
+  }
+
+  @media (min-width: 768px) {
+    .blog-related__wrapper .blog-index {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .blog-related__wrapper .blog-index {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .blog-related__wrapper .blog-index__post {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 24px 40px 0 rgba(7, 77, 197, 0.1), 0 8px 16px 0 rgba(7, 77, 197, 0.05);
+    background-color: var(--white, #fff);
+    padding: 0;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .blog-related__wrapper .blog-index__post:hover {
+    box-shadow: 0 24px 60px 0 rgba(7, 77, 197, 0.2), 0 8px 24px 0 rgba(7, 77, 197, 0.15);
+    transform: translateY(-4px);
+  }
+
+  .blog-related__wrapper .blog-index__post-image {
+    display: block;
+  }
+
+  .blog-related__wrapper .blog-index__post-image img {
+    border-radius: 4px 4px 0 0;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .blog-related__wrapper .blog-index__post-content {
+    padding: 20px;
+  }
+
+  .blog-related__wrapper .blog-index__post-content h3 {
+    margin-top: 8px;
+    font-size: 18px;
+  }
+
+  .blog-related__wrapper .blog-index__post-content h3 a {
+    color: #033180;
+    text-decoration: none;
+  }
+
+  .blog-related__wrapper .blog-index__post-content h3 a:hover {
+    text-decoration: underline;
+  }
+
+  .blog-related__wrapper .blog-index__post-content-meta {
+    font-size: 14px;
+    color: #033180;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .blog-related__wrapper .blog-header__tag {
+    color: rgb(255, 41, 12);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  /* Newsletter Subscribe Section */
+  .blog-post__subscribe {
+    background-color: #033180;
+    border-radius: 20px;
+    color: var(--white, #fff);
+    margin: 60px 0;
+    padding: 60px 28px;
+    position: relative;
+  }
+
+  .blog-post__subscribe * {
+    color: #fff;
+  }
+
+  .blog-post__subscribe .blog-post__subscribe-inner {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .blog-post__subscribe .blog-post__subscribe-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 8px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .blog-post__subscribe .blog-post__subscribe-inner {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+
+  .blog-post__subscribe h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+  }
+
+  @media (min-width: 992px) {
+    .blog-post__subscribe h2 {
+      font-size: 42px;
+    }
+  }
+
+  .blog-post__subscribe p {
+    font-size: 1rem;
+    line-height: 28px;
+    margin-bottom: 30px;
+    opacity: 0.9;
+  }
+
+  .blog-post__subscribe-illustration img {
+    max-width: 365px;
+    width: 100%;
+  }
+
+  @media (min-width: 990px) {
+    .blog-post__subscribe {
+      margin: 100px 0 60px;
+      padding: 60px;
+    }
+
+    .blog-post__subscribe-illustration {
+      position: absolute;
+      right: 20px;
+      top: 115px;
+      transform: translateY(-50%);
+    }
+  }
 </style>
 
 <script>
@@ -918,5 +1220,51 @@ const readingTime = estimateReadingTime(post.body);
         }
       });
     });
+  }
+
+  // Load HubSpot Forms script for newsletter
+  if (!window.hubspotFormsLoaded) {
+    window.hubspotFormsLoaded = true;
+    var script = document.createElement('script');
+    script.src = '//js.hsforms.net/forms/embed/v2.js';
+    script.charset = 'utf-8';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+
+  // Initialize HubSpot forms
+  function initHubSpotForms() {
+    var formTargets = document.querySelectorAll('.hs-form-target');
+    
+    formTargets.forEach(function(target) {
+      var portalId = target.getAttribute('data-portal-id');
+      var formId = target.getAttribute('data-form-id');
+      var region = target.getAttribute('data-region') || 'na1';
+      
+      if (portalId && formId && window.hbspt && !target.dataset.initialized) {
+        target.dataset.initialized = 'true';
+        window.hbspt.forms.create({
+          portalId: portalId,
+          formId: formId,
+          region: region,
+          target: target,
+          cssClass: 'hs-form stacked hs-custom-form'
+        });
+      }
+    });
+  }
+
+  function waitForHubSpot() {
+    if (window.hbspt && window.hbspt.forms) {
+      initHubSpotForms();
+    } else {
+      setTimeout(waitForHubSpot, 100);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', waitForHubSpot);
+  } else {
+    waitForHubSpot();
   }
 </script>

@@ -1,0 +1,211 @@
+---
+/**
+ * Blog Author Template Page
+ * Displays author info and their posts
+ */
+import Layout from "../../../layouts/Layout.astro";
+import { formatDate } from "../../../utils";
+import { getPostsByAuthor, getAuthor } from "../../../utils/sanity";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/blog");
+}
+
+// Get author info
+const { data: author } = await getAuthor(slug, Astro.request);
+
+if (!author) {
+  return Astro.redirect("/blog");
+}
+
+// Get posts by this author
+const { data: posts } = await getPostsByAuthor(author._id, Astro.request);
+
+const title = `${author.name} - Blog Author`;
+---
+
+<Layout title={title}>
+  <div class="body-container-wrapper">
+    <div class="body-container body-container--blog">
+      
+      <!-- Author Header -->
+      <div class="blog-author-header">
+        <nav class="blog-post__breadcrumbs">
+          <a class="blog-header__tag" href="/blog">Blog</a>
+          <span>/</span>
+          <span class="blog-header__tag blog-header__tag--active">Author</span>
+        </nav>
+        
+        <div class="blog-author-profile">
+          {author.avatar?.url && (
+            <img 
+              src={author.avatar.url} 
+              alt={author.name} 
+              class="blog-author-avatar"
+              loading="lazy"
+            />
+          )}
+          
+          <div class="blog-author-info">
+            <h1 class="blog-author-name">{author.name}</h1>
+            
+            {author.bio && (
+              <p class="blog-author-bio">{author.bio}</p>
+            )}
+            
+            <div class="blog-author-links">
+              {author.website && (
+                <a href={author.website} target="_blank" rel="noopener noreferrer">
+                  🌐 Website
+                </a>
+              )}
+              {author.twitter && (
+                <a href={`https://twitter.com/${author.twitter}`} target="_blank" rel="noopener noreferrer">
+                  𝕏 @{author.twitter}
+                </a>
+              )}
+              {author.linkedin && (
+                <a href={author.linkedin} target="_blank" rel="noopener noreferrer">
+                  💼 LinkedIn
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <p class="blog-author-count">{posts?.length || 0} articles</p>
+      </div>
+      
+      <!-- Posts Grid -->
+      <div class="blog-index">
+        {posts && posts.length > 0 ? (
+          posts.map((post) => {
+            const postDate = post.publishedAt || post._createdAt;
+            const topic = post.topics?.filter(t => t != null)?.[0];
+            return (
+              <article class="blog-index__post">
+                {post.featuredImage?.url && (
+                  <a href={`/blog/${post.slug.current}`} class="blog-index__post-image">
+                    <img 
+                      src={post.featuredImage.url} 
+                      alt={post.featuredImage.alt || post.title || ''} 
+                      loading="lazy"
+                    />
+                  </a>
+                )}
+                <div class="blog-index__post-content">
+                  {topic && (
+                    <a class="blog-header__tag" href={`/blog/topic/${topic.slug?.current}`}>
+                      {topic.name}
+                    </a>
+                  )}
+                  <h2 class="blog-index__post-title">
+                    <a href={`/blog/${post.slug.current}`}>{post.title}</a>
+                  </h2>
+                  {post.excerpt && (
+                    <p class="blog-index__post-excerpt">{post.excerpt}</p>
+                  )}
+                  <div class="blog-index__post-content-meta">
+                    <span>{formatDate(postDate)}</span>
+                  </div>
+                </div>
+              </article>
+            );
+          })
+        ) : (
+          <p class="blog-no-posts">No articles found by this author.</p>
+        )}
+      </div>
+      
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .blog-author-header {
+    text-align: center;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+  }
+  
+  .blog-author-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  
+  @media (min-width: 768px) {
+    .blog-author-profile {
+      flex-direction: row;
+      justify-content: center;
+      text-align: left;
+    }
+  }
+  
+  .blog-author-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .blog-author-info {
+    max-width: 500px;
+  }
+  
+  .blog-author-name {
+    font-size: 2rem;
+    color: #033180;
+    margin: 0 0 0.5rem;
+  }
+  
+  .blog-author-bio {
+    font-size: 1rem;
+    color: #666;
+    margin: 0 0 1rem;
+    line-height: 1.6;
+  }
+  
+  .blog-author-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  @media (min-width: 768px) {
+    .blog-author-links {
+      justify-content: flex-start;
+    }
+  }
+  
+  .blog-author-links a {
+    color: #00b5fa;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+  
+  .blog-author-links a:hover {
+    text-decoration: underline;
+  }
+  
+  .blog-author-count {
+    font-size: 0.875rem;
+    color: #999;
+    margin-top: 1rem;
+  }
+  
+  .blog-no-posts {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+  }
+</style>
+
