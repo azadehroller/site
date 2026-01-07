@@ -20,6 +20,9 @@ export async function getHomepage(request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -389,6 +392,20 @@ export async function getHomepage(request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column2[]{
@@ -756,6 +773,20 @@ export async function getHomepage(request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column3[]{
@@ -1123,6 +1154,20 @@ export async function getHomepage(request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column4[]{
@@ -1526,6 +1571,9 @@ export async function getGetStartedPage(request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -1895,6 +1943,20 @@ export async function getGetStartedPage(request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column2[]{
@@ -2262,6 +2324,20 @@ export async function getGetStartedPage(request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column3[]{
@@ -2629,6 +2705,20 @@ export async function getGetStartedPage(request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column4[]{
@@ -3031,6 +3121,9 @@ export async function getPage(slug: string, request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -3216,6 +3309,20 @@ export async function getPage(slug: string, request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column2[]{
@@ -3399,6 +3506,20 @@ export async function getPage(slug: string, request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column3[]{
@@ -3582,6 +3703,20 @@ export async function getPage(slug: string, request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column4[]{
@@ -3804,6 +3939,9 @@ export async function getFeature(slug: string, request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -4481,7 +4619,7 @@ export async function getFeature(slug: string, request?: Request) {
 
 export async function getPosts(request?: Request) {
   return await loadQuery<Post[]>({
-    query: groq`*[_type == "post" && defined(slug.current)] | order(_createdAt desc) {
+    query: groq`*[_type == "post" && defined(slug.current)] | order(coalesce(publishedAt, _createdAt) desc) {
       _type,
       _id,
       _createdAt,
@@ -4489,7 +4627,13 @@ export async function getPosts(request?: Request) {
       slug,
       excerpt,
       featuredImage,
-      publishedAt
+      publishedAt,
+      updatedAt,
+      metaDescription,
+      tags,
+      hubspotId,
+      "topics": topics[]->{ _id, name, slug, hubspotId },
+      "author": author->{ _id, name, slug, bio, avatar, hubspotId }
     }`,
     request,
   });
@@ -4497,8 +4641,152 @@ export async function getPosts(request?: Request) {
 
 export async function getPost(slug: string, request?: Request) {
   return await loadQuery<Post>({
-    query: groq`*[_type == "post" && slug.current == $slug][0]`,
+    query: groq`*[_type == "post" && slug.current == $slug][0]{
+      _type,
+      _id,
+      _createdAt,
+      title,
+      slug,
+      excerpt,
+      featuredImage,
+      publishedAt,
+      updatedAt,
+      body,
+      metaDescription,
+      tags,
+      hubspotId,
+      hubspotUrl,
+      "topics": topics[]->{ _id, name, slug, hubspotId },
+      "author": author->{ _id, name, slug, bio, avatar, email, website, twitter, linkedin, facebook, hubspotId }
+    }`,
     params: { slug },
+    request,
+  });
+}
+
+// Get related posts by topics
+export async function getRelatedPosts(topicIds: string[], currentPostId: string, limit: number = 3, request?: Request) {
+  return await loadQuery<Post[]>({
+    query: groq`*[
+      _type == "post" 
+      && defined(slug.current) 
+      && _id != $currentPostId
+      && count((topics[]->_id)[@ in $topicIds]) > 0
+    ] | order(coalesce(publishedAt, _createdAt) desc)[0...$limit] {
+      _type,
+      _id,
+      _createdAt,
+      title,
+      slug,
+      excerpt,
+      featuredImage,
+      publishedAt,
+      "topics": topics[]->{ _id, name, slug }
+    }`,
+    params: { topicIds, currentPostId, limit },
+    request,
+  });
+}
+
+// Get all blog topics
+export async function getBlogTopics(request?: Request) {
+  return await loadQuery<BlogTopic[]>({
+    query: groq`*[_type == "blogTopic"] | order(name asc) {
+      _id,
+      _type,
+      name,
+      slug,
+      description,
+      hubspotId,
+      "postCount": count(*[_type == "post" && references(^._id)])
+    }`,
+    request,
+  });
+}
+
+// Get posts by topic slug
+export async function getPostsByTopic(topicSlug: string, request?: Request) {
+  return await loadQuery<Post[]>({
+    query: groq`*[
+      _type == "post" 
+      && defined(slug.current)
+      && $topicSlug in topics[]->slug.current
+    ] | order(coalesce(publishedAt, _createdAt) desc) {
+      _type,
+      _id,
+      _createdAt,
+      title,
+      slug,
+      excerpt,
+      featuredImage,
+      publishedAt,
+      "topics": topics[]->{ _id, name, slug }
+    }`,
+    params: { topicSlug },
+    request,
+  });
+}
+
+// Get a single topic by slug
+export async function getTopic(slug: string, request?: Request) {
+  return await loadQuery<{ _id: string; name: string; slug: { current: string }; description?: string }>({
+    query: groq`*[_type == "blogTopic" && slug.current == $slug][0]{
+      _id,
+      name,
+      slug,
+      description
+    }`,
+    params: { slug },
+    request,
+  });
+}
+
+// Get a single author by slug
+export async function getAuthor(slug: string, request?: Request) {
+  return await loadQuery<{
+    _id: string;
+    name: string;
+    slug: { current: string };
+    bio?: string;
+    avatar?: { url: string; alt?: string };
+    website?: string;
+    twitter?: string;
+    linkedin?: string;
+  }>({
+    query: groq`*[_type == "blogAuthor" && slug.current == $slug][0]{
+      _id,
+      name,
+      slug,
+      bio,
+      avatar,
+      website,
+      twitter,
+      linkedin
+    }`,
+    params: { slug },
+    request,
+  });
+}
+
+// Get posts by author ID
+export async function getPostsByAuthor(authorId: string, request?: Request) {
+  return await loadQuery<Post[]>({
+    query: groq`*[
+      _type == "post" 
+      && defined(slug.current)
+      && author._ref == $authorId
+    ] | order(coalesce(publishedAt, _createdAt) desc) {
+      _type,
+      _id,
+      _createdAt,
+      title,
+      slug,
+      excerpt,
+      featuredImage,
+      publishedAt,
+      "topics": topics[]->{ _id, name, slug }
+    }`,
+    params: { authorId },
     request,
   });
 }
@@ -4723,7 +5011,178 @@ export interface ComparisonTable {
   columns?: ComparisonColumn[];
 }
 
-export type ColumnContent = TextBlock | RotatingTextBlock | ImageVideoModal | ImageBlock | AdvancedImage | ButtonStack | SingleButton | LogoSet | LogoSetReference | StatsSet | QuoteBlock | WidgetStatsReference | WidgetUserReviewsReference | TestimonialCarouselReference | FeaturesStackedContent | HeadingComposition | TrustedPartner | HubspotFormReference | IndustrySelector | FeaturesSelectorGlobalReference | FAQs | ResultsList | ComparisonTable;
+// Features Pricing Card types
+export interface FeaturesPricingFeatureItem {
+  _key?: string;
+  text?: string;
+  tooltip?: string;
+}
+
+export interface FeaturesPricingButtonLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+export interface FeaturesPricingCardItem {
+  _key?: string;
+  title?: string;
+  subtitle?: string;
+  showDivider?: boolean;
+  featuresHeading?: string;
+  features?: FeaturesPricingFeatureItem[];
+  buttonLabel?: string;
+  buttonLink?: FeaturesPricingButtonLink;
+}
+
+export interface FeaturesPricingCard {
+  _type: "featuresPricingCard";
+  _key?: string;
+  cards?: FeaturesPricingCardItem[];
+  alignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  buttonStyle?: 'primary' | 'secondary' | 'tertiary' | 'ghost';
+}
+
+// Features Horizontal Slider types
+export interface FeaturesHorizontalSliderSlide {
+  _key?: string;
+  title?: string;
+  content?: string;
+  image?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+  linkLabel?: string;
+  link?: {
+    href?: string;
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+}
+
+export interface FeaturesHorizontalSlider {
+  _type: "featuresHorizontalSlider";
+  _key?: string;
+  slides?: FeaturesHorizontalSliderSlide[];
+  theme?: 'light' | 'dark' | 'gxscore';
+  autoplayDelay?: number;
+}
+
+// Card Segmentation types
+export interface CardSegmentationLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+export interface CardSegmentationItem {
+  _key?: string;
+  image?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+  title?: string;
+  content?: string;
+  linkLabel?: string;
+  link?: CardSegmentationLink;
+}
+
+export interface CardSegmentation {
+  _type: "cardSegmentation";
+  _key?: string;
+  cards?: CardSegmentationItem[];
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise';
+}
+
+// Industry Selector Global types
+export interface IndustrySelectorGlobalLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+export interface IndustrySelectorGlobalItem {
+  _key?: string;
+  icon?: string;
+  title?: string;
+  link?: IndustrySelectorGlobalLink;
+}
+
+export interface IndustrySelectorGlobal {
+  _type: "industrySelectorGlobal";
+  _key?: string;
+  heading?: HeadingComposition;
+  industries?: IndustrySelectorGlobalItem[];
+  ctaLabel?: string;
+  ctaLink?: IndustrySelectorGlobalLink;
+  theme?: 'light' | 'dark';
+}
+
+// Industry Selector Global Reference types (references the global document)
+export interface IndustrySelectorGlobalDoc {
+  _id: string;
+  _type: "industrySelectorGlobalDoc";
+  heading?: HeadingComposition;
+  industries?: IndustrySelectorGlobalItem[];
+  ctaLabel?: string;
+  ctaLink?: IndustrySelectorGlobalLink;
+  theme?: 'light' | 'dark';
+}
+
+export interface IndustrySelectorGlobalReference {
+  _type: "industrySelectorGlobalReference";
+  _key?: string;
+  reference?: IndustrySelectorGlobalDoc;
+}
+
+// Stats Set Stacked Global types
+export interface StatsSetStackedGlobalItem {
+  _key?: string;
+  statsNumber?: string;
+  statsText?: string;
+}
+
+export interface StatsSetStackedGlobalDoc {
+  _id: string;
+  _type: "statsSetStackedGlobalDoc";
+  stats?: StatsSetStackedGlobalItem[];
+  theme?: 'light' | 'dark';
+  numberColor?: string;
+  dividerColor?: 'navy-80' | 'white' | 'navy-40';
+}
+
+export interface StatsSetStackedGlobalReference {
+  _type: "statsSetStackedGlobalReference";
+  _key?: string;
+  statsSetStackedGlobal?: StatsSetStackedGlobalDoc;
+}
+
+// Widget User Review Card types
+export interface WidgetUserReviewCardBadge {
+  _key?: string;
+  image?: {
+    asset?: { _ref?: string; _id?: string; url?: string };
+  };
+  alt?: string;
+  link?: string;
+}
+
+export interface WidgetUserReviewCard {
+  _type: "widgetUserReviewCard";
+  _key?: string;
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  badges?: WidgetUserReviewCardBadge[];
+  theme?: 'light' | 'dark' | 'gxscore';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+}
+
+export type ColumnContent = TextBlock | RotatingTextBlock | ImageVideoModal | ImageBlock | AdvancedImage | ButtonStack | SingleButton | LogoSet | LogoSetReference | StatsSet | QuoteBlock | WidgetStatsReference | WidgetUserReviewsReference | TestimonialCarouselReference | FeaturesStackedContent | HeadingComposition | TrustedPartner | HubspotFormReference | IndustrySelector | FeaturesSelectorGlobalReference | FAQs | ResultsList | ComparisonTable | FeaturesPricingCard | FeaturesHorizontalSlider | CardSegmentation | IndustrySelectorGlobal | IndustrySelectorGlobalReference | WidgetUserReviewCard | StatsSetStackedGlobalReference;
 
 // Button Stack types
 export interface ButtonLink {
@@ -5105,6 +5564,10 @@ export interface ColumnsBlock {
   };
   backgroundPosition?: string;
   backgroundSize?: string;
+  // Background gradient
+  backgroundGradient?: string;
+  gradientColorStart?: string;
+  gradientColorEnd?: string;
   // Spacing settings
   paddingTop?: string;
   paddingTopMobile?: string;
@@ -5206,6 +5669,9 @@ export async function getIndustry(slug: string, request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -6050,6 +6516,32 @@ export interface CompetitorsLandingPage {
   sections?: (ColumnsBlock | Divider)[];
 }
 
+// Blog Topic interface
+export interface BlogTopic {
+  _type: "blogTopic";
+  _id: string;
+  name: string;
+  slug: Slug;
+  description?: string;
+  hubspotId?: string;
+}
+
+// Blog Author interface
+export interface BlogAuthor {
+  _type: "blogAuthor";
+  _id: string;
+  name: string;
+  slug: Slug;
+  email?: string;
+  bio?: string;
+  avatar?: { url?: string; alt?: string };
+  website?: string;
+  twitter?: string;
+  linkedin?: string;
+  facebook?: string;
+  hubspotId?: string;
+}
+
 export interface Post {
   _type: "post";
   _id: string;
@@ -6059,7 +6551,15 @@ export interface Post {
   excerpt?: string;
   featuredImage?: { url?: string; alt?: string };
   publishedAt?: string;
+  updatedAt?: string;
   body?: PortableTextBlock[];
+  // New fields for HubSpot compatibility
+  topics?: BlogTopic[];
+  author?: BlogAuthor;
+  tags?: string[];
+  metaDescription?: string;
+  hubspotId?: string;
+  hubspotUrl?: string;
 }
 
 // Footer Global Types
@@ -6129,6 +6629,9 @@ export async function getPartner(slug: string, request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -6327,6 +6830,9 @@ export async function getPartnersLandingPage(request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -6523,6 +7029,9 @@ export async function getCompetitor(slug: string, request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -6721,6 +7230,9 @@ export async function getCompetitorsLandingPage(request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -6934,10 +7446,17 @@ export interface HeaderMegaFeaturedItem {
   };
 }
 
+export interface HeaderSubIntro {
+  _key?: string;
+  title: string;
+}
+
 export interface HeaderMegaMenu {
   _key?: string;
   parentLabel: string;
   menuType?: 'why_roller' | 'features' | 'industries' | 'solutions';
+  useAlternateLayout?: boolean;
+  subIntros?: HeaderSubIntro[];
   introTitle?: string;
   introDescription?: string;
   items?: HeaderMegaMenuItem[];
@@ -6998,6 +7517,8 @@ export async function getHeader(request?: Request) {
         _key,
         parentLabel,
         menuType,
+        useAlternateLayout,
+        subIntros[]{ _key, title },
         introTitle,
         introDescription,
         items[]{
@@ -7158,6 +7679,9 @@ export async function getLandingPage(slug: string, request?: Request) {
           backgroundImage{ asset-> },
           backgroundPosition,
           backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
           paddingTop,
           paddingTopMobile,
           paddingBottom,
@@ -7303,9 +7827,16 @@ export async function getLandingPage(slug: string, request?: Request) {
               reference->{
                 _id,
                 _type,
+                eyebrow,
                 title,
-                reviews[]{ _key, source, rating, text },
-                theme
+                text,
+                badges[]{ _key, image{ asset->{ _ref, url } }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
               }
             },
             _type == 'testimonialCarouselReference' => {
@@ -7330,14 +7861,15 @@ export async function getLandingPage(slug: string, request?: Request) {
             _type == 'hubspotFormReference' => {
               _type,
               _key,
-              reference->{
+              form->{
                 _id,
                 _type,
-                formId,
+                name,
                 portalId,
-                region,
-                title
-              }
+                formId,
+                region
+              },
+              theme
             },
             _type == 'industrySelector' => {
               _type,
@@ -7415,6 +7947,123 @@ export async function getLandingPage(slug: string, request?: Request) {
               theme,
               backgroundColor,
               darkBackgroundColor
+            },
+            _type == 'featuresPricingCard' => {
+              _type,
+              _key,
+              cards[]{
+                _key,
+                title,
+                subtitle,
+                showDivider,
+                featuresHeading,
+                features[]{
+                  _key,
+                  text,
+                  tooltip
+                },
+                buttonLabel,
+                buttonLink
+              },
+              alignment,
+              buttonStyle
+            },
+            _type == 'featuresHorizontalSlider' => {
+              _type,
+              _key,
+              slides[]{
+                _key,
+                title,
+                content,
+                image{ asset->{ _ref, url }, alt },
+                linkLabel,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme,
+              autoplayDelay
+            },
+            _type == 'cardSegmentation' => {
+              _type,
+              _key,
+              cards[]{
+                _key,
+                image{ asset->{ _ref, url }, alt },
+                title,
+                content,
+                linkLabel,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme
+            },
+            _type == 'industrySelectorGlobal' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType,
+                addBorderLine
+              },
+              industries[]{
+                _key,
+                icon,
+                title,
+                link{ href, openInNewTab, noFollow }
+              },
+              ctaLabel,
+              ctaLink{ href, openInNewTab, noFollow },
+              theme
+            },
+            _type == 'industrySelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType,
+                  addBorderLine
+                },
+                industries[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme
+              }
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column2[]{
@@ -7550,9 +8199,16 @@ export async function getLandingPage(slug: string, request?: Request) {
               reference->{
                 _id,
                 _type,
+                eyebrow,
                 title,
-                reviews[]{ _key, source, rating, text },
-                theme
+                text,
+                badges[]{ _key, image{ asset->{ _ref, url } }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
               }
             },
             _type == 'testimonialCarouselReference' => {
@@ -7577,14 +8233,15 @@ export async function getLandingPage(slug: string, request?: Request) {
             _type == 'hubspotFormReference' => {
               _type,
               _key,
-              reference->{
+              form->{
                 _id,
                 _type,
-                formId,
+                name,
                 portalId,
-                region,
-                title
-              }
+                formId,
+                region
+              },
+              theme
             },
             _type == 'industrySelector' => {
               _type,
@@ -7662,6 +8319,123 @@ export async function getLandingPage(slug: string, request?: Request) {
               theme,
               backgroundColor,
               darkBackgroundColor
+            },
+            _type == 'featuresPricingCard' => {
+              _type,
+              _key,
+              cards[]{
+                _key,
+                title,
+                subtitle,
+                showDivider,
+                featuresHeading,
+                features[]{
+                  _key,
+                  text,
+                  tooltip
+                },
+                buttonLabel,
+                buttonLink
+              },
+              alignment,
+              buttonStyle
+            },
+            _type == 'featuresHorizontalSlider' => {
+              _type,
+              _key,
+              slides[]{
+                _key,
+                title,
+                content,
+                image{ asset->{ _ref, url }, alt },
+                linkLabel,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme,
+              autoplayDelay
+            },
+            _type == 'cardSegmentation' => {
+              _type,
+              _key,
+              cards[]{
+                _key,
+                image{ asset->{ _ref, url }, alt },
+                title,
+                content,
+                linkLabel,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme
+            },
+            _type == 'industrySelectorGlobal' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType,
+                addBorderLine
+              },
+              industries[]{
+                _key,
+                icon,
+                title,
+                link{ href, openInNewTab, noFollow }
+              },
+              ctaLabel,
+              ctaLink{ href, openInNewTab, noFollow },
+              theme
+            },
+            _type == 'industrySelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType,
+                  addBorderLine
+                },
+                industries[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme
+              }
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column3[]{
@@ -7720,6 +8494,862 @@ export async function getLandingPage(slug: string, request?: Request) {
               alignment,
               stackDirection,
               gap
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            }
+          }
+        },
+        _type == 'divider' => {
+          _type,
+          _key,
+          style,
+          marginTop,
+          marginBottom
+        }
+      }
+    }`,
+    params: { slug },
+    request,
+  });
+}
+
+// Solution type for solution pages
+export interface Solution {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+}
+
+export async function getSolution(slug: string, request?: Request) {
+  return await loadQuery<Solution | null>({
+    query: groq`*[_type == "solution" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1PaddingBottomMobile,
+          column2PaddingBottomMobile,
+          column3PaddingBottomMobile,
+          column4PaddingBottomMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              image{ asset->{ _ref, url } },
+              theme,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              textAlignment
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                stats[]{ _key, value, label, prefix, suffix },
+                theme
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset->{ _ref, url } }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                testimonials[]{
+                  _key,
+                  text,
+                  author,
+                  role,
+                  venue,
+                  avatar{ asset->{ _ref, url } },
+                  logo{ asset->{ _ref, url } }
+                },
+                theme
+              }
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading,
+              industries[]{
+                _key,
+                name,
+                icon,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                features[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'industrySelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType,
+                  addBorderLine
+                },
+                industries[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading,
+              description,
+              items[]{ _key, question, answer },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              heading,
+              results[]{
+                _key,
+                title,
+                description,
+                image{ asset->{ _ref, url } }
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'comparisonTable' => {
+              _type,
+              _key,
+              heading,
+              rollerColumnHeading,
+              competitorColumnHeading,
+              rows[]{
+                _key,
+                feature,
+                rollerSupport,
+                competitorSupport
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'featuresPricingCard' => {
+              _type,
+              _key,
+              cards[]{
+                _key,
+                title,
+                subtitle,
+                showDivider,
+                featuresHeading,
+                features[]{
+                  _key,
+                  text,
+                  tooltip
+                },
+                buttonLabel,
+                buttonLink
+              },
+              alignment,
+              buttonStyle
+            },
+            _type == 'featuresHorizontalSlider' => {
+              _type,
+              _key,
+              slides[]{
+                _key,
+                title,
+                content,
+                image{ asset->{ _ref, url }, alt },
+                linkLabel,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme,
+              autoplayDelay
+            },
+            _type == 'cardSegmentation' => {
+              _type,
+              _key,
+              cards[]{
+                _key,
+                image{ asset->{ _ref, url }, alt },
+                title,
+                content,
+                linkLabel,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSetStackedGlobalReference' => {
+              _type,
+              _key,
+              statsSetStackedGlobal->{
+                _id,
+                _type,
+                stats[]{ _key, statsNumber, statsText },
+                theme,
+                numberColor,
+                dividerColor
+              }
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              image{ asset->{ _ref, url } },
+              theme,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              textAlignment
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                stats[]{ _key, value, label, prefix, suffix },
+                theme
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset->{ _ref, url } }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                title,
+                testimonials[]{
+                  _key,
+                  text,
+                  author,
+                  role,
+                  venue,
+                  avatar{ asset->{ _ref, url } },
+                  logo{ asset->{ _ref, url } }
+                },
+                theme
+              }
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading,
+              industries[]{
+                _key,
+                name,
+                icon,
+                link{ href, openInNewTab, noFollow }
+              },
+              theme
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                features[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'industrySelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType,
+                  addBorderLine
+                },
+                industries[]{
+                  _key,
+                  icon,
+                  title,
+                  link{ href, openInNewTab, noFollow }
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow },
+                theme
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading,
+              description,
+              items[]{ _key, question, answer },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'resultsList' => {
+              _type,
+              _key,
+              heading,
+              results[]{
+                _key,
+                title,
+                description,
+                image{ asset->{ _ref, url } }
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'comparisonTable' => {
+              _type,
+              _key,
+              heading,
+              rollerColumnHeading,
+              competitorColumnHeading,
+              rows[]{
+                _key,
+                feature,
+                rollerSupport,
+                competitorSupport
+              },
+              theme,
+              backgroundColor,
+              darkBackgroundColor
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
+            },
+            _type == 'statsSetStackedGlobalReference' => {
+              _type,
+              _key,
+              statsSetStackedGlobal->{
+                _id,
+                _type,
+                stats[]{ _key, statsNumber, statsText },
+                theme,
+                numberColor,
+                dividerColor
+              }
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttons[]{
+                _key,
+                text,
+                link,
+                variant,
+                buttonSize,
+                hasIcon,
+                icon,
+                mobileFullWidth
+              },
+              alignment,
+              stackDirection,
+              gap
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
             }
           },
           column4[]{
