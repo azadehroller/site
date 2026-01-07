@@ -1,0 +1,323 @@
+---
+/**
+ * IndustrySelectorGlobal - A horizontal flex-wrap display of industry links with icons
+ * Global component similar to IndustrySelector but without the card container
+ * Features:
+ * - HeadingComposition for header (eyebrow, title, text)
+ * - Horizontal flex-wrap of industry links
+ * - CTA button
+ * - Theme options
+ */
+import { cleanStega } from "../../utils/stega";
+import HeadingComposition from "../blocks/HeadingComposition.astro";
+import type { HeadingComposition as HeadingCompositionType } from "../../utils/sanity";
+
+interface IndustryLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface IndustryItem {
+  _key?: string;
+  icon?: string;
+  title?: string;
+  link?: IndustryLink;
+}
+
+interface Props {
+  // Heading - uses HeadingComposition type with all its fields
+  heading?: HeadingCompositionType;
+  // Industries
+  industries?: IndustryItem[];
+  // CTA
+  ctaLabel?: string;
+  ctaLink?: IndustryLink;
+  // Theme
+  theme?: 'light' | 'dark';
+  id?: string;
+}
+
+const {
+  heading,
+  industries = [],
+  ctaLabel = 'See all industries',
+  ctaLink,
+  theme: rawTheme = 'dark',
+  id = 'industry-selector-global'
+} = Astro.props;
+
+// Clean stega from style values
+const theme = cleanStega(rawTheme) || 'dark';
+
+// Generate unique ID for component
+const componentId = cleanStega(id) || `industry-selector-global-${Math.random().toString(36).slice(2, 9)}`;
+
+// Check if heading has any content
+const hasHeading = heading?.eyebrow || heading?.title || (heading?.text && heading.text.length > 0);
+
+// Theme classes
+const themeClass = theme === 'light' ? 'light' : 'dark';
+const textColorClass = theme === 'light' ? 'text-neutral-white' : 'text-primary-50';
+const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutral-white';
+
+// CTA link data
+const ctaHref = cleanStega(ctaLink?.href) || '/industries';
+const ctaOpenInNewTab = ctaLink?.openInNewTab;
+const ctaNoFollow = ctaLink?.noFollow;
+
+// Build rel attribute for CTA
+const ctaRelParts: string[] = [];
+if (ctaNoFollow) ctaRelParts.push('nofollow');
+if (ctaOpenInNewTab) ctaRelParts.push('noopener', 'noreferrer');
+const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
+---
+
+<div 
+  id={componentId}
+  class="industry-selector-global mx-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col lg:p-6 rounded-[32px] py-6 px-6 mb-0 md:mb-4"
+  data-sanity-edit-target
+>
+  {/* Header Section using HeadingComposition */}
+  {hasHeading && heading && (
+    <header class="text-primary-50 grid gap-4" data-sanity-edit-target>
+      <HeadingComposition 
+        eyebrow={heading.eyebrow}
+        title={heading.title}
+        text={heading.text}
+        theme={heading.theme}
+        textAlignment={heading.textAlignment}
+        eyebrowType={heading.eyebrowType}
+        eyebrowStyle={heading.eyebrowStyle}
+        headingType={heading.headingType}
+        displayType={heading.displayType}
+        textType={heading.textType}
+        addBorderLine={heading.addBorderLine}
+      />
+    </header>
+  )}
+
+  {/* Desktop flex-wrap view */}
+  <div class={`hidden md:flex flex-wrap gap-3 ms-auto me-auto ${themeClass}`}>
+    {industries.map((industry) => {
+      const industryTitle = industry.title;
+      const industryIcon = industry.icon;
+      const href = cleanStega(industry.link?.href) || '/';
+      const openInNewTab = industry.link?.openInNewTab;
+      const noFollow = industry.link?.noFollow;
+      
+      // Build rel attribute
+      const relParts: string[] = [];
+      if (noFollow) relParts.push('nofollow');
+      if (openInNewTab) relParts.push('noopener', 'noreferrer');
+      const rel = relParts.length > 0 ? relParts.join(' ') : undefined;
+      
+      // Skip empty items
+      if (!industryTitle && !industryIcon) return null;
+      
+      return (
+        <a 
+          href={href}
+          class={`js-industryItemsLink flex items-center justify-center gap-2 mo-card-features ${textColorClass} font-semibold ease-in transition duration-200 ${hoverBgClass} hover:shadow-3xl rounded-2xl`}
+          target={openInNewTab ? '_blank' : undefined}
+          rel={rel}
+          data-sanity-edit-target
+        >
+          {industryIcon && (
+            <span class="industry-icon" set:html={industryIcon} data-sanity-edit-target />
+          )}
+          {industryTitle && (
+            <span data-sanity-edit-target>{industryTitle}</span>
+          )}
+        </a>
+      );
+    })}
+  </div>
+
+  {/* Mobile dropdown view */}
+  <div class="grid gap-3 md:hidden dropdown-wrapper" data-sanity-ignore>
+    <select 
+      id={`${componentId}-dropdown`}
+      class="industry-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+      data-sanity-ignore
+    >
+      <option value="" selected>Select your industry</option>
+      {industries.map((industry) => {
+        const industryTitle = cleanStega(industry.title);
+        const href = cleanStega(industry.link?.href) || '/';
+        return (
+          <option value={href}>{industryTitle}</option>
+        );
+      })}
+    </select>
+    <button 
+      type="button"
+      class="industry-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 bg-secondary-50 hover:bg-secondary-70 rounded-3xl py-2 px-4 text-neutral-white"
+      data-dropdown-id={`${componentId}-dropdown`}
+    >
+      Discover
+    </button>
+  </div>
+
+</div>
+
+<style>
+  /* Container shadows */
+  .box-shadow-onlight {
+    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  .box-shadow-onlight-navy-40 {
+    box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
+  }
+
+  .bg-neutral-white {
+    background-color: #ffffff;
+  }
+
+  /* Dropdown wrapper with custom arrow */
+  .dropdown-wrapper {
+    position: relative;
+    isolation: isolate;
+    z-index: 9999;
+  }
+
+  .dropdown-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 24px;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 0.7em;
+    height: 0.4em;
+    background-color: var(--primary-50, #033180);
+    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Industry item cards */
+  .mo-card-features {
+    padding: 0.75rem 1.25rem;
+    min-height: 56px;
+  }
+
+  /* Shadow on hover */
+  .hover\:shadow-3xl:hover {
+    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  /* Icon container */
+  .industry-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .industry-icon :global(svg) {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Background colors */
+  .bg-widget-industries {
+    background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
+  }
+
+  /* Text colors */
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  /* Background colors for hover */
+  .hover\:bg-neutral-white:hover {
+    background-color: #ffffff;
+  }
+
+  .hover\:bg-primary-60:hover {
+    background-color: var(--primary-60, #011840);
+  }
+
+  /* Dropdown styles */
+  .industry-dropdown {
+    border: none;
+    outline: none;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto !important;
+    transform: translateZ(0);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  .industry-dropdown:focus {
+    box-shadow: 0 0 0 2px var(--primary-40, #074DC5);
+  }
+
+  /* Button styles */
+  .bg-secondary-50 {
+    background-color: var(--secondary-50, #ff3800);
+  }
+
+  .hover\:bg-secondary-70:hover {
+    background-color: var(--secondary-70, #cc2d00);
+  }
+</style>
+
+<script is:inline>
+(function() {
+  'use strict';
+
+  // Handle dropdown navigation
+  document.querySelectorAll('.industry-discover-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const dropdownId = btn.getAttribute('data-dropdown-id');
+      const dropdown = document.getElementById(dropdownId);
+      if (dropdown && dropdown.value) {
+        window.location.assign(dropdown.value);
+      }
+    });
+  });
+
+  // Fix for Sanity Visual Editing blocking select elements
+  document.querySelectorAll('.industry-dropdown').forEach(function(select) {
+    const wrapper = select.closest('.dropdown-wrapper');
+    if (!wrapper) return;
+
+    // Create an invisible button overlay
+    const overlay = document.createElement('button');
+    overlay.type = 'button';
+    overlay.className = 'select-click-overlay';
+    overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 48px; background: transparent; border: none; cursor: pointer; z-index: 10001;';
+    overlay.setAttribute('aria-label', 'Open dropdown');
+    
+    wrapper.style.position = 'relative';
+    wrapper.insertBefore(overlay, select);
+
+    overlay.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (typeof select.showPicker === 'function') {
+        try {
+          select.showPicker();
+        } catch (err) {
+          select.focus();
+        }
+      } else {
+        select.focus();
+        const event = new MouseEvent('mousedown', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        select.dispatchEvent(event);
+      }
+    });
+  });
+})();
+</script>

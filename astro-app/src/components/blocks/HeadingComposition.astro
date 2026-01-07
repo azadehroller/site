@@ -32,7 +32,7 @@ const {
   title: rawTitle,
   text: rawText,
   theme: rawTheme = 'dark',
-  textAlignment: rawTextAlignment = 'CENTER',
+  textAlignment: rawTextAlignment = 'LEFT',
   eyebrowType: rawEyebrowType = 'div',
   eyebrowStyle: rawEyebrowStyle = 'none',
   headingType: rawHeadingType = 'h2',
@@ -44,7 +44,7 @@ const {
 
 // Clean stega from style values (must be clean for CSS class names)
 const theme = cleanStega(rawTheme) || 'dark';
-const textAlignment = cleanStega(rawTextAlignment) || 'CENTER';
+const textAlignment = cleanStega(rawTextAlignment) || 'LEFT';
 const eyebrowType = cleanStega(rawEyebrowType) || 'div';
 const eyebrowStyle = cleanStega(rawEyebrowStyle) || 'none';
 const headingType = cleanStega(rawHeadingType) || 'h2';

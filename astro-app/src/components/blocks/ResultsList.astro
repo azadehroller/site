@@ -118,7 +118,7 @@ const textColorClass = getTextColorClass();
                 {linkLabel && (
                   <a 
                     href={href} 
-                    class="mt-auto relative inline-flex items-center gap-2 font-semibold cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 bg-transparent text-primary-50 font-serif group"
+                    class={`${textColorClass} mt-auto relative inline-flex items-center gap-2 font-semibold cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 bg-transparent text-primary-50 font-serif group`}
                     target={openInNewTab ? "_blank" : undefined}
                     rel={relAttr}
                     data-sanity-edit-target

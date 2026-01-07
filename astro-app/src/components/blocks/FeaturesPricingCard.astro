@@ -1,0 +1,300 @@
+---
+/**
+ * FeaturesPricingCard - A pricing tier cards component
+ * Converted from HubSpot features-pricing-card.module
+ * 
+ * Features:
+ * - Multiple pricing tier cards in a row
+ * - Each card has title, subtitle, divider, features list
+ * - Optional CTA button
+ * - Alignment options
+ */
+import { cleanStega } from '../../utils/stega';
+
+interface FeatureItem {
+  _key?: string;
+  text?: string;
+  tooltip?: string;
+}
+
+interface ButtonLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface PricingCard {
+  _key?: string;
+  title?: string;
+  subtitle?: string;
+  showDivider?: boolean;
+  featuresHeading?: string;
+  features?: FeatureItem[];
+  buttonLabel?: string;
+  buttonLink?: ButtonLink;
+}
+
+interface Props {
+  cards?: PricingCard[];
+  alignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  buttonStyle?: 'primary' | 'secondary' | 'tertiary' | 'ghost';
+  id?: string;
+}
+
+const {
+  cards: rawCards = [],
+  alignment: rawAlignment = 'LEFT',
+  buttonStyle: rawButtonStyle = 'primary',
+  id,
+} = Astro.props;
+
+// Clean stega from style values
+const alignment = cleanStega(rawAlignment) || 'LEFT';
+const buttonStyle = cleanStega(rawButtonStyle) || 'primary';
+
+// Preserve stega in visible text for visual editing
+const cards = rawCards || [];
+
+// Generate unique ID
+const componentId = id ? cleanStega(id) : `pricing-cards-${Math.random().toString(36).slice(2, 9)}`;
+
+// Alignment classes for header
+const getAlignmentClass = (): string => {
+  switch (alignment) {
+    case 'CENTER':
+      return 'content-center text-center';
+    case 'RIGHT':
+      return 'content-end text-right';
+    case 'LEFT':
+    default:
+      return 'content-start text-left';
+  }
+};
+
+// Alignment classes for features
+const getContentAlignmentClass = (): string => {
+  switch (alignment) {
+    case 'CENTER':
+      return 'items-center';
+    case 'RIGHT':
+      return 'items-end';
+    case 'LEFT':
+    default:
+      return 'items-start';
+  }
+};
+
+// Button style classes
+const getButtonClasses = (): string => {
+  const baseClasses = 'relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 rounded-3xl py-3 px-6 inline-flex';
+  
+  switch (buttonStyle) {
+    case 'secondary':
+      return `${baseClasses} bg-primary-50 hover:bg-primary-60 text-neutral-white`;
+    case 'tertiary':
+      return `${baseClasses} bg-transparent border-2 border-primary-50 text-primary-50 hover:bg-primary-10`;
+    case 'ghost':
+      return `${baseClasses} bg-transparent text-primary-50 hover:text-primary-60 underline`;
+    case 'primary':
+    default:
+      return `${baseClasses} bg-secondary-50 hover:bg-secondary-70 text-neutral-white`;
+  }
+};
+
+const alignmentClass = getAlignmentClass();
+const contentAlignmentClass = getContentAlignmentClass();
+const buttonClasses = getButtonClasses();
+
+// Check if centered (affects divider visibility)
+const isCentered = alignment === 'CENTER';
+---
+
+<div 
+  class="featured-pricing-cards grid grid-cols-1 lg:flex lg:flex-row justify-center gap-4 md:mx-auto my-4"
+  id={componentId}
+  data-sanity-edit-target
+>
+  {cards.map((card) => {
+    const cardTitle = card.title;
+    const cardSubtitle = card.subtitle;
+    const showDivider = card.showDivider !== false && !isCentered;
+    const featuresHeading = card.featuresHeading;
+    const features = card.features || [];
+    const buttonLabel = card.buttonLabel;
+    const buttonHref = cleanStega(card.buttonLink?.href);
+    const openInNewTab = card.buttonLink?.openInNewTab;
+    const noFollow = card.buttonLink?.noFollow;
+    
+    // Build rel attribute
+    const relParts: string[] = [];
+    if (noFollow) relParts.push('nofollow');
+    if (openInNewTab) relParts.push('noopener', 'noreferrer');
+    const rel = relParts.length > 0 ? relParts.join(' ') : undefined;
+    
+    return (
+      <div 
+        class="mo-card bg-neutral-white rounded-[32px] box-shadow-onlight px-4 md:px-6 relative flex flex-col gap-5 lg:w-[430px] lg:max-w-[430px]"
+        data-sanity-edit-target
+      >
+        {/* Header */}
+        <header class={`flex flex-col gap-y-3 flex-wrap ${alignmentClass}`}>
+          {cardTitle && (
+            <div class="text-lg uppercase font-extrabold text-secondary-50">
+              {cardTitle}
+            </div>
+          )}
+          {cardSubtitle && (
+            <div class="text-primary-50">
+              {cardSubtitle}
+            </div>
+          )}
+        </header>
+
+        {/* Divider */}
+        {showDivider && (
+          <div class="h-[1px] w-full bg-primary-40"></div>
+        )}
+
+        {/* Features List */}
+        {features.length > 0 && (
+          <div class="grid gap-3 relative">
+            {featuresHeading && (
+              <div class="text-primary-50 font-semibold">{featuresHeading}</div>
+            )}
+            <ul class={`flex flex-col mb-0 list ${contentAlignmentClass}`}>
+              {features.map((feature) => (
+                <li 
+                  class="relative text-primary-50 flex items-center gap-x-2 py-[8px]"
+                  data-sanity-edit-target
+                >
+                  <span>• {feature.text}</span>
+                  {feature.tooltip && (
+                    <div class="tooltip box-shadow-onlight">{feature.tooltip}</div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Button */}
+        {buttonLabel && buttonHref && (
+          <div class={isCentered ? 'm-auto' : 'mt-auto'}>
+            <a 
+              class={buttonClasses}
+              href={buttonHref}
+              target={openInNewTab ? '_blank' : undefined}
+              rel={rel}
+            >
+              <span>{buttonLabel}</span>
+            </a>
+          </div>
+        )}
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  /* Card styles */
+  .mo-card {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  /* Box shadow */
+  .box-shadow-onlight {
+    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  /* Colors */
+  .bg-neutral-white {
+    background-color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+
+  .text-secondary-50 {
+    color: var(--secondary-50, #ff3800);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .bg-primary-40 {
+    background-color: var(--primary-40, #074DC5);
+  }
+
+  .bg-secondary-50 {
+    background-color: var(--secondary-50, #ff3800);
+  }
+
+  .hover\:bg-secondary-70:hover {
+    background-color: var(--secondary-70, #cc2d00);
+  }
+
+  .bg-primary-50 {
+    background-color: var(--primary-50, #033180);
+  }
+
+  .hover\:bg-primary-60:hover {
+    background-color: var(--primary-60, #011840);
+  }
+
+  .hover\:bg-primary-10:hover {
+    background-color: var(--primary-10, #E8F0FF);
+  }
+
+  .hover\:text-primary-60:hover {
+    color: var(--primary-60, #011840);
+  }
+
+  /* Tooltip styles */
+  .list li:hover .tooltip {
+    opacity: 1;
+    transition-timing-function: cubic-bezier(.165,.84,.44,1);
+    transform: translateY(calc(-100% - 1px));
+  }
+
+  .tooltip {
+    opacity: 0;
+    position: absolute;
+    left: -16px;
+    right: -10px;
+    top: 0;
+    border-radius: 8px;
+    pointer-events: none;
+    background: #fff;
+    color: #033180;
+    font-weight: 600;
+    transition: transform, opacity, .15s ease-in-out;
+    transform-origin: 20px calc(100% + 12px);
+    transform: translateY(calc(-100% + 10px)) scale(.75);
+    padding: 16px;
+    font-size: 14px;
+    line-height: 18px;
+    z-index: 10;
+  }
+
+  .tooltip:before {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 18px;
+    width: 12px;
+    height: 12px;
+    transform: rotate(45deg);
+    border-radius: 0 0 4px 0;
+    background-color: inherit;
+    box-shadow: 3px 3px 5px rgba(82,95,127,.04);
+  }
+
+  /* Ensure list items can contain tooltip */
+  .list li {
+    position: relative;
+  }
+</style>
+

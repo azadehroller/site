@@ -9,6 +9,10 @@ interface Props {
   backgroundImage?: string;
   backgroundPosition?: string;
   backgroundSize?: string;
+  // Background gradient
+  backgroundGradient?: string;
+  gradientColorStart?: string;
+  gradientColorEnd?: string;
   paddingTop?: string;
   paddingTopMobile?: string;
   paddingBottom?: string;
@@ -35,6 +39,10 @@ const {
   backgroundImage: rawBackgroundImage,
   backgroundPosition: rawBackgroundPosition = 'center',
   backgroundSize: rawBackgroundSize = 'cover',
+  // Background gradient
+  backgroundGradient: rawBackgroundGradient = 'none',
+  gradientColorStart: rawGradientColorStart,
+  gradientColorEnd: rawGradientColorEnd,
   paddingTop: rawPaddingTop = '80px',
   paddingTopMobile: rawPaddingTopMobile = '48px',
   paddingBottom: rawPaddingBottom = '0px',
@@ -65,6 +73,10 @@ const customBackgroundColor = cleanStega(rawCustomBackgroundColor);
 const backgroundImage = cleanStega(rawBackgroundImage);
 const backgroundPosition = cleanStega(rawBackgroundPosition) || 'center';
 const backgroundSize = cleanStega(rawBackgroundSize) || 'cover';
+// Background gradient
+const backgroundGradient = cleanStega(rawBackgroundGradient) || 'none';
+const gradientColorStart = cleanStega(rawGradientColorStart);
+const gradientColorEnd = cleanStega(rawGradientColorEnd);
 const paddingTop = cleanStega(rawPaddingTop) || '80px';
 const paddingTopMobile = cleanStega(rawPaddingTopMobile) || '48px';
 const paddingBottom = cleanStega(rawPaddingBottom) || '0px';
@@ -118,7 +130,12 @@ function buildWrapperStyles(): string {
     styles.push(`background-color: ${bgColor}`);
   }
   
-  // Background image
+  // Background gradient (takes precedence over background color but not over background image)
+  if (backgroundGradient === 'custom' && gradientColorStart && gradientColorEnd) {
+    styles.push(`background: linear-gradient(to bottom, ${gradientColorStart}, ${gradientColorEnd})`);
+  }
+  
+  // Background image (takes precedence over gradient)
   if (backgroundImage) {
     styles.push(`background-image: url('${backgroundImage}')`);
     styles.push(`background-position: ${backgroundPosition}`);

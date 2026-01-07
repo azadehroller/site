@@ -1,0 +1,144 @@
+---
+/**
+ * StatsSetStackedGlobal - A vertical stacked stats display component
+ * Global component matching HubSpot stats-set-stacked structure
+ * Features:
+ * - Multiple stat items with number and description
+ * - Vertical stacked layout with dividers
+ * - Theme options (OnLight, OnDark)
+ * - Customizable number and divider colors
+ */
+import { cleanStega } from "../../utils/stega";
+
+interface StatItem {
+  _key?: string;
+  statsNumber?: string;
+  statsText?: string;
+}
+
+interface Props {
+  stats?: StatItem[];
+  theme?: 'light' | 'dark';
+  numberColor?: string;
+  dividerColor?: 'navy-80' | 'white' | 'navy-40';
+  id?: string;
+}
+
+const {
+  stats: rawStats = [],
+  theme: rawTheme = 'light',
+  numberColor: rawNumberColor = '#0960F6',
+  dividerColor: rawDividerColor = 'navy-80',
+  id,
+} = Astro.props;
+
+// Clean stega from style values
+const theme = cleanStega(rawTheme) || 'light';
+const numberColor = cleanStega(rawNumberColor) || '#0960F6';
+const dividerColor = cleanStega(rawDividerColor) || 'navy-80';
+
+// Preserve stega in visible text for visual editing
+const stats = rawStats || [];
+
+// Generate unique ID
+const componentId = id ? cleanStega(id) : `stats-set-stacked-${Math.random().toString(36).slice(2, 9)}`;
+
+// Divider color classes
+const getDividerColorClass = (): string => {
+  switch (dividerColor) {
+    case 'white':
+      return 'divide-white';
+    case 'navy-40':
+      return 'divide-navy-40';
+    case 'navy-80':
+    default:
+      return 'divide-navy-80';
+  }
+};
+
+// Text color for description based on theme
+const getTextColorClass = (): string => {
+  return theme === 'light' ? 'text-neutral-white' : 'text-primary-50';
+};
+
+const dividerColorClass = getDividerColorClass();
+const textColorClass = getTextColorClass();
+---
+
+<section id={componentId} class="stats-set-stacked" data-sanity-edit-target>
+  <div class={`flex flex-col justify-start content-start m-auto w-full divide-y ${dividerColorClass}`}>
+    {stats.map((stat) => {
+      const statNumber = stat.statsNumber;
+      const statText = stat.statsText;
+      
+      return (
+        <div 
+          class="stat-item flex flex-col items-start py-4"
+          style={`--stat-number-color: ${numberColor};`}
+          data-sanity-edit-target
+        >
+          <div class="stat-number font-extrabold text-3xl md:text-5xl leading-8 md:leading-[3.75rem]">
+            {statNumber}
+          </div>
+          <div class={`stat-text text-xl ${textColorClass}`}>
+            <span>{statText}</span>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</section>
+
+<style>
+  /* Stats Set Stacked - Custom styles */
+  .stats-set-stacked {
+    width: 100%;
+  }
+
+  /* Number color using CSS custom property */
+  .stat-item .stat-number {
+    color: var(--stat-number-color, #0960F6);
+  }
+
+  /* Divider colors */
+  .divide-navy-80 {
+    --tw-divide-opacity: 1;
+    border-color: rgb(1 24 64 / var(--tw-divide-opacity));
+  }
+
+  .divide-navy-80 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgb(1 24 64 / var(--tw-divide-opacity));
+  }
+
+  .divide-white > :not([hidden]) ~ :not([hidden]) {
+    --tw-divide-opacity: 1;
+    border-color: rgb(255 255 255 / var(--tw-divide-opacity));
+  }
+
+  .divide-navy-40 > :not([hidden]) ~ :not([hidden]) {
+    --tw-divide-opacity: 1;
+    border-color: rgb(157 191 251 / var(--tw-divide-opacity));
+  }
+
+  /* Text colors */
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+
+  /* Responsive text sizing for stat number */
+  .stat-number {
+    font-weight: 800;
+  }
+
+  @media (min-width: 768px) {
+    .stat-number {
+      font-size: 3rem;
+      line-height: 3.75rem;
+    }
+  }
+</style>
+

@@ -1,0 +1,209 @@
+---
+/**
+ * CardSegmentation - A grid of feature cards with images, titles, content, and links
+ * Based on HubSpot card-segmentation.module
+ * Features:
+ * - 3-column grid layout on large screens
+ * - Theme options (OnLight, OnDark, GxScore, SMB, Enterprise)
+ * - Cards with image, title, content, and optional link with arrow
+ */
+import { cleanStega } from '../../utils/stega';
+import { createBlockEditInfo, createDataSanityAttrs } from '../../utils/visualEditing';
+
+interface CardLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface CardItem {
+  _key?: string;
+  image?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+  title?: string;
+  content?: string;
+  linkLabel?: string;
+  link?: CardLink;
+}
+
+interface Props {
+  cards?: CardItem[];
+  theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise';
+  // Visual editing
+  sectionKey?: string;
+  documentId?: string;
+  documentType?: string;
+  id?: string;
+}
+
+const {
+  cards = [],
+  theme: rawTheme = 'dark',
+  sectionKey,
+  documentId,
+  documentType,
+  id,
+} = Astro.props;
+
+// Clean stega from style values for CSS
+const theme = cleanStega(rawTheme) || 'dark';
+
+// Create edit info for this section block
+const sectionEditInfo = documentId && documentType && sectionKey
+  ? createBlockEditInfo(documentId, documentType, sectionKey)
+  : null;
+
+// Theme-based styling functions
+function getCardBackgroundClass(): string {
+  switch (theme) {
+    case 'light':
+      return 'bg-primary-60';
+    case 'gxscore':
+      return 'bg-gx-80';
+    case 'smb':
+    case 'enterprise':
+    case 'dark':
+    default:
+      return 'bg-neutral-white';
+  }
+}
+
+function getTextColorClass(): string {
+  switch (theme) {
+    case 'light':
+      return 'text-neutral-white';
+    case 'gxscore':
+      return 'text-gx-80';
+    case 'smb':
+    case 'enterprise':
+    case 'dark':
+    default:
+      return 'text-primary-50';
+  }
+}
+
+function getArrowFillColor(): string {
+  switch (theme) {
+    case 'light':
+      return '#ffffff';
+    case 'gxscore':
+      return '#3C0091';
+    case 'smb':
+    case 'enterprise':
+    case 'dark':
+    default:
+      return '#033180';
+  }
+}
+
+const cardBgClass = getCardBackgroundClass();
+const textColorClass = getTextColorClass();
+const arrowFill = getArrowFillColor();
+---
+
+<dl 
+  id={id ? `cards-segmentation-${id}` : undefined}
+  class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-5 py-2"
+  {...createDataSanityAttrs(sectionEditInfo)}
+>
+  {cards.map((card) => {
+    const imageUrl = card.image?.asset?.url;
+    const imageAlt = cleanStega(card.image?.alt) || cleanStega(card.title) || 'Card image';
+    const cardTitle = card.title;
+    const cardContent = card.content;
+    const linkLabel = card.linkLabel || 'Learn more';
+    const linkHref = card.link?.href;
+    const openInNewTab = card.link?.openInNewTab;
+    const noFollow = card.link?.noFollow;
+    
+    return (
+      <div class={`flex flex-col gap-3 max-w-full ${cardBgClass} w-full h-full box-shadow-onlight-navy-40 rounded-[32px] overflow-hidden`}>
+        {/* Card Image */}
+        {imageUrl && (
+          <div class="w-full [&>img]:w-full [&>img]:object-cover">
+            <img 
+              src={imageUrl} 
+              alt={imageAlt}
+              loading="lazy"
+              class="w-full object-cover"
+            />
+          </div>
+        )}
+        
+        {/* Card Content */}
+        <div class={`flex flex-col gap-2 py-2 px-8 md:px-6 ${textColorClass}`}>
+          {cardTitle && (
+            <span class="text-2xl font-semibold" set:html={cardTitle} />
+          )}
+          {cardContent && (
+            <span set:html={cardContent} />
+          )}
+        </div>
+        
+        {/* Card Link */}
+        {linkHref && (
+          <div class="flex flex-col md:flex-row wrap px-8 md:px-6 gap-3 mt-auto pb-5">
+            <a 
+              class={`relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold text-md transition ease-in-out duration-300 w-full sm:w-auto whitespace-nowrap bg-transparent ${textColorClass} py-2 relative inline-flex items-center gap-2 group`}
+              href={linkHref}
+              target={openInNewTab ? '_blank' : undefined}
+              rel={`${noFollow ? 'nofollow' : ''} ${openInNewTab ? 'noopener noreferrer' : ''}`.trim() || undefined}
+            >
+              <span class={textColorClass}>{linkLabel}</span>
+              <span>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  fill="none" 
+                  class="transition-transform ease-out duration-300 group-hover:translate-x-1"
+                >
+                  <path 
+                    fill={arrowFill}
+                    d="m6.667 4-.94.94L8.78 8l-3.053 3.06.94.94 4-4-4-4Z"
+                  />
+                </svg>
+              </span>
+            </a>
+          </div>
+        )}
+      </div>
+    );
+  })}
+</dl>
+
+<style>
+  /* Box shadow matching HubSpot module */
+  .box-shadow-onlight-navy-40 {
+    box-shadow: 0 4px 24px rgba(1, 24, 64, 0.15);
+  }
+  
+  /* Background colors */
+  .bg-neutral-white {
+    background-color: #ffffff;
+  }
+  
+  .bg-primary-60 {
+    background-color: var(--primary-60, #011840);
+  }
+  
+  .bg-gx-80 {
+    background-color: var(--gx-80, #3C0091);
+  }
+  
+  /* Text colors */
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+  
+  .text-neutral-white {
+    color: #ffffff;
+  }
+  
+  .text-gx-80 {
+    color: var(--gx-80, #3C0091);
+  }
+</style>
+

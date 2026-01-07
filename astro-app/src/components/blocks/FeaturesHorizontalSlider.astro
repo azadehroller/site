@@ -1,0 +1,350 @@
+---
+/**
+ * Features Horizontal Slider Component
+ * A Swiper-based slider with fade effect and custom pagination
+ * Features:
+ * - Autoplay with configurable delay
+ * - Progress bar animation on active slide
+ * - Custom pagination with title, content, and CTA link
+ * - Theme support (OnDark, OnLight, GxScore)
+ */
+import { cleanStega } from "../../utils/stega";
+import { urlFor } from "../../utils/sanity";
+
+interface SlideItem {
+  _key?: string;
+  title?: string;
+  content?: string;
+  image?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+  linkLabel?: string;
+  link?: {
+    href?: string;
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+}
+
+interface Props {
+  slides?: SlideItem[];
+  theme?: 'light' | 'dark' | 'gxscore';
+  autoplayDelay?: number;
+  id?: string;
+}
+
+const {
+  slides: rawSlides = [],
+  theme: rawTheme = 'light',
+  autoplayDelay: rawAutoplayDelay = 5000,
+  id,
+} = Astro.props;
+
+// Clean stega values
+const theme = cleanStega(rawTheme) || 'light';
+const autoplayDelay = rawAutoplayDelay || 5000;
+const slides = rawSlides || [];
+
+// Generate unique ID for this instance
+const componentId = id ? cleanStega(id) : `features-slider-${Math.random().toString(36).slice(2, 9)}`;
+
+// Theme-based colors
+const getProgressBarBg = (): string => {
+  switch (theme) {
+    case 'dark': return '#cccccc';
+    case 'light': return '#F5F8FF';
+    case 'gxscore': return '#f4ebff';
+    default: return '#F5F8FF';
+  }
+};
+
+const getProgressBarActiveFill = (): string => {
+  switch (theme) {
+    case 'dark': return '#ff290c';
+    case 'light': return '#ff290c';
+    case 'gxscore': return '#A554FF';
+    default: return '#ff290c';
+  }
+};
+
+const getTitleColor = (): string => {
+  switch (theme) {
+    case 'dark': return '#ff290c';
+    case 'light': return '#ff290c';
+    case 'gxscore': return '#A554FF';
+    default: return '#ff290c';
+  }
+};
+
+const getTextColor = (): string => {
+  switch (theme) {
+    case 'dark': return '#033180';
+    case 'light': return '#fff';
+    case 'gxscore': return '#A554FF';
+    default: return '#fff';
+  }
+};
+
+const getLinkColor = (): string => {
+  switch (theme) {
+    case 'dark': return '#033180';
+    case 'light': return '#fff';
+    case 'gxscore': return '#3C0091';
+    default: return '#fff';
+  }
+};
+
+const getSvgFill = (): string => {
+  switch (theme) {
+    case 'dark': return '#ff290c';
+    case 'light': return '#ff290c';
+    case 'gxscore': return '#A554FF';
+    default: return '#ff290c';
+  }
+};
+
+// CSS variables for theming
+const cssVars = {
+  '--progress-bar-bg': getProgressBarBg(),
+  '--progress-bar-fill': getProgressBarActiveFill(),
+  '--pag-title-color': getTitleColor(),
+  '--pag-text-color': getTextColor(),
+  '--pag-link-color': getLinkColor(),
+  '--pag-svg-fill': getSvgFill(),
+  '--autoplay-delay': `${autoplayDelay}ms`,
+};
+---
+
+<section 
+  id={componentId}
+  class="features-horizontal-slider container relative"
+  style={Object.entries(cssVars).map(([k, v]) => `${k}: ${v}`).join('; ')}
+  data-autoplay-delay={autoplayDelay}
+  data-sanity-edit-target
+>
+  <!-- Swiper Container -->
+  <div class="swiper-container swiper">
+    <div class="swiper-wrapper">
+      {slides.map((slide, index) => {
+        const imageUrl = slide.image?.asset?._ref 
+          ? urlFor(slide.image.asset._ref).width(1248).height(520).url()
+          : slide.image?.asset?.url;
+        const alt = cleanStega(slide.image?.alt) || cleanStega(slide.title) || `Slide ${index + 1}`;
+        
+        return (
+          <article 
+            class={`swiper-slide slide-${index + 1}`}
+            data-name={cleanStega(slide.title) || ''}
+            data-content={cleanStega(slide.content) || ''}
+            data-link={cleanStega(slide.link?.href) || ''}
+            data-label={cleanStega(slide.linkLabel) || 'Learn more'}
+            data-new-tab={slide.link?.openInNewTab ? 'true' : 'false'}
+            data-no-follow={slide.link?.noFollow ? 'true' : 'false'}
+          >
+            {imageUrl && (
+              <div class="bg-[#FBF8FF] [&>img]:aspect-video [&>img]:w-full [&>img]:object-cover">
+                <img 
+                  src={imageUrl} 
+                  alt={alt}
+                  class="object-cover w-full h-full"
+                  width="1248"
+                  height="520"
+                  loading="lazy"
+                />
+              </div>
+            )}
+          </article>
+        );
+      })}
+    </div>
+    <!-- Pagination -->
+    <div class="swiper-pagination pag grid grid-cols-1 lg:grid-cols-3 gap-5 md:h-auto"></div>
+  </div>
+</section>
+
+<style>
+  .features-horizontal-slider {
+    overflow: visible;
+  }
+
+  .features-horizontal-slider .swiper {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .features-horizontal-slider .swiper-slide {
+    width: 100% !important;
+  }
+
+  .features-horizontal-slider .swiper-pagination {
+    position: relative;
+    bottom: -48px;
+  }
+
+  .features-horizontal-slider :global(.swiper-pagination-bullet) {
+    height: auto;
+    border-radius: 0;
+    width: auto;
+    text-align: left;
+    position: relative;
+    opacity: unset;
+    background: transparent;
+    margin: 0;
+  }
+
+  .features-horizontal-slider :global(.pag-content .pag-progress-bar) {
+    height: 4px;
+    width: auto;
+    position: relative;
+    overflow: hidden;
+    background: var(--progress-bar-bg);
+  }
+
+  .features-horizontal-slider :global(.pag-content .pag-progress-bar::before) {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+  }
+
+  .features-horizontal-slider :global(.swiper-pagination-bullet-active .pag-content .pag-progress-bar) {
+    background: var(--progress-bar-bg);
+  }
+
+  .features-horizontal-slider :global(.swiper-pagination-bullet-active .pag-content .pag-progress-bar::before) {
+    background: var(--progress-bar-fill);
+    animation: slide-progress var(--autoplay-delay) cubic-bezier(.3,0,.3,1) forwards;
+  }
+
+  @keyframes slide-progress {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  .features-horizontal-slider :global(.pag-title) {
+    color: var(--pag-title-color);
+  }
+
+  .features-horizontal-slider :global(.pag-text) {
+    color: var(--pag-text-color);
+  }
+
+  .features-horizontal-slider :global(.pag-link) {
+    color: var(--pag-link-color);
+  }
+
+  .features-horizontal-slider :global(.pag-svg rect) {
+    fill: var(--pag-svg-fill);
+  }
+</style>
+
+<script>
+  // Dynamic import for Swiper
+  async function initFeaturesSlider() {
+    // Check if Swiper is already loaded
+    if (typeof window.Swiper === 'undefined') {
+      // Load Swiper CSS
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/swiper@8/swiper-bundle.min.css';
+      document.head.appendChild(link);
+      
+      // Load Swiper JS
+      await new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/swiper@8/swiper-bundle.min.js';
+        script.onload = resolve;
+        document.head.appendChild(script);
+      });
+    }
+
+    // Initialize all feature sliders on the page
+    document.querySelectorAll('.features-horizontal-slider').forEach((container) => {
+      const swiperEl = container.querySelector('.swiper');
+      const slides = container.querySelectorAll('.swiper-slide');
+      const autoplayDelay = parseInt(container.getAttribute('data-autoplay-delay') || '5000');
+      
+      // Build slide data from data attributes
+      const slideData: Record<number, { name: string; content: string; link: string; label: string; newTab: boolean; noFollow: boolean }> = {};
+      slides.forEach((slide, index) => {
+        const el = slide as HTMLElement;
+        slideData[index] = {
+          name: el.dataset.name || '',
+          content: el.dataset.content || '',
+          link: el.dataset.link || '',
+          label: el.dataset.label || 'Learn more',
+          newTab: el.dataset.newTab === 'true',
+          noFollow: el.dataset.noFollow === 'true',
+        };
+      });
+
+      // Initialize Swiper
+      new window.Swiper(swiperEl as HTMLElement, {
+        effect: 'fade',
+        fadeEffect: {
+          crossFade: true,
+        },
+        autoHeight: true,
+        autoplay: {
+          delay: autoplayDelay,
+          disableOnInteraction: false,
+        },
+        loop: true,
+        watchSlidesProgress: true,
+        pagination: {
+          el: container.querySelector('.pag') as HTMLElement,
+          clickable: true,
+          renderBullet: function(index: number, className: string) {
+            const slide = slideData[index];
+            if (!slide) return '';
+            
+            const target = slide.newTab ? ' target="_blank"' : '';
+            const rel = slide.noFollow ? ' rel="nofollow noopener"' : slide.newTab ? ' rel="noopener"' : '';
+            
+            return `
+              <div class="flex flex-col gap-3">
+                <div class="pag-container ${className}">
+                  <div class="pag-content flex flex-col gap-3 h-full cursor-auto">
+                    <div class="pag-progress-bar"></div>
+                    <div class="pag-title text-2xl font-semibold">${slide.name}</div>
+                    <div class="pag-text text-base">${slide.content}</div>
+                  </div>
+                </div>
+                <a class="inline-flex items-center pag-link text-base font-semibold mt-auto w-max group" href="${slide.link}"${target}${rel}>
+                  <span>${slide.label}</span>
+                  <span>
+                    <svg class="pag-svg mr-0 ml-2 transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+                      <rect width="40" height="40" rx="20"/>
+                      <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+            `;
+          },
+        },
+      });
+    });
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFeaturesSlider);
+  } else {
+    initFeaturesSlider();
+  }
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initFeaturesSlider);
+</script>
+

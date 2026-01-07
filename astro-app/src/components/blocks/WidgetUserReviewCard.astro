@@ -1,0 +1,300 @@
+---
+/**
+ * WidgetUserReviewCard - A styled card component with heading, text, and badge images
+ * Displays as a row with content on the left (3/4) and badges on the right (1/4)
+ * Features dark blue gradient background with rounded corners
+ */
+import { cleanStega } from '../../utils/stega';
+import { createBlockEditInfo, createDataSanityAttrs } from '../../utils/visualEditing';
+
+interface BadgeItem {
+  _key?: string;
+  image?: {
+    asset?: { _ref?: string; url?: string };
+  };
+  alt?: string;
+  link?: string;
+}
+
+interface Props {
+  // Content
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  // Badges
+  badges?: BadgeItem[];
+  // Styles
+  theme?: 'light' | 'dark' | 'gxscore';
+  textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  eyebrowType?: 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
+  textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  // Visual editing
+  sectionKey?: string;
+  documentId?: string;
+  documentType?: string;
+}
+
+const {
+  // Content
+  eyebrow,
+  title = 'An established partner with a bold outlook',
+  text,
+  // Badges
+  badges,
+  // Styles
+  theme = 'dark',
+  textAlignment = 'LEFT',
+  eyebrowType = 'div',
+  headingType = 'h3',
+  displayType = 'h3',
+  textType = 'lg',
+  // Visual editing
+  sectionKey,
+  documentId,
+  documentType,
+} = Astro.props;
+
+// Create edit info for this section block
+const sectionEditInfo = documentId && documentType && sectionKey
+  ? createBlockEditInfo(documentId, documentType, sectionKey)
+  : null;
+
+// Clean stega from style values for CSS
+const cleanTheme = cleanStega(theme) || 'dark';
+const cleanAlignment = cleanStega(textAlignment) || 'LEFT';
+const cleanEyebrowType = cleanStega(eyebrowType) || 'div';
+const cleanHeadingType = cleanStega(headingType) || 'h3';
+const cleanDisplayType = cleanStega(displayType) || 'h3';
+const cleanTextType = cleanStega(textType) || 'lg';
+
+// Theme-based text colors
+const getTextColor = (theme: string) => {
+  switch (theme) {
+    case 'dark':
+      return 'text-neutral-white';
+    case 'light':
+      return 'text-primary-50';
+    case 'gxscore':
+      return 'text-gx-80';
+    default:
+      return 'text-neutral-white';
+  }
+};
+
+const getEyebrowColor = (theme: string) => {
+  switch (theme) {
+    case 'dark':
+      return 'text-secondary-50';
+    case 'light':
+      return 'text-secondary-50';
+    case 'gxscore':
+      return 'text-gx-90';
+    default:
+      return 'text-secondary-50';
+  }
+};
+
+const textColor = getTextColor(cleanTheme);
+const eyebrowColor = getEyebrowColor(cleanTheme);
+
+// Text alignment class
+const getTextAlignmentClass = (alignment: string) => {
+  switch (alignment) {
+    case 'LEFT':
+      return 'text-left';
+    case 'CENTER':
+      return 'text-center';
+    case 'RIGHT':
+      return 'text-right';
+    default:
+      return 'text-left';
+  }
+};
+
+const textAlignClass = getTextAlignmentClass(cleanAlignment);
+
+// Display type class for heading size
+const displayClass = cleanDisplayType ? `${cleanDisplayType}-heading` : '';
+
+// Text size class
+const textSizeClass = `text-${cleanTextType}`;
+
+// Dynamic heading tag
+const HeadingTag = cleanHeadingType as keyof HTMLElementTagNameMap;
+const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
+---
+
+<div 
+  class="widget-user-review-card flex flex-col lg:flex-row lg:items-center gap-4 box-shadow-ondark-blue-10-nohover rounded-3xl p-6 bg-user-review bg-cover"
+  {...createDataSanityAttrs(sectionEditInfo)}
+>
+  <!-- Header section - 3/4 width on desktop -->
+  <header class:list={["flex flex-col gap-4 lg:w-3/4", textAlignClass, textColor]}>
+    {eyebrow && (
+      <EyebrowTag 
+        class:list={[eyebrowColor, "uppercase font-extrabold text-sm my-0"]}
+        data-sanity-edit-target
+      >
+        {eyebrow}
+      </EyebrowTag>
+    )}
+    
+    <div class="my-0">
+      <HeadingTag 
+        class:list={["my-0", displayClass]}
+        data-sanity-edit-target
+      >
+        {title}
+      </HeadingTag>
+    </div>
+    
+    {text && (
+      <div 
+        class:list={[textSizeClass, "[&>ul]:list-disc [&>ul]:list-inside [&>ul]:mt-4 [&>ul>li]:ml-2"]}
+        data-sanity-edit-target
+      >
+        <span>{text}</span>
+      </div>
+    )}
+  </header>
+  
+  <!-- Badges section - 1/4 width on desktop -->
+  {badges && badges.length > 0 && (
+    <div class="flex lg:justify-end gap-4 lg:w-1/4">
+      {badges.map((badge) => {
+        // Support multiple possible URL paths from Sanity
+        const imageUrl = badge.image?.asset?.url || badge.image?.url || '';
+        const badgeLink = cleanStega(badge.link);
+        const badgeAlt = cleanStega(badge.alt) || 'Badge';
+        
+        return imageUrl ? (
+          <div>
+            {badgeLink ? (
+              <a 
+                href={badgeLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                aria-label={badgeAlt}
+              >
+                <img
+                  src={imageUrl}
+                  alt={badgeAlt}
+                  loading="lazy"
+                  width="116"
+                  height="183"
+                />
+              </a>
+            ) : (
+              <img
+                src={imageUrl}
+                alt={badgeAlt}
+                loading="lazy"
+                width="116"
+                height="183"
+              />
+            )}
+          </div>
+        ) : (
+          // Fallback: show placeholder when image URL is missing
+          <div class="badge-item badge-placeholder" title={`Badge: ${badgeAlt} (image missing)`}>
+            <div class="badge-placeholder-box">
+              <span>🖼️</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+</div>
+
+<style>
+  /* Background gradient for the card */
+  .bg-user-review {
+    background-image : url(/images/user-review-widget.webp);
+  }
+
+  /* Card shadow */
+  .box-shadow-ondark-blue-10-nohover {
+    box-shadow: 0 4px 24px rgba(1, 24, 64, 0.25);
+  }
+
+  /* Text colors */
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #011840);
+  }
+
+  .text-secondary-50 {
+    color: var(--secondary-50, #6366f1);
+  }
+
+  .text-gx-80 {
+    color: var(--gx-80, #374151);
+  }
+
+  .text-gx-90 {
+    color: var(--gx-90, #1f2937);
+  }
+
+  /* Heading display sizes */
+  .h1-heading {
+    font-size: 3rem;
+    line-height: 1.1;
+    font-weight: 700;
+  }
+
+  .h2-heading {
+    font-size: 2.25rem;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .h3-heading {
+    font-size: 1.875rem;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .h4-heading {
+    font-size: 1.5rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .h5-heading {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .h6-heading {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .s8-heading {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  /* Badge placeholder for missing images */
+  .badge-placeholder-box {
+    width: 80px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+</style>
+

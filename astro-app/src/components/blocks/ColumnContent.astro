@@ -20,7 +20,13 @@ import FeaturesSelector from "../globals/FeaturesSelector.astro";
 import FAQs from "./FAQs.astro";
 import ResultsList from "./ResultsList.astro";
 import ComparisonTable from "./ComparisonTable.astro";
-import type { ColumnContent as ColumnContentType, TextBlock, ImageBlock, ImageVideoModal as ImageVideoModalType, RotatingTextBlock, ButtonStack as ButtonStackType, SingleButton as SingleButtonType, LogoSet as LogoSetType, LogoSetReference, StatsSet as StatsSetType, QuoteBlock as QuoteBlockType, WidgetStatsReference, WidgetUserReviewsReference, TestimonialCarouselReference, FeaturesStackedContent as FeaturesStackedContentType, HeadingComposition as HeadingCompositionType, AdvancedImage as AdvancedImageType, TrustedPartner as TrustedPartnerType, HubspotFormReference, IndustrySelector as IndustrySelectorType, FeaturesSelectorGlobalReference, FAQs as FAQsType, ResultsList as ResultsListType, ComparisonTable as ComparisonTableType } from "../../utils/sanity";
+import FeaturesPricingCard from "./FeaturesPricingCard.astro";
+import FeaturesHorizontalSlider from "./FeaturesHorizontalSlider.astro";
+import CardSegmentation from "./CardSegmentation.astro";
+import IndustrySelectorGlobal from "../globals/IndustrySelectorGlobal.astro";
+import WidgetUserReviewCard from "./WidgetUserReviewCard.astro";
+import StatsSetStackedGlobal from "../globals/StatsSetStackedGlobal.astro";
+import type { ColumnContent as ColumnContentType, TextBlock, ImageBlock, ImageVideoModal as ImageVideoModalType, RotatingTextBlock, ButtonStack as ButtonStackType, SingleButton as SingleButtonType, LogoSet as LogoSetType, LogoSetReference, StatsSet as StatsSetType, QuoteBlock as QuoteBlockType, WidgetStatsReference, WidgetUserReviewsReference, TestimonialCarouselReference, FeaturesStackedContent as FeaturesStackedContentType, HeadingComposition as HeadingCompositionType, AdvancedImage as AdvancedImageType, TrustedPartner as TrustedPartnerType, HubspotFormReference, IndustrySelector as IndustrySelectorType, FeaturesSelectorGlobalReference, FAQs as FAQsType, ResultsList as ResultsListType, ComparisonTable as ComparisonTableType, FeaturesPricingCard as FeaturesPricingCardType, FeaturesHorizontalSlider as FeaturesHorizontalSliderType, CardSegmentation as CardSegmentationType, IndustrySelectorGlobal as IndustrySelectorGlobalType, IndustrySelectorGlobalReference as IndustrySelectorGlobalReferenceType, WidgetUserReviewCard as WidgetUserReviewCardType, StatsSetStackedGlobalReference as StatsSetStackedGlobalReferenceType } from "../../utils/sanity";
 import { urlFor } from "../../utils/image";
 import { cleanStega } from "../../utils/stega";
 import { createBlockEditInfo, createDataSanityAttrs, type SanityEditInfo } from "../../utils/visualEditing";
@@ -432,6 +438,105 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
           />
         </div>
       );
+    } else if (item._type === 'featuresPricingCard') {
+      const pricingCardData = item as FeaturesPricingCardType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <FeaturesPricingCard
+            cards={pricingCardData.cards}
+            alignment={cleanStega(pricingCardData.alignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined}
+            buttonStyle={cleanStega(pricingCardData.buttonStyle) as 'primary' | 'secondary' | 'tertiary' | 'ghost' | undefined}
+            id={cleanStega(pricingCardData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'featuresHorizontalSlider') {
+      const sliderData = item as FeaturesHorizontalSliderType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <FeaturesHorizontalSlider
+            slides={sliderData.slides}
+            theme={cleanStega(sliderData.theme) as 'light' | 'dark' | 'gxscore' | undefined}
+            autoplayDelay={sliderData.autoplayDelay}
+            id={cleanStega(sliderData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'cardSegmentation') {
+      const cardSegmentationData = item as CardSegmentationType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <CardSegmentation
+            cards={cardSegmentationData.cards}
+            theme={cleanStega(cardSegmentationData.theme) as 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | undefined}
+            id={cleanStega(cardSegmentationData._key)}
+            sectionKey={sectionKey}
+            documentId={documentId}
+            documentType={documentType}
+          />
+        </div>
+      );
+    } else if (item._type === 'industrySelectorGlobal') {
+      const industrySelectorGlobalData = item as IndustrySelectorGlobalType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <IndustrySelectorGlobal
+            heading={industrySelectorGlobalData.heading}
+            industries={industrySelectorGlobalData.industries}
+            ctaLabel={industrySelectorGlobalData.ctaLabel}
+            ctaLink={industrySelectorGlobalData.ctaLink}
+            theme={cleanStega(industrySelectorGlobalData.theme) as 'light' | 'dark' | undefined}
+            id={cleanStega(industrySelectorGlobalData._key)}
+          />
+        </div>
+      );
+    } else if (item._type === 'industrySelectorGlobalReference') {
+      const refData = item as IndustrySelectorGlobalReferenceType;
+      const globalData = refData.reference;
+      return globalData ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <IndustrySelectorGlobal
+            heading={globalData.heading}
+            industries={globalData.industries}
+            ctaLabel={globalData.ctaLabel}
+            ctaLink={globalData.ctaLink}
+            theme={cleanStega(globalData.theme) as 'light' | 'dark' | undefined}
+            id={cleanStega(globalData._id)}
+          />
+        </div>
+      ) : null;
+    } else if (item._type === 'widgetUserReviewCard') {
+      const cardData = item as WidgetUserReviewCardType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <WidgetUserReviewCard
+            eyebrow={cardData.eyebrow}
+            title={cardData.title}
+            text={cardData.text}
+            badges={cardData.badges}
+            theme={cleanStega(cardData.theme) as 'light' | 'dark' | 'gxscore' | undefined}
+            textAlignment={cleanStega(cardData.textAlignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined}
+            eyebrowType={cleanStega(cardData.eyebrowType) as 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}
+            headingType={cleanStega(cardData.headingType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}
+            displayType={cleanStega(cardData.displayType) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8' | undefined}
+            textType={cleanStega(cardData.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined}
+          />
+        </div>
+      );
+    } else if (item._type === 'statsSetStackedGlobalReference') {
+      const refData = item as StatsSetStackedGlobalReferenceType;
+      const globalData = refData.statsSetStackedGlobal;
+      return globalData ? (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <StatsSetStackedGlobal
+            stats={globalData.stats}
+            theme={cleanStega(globalData.theme) as 'light' | 'dark' | undefined}
+            numberColor={cleanStega(globalData.numberColor)}
+            dividerColor={cleanStega(globalData.dividerColor) as 'navy-80' | 'white' | 'navy-40' | undefined}
+            id={cleanStega(globalData._id)}
+          />
+        </div>
+      ) : null;
     }
   })}
 </div>
