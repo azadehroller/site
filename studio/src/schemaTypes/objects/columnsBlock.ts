@@ -1,9 +1,89 @@
 import {defineType, defineField} from 'sanity'
+import {createElement} from 'react'
+import {
+  DocumentTextIcon,
+  BlockContentIcon,
+  ImageIcon,
+  PlayIcon,
+  LinkIcon,
+  StackIcon,
+  BarChartIcon,
+  CommentIcon,
+  StarIcon,
+  SparklesIcon,
+  UsersIcon,
+  DocumentIcon,
+  EarthGlobeIcon,
+  HelpCircleIcon,
+  UlistIcon,
+  ThListIcon,
+  CreditCardIcon,
+  DashboardIcon,
+  ComposeIcon,
+  BulbOutlineIcon,
+  SyncIcon,
+  CogIcon,
+} from '@sanity/icons'
 
 /**
  * Columns Block - a reusable layout component for pages
  * Supports 1, 2, 3, 4 column layouts plus 1/3 and 3/1 asymmetric layouts
  */
+
+// ==========================================
+// BLOCK DEFINITIONS - Organized by category
+// ==========================================
+
+// Regular Blocks (inline content)
+const regularBlocks = [
+  // Text & Content
+  {type: 'headingComposition', title: '📝 Heading Composition', icon: BlockContentIcon},
+  {type: 'textBlock', title: '📄 Text Block', icon: DocumentTextIcon},
+  {type: 'rotatingTextBlock', title: '🔄 Rotating Text', icon: SyncIcon},
+  // Media
+  {type: 'advancedImage', title: '🖼️ Advanced Image', icon: ImageIcon},
+  {type: 'image', title: '📷 Image (Simple)', icon: ImageIcon},
+  {type: 'imageVideoModal', title: '▶️ Image Video Modal', icon: PlayIcon},
+  // Buttons & Links
+  {type: 'buttonStack', title: '🔘 Button Stack', icon: StackIcon},
+  {type: 'button', title: '🔗 Button (Single)', icon: LinkIcon},
+  // Statistics & Data
+  {type: 'statsSet', title: '📊 Stats Set', icon: BarChartIcon},
+  // Quotes & Testimonials
+  {type: 'quoteBlock', title: '💬 Quote Block', icon: CommentIcon},
+  // Features & Content
+  {type: 'featuresStackedContent', title: '✨ Features Stacked Content', icon: SparklesIcon},
+  {type: 'trustedPartner', title: '🤝 Trusted Partner', icon: UsersIcon},
+  {type: 'industrySelector', title: '🏢 Industry Selector', icon: EarthGlobeIcon},
+  // Lists & Tables
+  {type: 'resultsList', title: '📋 Results List', icon: UlistIcon},
+  {type: 'faqs', title: '❓ FAQs', icon: HelpCircleIcon},
+  {type: 'comparisonTable', title: '📊 Comparison Table', icon: ThListIcon},
+  // Sliders
+  {type: 'featuresHorizontalSlider', title: '🎠 Features Horizontal Slider', icon: PlayIcon},
+  // Cards
+  {type: 'featuresPricingCard', title: '💰 Features Pricing Cards', icon: CreditCardIcon},
+  {type: 'cardSegmentation', title: '🎴 Card Segmentation', icon: DashboardIcon},
+  {type: 'widgetUserReviewCard', title: '⭐ User Review Card', icon: StarIcon},
+  // Forms
+  {type: 'hubspotFormReference', title: '📝 HubSpot Form', icon: DocumentIcon},
+  // Inline variants (not global references)
+  {type: 'industrySelectorGlobal', title: '🏢 Industry Selector (Inline)', icon: EarthGlobeIcon},
+]
+
+// Global Blocks (references to singleton documents)
+const globalBlocks = [
+  {type: 'logoSetReference', title: '🏷️ Logo Set (Global)', icon: CogIcon},
+  {type: 'widgetStatsReference', title: '📈 Widget Stats (Global)', icon: BarChartIcon},
+  {type: 'widgetUserReviewsReference', title: '⭐ Widget User Reviews (Global)', icon: StarIcon},
+  {type: 'testimonialCarouselReference', title: '💬 Testimonial Carousel (Global)', icon: CommentIcon},
+  {type: 'featuresSelectorGlobalReference', title: '✨ Features Selector (Global)', icon: SparklesIcon},
+  {type: 'industrySelectorGlobalReference', title: '🌍 Industry Selector (Global)', icon: EarthGlobeIcon},
+  {type: 'statsSetStackedGlobalReference', title: '📊 Stats Set Stacked (Global)', icon: BarChartIcon},
+]
+
+// Combined blocks for column arrays
+const allColumnBlocks = [...regularBlocks, ...globalBlocks]
 
 export default defineType({
   name: 'columnsBlock',
@@ -113,6 +193,60 @@ export default defineType({
       },
       initialValue: 'cover',
       hidden: ({parent}) => !parent?.backgroundImage,
+    }),
+    // Background Gradient Settings
+    defineField({
+      name: 'backgroundGradient',
+      title: 'Background Gradient',
+      type: 'string',
+      description: 'Enable a linear gradient background (top to bottom)',
+      group: 'background',
+      options: {
+        list: [
+          {title: 'None', value: 'none'},
+          {title: 'Custom Gradient', value: 'custom'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'none',
+    }),
+    defineField({
+      name: 'gradientColorStart',
+      title: 'Gradient Start Color (Top)',
+      type: 'string',
+      description: 'Hex color for the top of the gradient (e.g., #033180)',
+      group: 'background',
+      hidden: ({parent}) => parent?.backgroundGradient !== 'custom',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const parent = context.parent as {backgroundGradient?: string}
+          if (parent?.backgroundGradient === 'custom' && !value) {
+            return 'Gradient start color is required when gradient is enabled'
+          }
+          if (value && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+            return 'Please enter a valid hex color (e.g., #033180)'
+          }
+          return true
+        }),
+    }),
+    defineField({
+      name: 'gradientColorEnd',
+      title: 'Gradient End Color (Bottom)',
+      type: 'string',
+      description: 'Hex color for the bottom of the gradient (e.g., #011840)',
+      group: 'background',
+      hidden: ({parent}) => parent?.backgroundGradient !== 'custom',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const parent = context.parent as {backgroundGradient?: string}
+          if (parent?.backgroundGradient === 'custom' && !value) {
+            return 'Gradient end color is required when gradient is enabled'
+          }
+          if (value && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+            return 'Please enter a valid hex color (e.g., #011840)'
+          }
+          return true
+        }),
     }),
     // Spacing Settings
     defineField({
@@ -284,30 +418,7 @@ export default defineType({
       title: 'Column 1',
       type: 'array',
       group: 'content',
-      of: [
-        {type: 'textBlock', title: 'Text Block'},
-        {type: 'headingComposition', title: 'Heading and Text Block'},
-        {type: 'rotatingTextBlock', title: 'Rotating Text'},
-        {type: 'imageVideoModal', title: 'Image Video Modal'},
-        {type: 'image', title: 'Image'},
-        {type: 'advancedImage', title: 'Advanced Image'},
-        {type: 'buttonStack', title: 'Button Stack'},
-        {type: 'button', title: 'Button'},
-        {type: 'logoSetReference', title: 'Logo Set (Global)'},
-        {type: 'statsSet', title: 'Stats Set'},
-        {type: 'quoteBlock', title: 'Quote'},
-        {type: 'widgetStatsReference', title: 'Widget Stats'},
-        {type: 'widgetUserReviewsReference', title: 'Widget User Reviews'},
-        {type: 'testimonialCarouselReference', title: 'Testimonial Carousel'},
-        {type: 'featuresStackedContent', title: 'Features Stacked Content'},
-        {type: 'trustedPartner', title: 'Trusted Partner'},
-        {type: 'hubspotFormReference', title: 'HubSpot Form'},
-        {type: 'industrySelector', title: 'Industry Selector'},
-        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
-        {type: 'faqs', title: 'FAQs'},
-        {type: 'resultsList', title: 'Results List'},
-        {type: 'comparisonTable', title: 'Comparison Table'},
-      ],
+      of: allColumnBlocks,
       description: 'Add content blocks to this column',
     }),
     defineField({
@@ -336,30 +447,7 @@ export default defineType({
       title: 'Column 2',
       type: 'array',
       group: 'content',
-      of: [
-        {type: 'textBlock', title: 'Text Block'},
-        {type: 'headingComposition', title: 'Heading and Text Block'},
-        {type: 'rotatingTextBlock', title: 'Rotating Text'},
-        {type: 'imageVideoModal', title: 'Image Video Modal'},
-        {type: 'image', title: 'Image'},
-        {type: 'advancedImage', title: 'Advanced Image'},
-        {type: 'buttonStack', title: 'Button Stack'},
-        {type: 'button', title: 'Button'},
-        {type: 'logoSetReference', title: 'Logo Set (Global)'},
-        {type: 'statsSet', title: 'Stats Set'},
-        {type: 'quoteBlock', title: 'Quote'},
-        {type: 'widgetStatsReference', title: 'Widget Stats'},
-        {type: 'widgetUserReviewsReference', title: 'Widget User Reviews'},
-        {type: 'testimonialCarouselReference', title: 'Testimonial Carousel'},
-        {type: 'featuresStackedContent', title: 'Features Stacked Content'},
-        {type: 'trustedPartner', title: 'Trusted Partner'},
-        {type: 'hubspotFormReference', title: 'HubSpot Form'},
-        {type: 'industrySelector', title: 'Industry Selector'},
-        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
-        {type: 'faqs', title: 'FAQs'},
-        {type: 'resultsList', title: 'Results List'},
-        {type: 'comparisonTable', title: 'Comparison Table'},
-      ],
+      of: allColumnBlocks,
       description: 'Add content blocks to this column',
       hidden: ({parent}) => parent?.layout === '1',
     }),
@@ -398,30 +486,7 @@ export default defineType({
       title: 'Column 3',
       type: 'array',
       group: 'content',
-      of: [
-        {type: 'textBlock', title: 'Text Block'},
-        {type: 'headingComposition', title: 'Heading and Text Block'},
-        {type: 'rotatingTextBlock', title: 'Rotating Text'},
-        {type: 'imageVideoModal', title: 'Image Video Modal'},
-        {type: 'image', title: 'Image'},
-        {type: 'advancedImage', title: 'Advanced Image'},
-        {type: 'buttonStack', title: 'Button Stack'},
-        {type: 'button', title: 'Button'},
-        {type: 'logoSetReference', title: 'Logo Set (Global)'},
-        {type: 'statsSet', title: 'Stats Set'},
-        {type: 'quoteBlock', title: 'Quote'},
-        {type: 'widgetStatsReference', title: 'Widget Stats'},
-        {type: 'widgetUserReviewsReference', title: 'Widget User Reviews'},
-        {type: 'testimonialCarouselReference', title: 'Testimonial Carousel'},
-        {type: 'featuresStackedContent', title: 'Features Stacked Content'},
-        {type: 'trustedPartner', title: 'Trusted Partner'},
-        {type: 'hubspotFormReference', title: 'HubSpot Form'},
-        {type: 'industrySelector', title: 'Industry Selector'},
-        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
-        {type: 'faqs', title: 'FAQs'},
-        {type: 'resultsList', title: 'Results List'},
-        {type: 'comparisonTable', title: 'Comparison Table'},
-      ],
+      of: allColumnBlocks,
       description: 'Add content blocks to this column',
       hidden: ({parent}) => !['3', '4'].includes(parent?.layout),
     }),
@@ -460,30 +525,7 @@ export default defineType({
       title: 'Column 4',
       type: 'array',
       group: 'content',
-      of: [
-        {type: 'textBlock', title: 'Text Block'},
-        {type: 'headingComposition', title: 'Heading and Text Block'},
-        {type: 'rotatingTextBlock', title: 'Rotating Text'},
-        {type: 'imageVideoModal', title: 'Image Video Modal'},
-        {type: 'image', title: 'Image'},
-        {type: 'advancedImage', title: 'Advanced Image'},
-        {type: 'buttonStack', title: 'Button Stack'},
-        {type: 'button', title: 'Button'},
-        {type: 'logoSetReference', title: 'Logo Set (Global)'},
-        {type: 'statsSet', title: 'Stats Set'},
-        {type: 'quoteBlock', title: 'Quote'},
-        {type: 'widgetStatsReference', title: 'Widget Stats'},
-        {type: 'widgetUserReviewsReference', title: 'Widget User Reviews'},
-        {type: 'testimonialCarouselReference', title: 'Testimonial Carousel'},
-        {type: 'featuresStackedContent', title: 'Features Stacked Content'},
-        {type: 'trustedPartner', title: 'Trusted Partner'},
-        {type: 'hubspotFormReference', title: 'HubSpot Form'},
-        {type: 'industrySelector', title: 'Industry Selector'},
-        {type: 'featuresSelectorGlobalReference', title: 'Features Selector (Global)'},
-        {type: 'faqs', title: 'FAQs'},
-        {type: 'resultsList', title: 'Results List'},
-        {type: 'comparisonTable', title: 'Comparison Table'},
-      ],
+      of: allColumnBlocks,
       description: 'Add content blocks to this column',
       hidden: ({parent}) => parent?.layout !== '4',
     }),
@@ -527,87 +569,47 @@ export default defineType({
       column4: 'column4',
     },
     prepare({layout, column1, column2, column3, column4}) {
-      // Map block types to human-readable labels
-      const blockTypeLabels: Record<string, string> = {
-        textBlock: 'Text Block',
-        headingComposition: 'Heading Composition',
-        rotatingTextBlock: 'Rotating Text',
-        imageVideoModal: 'Image Video Modal',
-        image: 'Image',
-        advancedImage: 'Advanced Image',
-        buttonStack: 'Button Stack',
-        button: 'Button',
-        logoSetReference: 'Logo Set (Global)',
-        statsSet: 'Stats Set',
-        quoteBlock: 'Quote',
-        widgetStatsReference: 'Widget Stats',
-        widgetUserReviewsReference: 'Widget User Reviews',
-        testimonialCarouselReference: 'Testimonial Carousel',
-        featuresStackedContent: 'Features Stacked Content',
-        trustedPartner: 'Trusted Partner',
-        hubspotFormReference: 'HubSpot Form',
-        industrySelector: 'Industry Selector',
-        featuresSelectorGlobalReference: 'Features Selector (Global)',
-        faqs: 'FAQs',
-        resultsList: 'Results List',
-        comparisonTable: 'Comparison Table',
-      }
-
-      // Helper to get block labels from a column array
-      const getColumnBlockLabels = (columnBlocks: Array<{_type: string}> | undefined): string => {
-        if (!columnBlocks || columnBlocks.length === 0) return 'Empty'
-        return columnBlocks
-          .map((block) => blockTypeLabels[block._type] || block._type)
-          .join(', ')
-      }
-
-      // Build the title based on which columns have content
-      const isSingleColumn = layout === '1'
-
-      // For single column layout, just show the block names without "Column 1:" prefix
-      if (isSingleColumn) {
-        const title = column1 && column1.length > 0 
-          ? getColumnBlockLabels(column1) 
-          : 'Columns Block (Empty)'
-        
-        return {
-          title,
-          subtitle: '1 Column',
-        }
-      }
-
-      // For multi-column layouts, show "Column X:" prefix
-      const columnLabels: string[] = []
-
-      if (column1 && column1.length > 0) {
-        columnLabels.push(`Column 1: ${getColumnBlockLabels(column1)}`)
-      }
-      if (column2 && column2.length > 0) {
-        columnLabels.push(`Column 2: ${getColumnBlockLabels(column2)}`)
-      }
-      if (column3 && column3.length > 0 && ['3', '4'].includes(layout)) {
-        columnLabels.push(`Column 3: ${getColumnBlockLabels(column3)}`)
-      }
-      if (column4 && column4.length > 0 && layout === '4') {
-        columnLabels.push(`Column 4: ${getColumnBlockLabels(column4)}`)
-      }
-
-      const title = columnLabels.length > 0 ? columnLabels.join(' + ') : 'Columns Block (Empty)'
-
       const layoutLabels: Record<string, string> = {
         '1': '1 Column',
         '2': '2 Columns',
         '3': '3 Columns',
         '4': '4 Columns',
-        '1/3': '2 Columns (1/3 + 2/3)',
-        '3/1': '2 Columns (2/3 + 1/3)',
-        '1/4': '2 Columns (1/4 + 3/4)',
-        '4/1': '2 Columns (3/4 + 1/4)',
+        '1/3': '1/3 + 2/3',
+        '3/1': '2/3 + 1/3',
+        '1/4': '1/4 + 3/4',
+        '4/1': '3/4 + 1/4',
       }
 
+      // Get first block type name from each column
+      const getColumnLabel = (col: Array<{_type: string}> | undefined, num: number): string => {
+        if (!col || col.length === 0) return ''
+        const firstType = col[0]?._type || 'block'
+        const count = col.length
+        return `Col${num}: ${firstType}${count > 1 ? ` +${count - 1}` : ''}`
+      }
+
+      const parts: string[] = []
+      if (column1?.length) parts.push(getColumnLabel(column1, 1))
+      if (column2?.length) parts.push(getColumnLabel(column2, 2))
+      if (column3?.length) parts.push(getColumnLabel(column3, 3))
+      if (column4?.length) parts.push(getColumnLabel(column4, 4))
+
+      // Use a static preview image for columnsBlock
+      // Save your screenshot to: studio/public/columns-preview.png
+      const previewImageUrl = '/columns-preview.png'
+
       return {
-        title,
-        subtitle: layoutLabels[layout] || layout,
+        title: layoutLabels[layout] || 'Columns',
+        subtitle: parts.join(' | ') || 'Empty',
+        media: createElement('img', {
+          src: previewImageUrl,
+          alt: 'Columns block',
+          style: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          },
+        }),
       }
     },
   },
