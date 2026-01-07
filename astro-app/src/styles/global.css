@@ -7,6 +7,81 @@
 @source "../templates/**/*.astro";
 @source "../components/**/*.astro";
 
+/* Custom maxmd breakpoint utilities (min-width: 992px) - must be in @layer utilities for proper cascade */
+@layer utilities {
+  @media screen and (min-width: 992px) {
+    /* Display */
+    .maxmd\:block {
+      display: block;
+    }
+    .maxmd\:hidden {
+      display: none;
+    }
+    .maxmd\:flex {
+      display: flex;
+    }
+    .maxmd\:grid {
+      display: grid;
+    }
+    .maxmd\:inline-flex {
+      display: inline-flex;
+    }
+    /* Order */
+    .maxmd\:order-none {
+      order: 0;
+    }
+    /* Margin */
+    .maxmd\:ml-0 {
+      margin-left: 0;
+    }
+    .maxmd\:mb-4 {
+      margin-bottom: 1rem;
+    }
+    /* Height */
+    .maxmd\:h-\[72px\] {
+      height: 72px;
+    }
+    /* Width */
+    .maxmd\:w-auto {
+      width: auto;
+    }
+    .maxmd\:w-fit {
+      width: fit-content;
+    }
+    /* Background */
+    .maxmd\:bg-neutral-white {
+      background-color: var(--neutral-white, #ffffff);
+    }
+    /* Gap */
+    .maxmd\:gap-x-0 {
+      column-gap: 0;
+    }
+    .maxmd\:gap-x-1 {
+      column-gap: 0.25rem;
+    }
+    .maxmd\:gap-x-8 {
+      column-gap: 2rem;
+    }
+    .maxmd\:gap-y-0 {
+      row-gap: 0;
+    }
+    /* Grid */
+    .maxmd\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .maxmd\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    /* Text */
+    .maxmd\:leading-7 {
+      line-height: 1.75rem;
+    }
+    .maxmd\:text-center {
+      text-align: center;
+    }
+  }
+}
+
 /* Google Fonts */
 
 /* Minimal custom theme configuration */
@@ -133,6 +208,126 @@
 
   /* Column gap */
   --column-gap: 2.13%;
+}
+:where(html) {
+  --container-sm: 544px;
+  --container-md: 768px;
+  --container-lg: 1012px;
+  --container-xl: 1312px;
+  --container-xlg: 1250px;
+  --fontFamily: 'proxima-nova', 'Helvetica Neue', 'Arial', sans-serif;
+  --scrollbarWidth: 0px;
+  --windowWidth: calc(100vw - var(--scrollbarWidth));
+  --sectionPaddingNormalMax: 80;
+  --sectionPaddingSmallMax: 110;
+  --sectionPaddingXSmallMax: 72;
+  --sectionPaddingMin: 48;
+  --cardPaddingMin: 32;
+  --cardCustomerStorgMin: 24;
+  --sectionPaddingMax: var(--sectionPaddingNormalMax);
+  --sectionPaddingTopMax: var(--sectionPaddingMax);
+  --sectionPaddingBottomMax: var(--sectionPaddingMax);
+  --cardPaddingTopMax: var(--sectionPaddingMin);
+  --cardPaddingBottomMax: var(--sectionPaddingMin);
+  --sectionPaddingTop: calc( var(--sectionPaddingMin) * 1px + (var(--sectionPaddingTopMax) - var(--sectionPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --sectionPaddingBottom: calc( var(--sectionPaddingMin) * 1px + (var(--sectionPaddingBottomMax) - var(--sectionPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --cardPaddingTop: calc( var(--cardPaddingMin) * 1px + (var(--cardPaddingTopMax) - var(--cardPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --cardPaddingBottom: calc( var(--cardPaddingMin) * 1px + (var(--cardPaddingBottomMax) - var(--cardPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --cardFeaturesPaddingTop: calc( var(--cardCustomerStorgMin) * 1px + (var(--cardPaddingMin) - var(--cardCustomerStorgMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --cardFeaturesPaddingBottom: calc( var(--cardCustomerStorgMin) * 1px + (var(--cardPaddingMin) - var(--cardCustomerStorgMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --cardCustomerStoryPaddingTop: calc( var(--cardCustomerStorgMin) * 1px + (var(--cardPaddingMin) - var(--cardPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --cardCustomerStoryPaddingBottom: calc( var(--cardCustomerStorgMin) * 1px + (var(--cardPaddingMin) - var(--cardPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px) );
+  --base-font-size: 16px;
+  --letter-spacing: -0.01em;
+  --body-text-family: 'Metropolis', sans-serif;
+  --content-offset-desktop: 80px;
+  --content-offset-sm: 90px;
+  --content-offset-mobile: 72px;
+  --rowGapNormal: 8px;
+  --rowGapMedium: 24px;
+  --rowGapLarge: 32px;
+  --size-1: 0.25rem;
+  --size-2: 0.5rem;
+  --size-3: 1rem;
+  --size-4: 1.5rem;
+  --size-5: 2.5rem;
+  --size-6: 3rem;
+  --size-7: 4rem;
+  --size-8: 5rem;
+  --size-9: 6rem;
+  --size-10: 7.5rem;
+  --size-11: 10rem;
+  --size-15: 15rem;
+  --font-lineheight-0: 1.12;
+  --font-lineheight-1: 1.25;
+  --font-lineheight-2: 1.375;
+  --font-lineheight-3: 1.5;
+  --font-lineheight-4: 1.75;
+  --font-lineheight-5: 2;
+  --font-size-fluid-2: clamp(2em, 3.5vw, var(--size-6));
+  --font-size-fluid-3: clamp(2rem, 4vw, var(--size-7));
+  --font-size-fluid-4: clamp(4rem, 6vw, var(--size-9));
+  --fontWeightBold: 800;
+  --neutral-white: #fff;
+  --neutral-black: #000000;
+  --neutral-70: #262626;
+  --neutral-60: #4d4d4d;
+  --neutral-50: #808080;
+  --neutral-40: #b3b3b3;
+  --neutral-30: #cccccc;
+  --neutral-20: #e5e5e4;
+  --neutral-10: #f2f2f2;
+  --error-70: #590202;
+  --error-60: #b20404;
+  --error-50: #e50b0b;
+  --error-40: #f24949;
+  --error-30: #ff8080;
+  --error-20: #ffbfbf;
+  --error-10: #fee5e5;
+  --secondary-70: #660c00;
+  --secondary-60: #991200;
+  --secondary-50: #ff290c;
+  --secondary-40: #ff4b33;
+  --secondary-30: #ff7866;
+  --secondary-20: #ffd2cc;
+  --secondary-10: #fff3f2;
+  --primary-70: #011332;
+  --primary-60: #032663;
+  --primary-50: #033180;
+  --primary-40: #074dc5;
+  --primary-30: #6ba0fa;
+  --primary-20: #9dbffb;
+  --primary-10: #cedffd;
+  --shadow-xsmall: 0px 1px 2px rgba(2, 34, 89, 0.05);
+  --shadow-small: 0px 1px 3px rgba(2, 34, 89, 0.1), 0px 1px 2px -1px rgba(2, 34, 89, 0.1);
+  --shadow-medium: 0px 4px 6px -1px rgba(2, 34, 89, 0.1), 0px 2px 4px -2px rgba(2, 34, 89, 0.1);
+  --shadow-large: 0px 10px 15px -3px rgba(2, 34, 89, 0.1), 0px 4px 6px -4px rgba(2, 34, 89, 0.1);
+  --shadow-xlarge: 0px 20px 25px -5px rgba(2, 34, 89, 0.1), 0px 8px 10px -6px rgba(2, 34, 89, 0.1);
+  --shadow-xxlarge: 0px 25px 50px -12px rgba(2, 34, 89, 0.25);
+  --shadown-onlight: 0px 24px 40px rgba(18, 77, 178, 0.1), 0px 8px 16px rgba(18, 77, 178, 0.05);
+  --shadown-gxscore: 0px 24px 40px rgba(201, 128, 255, 0.1), 0px 8px 16px rgba(201, 128, 255, 0.05);
+  --shadown-ondark: 0px 24px 40px rgba(1, 24, 64, 0.5), 0px 8px 16px rgba(1, 24, 64, 0.25);
+  --shadown-onlight-navy-40: 0px 8px 16px 0px rgba(18, 77, 178, 0.05), 0px 24px 40px 0px rgba(18, 77, 178, 0.1);
+  --shadown-onlight-navy-40-hover: 0px 8px 24px 0px rgba(18, 77, 178, 0.05), 0px 24px 60px 0px rgba(18, 77, 178, 0.1);
+  --shadown-ondark-blue-10: 0px 8px 16px 0px rgba(1, 19, 50, 0.25), 0px 24px 40px 0px rgba(1, 19, 50, 0.5);
+  --shadown-ondark-blue-10-hover: 0px 8px 24px 0px rgba(1, 19, 50, 0.5), 0px 24px 40px 0px rgba(1, 19, 50, 0.75);
+  --shadown-ondark-blue-40: 0px 8px 24px 0px rgba(7, 77, 197, 0.15), 0px 24px 60px 0px rgba(7, 77, 197, 0.2);
+  --shadown-ondark-blue-40: 0px 8px 16px 0px rgba(7, 77, 197, 0.05), 0px 24px 40px 0px rgba(7, 77, 197, 0.1);
+  --shadown-ondark-blue-40-hover: 0px 8px 24px 0px rgba(1, 19, 50, 0.5), 0px 24px 40px 0px rgba(1, 19, 50, 0.75);
+  --iris: #603FF5;
+  --iris-50: #603FF5
+}
+@media only screen and (min-width: 1032px) {
+  :where(html) {
+      --sectionPaddingTop:calc(var(--sectionPaddingTopMax) * 1px);
+      --sectionPaddingBottom: calc(var(--sectionPaddingBottomMax) * 1px);
+      --cardPaddingTop: calc(var(--sectionPaddingMin) * 1px);
+      --cardPaddingBottom: calc(var(--sectionPaddingMin) * 1px);
+      --cardFeaturesPaddingTop: calc(var(--cardPaddingMin) * 1px);
+      --cardFeaturesPaddingBottom: calc(var(--cardPaddingMin) * 1px);
+      --cardCustomerStoryPaddingTop: calc(var(--cardPaddingMin) * 1px);
+      --cardCustomerStoryPaddingBottom: calc(var(--cardPaddingMin) * 1px)
+  }
 }
 /* ===================================
    Global Blog Styles (HubSpot-compatible)
