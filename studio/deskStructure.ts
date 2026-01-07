@@ -18,6 +18,7 @@ import {
   UsersIcon,
   LinkIcon,
   PresentationIcon,
+  EditIcon,
 } from '@sanity/icons'
 
 export const deskStructure: StructureResolver = (S, context) =>
@@ -285,6 +286,60 @@ export const deskStructure: StructureResolver = (S, context) =>
                   S.document()
                     .schemaType('featuresSelectorGlobal')
                     .documentId('featuresSelectorGlobal')
+                ),
+              S.listItem()
+                .title('Industry Selector')
+                .icon(EarthGlobeIcon)
+                .child(
+                  S.document()
+                    .schemaType('industrySelectorGlobalDoc')
+                    .documentId('industrySelectorGlobal')
+                ),
+              S.listItem()
+                .title('Stats Set Stacked')
+                .icon(TagIcon)
+                .child(
+                  S.document()
+                    .schemaType('statsSetStackedGlobalDoc')
+                    .documentId('statsSetStackedGlobal')
+                ),
+              
+              S.divider(),
+              
+              // ==========================================
+              // Blog Post Metadata - Topics, Authors, Tags
+              // ==========================================
+              S.listItem()
+                .title('Blog Post Metadata')
+                .icon(EditIcon)
+                .child(
+                  S.list()
+                    .title('Blog Post Metadata')
+                    .items([
+                      S.listItem()
+                        .title('Topics')
+                        .icon(TagIcon)
+                        .child(
+                          S.documentTypeList('blogTopic')
+                            .title('Blog Topics')
+                        ),
+                      S.listItem()
+                        .title('Authors')
+                        .icon(UsersIcon)
+                        .child(
+                          S.documentTypeList('blogAuthor')
+                            .title('Blog Authors')
+                        ),
+                      S.listItem()
+                        .title('Tags')
+                        .icon(TagIcon)
+                        .child(
+                          S.document()
+                            .schemaType('blogTagsGlobal')
+                            .documentId('blogTagsGlobal')
+                            .title('Blog Tags')
+                        ),
+                    ])
                 ),
             ])
         ),
