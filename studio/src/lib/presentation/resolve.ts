@@ -13,8 +13,8 @@ export const locations = {
     select: {title: 'title', slug: 'slug.current'},
     resolve: (doc) => ({
       locations: [
-        {title: doc?.title || 'Untitled', href: `/post/${doc?.slug}`},
-        {title: 'Posts Index', href: `/`},
+        {title: doc?.title || 'Untitled', href: `/blog/${doc?.slug}`},
+        {title: 'Blog Index', href: `/blog`},
       ],
     }),
   }),
@@ -103,7 +103,7 @@ export const resolve: DocumentResolver = {
       filter: `_type == "getStartedPage"`,
     },
     {
-      route: '/post/:slug',
+      route: '/blog/:slug',
       filter: `_type == "post" && slug.current == $slug`,
     },
     {
