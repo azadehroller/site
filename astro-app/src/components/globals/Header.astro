@@ -42,10 +42,17 @@ interface MegaFeaturedItem {
   };
 }
 
+interface SubIntro {
+  _key?: string;
+  title: string;
+}
+
 interface MegaMenuDropdown {
   _key?: string;
   parentLabel: string;
   menuType?: 'why_roller' | 'features' | 'industries' | 'solutions';
+  useAlternateLayout?: boolean;
+  subIntros?: SubIntro[];
   introTitle?: string;
   introDescription?: string;
   items?: MegaMenuItem[];
@@ -324,15 +331,6 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   .header__main {
     align-items: center;
     display: flex;
-    order: 3;
-    margin-left: 0.75rem;
-  }
-
-  @media screen and (max-width: 1023px) {
-    .header__main {
-      order: unset;
-      margin-left: 0;
-    }
   }
 
   .header__nav {
@@ -888,7 +886,12 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   .header.dark .header__cta-btn--text {
     color: var(--neutral-white, #ffffff);
   }
-
+  .header  .header__block-toggle-item{
+    background-color:  var(--primary-50, #033180);
+  }
+  .header.dark  .header__block-toggle-item{
+    background-color: var(--neutral-white, #ffffff);
+  }
   /* No scrollbar utility */
   .no-scrollbar {
     -ms-overflow-style: none;
@@ -897,324 +900,6 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
-  }
-
-  /* Utility classes */
-  .b-0 {
-    border: 0;
-  }
-  
-  .no-underline {
-    text-decoration: none;
-  }
-  
-  .inline-block {
-    display: inline-block;
-  }
-  
-  .items-center {
-    align-items: center;
-  }
-
-  /* Custom maxmd breakpoint styles (min-width: 992px) */
-  @media screen and (min-width: 992px) {
-    .maxmd\:order-none {
-      order: 0;
-    }
-    .maxmd\:ml-0 {
-      margin-left: 0;
-    }
-    .maxmd\:flex {
-      display: flex;
-    }
-    .maxmd\:h-\[72px\] {
-      height: 72px;
-    }
-    .maxmd\:bg-neutral-white {
-      background-color: var(--neutral-white, #ffffff);
-    }
-    .maxmd\:block {
-      display: block;
-    }
-    .maxmd\:hidden {
-      display: none;
-    }
-    .maxmd\:w-auto {
-      width: auto;
-    }
-    .maxmd\:w-fit {
-      width: fit-content;
-    }
-    .maxmd\:gap-x-0 {
-      column-gap: 0;
-    }
-    .maxmd\:gap-x-1 {
-      column-gap: 0.25rem;
-    }
-    .maxmd\:gap-x-8 {
-      column-gap: 5rem;
-    }
-    .maxmd\:gap-y-0 {
-      row-gap: 0;
-    }
-    .maxmd\:gap-y-2 {
-      row-gap: 0.5rem;
-    }
-    .maxmd\:grid-cols-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .maxmd\:grid-cols-3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-    .maxmd\:flex-col {
-      flex-direction: column;
-    }
-    .maxmd\:leading-7 {
-      line-height: 1.75rem;
-    }
-    .maxmd\:mb-4 {
-      margin-bottom: 1.5rem;
-    }
-    .maxmd\:my-6 {
-      margin-top: 3rem;
-      margin-bottom: 3rem;
-    }
-    .maxmd\:pl-5 {
-      padding-left: 2rem;
-    }
-    .maxmd\:pr-5 {
-      padding-right: 2rem;
-    }
-    .maxmd\:text-center {
-      text-align: center;
-    }
-    .maxmd\:col-span-1 {
-      grid-column: span 1 / span 1;
-    }
-  }
-
-  /* Utility classes for flex, gap, grid */
-  .flex {
-    display: flex;
-  }
-  
-  .grow {
-    flex-grow: 1;
-  }
-  
-  .shrink-0 {
-    flex-shrink: 0;
-  }
-  
-  .fill-white {
-    fill: white;
-  }
-  
-  .gap-8 {
-    gap: 5rem;
-  }
-  
-  .gap-2 {
-    gap: 0.5rem;
-  }
-  
-  .gap-x-4 {
-    column-gap: 1rem;
-  }
-  
-  .gap-x-8 {
-    column-gap: 2rem;
-  }
-  
-  .gap-y-4 {
-    row-gap: 1rem;
-  }
-  
-  .grid {
-    display: grid;
-  }
-  
-  .grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  
-  .auto-rows-min {
-    grid-auto-rows: min-content;
-  }
-  
-  .gap-y-0 {
-    row-gap: 0;
-  }
-  
-  .gap-x-0 {
-    column-gap: 0;
-  }
-  
-  @media screen and (min-width: 1280px) {
-    .xl\:gap-x-8 {
-      column-gap: 2rem;
-    }
-  }
-  
-  .relative {
-    position: relative;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
-  .col-span-full {
-    grid-column: 1 / -1;
-  }
-  
-  .max-w-\[305px\] {
-    max-width: 305px;
-  }
-  
-  .max-w-\[256px\] {
-    max-width: 256px;
-  }
-  
-  .text-4xl {
-    font-size: 2.25rem;
-    line-height: 2.5rem;
-  }
-  
-  .font-extrabold {
-    font-weight: 800;
-  }
-  
-  .leading-11 {
-    line-height: 2.75rem;
-  }
-  
-  .mb-3 {
-    margin-bottom: 1rem;
-  }
-  
-  .mb-2 {
-    margin-bottom: 0.5rem;
-  }
-  
-  .bg-neutral-white {
-    background-color: var(--neutral-white, #ffffff);
-  }
-
-  .text-base {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-  
-  .text-sm {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-  }
-  
-  .text-xs {
-    font-size: 0.75rem;
-    line-height: 1rem;
-  }
-  
-  .text-primary-50 {
-    color: var(--primary-50, #033180);
-  }
-  
-  .text-secondary-50 {
-    color: var(--secondary-50, #ff290c);
-  }
-  
-  .hover\:text-secondary-50:hover {
-    color: var(--secondary-50, #ff290c);
-  }
-  
-  .leading-4 {
-    line-height: 1rem;
-  }
-  
-  .leading-6 {
-    line-height: 1.5rem;
-  }
-  
-  .leading-7 {
-    line-height: 1.75rem;
-  }
-  
-  .font-semibold {
-    font-weight: 600;
-  }
-  
-  .font-serif {
-    font-family: serif;
-  }
-  
-  .bg-primary-10 {
-    background-color: var(--primary-10, #cedffd);
-  }
-  
-  .rounded {
-    border-radius: 0.25rem;
-  }
-  
-  .w-\[170px\] {
-    width: 170px;
-  }
-  
-  .w-\[256px\] {
-    width: 256px;
-  }
-  
-  .flex-col {
-    flex-direction: column;
-  }
-  
-  .p-3 {
-    padding: 1rem;
-  }
-  
-  .m-0 {
-    margin: 0;
-  }
-  
-  .my-3 {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .mx-3 {
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-  
-  /* Pseudo-element for divider line */
-  .after\:absolute::after {
-    content: '';
-    position: absolute;
-  }
-  
-  .after\:w-\[1px\]::after {
-    width: 1px;
-  }
-  
-  .after\:h-\[100\%\]::after {
-    height: 100%;
-  }
-  
-  .after\:bg-primary-40::after {
-    background-color: var(--primary-40, #074dc5);
-  }
-  
-  .after\:top-0::after {
-    top: 0;
-  }
-  
-  .after\:right-\[-40px\]::after {
-    right: -40px;
-  }
-  
-  /* Hover state for SVG path */
-  .\[\&\>svg\>path\]\:hover\:fill-\[red\]:hover > svg > path {
-    fill: red;
   }
 </style>
 
@@ -1283,86 +968,121 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
                         </svg>
                       </button>
                       <div class="menu-drop-panel mega-drop">
-                        <div class="mega-drop-wrapper bg-neutral-white">
+                        <div class="mega-drop-wrapper maxmd:bg-neutral-white">
                           <div class="flex gap-8 container">
-                            <div class="flex gap-y-4 gap-x-8 maxmd:gap-x-0 xl:gap-x-8 container relative after:absolute after:w-[1px] after:h-[100%] after:bg-primary-40 after:top-0 after:right-[-40px]">
-                                {/* Intro section */}
-                                {megaMenu.introTitle && (
-                                  <div class="maxmd:block max-w-[305px]">
-                                    <div class="mega-drop__item-text">
-                                      <p class="text-primary-50 text-4xl font-extrabold leading-11 mb-3">{megaMenu.introTitle}</p>
-                                      {megaMenu.introDescription && (
-                                        <p class="text-base text-primary-50">{megaMenu.introDescription}</p>
-                                      )}
-                                    </div>
-
-                                  </div>
-                                )}
-                                
-                                {/* Menu items */}
-                                <div class="grow flex flex-col md:grid md:grid-cols-2">
-                                  {megaMenu.items?.map((menuItem) => (
-                                    <div class="mega-drop__item mb-2 maxmd:mb-4 w-[170px] maxmd:w-auto">
-                                      <div class="mega-drop__item-text flex items-center gap-x-4 maxmd:gap-x-1 xl:gap-x-4">
-                                          {menuItem.icon && (
-                                                <div class="maxmd:block" set:html={menuItem.icon}></div>
-                                              )}
-                                              <div class="grow">
-
-                                                <a 
-                                                  href={menuItem.link?.href || '#'}           
-                                                  target={menuItem.link?.openInNewTab ? '_blank' : undefined}
-                                                >
-                                                      <p class="text-base text-primary-50 hover:text-secondary-50 leading-4 maxmd:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
-
-                                                </a>
-                                                <div class="maxmd:flex text-sm text-primary-50">
-                                                  {menuItem.description && (
-                                                    <p class="mr-1 flex items-center">{menuItem.description}</p>
-                                                  )}
-                                                  
-                                                  {Array.isArray(menuItem.topFeatures) && menuItem.topFeatures.length > 0 && (
-                                                    <>
-                                                      {menuItem.topFeatures.map((feature, i) => {
-                                                        const href = feature.link || feature.link|| '#';
-                                                        // Try .link.href (Sanity object), fallback to .link (string)
-                                                        if ((feature.link|| feature.link) && feature.title) {
-                                                          return (
-                                                            <a
-                                                              href={feature.link|| feature.link}
-                                                              class="flex items-center text-sm text-left maxmd:text-center xl:text-left text-primary-40 mx-1 bg-primary-10 font-semibold py-1 px-2 rounded-[980px] hover:bg-[#6ba0fa] transition ease-in-out duration-300"
-                                                            >
-                                                              {feature.title}
-                                                            </a>
-                                                          );
-                                                        }
-                                                        return null;
-                                                      })}
-                                                    </>
-                                                  )}
-                                                </div>
-                                              </div>
-
+                            <div class:list={[
+                              megaMenu.useAlternateLayout 
+                                ? "grid grid-cols-2 maxmd:grid-cols-3 gap-y-0 maxmd:gap-y-0 gap-x-0 maxmd:gap-x-8" 
+                                : "flex gap-y-4 gap-x-8 maxmd:gap-x-0 xl:gap-x-8",
+                              "container relative after:absolute after:w-[1px] after:h-[100%] after:bg-neutral-90 after:top-0 after:right-[-40px] dark:after:bg-neutral-10"
+                            ]}>
+                              {/* Default structure - when useAlternateLayout is false or not set */}
+                              {!megaMenu.useAlternateLayout && (
+                                <>
+                                  {megaMenu.introTitle && (
+                                    <div class="hidden maxmd:block max-w-[305px]">
+                                      <div class="mega-drop__item-text">
+                                        <p class="text-primary-50 text-4xl font-extrabold leading-11 mb-3">{megaMenu.introTitle}</p>
+                                        {megaMenu.introDescription && (
+                                          <p class="text-base text-primary-50">{megaMenu.introDescription}</p>
+                                        )}
                                       </div>
                                     </div>
-                                  ))}
-                                  
-                                  {/* CTA link */}
-                                  {megaMenu.ctaLabel && megaMenu.ctaLink && (
-                                    <a href={megaMenu.ctaLink} class="mega-drop__cta">
-                                      {megaMenu.ctaLabel}
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
-                                        <path fill="#033180" d="M8 0 6.59 1.41 12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8Z"/>
-                                      </svg>
-                                    </a>
                                   )}
-                                </div>
 
+                                  {/* Menu items */}
+                                  <div class="grow flex flex-col md:grid md:grid-cols-2">
+                                    {megaMenu.items?.map((menuItem) => (
+                                      <div class="mega-drop__item mb-2 maxmd:mb-4 w-[170px] maxmd:w-auto">
+                                        <div class="mega-drop__item-text flex items-center gap-x-4 maxmd:gap-x-1 xl:gap-x-4">
+                                            {menuItem.icon && (
+                                                  <div class="hidden maxmd:block" set:html={menuItem.icon}></div>
+                                                )}
+                                                <div class="grow">
+
+                                                  <a 
+                                                    href={menuItem.link?.href || '#'}           
+                                                    target={menuItem.link?.openInNewTab ? '_blank' : undefined}
+                                                  >
+                                                        <p class="text-base text-primary-50 hover:text-secondary-50 leading-4 maxmd:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
+
+                                                  </a>
+                                                  <div class="hidden maxmd:flex text-sm text-primary-50">
+                                                    {menuItem.description && (
+                                                      <p class="mr-1 flex items-center">{menuItem.description}</p>
+                                                    )}
+                                                    
+                                                    {Array.isArray(menuItem.topFeatures) && menuItem.topFeatures.length > 0 && (
+                                                      <>
+                                                        {menuItem.topFeatures.map((feature, i) => {
+                                                          const href = feature.link || feature.link|| '#';
+                                                          // Try .link.href (Sanity object), fallback to .link (string)
+                                                          if ((feature.link|| feature.link) && feature.title) {
+                                                            return (
+                                                              <a
+                                                                href={feature.link|| feature.link}
+                                                                class="flex items-center text-sm text-left maxmd:text-center xl:text-left text-primary-40 mx-1 bg-primary-10 font-semibold py-1 px-2 rounded-[980px] hover:bg-[#6ba0fa] transition ease-in-out duration-300"
+                                                              >
+                                                                {feature.title}
+                                                              </a>
+                                                            );
+                                                          }
+                                                          return null;
+                                                        })}
+                                                      </>
+                                                    )}
+                                                  </div>
+                                                </div>
+
+                                        </div>
+                                      </div>
+                                    ))}
+                                    
+                                    {/* CTA link */}
+                                    {megaMenu.ctaLabel && megaMenu.ctaLink && (
+                                      <a href={megaMenu.ctaLink} class="mega-drop__cta">
+                                        {megaMenu.ctaLabel}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
+                                          <path fill="#033180" d="M8 0 6.59 1.41 12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8Z"/>
+                                        </svg>
+                                      </a>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+
+                              {/* Alternate structure - when useAlternateLayout is true */}
+                              {megaMenu.useAlternateLayout && (
+                                <>
+                                  {/* Intro section - Sub Intros */}
+                                  {megaMenu.subIntros && megaMenu.subIntros.length > 0 && (
+                                    <>
+                                      {megaMenu.subIntros.map((subIntro) => (
+                                        <div class="hidden maxmd:block">
+                                          <p class="font-extrabold text-secondary-50 leading-7 m-0">{subIntro.title}</p>
+                                        </div>
+                                      ))}
+                                    </>
+                                  )}
+                                  {/* menu items */}
+                                  {megaMenu.items?.map((menuItem) => (
+                                      <a href={menuItem.link?.href || '#'}  class="mega-drop__item w-[170px] maxmd:w-auto" target="_self">
+                                        {/* <img src="" alt="" width="100" loading=""> */}
+                                        <div class="mega-drop__item-text">
+                                          <p class="text-primary-50 hover:text-secondary-50 leading-4 maxmd:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
+                                          {menuItem.description && (
+                                             <p class="hidden maxmd:block text-sm text-primary-50">{menuItem.description}</p>
+                                          )}                                  
+                                        </div>
+                                      </a>
+                                    ))}
+                                </>
+                              )}
                             </div>
                             
                             {/* Featured section */}
                             {megaMenu.featuredItems && megaMenu.featuredItems.length > 0 && (
-                              <div class="maxmd:block min-w-[256px]">
+                              <div class="hidden maxmd:block min-w-[256px]">
                                 {megaMenu.featuredLabel && (
                                   <p class="font-extrabold text-secondary-50 leading-7 mb-3">{megaMenu.featuredLabel}</p>
                                 )}
@@ -1412,17 +1132,34 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
     <!-- Header CTA buttons -->
     {buttons.length > 0 && (
-      <div class="header__cta">
-        {buttons.map((button) => (
-          <a 
-            href={button.href}
-            class={`header__cta-btn header__cta-btn--${button.variant || 'primary'}`}
-            target={button.openInNewTab ? '_blank' : undefined}
-            rel={button.openInNewTab ? 'noopener noreferrer' : undefined}
-          >
-            {button.label}
-          </a>
-        ))}
+      <div class="ml-auto hidden md:block">
+        <ul
+          id="js-button-stack"
+          class="flex flex-row list-none gap-3 m-0"
+        >
+            {buttons.map((button, idx) => {
+              const cleanLabel = stripInvisible(button.label || '');
+              const labelLower = cleanLabel.toLowerCase();
+              return (
+                <li class="ml-0">
+                  <a
+                    href={button.href}
+                    class={[
+                      "button-all relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold text-md transition ease-in-out duration-300 w-full sm:w-auto whitespace-nowrap rounded-3xl py-2 px-4",
+                      button.variant === "primary" || !button.variant
+                        ? "bg-secondary-50 hover:bg-secondary-70 text-neutral-white"
+                        : "bg-neutral-white hover:bg-neutral-20 text-primary-50 border-[1px]"
+                    ].join(" ")}
+                    id={labelLower === "login" ? "button_stack_login" : labelLower === "get started" ? "button_stack_get_started" : undefined}
+                    target={button.openInNewTab ? "_blank" : undefined}
+                    rel={button.openInNewTab ? "noopener" : undefined}
+                  >
+                    <span>{cleanLabel}</span>
+                  </a>
+                </li>
+              );
+            })}
+        </ul>
       </div>
     )}
   </div>
