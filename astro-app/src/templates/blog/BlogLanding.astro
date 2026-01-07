@@ -3,15 +3,17 @@ import Card from "../../components/Card.astro";
 import Welcome from "../../components/Welcome.astro";
 import Layout from "../../layouts/Layout.astro";
 import Pagination from "../../components/Pagination.astro";
-import { getPosts } from "../../utils/sanity";
+import { getPosts, getBlogTopics } from "../../utils/sanity";
+import type { Post, BlogTopic } from "../../utils/sanity";
 
 interface Props {
   title?: string;
   postsPerPage?: number;
   currentPage?: number;
-  posts?: any[];
+  posts?: Post[];
   totalPages?: number;
   baseUrl?: string;
+  topics?: (BlogTopic & { postCount?: number })[];
 }
 
 const { 
@@ -21,11 +23,13 @@ const {
   posts: providedPosts,
   totalPages: providedTotalPages,
   baseUrl = "/blog/page",
+  topics: providedTopics,
 } = Astro.props;
 
 // Use provided posts or fetch them
 let posts = providedPosts;
 let totalPages = providedTotalPages;
+let topics = providedTopics;
 
 if (!posts) {
   const { data: allPosts } = await getPosts(Astro.request);
@@ -33,25 +37,465 @@ if (!posts) {
   const startIndex = (currentPage - 1) * postsPerPage;
   posts = allPosts.slice(startIndex, startIndex + postsPerPage);
 }
+
+// Fetch topics for filtering
+if (!topics) {
+  const { data: allTopics } = await getBlogTopics(Astro.request);
+  topics = allTopics || [];
+}
+
+// Get unique topics from current page posts for quick filter
+const currentPageTopics = new Set<string>();
+posts?.forEach(post => {
+  post.topics?.filter(t => t != null).forEach(topic => {
+    if (topic.name && topic.name !== 'Editor Picks') {
+      currentPageTopics.add(topic.name);
+    }
+  });
+});
 ---
 
 <Layout title={title}>
-  <section class="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
-    {posts && posts.length ? (
-      <>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => <Card post={post} />)}
-        </div>
-        {totalPages && totalPages > 1 && (
-          <Pagination 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            baseUrl={baseUrl} 
+  {/* Blog Header */}
+  <div class="blog-header">
+    <div class="blog-header__inner">
+      <h1 class="blog-header__heading">{title}</h1>
+      <p class="blog-header__text">
+        Insights, tips, and trends to help you run a successful attraction business.
+      </p>
+      <div class="blog-header__search">
+        <div class="blog-header__search--input">
+          <input 
+            type="text" 
+            class="blog-search-input" 
+            placeholder="Search articles..."
+            aria-label="Search articles"
           />
+        </div>
+        <div class="blog-header__search--icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+            <path fill="#fff" fill-rule="evenodd" d="M14.71 14h.79l4.99 5L19 20.49l-5-4.99v-.79l-.27-.28A6.471 6.471 0 0 1 9.5 16 6.5 6.5 0 1 1 16 9.5c0 1.61-.59 3.09-1.57 4.23l.28.27ZM5 9.5C5 11.99 7.01 14 9.5 14S14 11.99 14 9.5 11.99 5 9.5 5 5 7.01 5 9.5Z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Blog Content */}
+  <div class="blog-index__wrapper">
+    <div class="blog-index__section">
+      
+      {/* Section Header */}
+      <div class="blog-heading">
+        <h2 class="h2">Latest Articles</h2>
+      </div>
+
+      {/* Topic Filters */}
+      {topics && topics.length > 0 && (
+        <div class="blog-filter-options">
+          <nav id="js-scroll-nav">
+            <ul>
+              <li class="active"><a class="all" href="#" data-filter="all">All articles</a></li>
+              {topics.filter(t => t.name !== 'Editor Picks').slice(0, 6).map(topic => {
+                const topicClass = topic.name?.toLowerCase().replace(/[-\s,&]/g, '_').replace(/__+/g, '_');
+                return (
+                  <li data-filter={topicClass}>
+                    <a class={topicClass} href="#" data-filter={topicClass}>
+                      {topic.name?.length > 20 ? topic.name.substring(0, 17) + '...' : topic.name}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+          
+          {/* Dropdown for all categories */}
+          {topics.length > 6 && (
+            <div id="js-dropdown" class="dropdown blog-dropdown" data-dropdown>
+              <button class="btn--dropdown link" data-dropdown-button>
+                Browse categories 
+                <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="m7 9.5 5 5 5-5H7Z" fill="#023180" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <div class="dropdown-menu">
+                <div class="dropdown-links">
+                  {topics.filter(t => t.name !== 'Editor Picks').map(topic => (
+                    <a href={`/blog/topic/${topic.slug?.current}`} class="link">
+                      {topic.name} ({topic.postCount || 0})
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Blog Posts Grid */}
+      <section id="js-section-holder" class="blog-index blog-index-latest">
+        {posts && posts.length ? (
+          posts.map((post) => {
+            // Get topic class for filtering
+            const topicClass = post.topics?.filter(t => t != null)?.[0]?.name?.toLowerCase().replace(/[-\s,&]/g, '_').replace(/__+/g, '_') || '';
+            return (
+              <article class={`blog-index__post ${topicClass} item`} data-topic={topicClass}>
+                <Card post={post} />
+              </article>
+            );
+          })
+        ) : (
+          <Welcome />
         )}
-      </>
-    ) : (
-      <Welcome />
-    )}
-  </section>
+      </section>
+
+      {/* Pagination */}
+      {totalPages && totalPages > 1 && (
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          baseUrl={baseUrl} 
+        />
+      )}
+
+    </div>
+  </div>
 </Layout>
+
+<style>
+  /* Blog Header Styles */
+  .blog-header {
+    background: linear-gradient(135deg, #0270e0 0%, #033180 100%);
+    color: #fff;
+    margin-bottom: 40px;
+    padding: 60px 0;
+  }
+
+  .blog-header__inner {
+    margin: 0 auto;
+    max-width: 1300px;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .blog-header__heading {
+    margin-bottom: 16px;
+    font-size: 2rem;
+    text-transform: capitalize;
+  }
+
+  @media (min-width: 768px) {
+    .blog-header__heading {
+      font-size: 3rem;
+    }
+  }
+
+  .blog-header__text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 28px;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.9;
+  }
+
+  @media (min-width: 992px) {
+    .blog-header__text {
+      font-size: 18px;
+      line-height: 32px;
+    }
+  }
+
+  .blog-header__search {
+    align-items: center;
+    display: flex;
+    margin: 1.6rem auto 0;
+    max-width: 400px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+  }
+
+  .blog-header__search--input {
+    flex: 1;
+  }
+
+  .blog-search-input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    width: 100%;
+  }
+
+  .blog-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .blog-header__search--icon {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Blog Index Wrapper */
+  .blog-index__wrapper {
+    background-color: #fff;
+    margin: 0 auto;
+    max-width: 1300px;
+    padding: 0 20px;
+  }
+
+  .blog-index__section {
+    margin: 0 auto;
+    max-width: 1300px;
+  }
+
+  .blog-heading {
+    padding: 55px 0 0;
+    margin-top: 30px;
+    border-top: 1px solid #cbd7ee;
+  }
+
+  .blog-heading h2 {
+    font-size: 32px;
+    color: #033180;
+  }
+
+  /* Topic Filter Styles */
+  .blog-filter-options {
+    position: relative;
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 0 16px;
+    white-space: nowrap;
+  }
+
+  .blog-filter-options nav {
+    display: none;
+  }
+
+  @media (min-width: 992px) {
+    .blog-filter-options nav {
+      display: flex;
+      padding: 8px 0 0;
+    }
+
+    .blog-filter-options nav ul {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .blog-filter-options nav ul {
+    align-items: center;
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  .blog-filter-options nav li {
+    padding: 0 8px 0 1px;
+  }
+
+  .blog-filter-options nav li a {
+    border-radius: 100px;
+    box-shadow: 0 0 0 1px #cbd7ee;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 12px;
+    transition: background 0.2s ease;
+    color: #033180;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .blog-filter-options nav li.active a,
+  .blog-filter-options nav li:hover a {
+    background: #033180;
+    border: 0;
+    color: #fff;
+  }
+
+  /* Dropdown */
+  .blog-dropdown {
+    position: relative;
+  }
+
+  .blog-dropdown .btn--dropdown {
+    border: 0;
+    display: flex;
+    align-items: center;
+    padding: 5.5px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 0 0 1px #cbd7ee;
+    border-radius: 100px;
+    background: transparent;
+    transition: background 0.2s ease;
+    cursor: pointer;
+    color: #033180;
+  }
+
+  .blog-dropdown .btn--dropdown:hover,
+  .blog-dropdown.active .btn--dropdown {
+    color: #fff;
+    background: #033180;
+  }
+
+  .blog-dropdown .dropdown-menu {
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    left: 0;
+    top: calc(100% + 0.9rem);
+    background-color: #fff;
+    padding: 28px;
+    border-radius: 4px;
+    border: 1px solid rgba(2, 49, 128, 0.1);
+    display: none;
+    min-width: 300px;
+  }
+
+  .blog-dropdown.active .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  @media (min-width: 591px) {
+    .dropdown-links {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .dropdown-links {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .dropdown-links a {
+    font-size: 14px;
+    padding: 10px 8px;
+    color: #001F4A;
+    transition: background-color 150ms ease-in-out;
+    text-decoration: none;
+  }
+
+  .dropdown-links a:hover {
+    background: #f1f3f9;
+    border-radius: 4px;
+  }
+
+  /* Blog Index Grid */
+  .blog-index {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 60px 0 30px;
+  }
+
+  @media (min-width: 768px) {
+    .blog-index {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .blog-index {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .blog-index-latest {
+    padding: 20px 0 30px;
+  }
+
+  /* Override Card wrapper styles - articles already have card styling */
+  .blog-index__post.item {
+    display: contents;
+  }
+</style>
+
+<script>
+  // Topic filtering functionality
+  function initBlogFilter() {
+    const elementScrollNav = document.querySelectorAll("#js-scroll-nav li a");
+    const elementScrollNavLi = document.querySelectorAll("#js-scroll-nav li");
+    const elementHolder = document.querySelector("#js-section-holder");
+
+    if (!elementScrollNav.length || !elementHolder) return;
+
+    elementScrollNav.forEach(link => {
+      link.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        const filter = this.getAttribute("data-filter") || "all";
+
+        elementScrollNavLi.forEach(li => li.classList.remove("active"));
+        this.parentElement?.classList.add("active");
+
+        const items = elementHolder.querySelectorAll("article.item");
+
+        if (filter === "all") {
+          items.forEach(item => { 
+            (item as HTMLElement).style.display = "contents"; 
+          });
+        } else {
+          items.forEach(item => {
+            const itemTopic = item.getAttribute("data-topic");
+            (item as HTMLElement).style.display = itemTopic === filter ? "contents" : "none";
+          });
+        }
+      });
+    });
+  }
+
+  // Dropdown functionality
+  function initDropdowns() {
+    const dropdowns = document.querySelectorAll("[data-dropdown]");
+    if (dropdowns.length === 0) return;
+
+    dropdowns.forEach(dropdown => {
+      const button = dropdown.querySelector("[data-dropdown-button]");
+      if (!button) return;
+
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        dropdowns.forEach(other => {
+          if (other !== dropdown) other.classList.remove("active");
+        });
+
+        dropdown.classList.toggle("active");
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      const target = e.target as Element;
+      if (!target.closest("[data-dropdown]")) {
+        dropdowns.forEach(d => d.classList.remove("active"));
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        dropdowns.forEach(d => d.classList.remove("active"));
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initBlogFilter();
+    initDropdowns();
+  });
+</script>
