@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && tsc --noEmit && astro build",
+    "check": "NODE_OPTIONS='--max-old-space-size=8192' astro check",
+    "typecheck": "NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -34,11 +36,11 @@
   "devDependencies": {
     "@portabletext/types": "2.0.13",
     "@sanity/types": "3.48.1",
-    "@tailwindcss/vite": "^4.1.14",
+    "@tailwindcss/vite": "^4.1.18",
     "eslint": "9.20.1",
     "prettier": "3.3.2",
     "rimraf": "5.0.1",
-    "tailwindcss": "^4.1.14",
+    "tailwindcss": "^4.1.18",
     "typescript": "5.7.2",
     "vite": "^5.3.2"
   }
