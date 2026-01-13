@@ -1,3 +1,7 @@
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
 [build]
   command = "npm run build --workspace=astro-app"
   publish = "astro-app/dist"
