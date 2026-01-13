@@ -7,80 +7,8 @@
 @source "../templates/**/*.astro";
 @source "../components/**/*.astro";
 
-/* Custom maxmd breakpoint utilities (min-width: 992px) - must be in @layer utilities for proper cascade */
-@layer utilities {
-  @media screen and (min-width: 992px) {
-    /* Display */
-    .maxmd\:block {
-      display: block;
-    }
-    .maxmd\:hidden {
-      display: none;
-    }
-    .maxmd\:flex {
-      display: flex;
-    }
-    .maxmd\:grid {
-      display: grid;
-    }
-    .maxmd\:inline-flex {
-      display: inline-flex;
-    }
-    /* Order */
-    .maxmd\:order-none {
-      order: 0;
-    }
-    /* Margin */
-    .maxmd\:ml-0 {
-      margin-left: 0;
-    }
-    .maxmd\:mb-4 {
-      margin-bottom: 1rem;
-    }
-    /* Height */
-    .maxmd\:h-\[72px\] {
-      height: 72px;
-    }
-    /* Width */
-    .maxmd\:w-auto {
-      width: auto;
-    }
-    .maxmd\:w-fit {
-      width: fit-content;
-    }
-    /* Background */
-    .maxmd\:bg-neutral-white {
-      background-color: var(--neutral-white, #ffffff);
-    }
-    /* Gap */
-    .maxmd\:gap-x-0 {
-      column-gap: 0;
-    }
-    .maxmd\:gap-x-1 {
-      column-gap: 0.25rem;
-    }
-    .maxmd\:gap-x-8 {
-      column-gap: 2rem;
-    }
-    .maxmd\:gap-y-0 {
-      row-gap: 0;
-    }
-    /* Grid */
-    .maxmd\:grid-cols-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .maxmd\:grid-cols-3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-    /* Text */
-    .maxmd\:leading-7 {
-      line-height: 1.75rem;
-    }
-    .maxmd\:text-center {
-      text-align: center;
-    }
-  }
-}
+
+
 
 /* Google Fonts */
 
@@ -329,6 +257,71 @@
       --cardCustomerStoryPaddingBottom: calc(var(--cardPaddingMin) * 1px)
   }
 }
+  /* Text colors */
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #033180);
+  }
+  /* Background and shadow */
+  .bg-neutral-white {
+    background-color: #ffffff;
+  }
+
+  .box-shadow-onlight-navy-40 {
+    box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
+  }
+
+  /* Text colors */
+  .text-secondary-50 {
+    color: var(--secondary-50, #6366f1);
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #1e293b);
+  }
+  .text-primary-50 {
+    color: var(--primary-50, #1e293b);
+  }
+
+  .text-secondary-50 {
+    color: var(--secondary-50, #6366f1);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-gx-80 {
+    color: var(--gx-80, #374151);
+  }
+
+  .text-gx-90 {
+    color: var(--gx-90, #1f2937);
+  }
+   /* Button styles */
+   .bg-secondary-50 {
+    background-color: var(--secondary-50, #ff3800);
+  }
+
+  .hover\:bg-secondary-70:hover {
+    background-color: var(--secondary-70, #cc2d00);
+  }
+
+  .text-neutral-white {
+    color: #ffffff;
+  }
+
+  .text-primary-50 {
+    color: var(--primary-50, #011840);
+  }
+
+  /* Font-serif for CTA */
+  .font-serif {
+    font-family: var(--font-serif, Georgia, serif);
+  }
 /* ===================================
    Global Blog Styles (HubSpot-compatible)
    =================================== */
@@ -427,7 +420,15 @@ html {
 }
 
 .bg-new-design-mobile {
-  background-image: linear-gradient(272deg,#C239FB 0%,#3F40F2 27.41%);
+  background-image: linear-gradient(270deg,#C239FB 0%,#3F40F2 10%,#3F40F2 90%,#C239FB 100%);
+}
+
+.bg-product-launch {
+  background-image: linear-gradient(90deg, #001338 0.01%, #0960F6 84.99%, #38F6FF 99.99%);
+}
+
+.bg-product-launch-mobile {
+  background-image: linear-gradient(90deg, #001338 0.01%, #0960F6 84.99%, #38F6FF 99.99%);
 }
 
 .bg-pill-gradient {
