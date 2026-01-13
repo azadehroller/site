@@ -5,15 +5,20 @@ import { VisualEditing } from '@sanity/astro/visual-editing';
 import '../styles/global.css';
 import Footer from '../components/globals/Footer.astro';
 import Header from '../components/globals/Header.astro';
-import { getFooter, getHeader } from '../utils/sanity';
+import AnnouncementBar from '../components/AnnouncementBar.astro';
+import { getFooter, getHeader, type AnnouncementBarSettings } from '../utils/sanity';
 
 interface Props {
   title: string;
   headDocument?: string;
   headerTheme?: 'default' | 'dark' | 'light' | 'industry_report';
+  announcementBar?: AnnouncementBarSettings;
 }
 
-const { title, headDocument, headerTheme = 'default' } = Astro.props;
+const { title, headDocument, headerTheme = 'default', announcementBar } = Astro.props;
+
+// Show announcement bar if enabled and has text
+const showAnnouncementBar = announcementBar?.enabled && announcementBar?.text;
 
 const visualEditingEnabled = true; // Temporarily enabled for testing - was: import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED == 'true'
 // Localhost/dev: disable external trackers (gtag/GTM, Facebook, etc.) that may be blocked by course policy.
@@ -29,6 +34,9 @@ const { data: footerData } = await getFooter(Astro.request);
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <!-- temporary block robots from indexing -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
     <title>{title}</title>
     <ViewTransitions />
      
@@ -37,21 +45,24 @@ const { data: footerData } = await getFooter(Astro.request);
     <!-- <meta name="description" content=""> -->
     {enableThirdPartyScripts && (
       <>
-        <!-- Third-party trackers (disabled on localhost/dev) -->
-        <script type="text/javascript" async src="https://app.posthog.com/static/array.js"></script>
-        <script type="text/javascript" async src="https://ct.capterra.com/capterra_tracker.js?vid=2115025&amp;vkey=df330b132e6af93651d818491be94c26"></script>
-        <script type="text/javascript" async src="https://www.clarity.ms/tag/tqv8fkrhwq?ref=gtm"></script>
-        <script type="text/javascript" async src="https://bat.bing.com/bat.js"></script>
-        <script type="text/javascript" async src="https://amplify.outbrain.com/cp/obtp.js"></script>
-        <script type="text/javascript" async src="https://connect.facebook.net/en_US/fbevents.js"></script>
-        <script type="text/javascript" async src="https://www.redditstatic.com/ads/pixel.js"></script>
-        <script type="text/javascript" async src="https://snap.licdn.com/li.lms-analytics/insight.min.js"></script>
-        <script type="text/javascript" async src="https://secure.quantserve.com/quant.js"></script>
-        <script type="text/javascript" async src="https://secure.quantserve.com/quant.js"></script>
-        <script type="text/javascript" async src="https://www.googletagmanager.com/gtag/js?id=G-QFK5BRXC35&amp;cx=c&amp;gtm=4e5cb0h2"></script>
-        <script type="text/javascript" async src="https://www.googletagmanager.com/gtag/js?id=DC-15324765&amp;cx=c&amp;gtm=4e5cb0h2"></script>
-        <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-NQV6RMR"></script>
+        <!-- Third-party trackers (prod only) -->
+        <script is:inline async src="https://app.posthog.com/static/array.js"></script>
+        <script is:inline async src="https://ct.capterra.com/capterra_tracker.js?vid=2115025&amp;vkey=df330b132e6af93651d818491be94c26"></script>
+        <script is:inline async src="https://www.clarity.ms/tag/tqv8fkrhwq?ref=gtm"></script>
+        <script is:inline async src="https://bat.bing.com/bat.js"></script>
+        <script is:inline async src="https://amplify.outbrain.com/cp/obtp.js"></script>
+        <script is:inline async src="https://connect.facebook.net/en_US/fbevents.js"></script>
+        <script is:inline async src="https://www.redditstatic.com/ads/pixel.js"></script>
+        <script is:inline async src="https://snap.licdn.com/li.lms-analytics/insight.min.js"></script>
+        https://secure.quantserve.com
+        <script is:inline async src="https://secure.quantserve.com/quant.js"></script>
+    
+        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-QFK5BRXC35&amp;cx=c&amp;gtm=4e5cb0h2"></script>
+        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=DC-15324765&amp;cx=c&amp;gtm=4e5cb0h2"></script>
+        <script is:inline async src="https://www.googletagmanager.com/gtm.js?id=GTM-NQV6RMR"></script>
+    
         <script
+          is:inline
           src="https://js.hsadspixel.net/fb.js"
           type="text/javascript"
           id="hs-ads-pixel-3375779"
@@ -62,8 +73,16 @@ const { data: footerData } = await getFooter(Astro.request);
           data-hsjs-env="prod"
           data-hsjs-hublet="na1"
         ></script>
-        <script src="https://js.hs-analytics.net/analytics/1766356200000/3375779.js" type="text/javascript" id="hs-analytics"></script>
+    
         <script
+          is:inline
+          src="https://js.hs-analytics.net/analytics/1766356200000/3375779.js"
+          type="text/javascript"
+          id="hs-analytics"
+        ></script>
+    
+        <script
+          is:inline
           src="https://js.hs-banner.com/v2/3375779/banner.js"
           type="text/javascript"
           id="cookieBanner-3375779"
@@ -76,6 +95,7 @@ const { data: footerData } = await getFooter(Astro.request);
         ></script>
       </>
     )}
+    
     <!-- Schema.org JSON-LD for Roller software - not needed for this project
     <script type="application/ld+json">
        {
@@ -700,6 +720,16 @@ window.VWO.eB = window._vwoCc && window._vwoCc.dBL ? false : true;
     <slot name="head" />
   </head>
   <body class="m-0 bg-white font-sans">
+    {showAnnouncementBar && (
+      <AnnouncementBar
+        display={true}
+        text={announcementBar?.text}
+        ctaText={announcementBar?.ctaText}
+        link={announcementBar?.link}
+        countdownDate={announcementBar?.countdownDate}
+        theme={announcementBar?.theme}
+      />
+    )}
     <div class="main-wrapper">
       <Header
         logo={headerData?.logo}
