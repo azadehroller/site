@@ -1,7 +1,10 @@
 import type { PortableTextBlock } from "@portabletext/types";
-import type { ImageAsset, Slug } from "@sanity/types";
+import type { Slug } from "@sanity/types";
 import groq from "groq";
 import { loadQuery } from "./loadQuery";
+
+// Re-export groq for use in other files
+export { groq };
 
 export async function getHomepage(request?: Request) {
   return await loadQuery<Homepage | null>({
@@ -1546,7 +1549,8 @@ export async function getHomepage(request?: Request) {
           background,
           darkBackgroundColor
         }
-      }
+      },
+      announcementBar
     }`,
     request,
   });
@@ -3097,7 +3101,8 @@ export async function getGetStartedPage(request?: Request) {
           background,
           darkBackgroundColor
         }
-      }
+      },
+      announcementBar
     }`,
     request,
   });
@@ -4610,7 +4615,8 @@ export async function getFeature(slug: string, request?: Request) {
             ctaKind
           }
         }
-      }
+      },
+      announcementBar
     }`,
     params: { slug },
     request,
@@ -4668,10 +4674,10 @@ export async function getPost(slug: string, request?: Request) {
 export async function getRelatedPosts(topicIds: string[], currentPostId: string, limit: number = 3, request?: Request) {
   return await loadQuery<Post[]>({
     query: groq`*[
-      _type == "post" 
-      && defined(slug.current) 
-      && _id != $currentPostId
-      && count((topics[]->_id)[@ in $topicIds]) > 0
+      _type == "post"
+      && defined(slug.current)
+      && !(_id in [$currentPostId, "drafts." + $currentPostId])
+      && count((topics[]._ref)[@ in $topicIds]) > 0
     ] | order(coalesce(publishedAt, _createdAt) desc)[0...$limit] {
       _type,
       _id,
@@ -4681,7 +4687,8 @@ export async function getRelatedPosts(topicIds: string[], currentPostId: string,
       excerpt,
       featuredImage,
       publishedAt,
-      "topics": topics[]->{ _id, name, slug }
+      "topics": topics[]->{ _id, name, slug },
+      body
     }`,
     params: { topicIds, currentPostId, limit },
     request,
@@ -4827,6 +4834,7 @@ export interface ImageVideoModal {
   videoId: string;
   border?: boolean;
   lightBackgroundShadow?: boolean;
+  loading?: 'lazy' | 'eager';
 }
 
 export interface ImageBlock {
@@ -4947,6 +4955,7 @@ export interface FaqsHeadingData {
   headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
   textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  addBorderLine?: boolean;
 }
 
 export interface FAQs {
@@ -5573,6 +5582,10 @@ export interface ColumnsBlock {
   paddingTopMobile?: string;
   paddingBottom?: string;
   paddingBottomMobile?: string;
+  paddingLeft?: string;
+  paddingLeftMobile?: string;
+  paddingRight?: string;
+  paddingRightMobile?: string;
 }
 
 // Trusted Partner types
@@ -5582,7 +5595,7 @@ export interface TrustedPartner {
   // Content (HeadingComposition fields)
   eyebrow?: string;
   title?: string;
-  text?: string;
+  text?: PortableTextBlock[];
   // Styles (same as HeadingComposition)
   theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
   textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -5606,12 +5619,27 @@ export interface TrustedPartner {
   borderRadius?: string;
 }
 
+// Announcement bar settings - editable object with theme, text, link, etc.
+export interface AnnouncementBarSettings {
+  enabled?: boolean;
+  theme?: "default" | "new_design" | "industry_report" | "product_launch";
+  text?: string;
+  ctaText?: string;
+  link?: {
+    href?: string;
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+  countdownDate?: string;
+}
+
 export interface Homepage {
   _type: "homepage";
   _id: string;
   _updatedAt?: string;
   title?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export interface GetStartedPage {
@@ -5622,6 +5650,7 @@ export interface GetStartedPage {
   seoTitle?: string;
   seoDescription?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export interface Page {
@@ -5640,6 +5669,7 @@ export interface Feature {
   slug: Slug;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export interface Industry {
@@ -5649,6 +5679,7 @@ export interface Industry {
   slug: Slug;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export async function getIndustry(slug: string, request?: Request) {
@@ -6475,7 +6506,8 @@ export async function getIndustry(slug: string, request?: Request) {
           size,
           sizeMobile
         }
-      }
+      },
+      announcementBar
     }`,
     params: { slug },
     request,
@@ -6489,6 +6521,7 @@ export interface Partner {
   slug: Slug;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export interface PartnersLandingPage {
@@ -6497,6 +6530,7 @@ export interface PartnersLandingPage {
   title?: string;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export interface Competitor {
@@ -6506,6 +6540,7 @@ export interface Competitor {
   slug: Slug;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export interface CompetitorsLandingPage {
@@ -6514,6 +6549,7 @@ export interface CompetitorsLandingPage {
   title?: string;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 // Blog Topic interface
@@ -6803,7 +6839,8 @@ export async function getPartner(slug: string, request?: Request) {
             }
           }
         }
-      }
+      },
+      announcementBar
     }`,
     params: { slug },
     request,
@@ -7002,7 +7039,8 @@ export async function getPartnersLandingPage(request?: Request) {
             }
           }
         }
-      }
+      },
+      announcementBar
     }`,
     request,
   });
@@ -7203,7 +7241,8 @@ export async function getCompetitor(slug: string, request?: Request) {
             }
           }
         }
-      }
+      },
+      announcementBar
     }`,
     params: { slug },
     request,
@@ -7402,7 +7441,8 @@ export async function getCompetitorsLandingPage(request?: Request) {
             }
           }
         }
-      }
+      },
+      announcementBar
     }`,
     request,
   });
@@ -7657,6 +7697,8 @@ export interface LandingPage {
   sections?: (ColumnsBlock | Divider)[];
   seoTitle?: string;
   seoDescription?: string;
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export async function getLandingPage(slug: string, request?: Request) {
@@ -8562,7 +8604,9 @@ export async function getLandingPage(slug: string, request?: Request) {
           marginTop,
           marginBottom
         }
-      }
+      },
+      headerTheme,
+      announcementBar
     }`,
     params: { slug },
     request,
@@ -8576,6 +8620,7 @@ export interface Solution {
   slug: { current: string };
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export async function getSolution(slug: string, request?: Request) {
@@ -9418,7 +9463,8 @@ export async function getSolution(slug: string, request?: Request) {
           marginTop,
           marginBottom
         }
-      }
+      },
+      announcementBar
     }`,
     params: { slug },
     request,

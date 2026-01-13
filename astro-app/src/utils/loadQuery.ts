@@ -10,7 +10,7 @@ const visualEditingEnabled =
   String(import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED) === 'true'
 const token = import.meta.env.SANITY_API_READ_TOKEN
 
-type LoadQueryArgs<T> = {
+type LoadQueryArgs = {
   query: string
   params?: QueryParams
   request?: Request // pass Astro's request in from pages/load functions
@@ -20,7 +20,7 @@ export async function loadQuery<T>({
   query,
   params,
   request
-}: LoadQueryArgs<T>): Promise<{ data: T; perspective: 'published' | 'previewDrafts' }> {
+}: LoadQueryArgs): Promise<{ data: T; perspective: 'published' | 'previewDrafts' }> {
   // Detect preview from cookie set by /api/draft-mode/enable
   const cookieHeader = request?.headers.get('cookie') || ''
   const isPreview = /\bsanity-preview=true\b/.test(cookieHeader)
