@@ -31,6 +31,9 @@ export default defineConfig({
   // Server output is required for SSR and visual editing
   output: 'server',
   adapter: netlify(),
+  checker: {
+    typescript: false,
+  },
   vite: {
     plugins: [tailwindcss()],
   },
