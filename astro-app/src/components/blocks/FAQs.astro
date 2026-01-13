@@ -25,6 +25,7 @@ interface HeadingData {
   headingType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   displayType?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 's8';
   textType?: 'xs' | 'sm' | 'base' | 'lg' | '2xl';
+  addBorderLine?: boolean;
 }
 
 interface Props {
@@ -165,24 +166,6 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
 )}
 
 <style>
-  /* Border colors */
-  .border-primary-50 {
-    border-color: var(--primary-50, #033180);
-  }
-
-  .border-neutral-white {
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  /* Text colors */
-  .text-primary-50 {
-    color: var(--primary-50, #033180);
-  }
-
-  .text-neutral-white {
-    color: #ffffff;
-  }
-
   /* Button focus state */
   dt button:focus {
     outline: 2px solid var(--secondary-50, #cc4400);

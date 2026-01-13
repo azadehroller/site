@@ -9,7 +9,7 @@
  * - Theme support (OnDark, OnLight, GxScore)
  */
 import { cleanStega } from "../../utils/stega";
-import { urlFor } from "../../utils/sanity";
+import { urlFor } from "../../utils/image";
 
 interface SlideItem {
   _key?: string;
@@ -128,7 +128,7 @@ const cssVars = {
     <div class="swiper-wrapper">
       {slides.map((slide, index) => {
         const imageUrl = slide.image?.asset?._ref 
-          ? urlFor(slide.image.asset._ref).width(1248).height(520).url()
+          ? urlFor(slide.image as import("@sanity/types").Image).width(1248).height(520).url()
           : slide.image?.asset?.url;
         const alt = cleanStega(slide.image?.alt) || cleanStega(slide.title) || `Slide ${index + 1}`;
         
@@ -249,6 +249,13 @@ const cssVars = {
 </style>
 
 <script>
+  // Type declaration for Swiper
+  declare global {
+    interface Window {
+      Swiper: new (el: HTMLElement, options: object) => object;
+    }
+  }
+
   // Dynamic import for Swiper
   async function initFeaturesSlider() {
     // Check if Swiper is already loaded

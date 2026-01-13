@@ -17,7 +17,7 @@ interface Props {
 const { columns, id } = Astro.props;
 
 // Generate a unique ID for the table
-const tableId = cleanStega(id) || `comparison-table-${Math.random().toString(36).substr(2, 9)}`;
+const tableId = cleanStega(id) || `comparison-table-${Math.random().toString(36).slice(2, 11)}`;
 ---
 
 <section id={tableId} class="my-4">

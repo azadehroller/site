@@ -30,9 +30,6 @@ interface Props {
   heading?: HeadingCompositionType;
   // Industries
   industries?: IndustryItem[];
-  // CTA
-  ctaLabel?: string;
-  ctaLink?: IndustryLink;
   // Theme
   theme?: 'light' | 'dark';
   id?: string;
@@ -41,8 +38,6 @@ interface Props {
 const {
   heading,
   industries = [],
-  ctaLabel = 'See all industries',
-  ctaLink,
   theme: rawTheme = 'dark',
   id = 'industry-selector-global'
 } = Astro.props;
@@ -61,16 +56,7 @@ const themeClass = theme === 'light' ? 'light' : 'dark';
 const textColorClass = theme === 'light' ? 'text-neutral-white' : 'text-primary-50';
 const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutral-white';
 
-// CTA link data
-const ctaHref = cleanStega(ctaLink?.href) || '/industries';
-const ctaOpenInNewTab = ctaLink?.openInNewTab;
-const ctaNoFollow = ctaLink?.noFollow;
-
-// Build rel attribute for CTA
-const ctaRelParts: string[] = [];
-if (ctaNoFollow) ctaRelParts.push('nofollow');
-if (ctaOpenInNewTab) ctaRelParts.push('noopener', 'noreferrer');
-const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
+// CTA link data (unused in current implementation)
 ---
 
 <div 
@@ -171,10 +157,6 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
   }
 
-  .bg-neutral-white {
-    background-color: #ffffff;
-  }
-
   /* Dropdown wrapper with custom arrow */
   .dropdown-wrapper {
     position: relative;
@@ -224,24 +206,6 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
   }
 
-  /* Text colors */
-  .text-primary-50 {
-    color: var(--primary-50, #033180);
-  }
-
-  .text-neutral-white {
-    color: #ffffff;
-  }
-
-  /* Background colors for hover */
-  .hover\:bg-neutral-white:hover {
-    background-color: #ffffff;
-  }
-
-  .hover\:bg-primary-60:hover {
-    background-color: var(--primary-60, #011840);
-  }
-
   /* Dropdown styles */
   .industry-dropdown {
     border: none;
@@ -258,14 +222,6 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     box-shadow: 0 0 0 2px var(--primary-40, #074DC5);
   }
 
-  /* Button styles */
-  .bg-secondary-50 {
-    background-color: var(--secondary-50, #ff3800);
-  }
-
-  .hover\:bg-secondary-70:hover {
-    background-color: var(--secondary-70, #cc2d00);
-  }
 </style>
 
 <script is:inline>

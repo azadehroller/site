@@ -141,6 +141,7 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
             {badgeLink ? (
               <a 
                 href={badgeLink} 
+                aria-label=`Read more about ${badgeAlt} - ${badgeLink}`
                 target="_blank" 
                 rel="noopener noreferrer"
                 aria-label={badgeAlt}
@@ -169,26 +170,6 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
 </section>
 
 <style>
-  .text-primary-50 {
-    color: var(--primary-50, #1e293b);
-  }
-
-  .text-secondary-50 {
-    color: var(--secondary-50, #6366f1);
-  }
-
-  .text-neutral-white {
-    color: #ffffff;
-  }
-
-  .text-gx-80 {
-    color: var(--gx-80, #374151);
-  }
-
-  .text-gx-90 {
-    color: var(--gx-90, #1f2937);
-  }
-
   /* Heading display sizes */
   .h1-heading {
     font-size: 3rem;

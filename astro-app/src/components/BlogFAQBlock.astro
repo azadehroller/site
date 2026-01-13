@@ -1,0 +1,173 @@
+---
+/**
+ * BlogFAQBlock - FAQ accordion using <details> and <summary> HTML tags
+ * Follows HubSpot FAQ structure with matching styles
+ */
+import { cleanStega } from '../utils/stega';
+
+interface FaqItem {
+  _key?: string;
+  question?: string;
+  answer?: string;
+}
+
+interface Props {
+  node?: {
+    _type: 'blogFAQBlock';
+    _key: string;
+    label?: string;
+    title?: string;
+    items?: FaqItem[];
+    expandFirst?: boolean;
+  };
+  value?: {
+    _type: 'blogFAQBlock';
+    _key: string;
+    label?: string;
+    title?: string;
+    items?: FaqItem[];
+    expandFirst?: boolean;
+  };
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+
+// Clean Sanity stega encoding
+const title = cleanStega(blockData?.title || '');
+const items = blockData?.items || [];
+const expandFirst = blockData?.expandFirst || false;
+---
+
+{items.length > 0 && (
+  <section class="blog-faq-section">
+    {title && (
+      <h2 class="a-faq__title">{title}</h2>
+    )}
+
+    <div class="m-faq__items">
+      {items.map((item, index) => {
+        const question = cleanStega(item.question || '');
+        const answer = cleanStega(item.answer || '');
+        const isFirst = index === 0 && expandFirst;
+
+        return (
+          <details class="m-faq__item" open={isFirst}>
+            <summary class="a-faq__heading">
+              {question}
+            </summary>
+            <div class="a-faq__body">
+              <p>{answer}</p>
+            </div>
+          </details>
+        );
+      })}
+    </div>
+  </section>
+)}
+
+<style>
+  .blog-faq-section {
+    margin: 2rem 0;
+  }
+
+  .a-faq__title {
+    margin-bottom: 33px;
+  }
+
+  .m-faq__items {
+    max-width: 856px;
+    margin: 0 auto;
+  }
+
+  .m-faq__item {
+    padding: 16px 0 16px 0;
+    background: #ffffff;
+    border-bottom: 1px solid #023180;
+    text-align: left;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .m-faq__item:not(:last-child) {
+    margin-bottom: 16px;
+  }
+
+  /* Minus icon (open state) - hidden by default */
+  .m-faq__item::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    background-image: url('/images/icons/minus.png');
+    background-size: 24px 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 21px;
+    top: 21px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Plus icon (closed state) - visible by default */
+  .m-faq__item::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    background-image: url('/images/icons/plus.png');
+    background-size: 24px 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 21px;
+    top: 21px;
+    pointer-events: none;
+  }
+
+  /* When open: show minus, hide plus, add bottom padding */
+  .m-faq__item[open] {
+    padding-bottom: 16px;
+  }
+
+  .m-faq__item[open]::before {
+    opacity: 1;
+  }
+
+  .m-faq__item[open]::after {
+    opacity: 0;
+  }
+
+  .a-faq__heading {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  /* Remove default marker */
+  .a-faq__heading::-webkit-details-marker {
+    display: none;
+  }
+
+  .a-faq__heading::marker {
+    display: none;
+  }
+
+  .a-faq__body {
+    margin-bottom: 0;
+  }
+
+  /* Desktop styles */
+  @media (min-width: 1025px) {
+    .a-faq__title {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .m-faq__item {
+      padding-right: 0;
+    }
+  }
+</style>

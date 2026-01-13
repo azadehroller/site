@@ -67,15 +67,18 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
     } else if (item._type === 'imageVideoModal') {
       const modal = item as ImageVideoModalType;
       const thumbnailUrl = modal.thumbnail?.asset?.url;
+      // Clean loading value from stega encoding
+      const cleanLoading = cleanStega(modal.loading) as 'lazy' | 'eager' | undefined;
       return (
         <div class="content-block-wrapper" {...editAttrs}>
+          {/* PRESERVE stega in videoId for visual editing */}
           <ImageVideoModal
             thumbnail={{
+              image: modal.thumbnail, // Pass full Sanity image object for srcset generation
               src: thumbnailUrl || '',
-              // PRESERVE stega in alt for visual editing click-to-edit
-              alt: modal.thumbnail?.alt || '',
+              alt: cleanStega(modal.thumbnail?.alt) || '',
+              loading: cleanLoading,
             }}
-            // PRESERVE stega in videoId for visual editing
             videoId={modal.videoId}
             style={{
               border: modal.border,
@@ -483,8 +486,6 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
           <IndustrySelectorGlobal
             heading={industrySelectorGlobalData.heading}
             industries={industrySelectorGlobalData.industries}
-            ctaLabel={industrySelectorGlobalData.ctaLabel}
-            ctaLink={industrySelectorGlobalData.ctaLink}
             theme={cleanStega(industrySelectorGlobalData.theme) as 'light' | 'dark' | undefined}
             id={cleanStega(industrySelectorGlobalData._key)}
           />
@@ -498,8 +499,6 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
           <IndustrySelectorGlobal
             heading={globalData.heading}
             industries={globalData.industries}
-            ctaLabel={globalData.ctaLabel}
-            ctaLink={globalData.ctaLink}
             theme={cleanStega(globalData.theme) as 'light' | 'dark' | undefined}
             id={cleanStega(globalData._id)}
           />

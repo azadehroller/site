@@ -48,7 +48,7 @@ const {
   borderRadius = 'none',
   shadow = 'none',
   objectFit = 'contain',
-  id = `advanced-image-${Math.random().toString(36).substr(2, 9)}`
+  id = `advanced-image-${Math.random().toString(36).slice(2, 11)}`
 } = Astro.props;
 
 // Clean stega from style values that are used in CSS classes
@@ -82,8 +82,8 @@ let width = customWidth || 800;
 let height = customHeight || 600;
 
 // If we have a Sanity image, try to get original dimensions
-if (canBuildResponsive && image.asset?.metadata?.dimensions) {
-  const dims = image.asset.metadata.dimensions;
+if (canBuildResponsive && (image as any).asset?.metadata?.dimensions) {
+  const dims = (image as any).asset.metadata.dimensions;
   width = customWidth || dims.width || 800;
   height = customHeight || dims.height || 600;
 }

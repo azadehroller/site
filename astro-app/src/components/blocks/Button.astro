@@ -108,7 +108,7 @@ if (settings.link.openInNewTab) {
 const relAttr = relParts.length > 0 ? relParts.join(' ') : undefined;
 
 // Button ID
-const cleanButtonText = cleanStega(rawSettings.buttonText) || 'Button';
+const cleanButtonText = cleanStega(rawSettings?.buttonText) || 'Button';
 const cleanLabelForId = cleanButtonText.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
 const buttonId = id ? `button_${id}` : `button_${cleanLabelForId}`;
 
@@ -331,35 +331,6 @@ const iconSvg = btnIcon.iconFieldSvg;
   .button-transparent:hover {
     color: var(--neutral-white, #fff);
     background-color: transparent;
-  }
-
-  /* Flex utilities */
-  .flex {
-    display: flex;
-  }
-
-  .justify-center {
-    justify-content: center;
-  }
-
-  .items-center {
-    align-items: center;
-  }
-
-  .mr-2 {
-    margin-right: 0.5rem;
-  }
-
-  .mr-0 {
-    margin-right: 0;
-  }
-
-  .ml-2 {
-    margin-left: 0.5rem;
-  }
-
-  .order-1 {
-    order: 1;
   }
 </style>
 

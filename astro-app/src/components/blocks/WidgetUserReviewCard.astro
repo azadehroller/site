@@ -11,6 +11,7 @@ interface BadgeItem {
   _key?: string;
   image?: {
     asset?: { _ref?: string; url?: string };
+    url?: string;
   };
   alt?: string;
   link?: string;
@@ -218,27 +219,6 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
   /* Card shadow */
   .box-shadow-ondark-blue-10-nohover {
     box-shadow: 0 4px 24px rgba(1, 24, 64, 0.25);
-  }
-
-  /* Text colors */
-  .text-neutral-white {
-    color: #ffffff;
-  }
-
-  .text-primary-50 {
-    color: var(--primary-50, #011840);
-  }
-
-  .text-secondary-50 {
-    color: var(--secondary-50, #6366f1);
-  }
-
-  .text-gx-80 {
-    color: var(--gx-80, #374151);
-  }
-
-  .text-gx-90 {
-    color: var(--gx-90, #1f2937);
   }
 
   /* Heading display sizes */

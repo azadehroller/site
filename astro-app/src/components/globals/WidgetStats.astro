@@ -1,5 +1,4 @@
 ---
-import type { WidgetStats as WidgetStatsType } from "../../utils/sanity";
 import { cleanStega } from "../../utils/stega";
 
 interface Props {
@@ -65,22 +64,6 @@ const { eyebrow, title, blurb, stats, horizontalLayout = false } = Astro.props;
   .widget-stats {
     --shadow-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
-  }
-  
-  .box-shadow-onlight {
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  }
-  
-  .bg-neutral-white {
-    background-color: #ffffff;
-  }
-  
-  .text-secondary-50 {
-    color: var(--secondary-50, #6366f1);
-  }
-  
-  .text-primary-50 {
-    color: var(--primary-50, #1e293b);
   }
 </style>
 

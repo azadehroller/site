@@ -4,6 +4,7 @@
  * Renders Sanity CDN images or external URL images
  */
 import { urlFor } from '../utils/image';
+import type { Image } from '@sanity/types';
 
 interface BlogImageData {
   _type: 'blogImageBlock';
@@ -47,10 +48,10 @@ if (externalUrl) {
 } else if (sanityImage?.asset?._ref) {
   try {
     const sizeValue = cleanStega(blockData?.size);
-    const width = sizeValue === 'small' ? 400 : 
-                  sizeValue === 'medium' ? 600 : 
+    const width = sizeValue === 'small' ? 400 :
+                  sizeValue === 'medium' ? 600 :
                   sizeValue === 'large' ? 800 : 1200;
-    imageUrl = urlFor(sanityImage).width(width).auto('format').url();
+    imageUrl = urlFor(sanityImage as Image).width(width).auto('format').url();
   } catch (e) {
     console.error('Failed to generate Sanity image URL:', e);
   }
@@ -114,6 +115,7 @@ const imgStyle = inlineStyle || undefined;
   
   .blog-image-block img {
     display: block;
+    /* width: 100%; */
     height: auto;
     border-radius: 8px;
   }
@@ -147,21 +149,39 @@ const imgStyle = inlineStyle || undefined;
   }
   
   /* Sizes */
-  .blog-image-block--small img {
+  .blog-image-block--small {
     max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  
-  .blog-image-block--medium img {
+
+  .blog-image-block--medium {
     max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  
-  .blog-image-block--large img {
+
+  .blog-image-block--large {
     max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  
+
+  .blog-image-block--full {
+    max-width: 100%;
+  }
+
   .blog-image-block--full img {
-    width: 100%;
     max-width: none;
+  }
+
+  /* Responsive adjustments for mobile */
+  @media (max-width: 768px) {
+    .blog-image-block--small,
+    .blog-image-block--medium,
+    .blog-image-block--large {
+      max-width: 100%;
+    }
   }
   
   /* Inline floated images (inside text blocks) */

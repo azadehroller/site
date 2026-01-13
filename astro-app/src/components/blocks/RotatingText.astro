@@ -21,7 +21,7 @@ interface Props {
 const {
   content,
   styles = {},
-  id = `rotating-text-${Math.random().toString(36).substr(2, 9)}`
+  id = `rotating-text-${Math.random().toString(36).slice(2, 11)}`
 } = Astro.props;
 
 // Content
@@ -163,85 +163,14 @@ const EyebrowTag = eyebrowType || 'div';
 
 <style set:html={`
     /* ===================================
-       Tailwind Utility Fallbacks
+       Component-Specific Styles
        =================================== */
     
-    /* Layout */
-    .grid { display: grid; }
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    @media (min-width: 1024px) {
-        .lg\\:flex-row { flex-direction: row; }
-    }
-    
-    /* Alignment */
-    .items-start { align-items: flex-start; }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
+    /* Custom semantic classes */
     .is-centered { text-align: center; }
-    
-    /* Gap */
-    .gap-0 { gap: 0; }
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 0.75rem; }
-    .gap-4 { gap: 1rem; }
-    @media (min-width: 768px) {
-        .md\\:gap-2 { gap: 0.5rem; }
-        .md\\:gap-3 { gap: 0.75rem; }
-    }
-    
-    /* Text alignment */
-    .text-left { text-align: left; }
-    .text-center { text-align: center; }
-    .text-right { text-align: right; }
-    
-    /* Text colors - using CSS variables from global.css */
-    .text-neutral-white { color: var(--neutral-white, #fff); }
-    .text-primary-50 { color: var(--primary-50, #033180); }
-    .text-secondary-50 { color: var(--secondary-50, #ff290c); }
-    .text-gx-80 { color: #8B5CF6; }
-    .text-gx-90 { color: #7C3AED; }
-    
-    /* Typography */
-    .uppercase { text-transform: uppercase; }
-    .font-extrabold { font-weight: 800; }
-    .text-balance { text-wrap: balance; }
     .small { font-size: 0.875rem; }
     
-    /* Text sizes */
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-base { font-size: 1rem; line-height: 1.5rem; }
-    .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    
-    /* Margin */
-    .my-0 { margin-top: 0; margin-bottom: 0; }
-    .mt-0 { margin-top: 0; }
-    .mb-0 { margin-bottom: 0; }
-    
-    /* Height classes - arbitrary values */
-    .h-\\[44px\\] { height: 44px; }
-    .h-\\[35px\\] { height: 35px; }
-    .h-\\[20px\\] { height: 20px; }
-    @media (min-width: 640px) {
-        .sm\\:h-\\[45px\\] { height: 45px; }
-    }
-    @media (min-width: 768px) {
-        .md\\:h-\\[44px\\] { height: 44px; }
-        .md\\:h-\\[40px\\] { height: 40px; }
-        .md\\:h-\\[45px\\] { height: 45px; }
-        .md\\:h-\\[25px\\] { height: 25px; }
-        .md\\:h-auto { height: auto; }
-    }
-    @media (min-width: 1024px) {
-        .lg\\:h-\\[52px\\] { height: 52px; }
-        .lg\\:h-\\[50px\\] { height: 50px; }
-        .lg\\:h-\\[30px\\] { height: 30px; }
-        .lg\\:h-auto { height: auto; }
-    }
-    
-    /* Heading display classes */
+    /* Custom heading display classes */
     .h1-heading {
         font-size: clamp(2rem, 4vw, 4rem);
         font-weight: 800;

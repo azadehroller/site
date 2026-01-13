@@ -169,24 +169,6 @@ function buildRel(link?: TestimonialLink): string | undefined {
     padding: 2rem;
   }
 
-  /* Background and shadow */
-  .bg-neutral-white {
-    background-color: #ffffff;
-  }
-
-  .box-shadow-onlight-navy-40 {
-    box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
-  }
-
-  /* Text colors */
-  .text-secondary-50 {
-    color: var(--secondary-50, #6366f1);
-  }
-
-  .text-primary-50 {
-    color: var(--primary-50, #1e293b);
-  }
-
   /* List styling */
   .testimonial-carousel--wrapper__inner ul {
     gap: 1.25rem;
@@ -215,7 +197,8 @@ function buildRel(link?: TestimonialLink): string | undefined {
       itemContent.forEach((content) => {
         const duplicatedContent = content.cloneNode(true);
         if (duplicatedContent instanceof Element) {
-          duplicatedContent.setAttribute("aria-hidden", "true");
+          // Use inert to fully remove from accessibility tree AND prevent focus
+          duplicatedContent.setAttribute("inert", "");
         }
         itemInner.appendChild(duplicatedContent);
       });

@@ -151,7 +151,7 @@ const hasLogo = imageType === 'logo' && logoUrl;
 const hasImage = hasAvatar || hasLogo;
 
 // Generate unique ID
-const quoteId = id ? cleanStega(id) : `quote-${Math.random().toString(36).substr(2, 9)}`;
+const quoteId = id ? cleanStega(id) : `quote-${Math.random().toString(36).slice(2, 11)}`;
 
 /**
  * Sanitize HTML to allow only safe tags

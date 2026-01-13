@@ -46,16 +46,14 @@ const paddingBottom = getPaddingBottom(aspectRatio);
 
 {videoId && (
   <div class="blog-video-block" style={`max-width: ${maxWidth}; margin: 2rem auto;`}>
-    {title && <h3 class="video-title">{title}</h3>}
-    
     <div class="video-wrapper" style={`padding-bottom: ${paddingBottom};`}>
       {videoType === 'wistia' && (
         <Fragment>
-          <script src={`https://fast.wistia.com/embed/medias/${videoId}.jsonp`} async></script>
-          <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
+          <script is:inline src={`https://fast.wistia.com/embed/medias/${videoId}.jsonp`} async></script>
+          <script is:inline src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
           <div class="wistia_responsive_padding" style={`padding: ${paddingBottom} 0 0 0; position: relative;`}>
-            <div class="wistia_responsive_wrapper" style="height: 100%; left: 0; position: absolute; top: 0; width: 100%;">
-              <span 
+            <div class="wistia_responsive_wrapper" style="height: 100%; left: 0; position: absolute; top: 0; width: 100%;" title={title || 'Video'}>
+              <span
                 class={`wistia_embed wistia_async_${videoId} popover=true videoFoam=true ${autoplay ? 'autoPlay=true' : ''}`}
                 style="display: inline-block; height: 100%; position: relative; width: 100%;"
               >&nbsp;</span>
@@ -63,7 +61,7 @@ const paddingBottom = getPaddingBottom(aspectRatio);
           </div>
         </Fragment>
       )}
-      
+
       {videoType === 'youtube' && (
         <iframe
           src={`https://www.youtube.com/embed/${videoId}${autoplay ? '?autoplay=1&mute=1' : ''}`}
@@ -73,7 +71,7 @@ const paddingBottom = getPaddingBottom(aspectRatio);
           loading="lazy"
         ></iframe>
       )}
-      
+
       {videoType === 'vimeo' && (
         <iframe
           src={`https://player.vimeo.com/video/${videoId}${autoplay ? '?autoplay=1&muted=1' : ''}`}
@@ -92,15 +90,7 @@ const paddingBottom = getPaddingBottom(aspectRatio);
     display: block;
     margin: 2rem auto;
   }
-  
-  .video-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #033180;
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-  
+
   .video-wrapper {
     position: relative;
     width: 100%;

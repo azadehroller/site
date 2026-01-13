@@ -18,11 +18,13 @@ interface BadgeItem {
   link?: string;
 }
 
+import type { PortableTextBlock } from "@portabletext/types";
+
 interface Props {
   // Content (HeadingComposition fields)
   eyebrow?: string;
   title?: string;
-  text?: string;
+  text?: PortableTextBlock[];
   // Styles (same as HeadingComposition)
   theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
   textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';

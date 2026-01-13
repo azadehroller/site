@@ -437,12 +437,16 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
       padding-bottom: 1.875rem;
       position: fixed;
       right: 0;
-      top: 72px;
+      top: calc(var(--announcement-bar-height, 0px) + 72px);
       z-index: 20;
       height: calc(100vh - 72px);
     }
   }
-
+  @media screen and (max-width: 991px) {
+   .header:not(.is-fixed) .header__block {
+          top: calc(var(--announcement-bar-height, 0px) + var(--header-height, 0px));
+    }
+}
   @media screen and (min-width: 1024px) {
     .header__block {
       background-color: transparent;
@@ -906,7 +910,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 <header id="header" class:list={["header", themeClass]}>
   <a href="#main-content" class="header__skip">Skip to content</a>
 
-  <div class="inner-header container px-0 md:px-5 lg:px-5 py-4">
+  <div class="inner-header container md:px-5 lg:px-5 py-4">
     <!-- Logo (Dark Background) -->
     <div class="header__logo w-[160px] mr-2 sm:w-[192px] shrink-0">
       <a href={logoLink}>
@@ -933,7 +937,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
       </a>
     </div>
 
-    <div class="header__main order-3 maxmd:order-none ml-3 maxmd:ml-0">
+    <div class="header__main flex ml-0 order-3 lg:order-2 md:ml-3">
       <!-- Mobile menu trigger -->
       <button 
         id="header__block-toggle" 
@@ -953,9 +957,9 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
           <ul role="list" class="main-nav-list" id="main-nav-list">
             {navItems.map((item) => {
               const megaMenu = item.hasMegaMenu ? getMegaMenu(item.label) : undefined;
-              const itemClasses = megaMenu 
-                ? 'main-nav__item no-underline inline-block maxmd:flex items-center maxmd:h-[72px] mega-link menu-drop' 
-                : 'main-nav__item no-underline inline-block maxmd:flex items-center maxmd:h-[72px]';
+              const itemClasses = megaMenu
+                ? 'main-nav__item no-underline flex md:inline-block items-center h-[72px] md:h-auto mega-link menu-drop'
+                : 'main-nav__item no-underline flex md:inline-block items-center h-[72px] md:h-auto';
               
               return (
                 <li class={itemClasses}>
@@ -968,19 +972,19 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
                         </svg>
                       </button>
                       <div class="menu-drop-panel mega-drop">
-                        <div class="mega-drop-wrapper maxmd:bg-neutral-white">
+                        <div class="mega-drop-wrapper md:bg-neutral-white">
                           <div class="flex gap-8 container">
                             <div class:list={[
-                              megaMenu.useAlternateLayout 
-                                ? "grid grid-cols-2 maxmd:grid-cols-3 gap-y-0 maxmd:gap-y-0 gap-x-0 maxmd:gap-x-8" 
-                                : "flex gap-y-4 gap-x-8 maxmd:gap-x-0 xl:gap-x-8",
+                              megaMenu.useAlternateLayout
+                                ? "grid grid-cols-2 md:grid-cols-3 gap-y-0 md:gap-y-0 gap-x-0 md:gap-x-8"
+                                : "flex gap-y-4 gap-x-8 md:gap-x-0 xl:gap-x-8",
                               "container relative after:absolute after:w-[1px] after:h-[100%] after:bg-neutral-90 after:top-0 after:right-[-40px] dark:after:bg-neutral-10"
                             ]}>
                               {/* Default structure - when useAlternateLayout is false or not set */}
                               {!megaMenu.useAlternateLayout && (
                                 <>
                                   {megaMenu.introTitle && (
-                                    <div class="hidden maxmd:block max-w-[305px]">
+                                    <div class="hidden md:block max-w-[305px]">
                                       <div class="mega-drop__item-text">
                                         <p class="text-primary-50 text-4xl font-extrabold leading-11 mb-3">{megaMenu.introTitle}</p>
                                         {megaMenu.introDescription && (
@@ -993,35 +997,34 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
                                   {/* Menu items */}
                                   <div class="grow flex flex-col md:grid md:grid-cols-2">
                                     {megaMenu.items?.map((menuItem) => (
-                                      <div class="mega-drop__item mb-2 maxmd:mb-4 w-[170px] maxmd:w-auto">
-                                        <div class="mega-drop__item-text flex items-center gap-x-4 maxmd:gap-x-1 xl:gap-x-4">
+                                      <div class="mega-drop__item mb-2 md:mb-4 w-[170px] md:w-auto">
+                                        <div class="mega-drop__item-text flex items-center gap-x-4 md:gap-x-1 xl:gap-x-4">
                                             {menuItem.icon && (
-                                                  <div class="hidden maxmd:block" set:html={menuItem.icon}></div>
+                                                  <div class="hidden md:block" set:html={menuItem.icon}></div>
                                                 )}
                                                 <div class="grow">
 
-                                                  <a 
-                                                    href={menuItem.link?.href || '#'}           
+                                                  <a
+                                                    href={menuItem.link?.href || '#'}
                                                     target={menuItem.link?.openInNewTab ? '_blank' : undefined}
                                                   >
-                                                        <p class="text-base text-primary-50 hover:text-secondary-50 leading-4 maxmd:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
+                                                        <p class="text-base text-primary-50 hover:text-secondary-50 leading-4 md:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
 
                                                   </a>
-                                                  <div class="hidden maxmd:flex text-sm text-primary-50">
+                                                  <div class="hidden md:flex text-sm text-primary-50">
                                                     {menuItem.description && (
                                                       <p class="mr-1 flex items-center">{menuItem.description}</p>
                                                     )}
                                                     
                                                     {Array.isArray(menuItem.topFeatures) && menuItem.topFeatures.length > 0 && (
                                                       <>
-                                                        {menuItem.topFeatures.map((feature, i) => {
-                                                          const href = feature.link || feature.link|| '#';
+                                                        {menuItem.topFeatures.map((feature) => {
                                                           // Try .link.href (Sanity object), fallback to .link (string)
                                                           if ((feature.link|| feature.link) && feature.title) {
                                                             return (
                                                               <a
                                                                 href={feature.link|| feature.link}
-                                                                class="flex items-center text-sm text-left maxmd:text-center xl:text-left text-primary-40 mx-1 bg-primary-10 font-semibold py-1 px-2 rounded-[980px] hover:bg-[#6ba0fa] transition ease-in-out duration-300"
+                                                                class="flex items-center text-sm text-left md:text-center xl:text-left text-primary-40 mx-1 bg-primary-10 font-semibold py-1 px-2 rounded-[980px] hover:bg-[#6ba0fa] transition ease-in-out duration-300"
                                                               >
                                                                 {feature.title}
                                                               </a>
@@ -1058,7 +1061,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
                                   {megaMenu.subIntros && megaMenu.subIntros.length > 0 && (
                                     <>
                                       {megaMenu.subIntros.map((subIntro) => (
-                                        <div class="hidden maxmd:block">
+                                        <div class="hidden md:block">
                                           <p class="font-extrabold text-secondary-50 leading-7 m-0">{subIntro.title}</p>
                                         </div>
                                       ))}
@@ -1066,12 +1069,12 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
                                   )}
                                   {/* menu items */}
                                   {megaMenu.items?.map((menuItem) => (
-                                      <a href={menuItem.link?.href || '#'}  class="mega-drop__item w-[170px] maxmd:w-auto" target="_self">
+                                      <a href={menuItem.link?.href || '#'}  class="mega-drop__item w-[170px] md:w-auto" target="_self">
                                         {/* <img src="" alt="" width="100" loading=""> */}
                                         <div class="mega-drop__item-text">
-                                          <p class="text-primary-50 hover:text-secondary-50 leading-4 maxmd:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
+                                          <p class="text-primary-50 hover:text-secondary-50 leading-4 md:leading-7 md:font-semibold mb-2">{menuItem.title}</p>
                                           {menuItem.description && (
-                                             <p class="hidden maxmd:block text-sm text-primary-50">{menuItem.description}</p>
+                                             <p class="hidden md:block text-sm text-primary-50">{menuItem.description}</p>
                                           )}                                  
                                         </div>
                                       </a>
@@ -1082,7 +1085,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
                             
                             {/* Featured section */}
                             {megaMenu.featuredItems && megaMenu.featuredItems.length > 0 && (
-                              <div class="hidden maxmd:block min-w-[256px]">
+                              <div class="hidden md:block min-w-[256px]">
                                 {megaMenu.featuredLabel && (
                                   <p class="font-extrabold text-secondary-50 leading-7 mb-3">{megaMenu.featuredLabel}</p>
                                 )}
@@ -1132,12 +1135,12 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
     <!-- Header CTA buttons -->
     {buttons.length > 0 && (
-      <div class="ml-auto hidden md:block">
+      <div class="ml-auto hidden md:flex order-2 lg:order-3">
         <ul
           id="js-button-stack"
           class="flex flex-row list-none gap-3 m-0"
         >
-            {buttons.map((button, idx) => {
+            {buttons.map((button) => {
               const cleanLabel = stripInvisible(button.label || '');
               const labelLower = cleanLabel.toLowerCase();
               return (
@@ -1182,8 +1185,20 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   // Check if we're on mobile
   const isMobile = () => window.innerWidth < mobileBreakpoint;
 
+  // Measure header height when menu is not active and store in CSS variable
+  const updateHeaderHeight = () => {
+    // Only measure when menu is NOT active to get the collapsed header height
+    if (!block.classList.contains("is-active")) {
+      const height = header.offsetHeight;
+      block.style.setProperty('--header-height', height + 'px');
+    }
+  };
+
+  // Initial measurement
+  updateHeaderHeight();
+
   const handleScroll = () => {
-    const currentScrollPosition = window.pageYOffset;
+    const currentScrollPosition = window.scrollY;
 
     clearTimeout(timeout);
     timeout = setTimeout(() => {
@@ -1204,6 +1219,8 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     // Close all open dropdowns when closing mobile menu
     if (isActive) {
       closeAllDropdowns();
+      // Update header height after menu closes
+      setTimeout(updateHeaderHeight, 50);
     }
   };
 
@@ -1274,6 +1291,8 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
       if (!isMobile()) {
         closeAllDropdowns();
       }
+      // Update header height on resize
+      updateHeaderHeight();
     }, 150);
   });
 
