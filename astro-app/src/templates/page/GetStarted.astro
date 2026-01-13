@@ -35,7 +35,7 @@ const getDividerBgClass = (divider: DividerType): string => {
 };
 ---
 
-<Layout title={seoTitle}>
+<Layout title={seoTitle} announcementBar={page?.announcementBar}>
   <main class="get-started-page">
     {sections.length > 0 ? (
       sections.map((section) => {

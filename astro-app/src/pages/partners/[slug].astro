@@ -19,7 +19,7 @@ const documentId = partner?._id || '';
 const documentType = 'partner';
 ---
 
-<Layout title={partner?.title || "Partner"}>
+<Layout title={partner?.title || "Partner"} announcementBar={partner?.announcementBar}>
   {partner?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;

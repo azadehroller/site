@@ -25,7 +25,7 @@ const getDividerBgClass = (divider: DividerType): string => {
 };
 ---
 
-<Layout title={title}>
+<Layout title={title} announcementBar={homepage?.announcementBar}>
   <main class="homepage">
     {sections.length > 0 ? (
       sections.map((section) => {

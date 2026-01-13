@@ -19,7 +19,7 @@ const documentId = feature?._id || '';
 const documentType = 'feature';
 ---
 
-<Layout title={feature?.title || "Feature"}>
+<Layout title={feature?.title || "Feature"} announcementBar={feature?.announcementBar}>
   {feature?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;

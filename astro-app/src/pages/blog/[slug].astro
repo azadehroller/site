@@ -3,10 +3,14 @@ import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
 import { formatDate } from "../../utils";
 import { getPost, getRelatedPosts } from "../../utils/sanity";
+import { loadQuery } from "../../utils/loadQuery";
 import BlogTextBlock from "../../components/BlogTextBlock.astro";
 import BlogVideoBlock from "../../components/BlogVideoBlock.astro";
 import BlogImageBlock from "../../components/BlogImageBlock.astro";
 import BlogTableBlock from "../../components/BlogTableBlock.astro";
+import BlogTableData from "../../components/BlogTableData.astro";
+import BlogFAQBlock from "../../components/BlogFAQBlock.astro";
+import BlogQuoteBlock from "../../components/BlogQuoteBlock.astro";
 import BlogRawHtmlBlock from "../../components/BlogRawHtmlBlock.astro";
 
 // SSR enabled for preview/draft mode
@@ -33,9 +37,6 @@ function cleanText(text: string | undefined): string {
 // Clean the title
 const cleanTitle = cleanText(post.title);
 const cleanAlt = cleanText(post.featuredImage?.alt) || cleanTitle;
-
-// Use publishedAt or _createdAt as fallback
-const displayDate = post.publishedAt || post._createdAt;
 
 // Use updatedAt if it's later than publishedAt
 const lastUpdated = post.updatedAt && post.publishedAt && new Date(post.updatedAt) > new Date(post.publishedAt)
@@ -65,19 +66,53 @@ const readingTime = estimateReadingTime(post.body || []);
 // Get first topic for breadcrumb (filter out null references)
 const firstTopic = post.topics?.filter(t => t != null)?.[0];
 
-// Get author (use from post or fall back to default)
-const author = post.author || {
-  name: 'ROLLER Software',
-  bio: 'The team at ROLLER collaborates with venue management experts, marketers, and customer experience professionals to bring you insights that help grow and optimize your attraction business.',
-  slug: { current: 'roller-software' },
-};
+// Fetch author directly using raw reference (dereferencing may fail for draft references)
+const { data: postWithAuthorRef } = await loadQuery<{ authorRef: string | null }>({
+  query: `*[_type == "post" && slug.current == $slug][0]{ "authorRef": author._ref }`,
+  params: { slug: post.slug.current },
+  request: Astro.request,
+});
 
-// Fetch related articles based on topics (filter out null references)
-const topicIds = post.topics?.filter(t => t != null).map(t => t._id) || [];
+// Fetch author data if reference exists
+let author = null;
+if (postWithAuthorRef?.authorRef) {
+  const { data: authorData } = await loadQuery<any>({
+    query: `*[_id == $authorId][0]{ _id, name, slug, bio, avatar, email }`,
+    params: { authorId: postWithAuthorRef.authorRef.replace(/^drafts\./, '') },
+    request: Astro.request,
+  });
+  author = authorData;
+}
+
+// Fall back to default author if not found
+if (!author) {
+  author = {
+    name: 'ROLLER Software',
+    bio: 'The team at ROLLER collaborates with venue management experts, marketers, and customer experience professionals to bring you insights that help grow and optimize your attraction business.',
+    slug: { current: 'roller-software' },
+  };
+}
+
+// Fetch related articles based on topics
+// Get raw topic references since dereferencing may fail for draft topics
+const { data: postWithRefs } = await loadQuery<{ topicRefs: string[] }>({
+  query: `*[_type == "post" && slug.current == $slug][0]{ "topicRefs": topics[]._ref }`,
+  params: { slug: post.slug.current },
+  request: Astro.request,
+});
+
+const topicIds = postWithRefs?.topicRefs || [];
+console.log('[Related Posts Debug]', {
+  postId: post._id,
+  topicIds,
+  topicsCount: topicIds.length
+});
+
 let relatedPosts: typeof post[] = [];
 if (topicIds.length > 0) {
   const { data: related } = await getRelatedPosts(topicIds, post._id, 3, Astro.request);
   relatedPosts = related || [];
+  console.log('[Related Posts Debug] Found:', relatedPosts.length, 'posts');
 }
 ---
 
@@ -158,7 +193,7 @@ if (topicIds.length > 0) {
           <!-- Article -->
           <article class="blog-post__article">
             <div class="blog-post__body">
-              <PortableText
+              {post.body && <PortableText
                 value={post.body}
                 components={{
                   type: {
@@ -167,10 +202,13 @@ if (topicIds.length > 0) {
                     blogVideoBlock: BlogVideoBlock,
                     blogImageBlock: BlogImageBlock,
                     blogTableBlock: BlogTableBlock,
+                    blogTableData: BlogTableData,
+                    blogFAQBlock: BlogFAQBlock,
+                    blogQuoteBlock: BlogQuoteBlock,
                     blogRawHtmlBlock: BlogRawHtmlBlock,
                   }
                 }}
-              />
+              />}
             </div>
           </article>
 
@@ -215,7 +253,7 @@ if (topicIds.length > 0) {
                       </span>
                       <span class="share-icons__label">Facebook</span>
                     </a>
-                    <a target="_blank" href={`https://twitter.com/share?url=${encodedUrl}`}>
+                    <!-- <a target="_blank" href={`https://twitter.com/share?url=${encodedUrl}`}>
                       <span class="share-icons__icon">
                         <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <rect width="24" height="24" rx="12" fill="var(--white, #fff)"></rect>
@@ -223,7 +261,7 @@ if (topicIds.length > 0) {
                         </svg>
                       </span>
                       <span class="share-icons__label">Twitter</span>
-                    </a>
+                    </a> -->
                     <a id="js-copy-to-clipboard" style="cursor: pointer;">
                       <span class="share-icons__icon">
                         <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1194,6 +1232,24 @@ if (topicIds.length > 0) {
 </style>
 
 <script>
+  // Type declarations for HubSpot
+  declare global {
+    interface Window {
+      hubspotFormsLoaded?: boolean;
+      hbspt?: {
+        forms: {
+          create: (options: {
+            portalId: string;
+            formId: string;
+            region: string;
+            target: Element;
+            cssClass: string;
+          }) => void;
+        };
+      };
+    }
+  }
+  
   // Progress bar functionality (disabled for now)
   // window.addEventListener('scroll', () => {
   //   const progressBar = document.getElementById('js-progress-bar');
@@ -1241,8 +1297,8 @@ if (topicIds.length > 0) {
       var formId = target.getAttribute('data-form-id');
       var region = target.getAttribute('data-region') || 'na1';
       
-      if (portalId && formId && window.hbspt && !target.dataset.initialized) {
-        target.dataset.initialized = 'true';
+      if (portalId && formId && window.hbspt && !(target as HTMLElement).dataset.initialized) {
+        (target as HTMLElement).dataset.initialized = 'true';
         window.hbspt.forms.create({
           portalId: portalId,
           formId: formId,

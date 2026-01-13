@@ -27,7 +27,7 @@ const documentType = landingPage ? 'landingPage' : 'page';
 const headerTheme = landingPage?.headerTheme || regularPage?.headerTheme || 'default';
 ---
 
-<Layout title={page?.title || "Page"} headerTheme={headerTheme}>
+<Layout title={page?.title || "Page"} headerTheme={headerTheme} announcementBar={landingPage?.announcementBar}>
   {page?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;

@@ -26,7 +26,6 @@ if (!topic) {
 const { data: posts } = await getPostsByTopic(slug, Astro.request);
 
 const title = `${topic.name} - Blog`;
-const description = topic.description || `Articles about ${topic.name}`;
 ---
 
 <Layout title={title}>

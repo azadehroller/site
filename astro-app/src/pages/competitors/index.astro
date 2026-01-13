@@ -13,7 +13,7 @@ const documentId = competitorsLanding?._id || '';
 const documentType = 'competitorsLandingPage';
 ---
 
-<Layout title={competitorsLanding?.title || "Competitors"}>
+<Layout title={competitorsLanding?.title || "Competitors"} announcementBar={competitorsLanding?.announcementBar}>
   <CompetitorsLanding 
     competitorsLanding={competitorsLanding}
     documentId={documentId}

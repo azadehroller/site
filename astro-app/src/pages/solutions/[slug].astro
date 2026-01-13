@@ -19,7 +19,7 @@ const documentId = solution?._id || '';
 const documentType = 'solution';
 ---
 
-<Layout title={solution?.title || "Solution"}>
+<Layout title={solution?.title || "Solution"} announcementBar={solution?.announcementBar}>
   {solution?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;

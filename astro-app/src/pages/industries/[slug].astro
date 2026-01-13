@@ -19,7 +19,7 @@ const documentId = industry?._id || '';
 const documentType = 'industry';
 ---
 
-<Layout title={industry?.title || "Industry"}>
+<Layout title={industry?.title || "Industry"} announcementBar={industry?.announcementBar}>
   {industry?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;

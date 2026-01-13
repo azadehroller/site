@@ -19,7 +19,7 @@ const documentId = competitor?._id || '';
 const documentType = 'competitor';
 ---
 
-<Layout title={competitor?.title || "Competitor"}>
+<Layout title={competitor?.title || "Competitor"} announcementBar={competitor?.announcementBar}>
   {competitor?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;
