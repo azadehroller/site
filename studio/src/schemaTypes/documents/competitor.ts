@@ -11,6 +11,7 @@ export default defineType({
   icon: () => '⚔️',
   groups: [
     {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
     {name: 'seo', title: 'SEO'},
   ],
   fields: [
@@ -54,6 +55,13 @@ export default defineType({
         },
       ],
     }),
+    // Settings
+    defineField({
+      name: 'announcementBar',
+      title: 'Announcement Bar',
+      type: 'announcementBarSettings',
+      group: 'settings',
+    }),
     // SEO fields
     defineField({
       name: 'seoTitle',
@@ -84,5 +92,3 @@ export default defineType({
     },
   },
 })
-
-

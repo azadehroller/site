@@ -160,16 +160,25 @@ export default defineType({
       of: [
         // Text Block - rich text section with inline images (standalone)
         {type: 'blogTextBlock'},
-        
+
         // Video Block - embedded video (standalone)
         {type: 'blogVideoBlock'},
-        
+
         // Image Block - image section (standalone)
         {type: 'blogImageBlock'},
-        
+
         // Table Block - HTML table (standalone)
         {type: 'blogTableBlock'},
-        
+
+        // Table Data - Structured table (user-friendly, standalone)
+        {type: 'blogTableData'},
+
+        // FAQ Block - Accordion-style FAQs (standalone)
+        {type: 'blogFAQBlock'},
+
+        // Quote Block - Customer testimonials/quotes (standalone)
+        {type: 'blogQuoteBlock'},
+
         // Raw HTML Block - for complex content (standalone)
         {type: 'blogRawHtmlBlock'},
       ],

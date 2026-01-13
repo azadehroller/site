@@ -8,6 +8,10 @@ export default defineType({
   name: 'featuresLandingPage',
   title: 'Features Landing',
   type: 'document',
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
+  ],
   fields: [
     defineField({
       name: 'title',
@@ -15,6 +19,7 @@ export default defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
       initialValue: 'Features',
+      group: 'content',
     }),
     defineField({
       name: 'description',
@@ -22,12 +27,14 @@ export default defineType({
       type: 'text',
       rows: 3,
       description: 'A short description for the features landing page',
+      group: 'content',
     }),
     defineField({
       name: 'sections',
       title: 'Page Sections',
       type: 'array',
       description: 'Add and arrange sections for the features landing page',
+      group: 'content',
       of: [
         {
           type: 'columnsBlock',
@@ -36,6 +43,13 @@ export default defineType({
           type: 'divider',
         },
       ],
+    }),
+    // Settings
+    defineField({
+      name: 'announcementBar',
+      title: 'Announcement Bar',
+      type: 'announcementBarSettings',
+      group: 'settings',
     }),
   ],
   preview: {
@@ -46,4 +60,3 @@ export default defineType({
     },
   },
 })
-

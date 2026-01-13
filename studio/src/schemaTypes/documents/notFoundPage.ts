@@ -8,6 +8,10 @@ export default defineType({
   name: 'notFoundPage',
   title: 'Not Found Page',
   type: 'document',
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
+  ],
   fields: [
     defineField({
       name: 'title',
@@ -15,6 +19,7 @@ export default defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
       initialValue: 'Page Not Found',
+      group: 'content',
     }),
     defineField({
       name: 'heading',
@@ -22,6 +27,7 @@ export default defineType({
       type: 'string',
       initialValue: '404',
       description: 'The main heading displayed on the 404 page',
+      group: 'content',
     }),
     defineField({
       name: 'message',
@@ -30,12 +36,14 @@ export default defineType({
       rows: 3,
       initialValue: "Sorry, the page you're looking for doesn't exist.",
       description: 'The message displayed below the heading',
+      group: 'content',
     }),
     defineField({
       name: 'sections',
       title: 'Page Sections',
       type: 'array',
       description: 'Add and arrange sections for the 404 page',
+      group: 'content',
       of: [
         {
           type: 'columnsBlock',
@@ -44,6 +52,13 @@ export default defineType({
           type: 'divider',
         },
       ],
+    }),
+    // Settings
+    defineField({
+      name: 'announcementBar',
+      title: 'Announcement Bar',
+      type: 'announcementBarSettings',
+      group: 'settings',
     }),
   ],
   preview: {
@@ -54,4 +69,3 @@ export default defineType({
     },
   },
 })
-

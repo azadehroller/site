@@ -9,12 +9,17 @@ export default defineType({
   title: 'Industry',
   type: 'document',
   icon: () => '🏭',
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
+  ],
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
       validation: (Rule) => Rule.required(),
+      group: 'content',
     }),
     defineField({
       name: 'slug',
@@ -25,17 +30,20 @@ export default defineType({
         source: 'title',
         maxLength: 96,
       },
+      group: 'content',
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
       rows: 3,
+      group: 'content',
     }),
     defineField({
       name: 'sections',
       title: 'Page Sections',
       type: 'array',
+      group: 'content',
       of: [
         {
           type: 'columnsBlock',
@@ -44,6 +52,13 @@ export default defineType({
           type: 'divider',
         },
       ],
+    }),
+    // Settings
+    defineField({
+      name: 'announcementBar',
+      title: 'Announcement Bar',
+      type: 'announcementBarSettings',
+      group: 'settings',
     }),
   ],
   preview: {
@@ -59,4 +74,3 @@ export default defineType({
     },
   },
 })
-

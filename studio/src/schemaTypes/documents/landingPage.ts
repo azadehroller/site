@@ -75,6 +75,12 @@ export default defineType({
       },
       initialValue: 'default',
     }),
+    defineField({
+      name: 'announcementBar',
+      title: 'Announcement Bar',
+      type: 'announcementBarSettings',
+      group: 'settings',
+    }),
     // SEO fields
     defineField({
       name: 'seoTitle',
@@ -105,5 +111,3 @@ export default defineType({
     },
   },
 })
-
-
