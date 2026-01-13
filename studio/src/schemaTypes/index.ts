@@ -62,6 +62,10 @@ import blogVideoBlock from './objects/blogVideoBlock'
 import blogImageBlock from './objects/blogImageBlock'
 import blogRawHtmlBlock from './objects/blogRawHtmlBlock'
 import blogTableBlock from './objects/blogTableBlock'
+import blogTableData from './objects/blogTableData'
+import blogFAQBlock from './objects/blogFAQBlock'
+import blogQuoteBlock from './objects/blogQuoteBlock'
+import announcementBarSettings from './objects/announcementBarSettings'
 
 // Export an array of all the schema types.  This is used in the Sanity Studio configuration. https://www.sanity.io/docs/schema-types
 
@@ -159,4 +163,9 @@ export const schemaTypes = [
   blogImageBlock,
   blogRawHtmlBlock,
   blogTableBlock,
+  blogTableData,
+  blogFAQBlock,
+  blogQuoteBlock,
+  // Announcement Bar Settings
+  announcementBarSettings,
 ]
