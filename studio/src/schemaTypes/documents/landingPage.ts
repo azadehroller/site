@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {seoFields, seoGroup} from '../objects/seoFields'
 
 /**
  * Landing Page document type - For root-level landing pages
@@ -13,7 +14,7 @@ export default defineType({
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'settings', title: 'Settings'},
-    {name: 'seo', title: 'SEO'},
+    seoGroup,
   ],
   fields: [
     defineField({
@@ -81,22 +82,8 @@ export default defineType({
       type: 'announcementBarSettings',
       group: 'settings',
     }),
-    // SEO fields
-    defineField({
-      name: 'seoTitle',
-      title: 'SEO Title',
-      type: 'string',
-      group: 'seo',
-      description: 'Override the page title for SEO (optional)',
-    }),
-    defineField({
-      name: 'seoDescription',
-      title: 'SEO Description',
-      type: 'text',
-      group: 'seo',
-      rows: 3,
-      description: 'Meta description for search engines',
-    }),
+    // SEO
+    ...seoFields,
   ],
   preview: {
     select: {

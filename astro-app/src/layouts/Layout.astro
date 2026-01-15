@@ -8,14 +8,47 @@ import Header from '../components/globals/Header.astro';
 import AnnouncementBar from '../components/AnnouncementBar.astro';
 import { getFooter, getHeader, type AnnouncementBarSettings } from '../utils/sanity';
 
+interface SEOImage {
+  asset?: {
+    _ref?: string;
+    url?: string;
+  };
+  alt?: string;
+}
+
+interface SEOProps {
+  seoTitle?: string;
+  seoDescription?: string;
+  seoImage?: SEOImage;
+  noIndex?: boolean;
+  canonicalUrl?: string;
+  // For blog posts - fallback image from featured image
+  fallbackImage?: {
+    url?: string;
+    alt?: string;
+  };
+  // Fallback description (e.g., excerpt for blog posts)
+  fallbackDescription?: string;
+}
+
 interface Props {
   title: string;
   headDocument?: string;
   headerTheme?: 'default' | 'dark' | 'light' | 'industry_report';
   announcementBar?: AnnouncementBarSettings;
+  seo?: SEOProps;
 }
 
-const { title, headDocument, headerTheme = 'default', announcementBar } = Astro.props;
+const { title, headDocument, headerTheme = 'default', announcementBar, seo } = Astro.props;
+
+// SEO values with fallbacks
+const pageTitle = seo?.seoTitle || title;
+const metaDescription = seo?.seoDescription || seo?.fallbackDescription;
+// Use seoImage if set, otherwise fall back to fallbackImage (e.g., featured image for blog posts)
+const ogImage = seo?.seoImage?.asset?.url || seo?.fallbackImage?.url;
+const ogImageAlt = seo?.seoImage?.alt || seo?.fallbackImage?.alt || pageTitle;
+const noIndex = seo?.noIndex;
+const canonicalUrl = seo?.canonicalUrl || Astro.url.href;
 
 // Show announcement bar if enabled and has text
 const showAnnouncementBar = announcementBar?.enabled && announcementBar?.text;
@@ -34,15 +67,36 @@ const { data: footerData } = await getFooter(Astro.request);
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <!-- temporary block robots from indexing -->
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
-    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- SEO Meta Tags -->
+    {noIndex ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow" />
+    )}
+    
+    <title>{pageTitle}</title>
+    {metaDescription && <meta name="description" content={metaDescription} />}
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    {metaDescription && <meta property="og:description" content={metaDescription} />}
+    <meta property="og:url" content={canonicalUrl} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && <meta property="og:image:alt" content={ogImageAlt} />}
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    {metaDescription && <meta name="twitter:description" content={metaDescription} />}
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    
     <ViewTransitions />
      
     <link rel="shortcut icon" href="https://www.roller.software/hubfs/ROLLER%20Chevron%20(1).png">
-    
-    <!-- <meta name="description" content=""> -->
     {enableThirdPartyScripts && (
       <>
         <!-- Third-party trackers (prod only) -->

@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
+import {seoFields, seoGroup} from '../objects/seoFields'
 
 export default defineType({
   name: 'page',
@@ -10,6 +11,7 @@ export default defineType({
     { name: 'content', title: 'Content' },
     { name: 'navigation', title: 'Navigation' },
     { name: 'settings', title: 'Settings' },
+    seoGroup,
   ],
   fields: [
     // --------------------
@@ -127,6 +129,8 @@ export default defineType({
       },
       initialValue: 'default',
     }),
+    // SEO
+    ...seoFields,
   ],
 
   preview: {

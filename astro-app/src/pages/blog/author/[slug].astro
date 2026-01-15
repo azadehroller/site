@@ -88,10 +88,10 @@ const title = `${author.name} - Blog Author`;
             const topic = post.topics?.filter(t => t != null)?.[0];
             return (
               <article class="blog-index__post">
-                {post.featuredImage?.url && (
+                {post.featuredImage?.asset?.url && (
                   <a href={`/blog/${post.slug.current}`} class="blog-index__post-image">
                     <img 
-                      src={post.featuredImage.url} 
+                      src={post.featuredImage.asset.url} 
                       alt={post.featuredImage.alt || post.title || ''} 
                       loading="lazy"
                     />

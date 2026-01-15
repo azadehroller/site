@@ -1,4 +1,69 @@
 import {defineField, defineType} from 'sanity'
+import {seoGroup} from '../objects/seoFields'
+
+// Custom SEO fields for blog posts - seoImage inherits from featuredImage if not set
+const blogSeoFields = [
+  defineField({
+    name: 'seoTitle',
+    title: 'SEO Title',
+    type: 'string',
+    group: 'seo',
+    description: 'Override the page title for search engines. Defaults to post title if empty.',
+    validation: (Rule) => Rule.max(70).warning('SEO titles should be under 70 characters'),
+  }),
+  defineField({
+    name: 'seoDescription',
+    title: 'SEO Description',
+    type: 'text',
+    group: 'seo',
+    rows: 3,
+    description: 'Meta description for search engines. Defaults to excerpt if empty.',
+    validation: (Rule) => Rule.max(320).warning('Meta descriptions should be under 160 characters for best results'),
+  }),
+  // Legacy field from HubSpot migration - kept for backwards compatibility
+  defineField({
+    name: 'metaDescription',
+    title: 'Meta Description (Legacy)',
+    type: 'text',
+    group: 'seo',
+    rows: 3,
+    hidden: true,
+    description: 'Deprecated: This field was migrated from HubSpot. Please use SEO Description instead.',
+  }),
+  defineField({
+    name: 'seoImage',
+    title: 'Social Share Image',
+    type: 'image',
+    group: 'seo',
+    description: 'Override the social share image. If empty, the Featured Image will be used automatically.',
+    options: {
+      hotspot: true,
+    },
+    fields: [
+      defineField({
+        name: 'alt',
+        title: 'Alt Text',
+        type: 'string',
+        description: 'Alternative text for accessibility',
+      }),
+    ],
+  }),
+  defineField({
+    name: 'noIndex',
+    title: 'Hide from Search Engines',
+    type: 'boolean',
+    group: 'seo',
+    description: 'If enabled, this post will not be indexed by search engines',
+    initialValue: false,
+  }),
+  defineField({
+    name: 'canonicalUrl',
+    title: 'Canonical URL',
+    type: 'url',
+    group: 'seo',
+    description: 'Optional: Specify if this content exists elsewhere and should point to that URL',
+  }),
+]
 
 export default defineType({
   name: 'post',
@@ -7,8 +72,8 @@ export default defineType({
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'metadata', title: 'Metadata'},
-    {name: 'seo', title: 'SEO'},
     {name: 'hubspot', title: 'HubSpot Data'},
+    seoGroup,
   ],
   fields: [
     defineField({
@@ -38,22 +103,21 @@ export default defineType({
       group: 'content',
     }),
 
-    // External image support
+    // Featured image - now using Sanity assets
     defineField({
       name: 'featuredImage',
       title: 'Featured Image',
-      type: 'object',
+      type: 'image',
       group: 'content',
+      options: {
+        hotspot: true,
+      },
       fields: [
         defineField({
-          name: 'url',
-          title: 'Image URL',
-          type: 'url',
-        }),
-        defineField({
           name: 'alt',
-          title: 'Alt text',
+          title: 'Alt Text',
           type: 'string',
+          description: 'Alternative text for accessibility',
         }),
       ],
     }),
@@ -130,25 +194,8 @@ export default defineType({
       description: 'Original HubSpot URL',
     }),
 
-    // SEO Title (custom title for search engines)
-    defineField({
-      name: 'seoTitle',
-      title: 'SEO Title',
-      type: 'string',
-      group: 'seo',
-      description: 'Custom title for search engines (if different from post title)',
-    }),
-
-    // Meta description for SEO
-    defineField({
-      name: 'metaDescription',
-      title: 'Meta Description',
-      type: 'text',
-      rows: 3,
-      group: 'seo',
-      description: 'SEO meta description (max 160 characters)',
-      validation: (rule) => rule.max(300),
-    }),
+    // SEO (custom for blog posts - inherits featured image)
+    ...blogSeoFields,
 
     // Body content - STANDALONE modular blocks (not nested)
     defineField({

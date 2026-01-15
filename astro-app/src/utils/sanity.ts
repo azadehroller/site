@@ -4632,7 +4632,13 @@ export async function getPosts(request?: Request) {
       title,
       slug,
       excerpt,
-      featuredImage,
+      featuredImage{
+        asset->{
+          _id,
+          url
+        },
+        alt
+      },
       publishedAt,
       updatedAt,
       metaDescription,
@@ -4654,7 +4660,13 @@ export async function getPost(slug: string, request?: Request) {
       title,
       slug,
       excerpt,
-      featuredImage,
+      featuredImage{
+        asset->{
+          _id,
+          url
+        },
+        alt
+      },
       publishedAt,
       updatedAt,
       body,
@@ -4662,6 +4674,18 @@ export async function getPost(slug: string, request?: Request) {
       tags,
       hubspotId,
       hubspotUrl,
+      // SEO fields
+      seoTitle,
+      seoDescription,
+      seoImage{
+        asset->{
+          _id,
+          url
+        },
+        alt
+      },
+      noIndex,
+      canonicalUrl,
       "topics": topics[]->{ _id, name, slug, hubspotId },
       "author": author->{ _id, name, slug, bio, avatar, email, website, twitter, linkedin, facebook, hubspotId }
     }`,
@@ -4685,7 +4709,13 @@ export async function getRelatedPosts(topicIds: string[], currentPostId: string,
       title,
       slug,
       excerpt,
-      featuredImage,
+      featuredImage{
+        asset->{
+          _id,
+          url
+        },
+        alt
+      },
       publishedAt,
       "topics": topics[]->{ _id, name, slug },
       body
@@ -4725,7 +4755,13 @@ export async function getPostsByTopic(topicSlug: string, request?: Request) {
       title,
       slug,
       excerpt,
-      featuredImage,
+      featuredImage{
+        asset->{
+          _id,
+          url
+        },
+        alt
+      },
       publishedAt,
       "topics": topics[]->{ _id, name, slug }
     }`,
@@ -4789,7 +4825,13 @@ export async function getPostsByAuthor(authorId: string, request?: Request) {
       title,
       slug,
       excerpt,
-      featuredImage,
+      featuredImage{
+        asset->{
+          _id,
+          url
+        },
+        alt
+      },
       publishedAt,
       "topics": topics[]->{ _id, name, slug }
     }`,
@@ -5633,7 +5675,22 @@ export interface AnnouncementBarSettings {
   countdownDate?: string;
 }
 
-export interface Homepage {
+// SEO fields - shared across all page types
+export interface SEOFields {
+  seoTitle?: string;
+  seoDescription?: string;
+  seoImage?: {
+    asset?: {
+      _ref?: string;
+      url?: string;
+    };
+    alt?: string;
+  };
+  noIndex?: boolean;
+  canonicalUrl?: string;
+}
+
+export interface Homepage extends SEOFields {
   _type: "homepage";
   _id: string;
   _updatedAt?: string;
@@ -5642,18 +5699,16 @@ export interface Homepage {
   announcementBar?: AnnouncementBarSettings;
 }
 
-export interface GetStartedPage {
+export interface GetStartedPage extends SEOFields {
   _type: "getStartedPage";
   _id: string;
   _updatedAt?: string;
   title?: string;
-  seoTitle?: string;
-  seoDescription?: string;
   sections?: (ColumnsBlock | Divider)[];
   announcementBar?: AnnouncementBarSettings;
 }
 
-export interface Page {
+export interface Page extends SEOFields {
   _type: "page";
   _id: string;
   title?: string;
@@ -5662,7 +5717,7 @@ export interface Page {
   sections?: (ColumnsBlock | Divider | Post)[];
 }
 
-export interface Feature {
+export interface Feature extends SEOFields {
   _type: "feature";
   _id: string;
   title?: string;
@@ -5672,7 +5727,7 @@ export interface Feature {
   announcementBar?: AnnouncementBarSettings;
 }
 
-export interface Industry {
+export interface Industry extends SEOFields {
   _type: "industry";
   _id: string;
   title?: string;
@@ -6514,7 +6569,7 @@ export async function getIndustry(slug: string, request?: Request) {
   });
 }
 
-export interface Partner {
+export interface Partner extends SEOFields {
   _type: "partner";
   _id: string;
   title?: string;
@@ -6524,7 +6579,7 @@ export interface Partner {
   announcementBar?: AnnouncementBarSettings;
 }
 
-export interface PartnersLandingPage {
+export interface PartnersLandingPage extends SEOFields {
   _type: "partnersLandingPage";
   _id: string;
   title?: string;
@@ -6533,7 +6588,7 @@ export interface PartnersLandingPage {
   announcementBar?: AnnouncementBarSettings;
 }
 
-export interface Competitor {
+export interface Competitor extends SEOFields {
   _type: "competitor";
   _id: string;
   title?: string;
@@ -6543,7 +6598,7 @@ export interface Competitor {
   announcementBar?: AnnouncementBarSettings;
 }
 
-export interface CompetitorsLandingPage {
+export interface CompetitorsLandingPage extends SEOFields {
   _type: "competitorsLandingPage";
   _id: string;
   title?: string;
@@ -6585,7 +6640,13 @@ export interface Post {
   title?: string;
   slug: Slug;
   excerpt?: string;
-  featuredImage?: { url?: string; alt?: string };
+  featuredImage?: {
+    asset?: {
+      _id?: string;
+      url?: string;
+    };
+    alt?: string;
+  };
   publishedAt?: string;
   updatedAt?: string;
   body?: PortableTextBlock[];
@@ -6596,6 +6657,18 @@ export interface Post {
   metaDescription?: string;
   hubspotId?: string;
   hubspotUrl?: string;
+  // SEO fields
+  seoTitle?: string;
+  seoDescription?: string;
+  seoImage?: {
+    asset?: {
+      _id?: string;
+      url?: string;
+    };
+    alt?: string;
+  };
+  noIndex?: boolean;
+  canonicalUrl?: string;
 }
 
 // Footer Global Types
@@ -7689,14 +7762,12 @@ export async function getFeaturesSelectorGlobal(request?: Request) {
 }
 
 // Landing Page type for root-level landing pages
-export interface LandingPage {
+export interface LandingPage extends SEOFields {
   _id: string;
   title: string;
   slug: { current: string };
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
-  seoTitle?: string;
-  seoDescription?: string;
   headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
@@ -8614,7 +8685,7 @@ export async function getLandingPage(slug: string, request?: Request) {
 }
 
 // Solution type for solution pages
-export interface Solution {
+export interface Solution extends SEOFields {
   _id: string;
   title: string;
   slug: { current: string };

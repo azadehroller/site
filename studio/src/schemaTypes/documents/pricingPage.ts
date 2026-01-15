@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {seoFields, seoGroup} from '../objects/seoFields'
 
 /**
  * Pricing Page schema - Singleton document for the pricing page
@@ -11,6 +12,7 @@ export default defineType({
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'settings', title: 'Settings'},
+    seoGroup,
   ],
   fields: [
     defineField({
@@ -50,6 +52,8 @@ export default defineType({
       type: 'announcementBarSettings',
       group: 'settings',
     }),
+    // SEO
+    ...seoFields,
   ],
   preview: {
     prepare() {

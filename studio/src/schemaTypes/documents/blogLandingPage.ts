@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {seoFields, seoGroup} from '../objects/seoFields'
 
 /**
  * Blog Landing Page schema - Singleton document for the blog index
@@ -8,6 +9,11 @@ export default defineType({
   name: 'blogLandingPage',
   title: 'Blog Landing',
   type: 'document',
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'settings', title: 'Settings'},
+    seoGroup,
+  ],
   fields: [
     defineField({
       name: 'title',
@@ -15,6 +21,7 @@ export default defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
       initialValue: 'Blog',
+      group: 'content',
     }),
     defineField({
       name: 'description',
@@ -22,6 +29,7 @@ export default defineType({
       type: 'text',
       rows: 3,
       description: 'A short description for the blog landing page',
+      group: 'content',
     }),
     defineField({
       name: 'postsPerPage',
@@ -29,12 +37,14 @@ export default defineType({
       type: 'number',
       initialValue: 9,
       validation: (Rule) => Rule.min(1).max(50),
+      group: 'settings',
     }),
     defineField({
       name: 'sections',
       title: 'Page Sections',
       type: 'array',
       description: 'Add and arrange sections for the blog landing page',
+      group: 'content',
       of: [
         {
           type: 'columnsBlock',
@@ -44,6 +54,8 @@ export default defineType({
         },
       ],
     }),
+    // SEO
+    ...seoFields,
   ],
   preview: {
     prepare() {

@@ -114,9 +114,25 @@ if (topicIds.length > 0) {
   relatedPosts = related || [];
   console.log('[Related Posts Debug] Found:', relatedPosts.length, 'posts');
 }
+
+// Prepare SEO props with fallback to featured image
+const seoProps = {
+  seoTitle: post.seoTitle || cleanTitle,
+  seoDescription: post.seoDescription || post.metaDescription,
+  seoImage: post.seoImage,
+  noIndex: post.noIndex,
+  canonicalUrl: post.canonicalUrl,
+  // Fallback to featured image if no SEO image is set
+  fallbackImage: post.featuredImage?.asset?.url ? {
+    url: post.featuredImage.asset.url,
+    alt: cleanAlt,
+  } : undefined,
+  // Fallback to excerpt if no SEO description
+  fallbackDescription: post.excerpt,
+};
 ---
 
-<Layout title={cleanTitle || "Blog Post"}>
+<Layout title={cleanTitle || "Blog Post"} seo={seoProps}>
   <article class="body-container-wrapper">
     <!-- Progress bar (hidden for now) -->
     <!-- <div class="blog-post__progressbar">
@@ -171,10 +187,10 @@ if (topicIds.length > 0) {
         
         <!-- Featured Image -->
         <div class="blog-post__header-image">
-          {post.featuredImage?.url && (
+          {post.featuredImage?.asset?.url && (
             <figure class="blog-post__header-img">
               <img 
-                src={post.featuredImage.url}
+                src={post.featuredImage.asset.url}
                 class="hs-image-widget" 
                 style="width:820px;border-width:0px;border:0px;" 
                 width="820" 
@@ -293,10 +309,10 @@ if (topicIds.length > 0) {
                 const relatedDate = relatedPost.publishedAt || relatedPost._createdAt;
                 return (
                   <article class="blog-index__post">
-                    {relatedPost.featuredImage?.url && (
+                    {relatedPost.featuredImage?.asset?.url && (
                       <a href={`/blog/${relatedPost.slug.current}`} class="blog-index__post-image">
                         <img 
-                          src={relatedPost.featuredImage.url} 
+                          src={relatedPost.featuredImage.asset.url} 
                           alt={relatedPost.featuredImage.alt || relatedPost.title || ''} 
                           loading="lazy"
                         />

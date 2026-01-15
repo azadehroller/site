@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {seoFields, seoGroup} from '../objects/seoFields'
 
 /**
  * Articles Landing Page schema - Singleton document for the articles index
@@ -10,7 +11,7 @@ export default defineType({
   type: 'document',
   groups: [
     {name: 'content', title: 'Content', default: true},
-    {name: 'seo', title: 'SEO'},
+    seoGroup,
   ],
   fields: [
     defineField({
@@ -44,22 +45,8 @@ export default defineType({
         },
       ],
     }),
-    // SEO fields
-    defineField({
-      name: 'seoTitle',
-      title: 'SEO Title',
-      type: 'string',
-      group: 'seo',
-      description: 'Override the page title for SEO (optional)',
-    }),
-    defineField({
-      name: 'seoDescription',
-      title: 'SEO Description',
-      type: 'text',
-      group: 'seo',
-      rows: 3,
-      description: 'Meta description for search engines',
-    }),
+    // SEO
+    ...seoFields,
   ],
   preview: {
     prepare() {

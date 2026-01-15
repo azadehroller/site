@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {seoFields, seoGroup} from '../objects/seoFields'
 
 /**
  * Not Found Page schema - Singleton document for the 404 page
@@ -11,6 +12,7 @@ export default defineType({
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'settings', title: 'Settings'},
+    seoGroup,
   ],
   fields: [
     defineField({
@@ -60,6 +62,8 @@ export default defineType({
       type: 'announcementBarSettings',
       group: 'settings',
     }),
+    // SEO
+    ...seoFields,
   ],
   preview: {
     prepare() {
