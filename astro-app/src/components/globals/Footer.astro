@@ -81,6 +81,17 @@ const socialIcons: Record<string, string> = {
 
 // Check if we have content from Sanity
 const hasContent = newsletterTitle || columns.length > 0;
+
+// Strip invisible Unicode characters from a string
+const stripInvisible = (str: string): string => {
+  if (!str) return '';
+  // Remove zero-width and invisible Unicode characters
+  return str.replace(/[\u200B-\u200D\uFEFF\u2060-\u2069\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180D\u200E\u200F\u202A-\u202E]/g, '').trim();
+};
+
+// Sanitize floating button text
+const sanitizedFloatingButtonPrimaryText = stripInvisible(floatingButtonPrimaryText || '');
+const sanitizedFloatingButtonSecondaryText = stripInvisible(floatingButtonSecondaryText || '');
 ---
 
 <style>
@@ -439,18 +450,20 @@ const hasContent = newsletterTitle || columns.length > 0;
     opacity: 0;
   }
 
+  /* Front text animation: starts visible, alternates, ends visible */
   @keyframes fadeFrontSeq {
-    0% { opacity: 0; }
-    8% { opacity: 1; }
+    0% { opacity: 1; }
     25% { opacity: 1; }
     33% { opacity: 0; }
     50% { opacity: 0; }
     58% { opacity: 1; }
     75% { opacity: 1; }
     83% { opacity: 0; }
-    100% { opacity: 0; }
+    92% { opacity: 0; }
+    100% { opacity: 1; }
   }
 
+  /* Back text animation: starts hidden, alternates, ends hidden */
   @keyframes fadeBackSeq {
     0% { opacity: 0; }
     25% { opacity: 0; }
@@ -459,16 +472,16 @@ const hasContent = newsletterTitle || columns.length > 0;
     58% { opacity: 0; }
     75% { opacity: 0; }
     83% { opacity: 1; }
-    98% { opacity: 1; }
+    92% { opacity: 1; }
     100% { opacity: 0; }
   }
 
   .floating-button-front {
-    animation: fadeBackSeq 12s linear 1 forwards;
+    animation: fadeFrontSeq 12s linear 1 forwards;
   }
 
   .floating-button-back {
-    animation: fadeFrontSeq 12s linear 1 forwards;
+    animation: fadeBackSeq 12s linear 1 forwards;
   }
 
   .floating-button:hover .floating-button-text span {
@@ -889,11 +902,11 @@ const hasContent = newsletterTitle || columns.length > 0;
 
 {/* Floating Button - only show if enabled and has content */}
 {showFloatingButton && floatingButtonUrl && (
-  <a href={floatingButtonUrl} class="floating-button" aria-label={floatingButtonPrimaryText || 'Contact us'}>
+  <a href={floatingButtonUrl} class="floating-button" aria-label={sanitizedFloatingButtonPrimaryText || 'Contact us'}>
     <div class="floating-button-wrap" aria-live="polite">
       <div class="floating-button-text">
-        <span class="floating-button-front">{floatingButtonPrimaryText}</span>
-        <span class="floating-button-back">{floatingButtonSecondaryText}</span>
+        <span class="floating-button-front">{sanitizedFloatingButtonPrimaryText}</span>
+        <span class="floating-button-back">{sanitizedFloatingButtonSecondaryText}</span>
       </div>
     </div>
     <div class="floating-button-icon" aria-hidden="true">
