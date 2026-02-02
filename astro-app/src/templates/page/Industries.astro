@@ -1,0 +1,148 @@
+---
+/**
+ * Industries Landing Page Template
+ * Renders the Industries Landing singleton page from Sanity
+ */
+import Layout from "../../layouts/Layout.astro";
+import Columns from "../../components/blocks/Columns.astro";
+import ColumnContent from "../../components/blocks/ColumnContent.astro";
+import Divider from "../../components/blocks/Divider.astro";
+import type { IndustriesLandingPage, ColumnsBlock, Divider as DividerType } from "../../utils/sanity";
+import { cleanStega } from "../../utils/stega";
+
+interface Props {
+  page: IndustriesLandingPage | null;
+}
+
+const { page } = Astro.props;
+
+// Debug in development
+if (import.meta.env.DEV && !page) {
+  console.warn('[Industries.astro] ⚠️  Page is null!');
+} else if (import.meta.env.DEV && page && (!page.sections || page.sections.length === 0)) {
+  console.warn('[Industries.astro] ⚠️  Page exists but sections is empty:', {
+    pageId: page._id,
+    sections: page.sections,
+    sectionsType: typeof page.sections,
+    sectionsLength: page.sections?.length
+  });
+}
+
+const title = page?.title || "Industries";
+const seoTitle = page?.seoTitle || title;
+const sections = page?.sections || [];
+const headerTheme = page?.headerTheme || 'dark'; // Default to 'dark' as requested
+
+// Document info for visual editing - enables click-to-edit on nested elements
+const documentId = page?._id || '';
+const documentType = 'industriesLandingPage';
+
+// Helper to get divider background color class
+const getDividerBgClass = (divider: DividerType): string => {
+  const background = cleanStega(divider.background) || 'light';
+  if (background === 'light') return 'divider-bg-light';
+  
+  const darkBgColor = cleanStega(divider.darkBackgroundColor) || 'var(--blue-10)';
+  if (darkBgColor === 'var(--blue-30)') return 'divider-bg-blue30';
+  return 'divider-bg-blue10';
+};
+---
+
+<Layout title={seoTitle} headerTheme={headerTheme} announcementBar={page?.announcementBar}>
+  <main class="industries-landing-page">
+    {sections.length > 0 ? (
+      sections.map((section) => {
+        if (section._type === 'columnsBlock') {
+          const block = section as ColumnsBlock;
+          // Pass document and section info for visual editing
+          const sectionKey = block._key;
+          return (
+            <Columns 
+              layout={block.layout}
+              backgroundColor={block.backgroundColor}
+              customBackgroundColor={block.customBackgroundColor}
+              backgroundImage={block.backgroundImage?.asset?.url}
+              backgroundPosition={block.backgroundPosition}
+              backgroundSize={block.backgroundSize}
+              backgroundGradient={block.backgroundGradient}
+              gradientColorStart={block.gradientColorStart}
+              gradientColorEnd={block.gradientColorEnd}
+              paddingTop={block.paddingTop}
+              paddingTopMobile={block.paddingTopMobile}
+              paddingBottom={block.paddingBottom}
+              paddingBottomMobile={block.paddingBottomMobile}
+              sectionKey={sectionKey}
+              documentId={documentId}
+              documentType={documentType}
+            >
+              <ColumnContent 
+                slot="col1" 
+                content={block.column1} 
+                columnName="column1"
+                sectionKey={sectionKey}
+                documentId={documentId}
+                documentType={documentType}
+              />
+              {block.column2 && <ColumnContent 
+                slot="col2" 
+                content={block.column2}
+                columnName="column2"
+                sectionKey={sectionKey}
+                documentId={documentId}
+                documentType={documentType}
+              />}
+              {block.column3 && <ColumnContent 
+                slot="col3" 
+                content={block.column3}
+                columnName="column3"
+                sectionKey={sectionKey}
+                documentId={documentId}
+                documentType={documentType}
+              />}
+              {block.column4 && <ColumnContent 
+                slot="col4" 
+                content={block.column4}
+                columnName="column4"
+                sectionKey={sectionKey}
+                documentId={documentId}
+                documentType={documentType}
+              />}
+            </Columns>
+          );
+        } else if (section._type === 'divider') {
+          const divider = section as DividerType;
+          const bgClass = getDividerBgClass(divider);
+          const sectionKey = divider._key;
+          return (
+            <div 
+              class={`dnd-section ${bgClass}`}
+              data-sanity-edit-target
+            >
+              <Divider
+                showDivider={divider.showDivider}
+                dividerType={divider.dividerType}
+                background={divider.background}
+                sectionKey={sectionKey}
+                documentId={documentId}
+                documentType={documentType}
+              />
+            </div>
+          );
+        }
+      })
+    ) : (
+      <section class="px-4 sm:px-6 lg:px-8 py-16 max-w-7xl mx-auto text-center">
+        <h1 class="text-4xl font-bold mb-4">Industries</h1>
+        <p class="text-lg text-gray-600">
+          Add content to your Industries Landing page in Sanity Studio.
+        </p>
+      </section>
+    )}
+  </main>
+</Layout>
+
+<style>
+  .industries-landing-page {
+    min-height: 50vh;
+  }
+</style>

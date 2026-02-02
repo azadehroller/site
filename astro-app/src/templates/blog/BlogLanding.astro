@@ -3,7 +3,8 @@ import Card from "../../components/Card.astro";
 import Welcome from "../../components/Welcome.astro";
 import Layout from "../../layouts/Layout.astro";
 import Pagination from "../../components/Pagination.astro";
-import { getPosts, getBlogTopics } from "../../utils/sanity";
+import { getBlogLandingData } from "../../utils/sanity";
+import { formatDate } from "../../utils";
 import type { Post, BlogTopic } from "../../utils/sanity";
 
 interface Props {
@@ -26,22 +27,28 @@ const {
   topics: providedTopics,
 } = Astro.props;
 
-// Use provided posts or fetch them
+// Use provided data or fetch everything in a single optimized query
 let posts = providedPosts;
 let totalPages = providedTotalPages;
 let topics = providedTopics;
+let editorPicks: Post[] = [];
 
-if (!posts) {
-  const { data: allPosts } = await getPosts(Astro.request);
-  totalPages = Math.ceil(allPosts.length / postsPerPage);
-  const startIndex = (currentPage - 1) * postsPerPage;
-  posts = allPosts.slice(startIndex, startIndex + postsPerPage);
+if (!posts || !topics) {
+  // Single query fetches: paginated posts, total count, topics, and editor picks
+  const { data } = await getBlogLandingData(currentPage, postsPerPage, Astro.request);
+  
+  posts = posts || data.posts;
+  topics = topics || data.topics;
+  editorPicks = data.editorPicks || [];
+  totalPages = totalPages || Math.ceil(data.total / postsPerPage);
 }
 
-// Fetch topics for filtering
-if (!topics) {
-  const { data: allTopics } = await getBlogTopics(Astro.request);
-  topics = allTopics || [];
+// Helper function to calculate reading time from pre-computed character count
+// wordCount field from Sanity is actually character count from length(pt::text(body))
+// Formula: ~5 chars per word, 200 words/minute = charCount / 1000 minutes
+function estimateReadingTime(charCount: number | undefined): number {
+  if (!charCount || charCount <= 0) return 1;
+  return Math.max(1, Math.ceil(charCount / 1000));
 }
 
 // Get unique topics from current page posts for quick filter
@@ -53,9 +60,39 @@ posts?.forEach(post => {
     }
   });
 });
+
+// Helper function to strip Sanity stega (invisible Unicode) characters
+// These are zero-width characters used for Visual Editing click-to-edit
+function stripStega(str: string | undefined): string {
+  if (!str) return '';
+  // Remove ALL invisible/zero-width Unicode characters and control characters
+  // This covers stega encoding characters used by Sanity
+  return str
+    .replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u180E\u00AD\uDB40-\uDBFF]/g, '')
+    .replace(/[\uE000-\uF8FF]/g, '') // Private use area
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Control characters
+}
+
+// Helper to create a clean class name from topic name
+// Uses hyphens (e.g., "water-parks") to match filter button format
+function toTopicClass(name: string | undefined): string {
+  if (!name) return '';
+  // First strip stega, then only keep alphanumeric and basic punctuation
+  const cleaned = stripStega(name);
+  // Convert to lowercase and replace spaces with hyphens, preserve existing hyphens
+  return cleaned
+    .toLowerCase()
+    .replace(/[^a-z0-9\s\-]/g, '') // Remove all non-alphanumeric except space and hyphen
+    .replace(/\s+/g, '-') // Convert spaces to hyphens
+    .replace(/-+/g, '-') // Collapse multiple hyphens
+    .replace(/^-|-$/g, ''); // Trim leading/trailing hyphens
+}
+
+// Get LCP image URL for preloading (main editor pick featured image)
+const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
 ---
 
-<Layout title={title}>
+<Layout title={title} lcpImage={lcpImageUrl}>
   {/* Blog Header */}
   <div class="blog-header">
     <div class="blog-header__inner">
@@ -63,20 +100,25 @@ posts?.forEach(post => {
       <p class="blog-header__text">
         Insights, tips, and trends to help you run a successful attraction business.
       </p>
-      <div class="blog-header__search">
-        <div class="blog-header__search--input">
-          <input 
-            type="text" 
-            class="blog-search-input" 
-            placeholder="Search articles..."
-            aria-label="Search articles"
-          />
+      <div class="blog-header__search-wrapper">
+        <div class="blog-header__search">
+          <div class="blog-header__search--input">
+            <input 
+              type="text" 
+              id="blog-search-input"
+              class="blog-search-input" 
+              placeholder="Search articles..."
+              aria-label="Search articles"
+              autocomplete="off"
+            />
+          </div>
+          <div class="blog-header__search--icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+              <path fill="#fff" fill-rule="evenodd" d="M14.71 14h.79l4.99 5L19 20.49l-5-4.99v-.79l-.27-.28A6.471 6.471 0 0 1 9.5 16 6.5 6.5 0 1 1 16 9.5c0 1.61-.59 3.09-1.57 4.23l.28.27ZM5 9.5C5 11.99 7.01 14 9.5 14S14 11.99 14 9.5 11.99 5 9.5 5 5 7.01 5 9.5Z" clip-rule="evenodd"/>
+            </svg>
+          </div>
         </div>
-        <div class="blog-header__search--icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-            <path fill="#fff" fill-rule="evenodd" d="M14.71 14h.79l4.99 5L19 20.49l-5-4.99v-.79l-.27-.28A6.471 6.471 0 0 1 9.5 16 6.5 6.5 0 1 1 16 9.5c0 1.61-.59 3.09-1.57 4.23l.28.27ZM5 9.5C5 11.99 7.01 14 9.5 14S14 11.99 14 9.5 11.99 5 9.5 5 5 7.01 5 9.5Z" clip-rule="evenodd"/>
-          </svg>
-        </div>
+        <div id="blog-search-results" class="blog-search-results" aria-live="polite"></div>
       </div>
     </div>
   </div>
@@ -85,61 +127,319 @@ posts?.forEach(post => {
   <div class="blog-index__wrapper">
     <div class="blog-index__section">
       
+      {/* Editor Picks Section */}
+      {editorPicks && editorPicks.length > 0 && (
+        <>
+          <div class="blog-index__section-header">
+            <h2 class="h2">Editor Picks</h2>
+            <span>
+              <a href="/blog/topic/editor-picks">
+                View all
+                <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#143D82"/>
+                </svg>
+              </a>
+            </span>
+          </div>
+          <section class="blog-index blog-index-picks">
+            {editorPicks.length > 0 && (() => {
+              const mainPick = editorPicks[0];
+              const displayDate = mainPick.publishedAt || mainPick._createdAt;
+              const firstTopic = mainPick.topics?.filter(t => t != null)?.[0];
+              const readingTime = estimateReadingTime(mainPick.wordCount);
+              
+              return (
+                <article class="blog-index__post">
+                  {mainPick.featuredImage?.asset?.url && (
+                    <a href={`/blog/${mainPick.slug.current}`} class="blog-index__post-image blog-index__post-image-featured">
+                      <img
+                        src={mainPick.featuredImage.asset.url}
+                        alt={mainPick.featuredImage.alt || mainPick.title || ""}
+                        width="703"
+                        height="380"
+                        loading="eager"
+                        fetchpriority="high"
+                      />
+                    </a>
+                  )}
+                  <div class="blog-index__post-content">
+                    {firstTopic && (
+                      <a class="blog-header__tag" href={`/blog/topic/${firstTopic.slug?.current}`}>
+                        {firstTopic.name}
+                      </a>
+                    )}
+                    <h3 class="blog-index__main-editor-pick-title">
+                      <a href={`/blog/${mainPick.slug.current}`}>{mainPick.title}</a>
+                    </h3>
+                    <p class="blog-index__post-date text-secondary">
+                      <time datetime={displayDate}>
+                        Published: {formatDate(displayDate)}
+                      </time>
+                      <span> | </span>
+                      <span class="blog-post__readingtime">
+                        <span class="blog-post__readingtime-icon">
+                          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"/>
+                          </svg>
+                        </span>
+                        {readingTime} min. read
+                      </span>
+                    </p>
+                  </div>
+                </article>
+              );
+            })()}
+
+            <div class="blog-index-picks__sidebar">
+              {editorPicks.slice(1, 4).map((pick) => {
+                const displayDate = pick.publishedAt || pick._createdAt;
+                const firstTopic = pick.topics?.filter(t => t != null)?.[0];
+                const readingTime = estimateReadingTime(pick.wordCount);
+                
+                return (
+                  <article class="blog-index__post blog-index__summary">
+                    <section class="blog-index__post-content">
+                      {firstTopic && (
+                        <a class="blog-header__tag" href={`/blog/topic/${firstTopic.slug?.current}`}>
+                          {firstTopic.name}
+                        </a>
+                      )}
+                      <h3 class="blog-index__summary-title">
+                        <a href={`/blog/${pick.slug.current}`}>{pick.title}</a>
+                      </h3>
+                      <p class="blog-index__post-date text-secondary">
+                        <time datetime={displayDate}>
+                          Published: {formatDate(displayDate)}
+                        </time>
+                        <span> | </span>
+                        <span class="blog-post__readingtime">
+                          <span class="blog-post__readingtime-icon">
+                            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"/>
+                            </svg>
+                          </span>
+                          {readingTime} mins
+                        </span>
+                      </p>
+                      <div class="blog-index__post-content-meta">
+                      </div>
+                    </section>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        </>
+      )}
+
       {/* Section Header */}
       <div class="blog-heading">
         <h2 class="h2">Latest Articles</h2>
       </div>
 
-      {/* Topic Filters */}
-      {topics && topics.length > 0 && (
-        <div class="blog-filter-options">
-          <nav id="js-scroll-nav">
-            <ul>
-              <li class="active"><a class="all" href="#" data-filter="all">All articles</a></li>
-              {topics.filter(t => t.name !== 'Editor Picks').slice(0, 6).map(topic => {
-                const topicClass = topic.name?.toLowerCase().replace(/[-\s,&]/g, '_').replace(/__+/g, '_');
-                return (
-                  <li data-filter={topicClass}>
-                    <a class={topicClass} href="#" data-filter={topicClass}>
-                      {topic.name?.length > 20 ? topic.name.substring(0, 17) + '...' : topic.name}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-          
-          {/* Dropdown for all categories */}
-          {topics.length > 6 && (
-            <div id="js-dropdown" class="dropdown blog-dropdown" data-dropdown>
-              <button class="btn--dropdown link" data-dropdown-button>
-                Browse categories 
-                <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path d="m7 9.5 5 5 5-5H7Z" fill="#023180" clip-rule="evenodd"/>
-                </svg>
-              </button>
-              <div class="dropdown-menu">
-                <div class="dropdown-links">
-                  {topics.filter(t => t.name !== 'Editor Picks').map(topic => (
-                    <a href={`/blog/topic/${topic.slug?.current}`} class="link">
-                      {topic.name} ({topic.postCount || 0})
+      {/* Topic Filters and Browse Category */}
+      <div class="blog-filter-options">
+        <nav id="js-scroll-nav" aria-label="Filter articles by topic">
+          <ul role="list">
+            <li class="active">
+              <button type="button" class="filter-btn" data-filter="all" data-topic-slug="">All articles</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="payments" data-raw-name="Payments" data-topic-slug="payments">Payments</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="go-karting" data-raw-name="Go-Karting" data-topic-slug="go-karting">Go-Karting</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="ticketing" data-raw-name="Ticketing" data-topic-slug="ticketing">Ticketing</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="rage-rooms" data-raw-name="Rage Rooms" data-topic-slug="rage-rooms">Rage Rooms</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="trampoline-parks" data-raw-name="Trampoline Parks" data-topic-slug="trampoline-parks">Trampoline Parks</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="bowling" data-raw-name="Bowling" data-topic-slug="bowling">Bowling</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="roller-skating" data-raw-name="Roller Skating" data-topic-slug="roller-skating">Roller Skating</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="obstacle-courses" data-raw-name="Obstacle Courses" data-topic-slug="obstacle-courses">Obstacle Courses</button>
+            </li>
+            <li>
+              <button type="button" class="filter-btn" data-filter="point-of-sale" data-raw-name="Point of Sale" data-topic-slug="point-of-sale">Point of Sale</button>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Browse Category Dropdown */}
+        {topics && topics.length > 0 && (
+          <div class="blog-dropdown dropdown" data-dropdown>
+            <button type="button" class="btn--dropdown" data-dropdown-button aria-label="Browse categories">
+              Browse categories
+              <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12">
+                <path d="M6 9L1 4h10L6 9z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              <div class="dropdown-links">
+                {topics
+                  .filter(topic => (topic as any).postCount > 0)
+                  .sort((a, b) => ((b as any).postCount || 0) - ((a as any).postCount || 0))
+                  .map((topic) => (
+                    <a 
+                      href={`/blog/topic/${topic.slug?.current}`}
+                      class="dropdown-link"
+                    >
+                      {topic.name} ({((topic as any).postCount || 0)})
                     </a>
                   ))}
-                </div>
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       {/* Blog Posts Grid */}
       <section id="js-section-holder" class="blog-index blog-index-latest">
         {posts && posts.length ? (
-          posts.map((post) => {
-            // Get topic class for filtering
-            const topicClass = post.topics?.filter(t => t != null)?.[0]?.name?.toLowerCase().replace(/[-\s,&]/g, '_').replace(/__+/g, '_') || '';
+          posts.map((post, postIdx) => {
+            // Debug: Log post topics for first few posts
+            if (postIdx < 3) {
+              console.log(`[Server] Post ${postIdx} (${post.title?.substring(0, 30)}...):`, {
+                hasTopics: !!post.topics,
+                topicsLength: post.topics?.length || 0,
+                topics: post.topics,
+                topicsRaw: JSON.stringify(post.topics)
+              });
+            }
+
+            // Get all topic classes for filtering (supports multiple topics per post)
+            // More defensive filtering to handle edge cases
+            // Handle both array of topics and potential different structures
+            const rawTopics = post.topics || [];
+            
+            // Debug: Log each step of filtering for first few posts
+            if (postIdx < 3) {
+              const step1 = rawTopics.filter(t => t != null);
+              const step2 = step1.filter(t => {
+                const topicAny = t as any;
+                const name = t.name || topicAny.title || topicAny.label || '';
+                return name != null && name !== '' && typeof name === 'string';
+              });
+              const step3 = step2.map(t => {
+                const topicAny = t as any;
+                const name = t.name || topicAny.title || topicAny.label || '';
+                return {
+                  ...t,
+                  name: stripStega(name).trim()
+                };
+              });
+              const step4 = step3.filter(t => t.name.length > 0);
+              
+              console.log(`[Server] Post ${postIdx} filtering steps:`, {
+                rawTopicsLength: rawTopics.length,
+                step1_afterNullCheck: step1.length,
+                step2_afterNameCheck: step2.length,
+                step3_afterStripStega: step3.length,
+                step4_afterLengthCheck: step4.length,
+                topicDetails: rawTopics.slice(0, 2).map((t, idx) => {
+                  const topicAny = t as any;
+                  const name = t?.name || topicAny?.title || topicAny?.label || '';
+                  const stripped = stripStega(name).trim();
+                  return {
+                    index: idx,
+                    rawName: name,
+                    rawNameType: typeof name,
+                    rawNameLength: name?.length || 0,
+                    strippedName: stripped,
+                    strippedLength: stripped.length,
+                    hasName: !!t?.name,
+                    topicKeys: Object.keys(t || {}),
+                    fullTopic: t
+                  };
+                })
+              });
+            }
+            
+            const validTopics = Array.isArray(rawTopics) 
+              ? rawTopics
+                  .filter(t => t != null)
+                  .filter(t => {
+                    // Handle different possible structures (using type assertion for safety)
+                    const topicAny = t as any;
+                    const name = t.name || topicAny.title || topicAny.label || '';
+                    return name != null && name !== '' && typeof name === 'string';
+                  })
+                  .map(t => {
+                    // Extract name from different possible structures
+                    const topicAny = t as any;
+                    const name = t.name || topicAny.title || topicAny.label || '';
+                    return {
+                      ...t,
+                      name: stripStega(name).trim() // Strip stega and trim
+                    };
+                  })
+                  .filter(t => t.name.length > 0) // Filter out empty names after cleaning
+              : [];
+            
+            // Debug: Log valid topics for first few posts
+            if (postIdx < 3) {
+              console.log(`[Server] Post ${postIdx} validTopics:`, {
+                validTopicsLength: validTopics.length,
+                validTopics: validTopics.map(t => ({ name: t.name, slug: t.slug?.current }))
+              });
+            }
+            
+            const topicClasses = validTopics
+              .map(t => toTopicClass(t.name))
+              .filter(Boolean)
+              .join(' ') || '';
+            
+            // Store topics as comma-separated for data attribute
+            const topicData = validTopics
+              .map(t => toTopicClass(t.name))
+              .filter(Boolean)
+              .join(',') || '';
+            
+            // Store raw topic names (already cleaned above)
+            const rawTopicNames = validTopics
+              .map(t => t.name)
+              .filter(Boolean)
+              .join(',') || '';
+
+            // Store topic slugs for matching (more reliable than names)
+            const topicSlugs = validTopics
+              .map(t => t.slug?.current || '')
+              .filter(Boolean)
+              .join(',') || '';
+
+            // Debug: Log final topic data for first few posts
+            if (postIdx < 3) {
+              console.log(`[Server] Post ${postIdx} final topic data:`, {
+                topicClasses,
+                topicData,
+                rawTopicNames,
+                topicSlugs,
+                validTopicsCount: validTopics.length,
+                validTopics: validTopics.map(t => ({ name: t.name, slug: t.slug?.current }))
+              });
+            }
+            
+            // Filter out null topics before stringifying for debug
+            const nonNullTopics = (post.topics || []).filter(t => t != null);
+            
             return (
-              <article class={`blog-index__post ${topicClass} item`} data-topic={topicClass}>
+              <article 
+                class={`blog-index__post ${topicClasses} item`} 
+                data-topics={topicData}
+                data-raw-topics={rawTopicNames}
+                data-topic-slugs={topicSlugs}
+                data-debug-topics={JSON.stringify(nonNullTopics)}
+                data-debug-valid-topics={JSON.stringify(validTopics)}
+              >
                 <Card post={post} />
               </article>
             );
@@ -209,8 +509,6 @@ posts?.forEach(post => {
   .blog-header__search {
     align-items: center;
     display: flex;
-    margin: 1.6rem auto 0;
-    max-width: 400px;
     padding: 10px 20px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50px;
@@ -239,6 +537,74 @@ posts?.forEach(post => {
     align-items: center;
   }
 
+  /* Search Results Dropdown */
+  .blog-header__search-wrapper {
+    position: relative;
+    max-width: 400px;
+    margin: 1.6rem auto 0;
+  }
+
+  .blog-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    margin-top: 8px;
+    text-align: left;
+  }
+
+  .blog-search-results.active {
+    display: block;
+  }
+
+  /* Use :global() for dynamically inserted content */
+  .blog-search-results :global(.blog-search-results__list) {
+    list-style: none;
+    margin: 0;
+    padding: 12px 0;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li) {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li a) {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #023180;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.15s ease;
+    text-align: left;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li a:hover) {
+    background-color: #f5f8ff;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li a strong) {
+    font-weight: 700;
+    color: #023180;
+  }
+
+  .blog-search-results :global(.blog-search-results__loading),
+  .blog-search-results :global(.blog-search-results__empty) {
+    padding: 16px 20px;
+    text-align: left;
+    color: #666;
+    font-size: 14px;
+  }
+
   /* Blog Index Wrapper */
   .blog-index__wrapper {
     background-color: #fff;
@@ -263,6 +629,260 @@ posts?.forEach(post => {
     color: #033180;
   }
 
+  /* Editor Picks Section Styles */
+  .blog-index__section-header {
+    align-items: center;
+    border-bottom: 1px solid #cbd7ee;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+  }
+
+  .blog-index__section-header h2 {
+    font-size: 32px;
+    color: #033180;
+    margin: 0;
+  }
+
+  .blog-index__section-header h4 {
+    color: #033180;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .blog-index__section-header span {
+    display: flex;
+    justify-content: end;
+  }
+
+  .blog-index__section-header span a {
+    align-items: center;
+    color: #033180;
+    display: flex;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .blog-index__section-header span a:hover {
+    color: #0270e0;
+  }
+
+  .blog-index__section-header span a svg {
+    margin: 0 10px;
+  }
+
+  .blog-index.blog-index-picks {
+    display: flex;
+    flex-direction: column;
+    gap: 0 54px;
+    grid-auto-columns: 1fr;
+    grid-template-columns: 1.4fr 1fr;
+    padding: 0;
+  }
+
+  @media (min-width: 992px) {
+    .blog-index.blog-index-picks {
+      display: grid;
+    }
+  }
+
+  .blog-index.blog-index-picks .blog-index__post {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .blog-index.blog-index-picks > .blog-index__post {
+    border-bottom: 1px solid #cbd7ee;
+  }
+
+  .blog-index.blog-index-picks > .blog-index__post:hover {
+    transform: none;
+  }
+
+  @media (min-width: 992px) {
+    .blog-index.blog-index-picks .blog-index__post {
+      border-bottom: 0;
+    }
+  }
+
+  .blog-index.blog-index-picks .blog-index__main-editor-pick-title {
+    font-size: var(--size-4, 24px);
+  }
+
+  @media (min-width: 768px) {
+    .blog-index.blog-index-picks .blog-index__main-editor-pick-title {
+      font-size: 32px;
+    }
+  }
+
+  .blog-index.blog-index-picks .blog-index__summary-title {
+    font-size: 18px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+  }
+
+  .blog-index.blog-index-picks .blog-index__summary-title a {
+    color: #033180;
+    text-decoration: none;
+  }
+
+  .blog-index.blog-index-picks .blog-index__summary-title a:hover {
+    text-decoration: underline;
+  }
+
+  .blog-index.blog-index-picks > .blog-index__post .blog-index__post-content {
+    padding: 24px 0;
+  }
+
+  .blog-index-picks__sidebar {
+    padding: 0;
+  }
+
+  .blog-index-picks__sidebar h3 {
+    padding: 8px 0;
+  }
+
+  .blog-index-picks .blog-index__summary {
+    display: flex;
+    flex-direction: row-reverse;
+    padding: 0;
+    padding-bottom: 14px;
+  }
+
+  .blog-index-picks .blog-index__summary:not(:first-child) {
+    padding: 28px 0 14px;
+  }
+
+  @media (max-width: 1080px) {
+    .blog-index-picks .blog-index__summary:first-child {
+      padding: 28px 0 0;
+    }
+  }
+
+  .blog-index-picks .blog-index__summary:not(:last-child) {
+    border-bottom: 1px solid #cbd7ee;
+  }
+
+  .blog-index-picks .blog-index__summary .blog-index__post-content {
+    flex: auto;
+    padding: 0 16px 0 0;
+  }
+
+  @media (max-width: 768px) {
+    .blog-index-picks .blog-index__summary .blog-index__post-content {
+      padding: 0;
+    }
+  }
+
+  .blog-index-picks .blog-index__summary .blog-index__post-image {
+    display: flex;
+  }
+
+  @media (max-width: 1080px) {
+    .blog-index-picks .blog-index__summary .blog-index__post-image {
+      display: none;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .blog-index-picks .blog-index__summary .blog-index__post-image,
+    .blog-index-picks .blog-index__summary .blog-index__post-image img {
+      height: 80px;
+      width: 130px;
+    }
+  }
+
+  .blog-index-picks .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name span {
+    color: #033180;
+    font-size: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary {
+      display: flex;
+    }
+
+    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-image img {
+      height: 54px;
+      width: 85px;
+    }
+
+    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name {
+      font-size: 14px;
+      padding: 0 8px 0 0;
+    }
+
+    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name span {
+      font-size: 14px;
+    }
+
+    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name .blog-post__readingtime {
+      font-size: 14px;
+      padding: 0 8px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .blog-index.blog-index-picks .blog-index-picks__sidebar .blog-index__post {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      justify-content: right;
+      justify-items: baseline;
+    }
+  }
+
+  .blog-index-picks h2 {
+    font-size: 32px;
+    padding: 8px 0 0;
+  }
+
+  @media (min-width: 992px) {
+    .blog-index-picks h2 {
+      font-size: 42px;
+      padding: 8px 0 0;
+    }
+  }
+
+  .blog-index-picks .blog-post__meta-avatar {
+    display: flex;
+    align-items: center;
+  }
+
+  .blog-index-picks .blog-post__meta-avatar img {
+    height: 38px;
+    width: 38px;
+  }
+
+  .blog-index-picks .blog-post__meta-name {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    position: relative;
+  }
+
+  .blog-index-picks .blog-post__meta-name span {
+    color: #757382;
+    font-size: 14px;
+  }
+
+  .blog-index-picks .blog-post__readingtime {
+    position: relative;
+  }
+
+  .blog-index-picks .blog-post__separator {
+    background: #eee;
+    height: 31px;
+    width: 1px;
+  }
+
   /* Topic Filter Styles */
   .blog-filter-options {
     position: relative;
@@ -271,6 +891,7 @@ posts?.forEach(post => {
     flex-wrap: wrap;
     padding: 0 0 16px;
     white-space: nowrap;
+    gap: 8px;
   }
 
   .blog-filter-options nav {
@@ -301,43 +922,77 @@ posts?.forEach(post => {
     padding: 0 8px 0 1px;
   }
 
-  .blog-filter-options nav li a {
+  .blog-filter-options nav li .filter-btn {
+    border: none;
     border-radius: 100px;
     box-shadow: 0 0 0 1px #cbd7ee;
     font-size: 14px;
     font-weight: 700;
     padding: 8px 12px;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease;
     color: #033180;
-    text-decoration: none;
-    display: inline-block;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
   }
 
-  .blog-filter-options nav li.active a,
-  .blog-filter-options nav li:hover a {
+  .blog-filter-options nav li.active .filter-btn,
+  .blog-filter-options nav li:hover .filter-btn {
     background: #033180;
-    border: 0;
     color: #fff;
   }
 
-  /* Dropdown */
+  /* Browse Category Dropdown */
   .blog-dropdown {
     position: relative;
+    margin-left: 8px;
+  }
+
+  @media (min-width: 992px) {
+    .blog-dropdown {
+      margin-left: 16px;
+    }
+  }
+
+  @media (max-width: 991px) {
+    .blog-dropdown {
+      margin-left: 0;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .blog-dropdown .btn--dropdown {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .blog-dropdown .dropdown-menu {
+      left: 0;
+      right: 0;
+      width: 100%;
+    }
   }
 
   .blog-dropdown .btn--dropdown {
     border: 0;
     display: flex;
     align-items: center;
+    gap: 6px;
     padding: 5.5px 12px;
     font-size: 14px;
     font-weight: 700;
     box-shadow: 0 0 0 1px #cbd7ee;
     border-radius: 100px;
     background: transparent;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
     cursor: pointer;
     color: #033180;
+    font-family: inherit;
+  }
+
+  .blog-dropdown .btn--dropdown svg {
+    transition: transform 0.2s ease;
+    pointer-events: none;
   }
 
   .blog-dropdown .btn--dropdown:hover,
@@ -346,22 +1001,33 @@ posts?.forEach(post => {
     background: #033180;
   }
 
+  .blog-dropdown.active .btn--dropdown svg {
+    transform: rotate(180deg);
+  }
+
   .blog-dropdown .dropdown-menu {
     position: absolute;
     z-index: 10;
     right: 0;
-    left: 0;
+    left: auto;
     top: calc(100% + 0.9rem);
     background-color: #fff;
-    padding: 28px;
+    padding: 28px 28px 28px 20px;
     border-radius: 4px;
     border: 1px solid rgba(2, 49, 128, 0.1);
     display: none;
     min-width: 300px;
+    pointer-events: none;
+    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+    opacity: 0;
+    transform: translateY(-10px);
   }
 
   .blog-dropdown.active .dropdown-menu {
     display: block;
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .dropdown-links {
@@ -382,15 +1048,18 @@ posts?.forEach(post => {
     }
   }
 
-  .dropdown-links a {
+  .dropdown-links a,
+  .dropdown-links .dropdown-link {
     font-size: 14px;
     padding: 10px 8px;
     color: #001F4A;
     transition: background-color 150ms ease-in-out;
     text-decoration: none;
+    display: block;
   }
 
-  .dropdown-links a:hover {
+  .dropdown-links a:hover,
+  .dropdown-links .dropdown-link:hover {
     background: #f1f3f9;
     border-radius: 4px;
   }
@@ -423,38 +1092,384 @@ posts?.forEach(post => {
   .blog-index__post.item {
     display: contents;
   }
+
+  /* When filtering, we need to override display: contents to hide articles */
+  .blog-index__post.item[style*="display: none"] {
+    display: none !important;
+  }
 </style>
 
 <script>
+  // Helper to strip Sanity stega (invisible Unicode) characters on client side
+  // Must match server-side stripStega() function exactly
+  function cleanStega(str: string): string {
+    if (!str) return '';
+    // Remove ALL invisible/zero-width Unicode characters and control characters
+    // This matches the server-side stripStega() function exactly
+    return str
+      .replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u180E\u00AD\uDB40-\uDBFF]/g, '')
+      .replace(/[\uE000-\uF8FF]/g, '') // Private use area
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Control characters
+  }
+
+  // Helper to create a clean topic key from string
+  // Must match server-side toTopicClass() function logic exactly - uses hyphens
+  function cleanTopicKey(str: string): string {
+    if (!str) return '';
+    // First strip stega, then only keep alphanumeric and basic punctuation
+    const cleaned = cleanStega(str);
+    // Convert to lowercase and replace spaces with hyphens, preserve existing hyphens
+    return cleaned
+      .toLowerCase()
+      .replace(/[^a-z0-9\s\-]/g, '') // Remove all non-alphanumeric except space and hyphen
+      .replace(/\s+/g, '-') // Convert spaces to hyphens
+      .replace(/-+/g, '-') // Collapse multiple hyphens
+      .replace(/^-|-$/g, ''); // Trim leading/trailing hyphens
+  }
+
   // Topic filtering functionality
   function initBlogFilter() {
-    const elementScrollNav = document.querySelectorAll("#js-scroll-nav li a");
-    const elementScrollNavLi = document.querySelectorAll("#js-scroll-nav li");
-    const elementHolder = document.querySelector("#js-section-holder");
+    const filterButtons = document.querySelectorAll("#js-scroll-nav .filter-btn");
+    const filterListItems = document.querySelectorAll("#js-scroll-nav li");
+    const articleHolder = document.querySelector("#js-section-holder");
 
-    if (!elementScrollNav.length || !elementHolder) return;
+    if (!filterButtons.length || !articleHolder) {
+      console.log("[BlogFilter] Missing elements:", { 
+        buttons: filterButtons.length, 
+        holder: !!articleHolder 
+      });
+      return;
+    }
 
-    elementScrollNav.forEach(link => {
-      link.addEventListener("click", function(this: HTMLElement, e: Event) {
-        e.preventDefault();
+    console.log("[BlogFilter] Initializing with", filterButtons.length, "filter buttons");
 
-        const filter = this.getAttribute("data-filter") || "all";
+    // Log all filter buttons and their attributes
+    filterButtons.forEach((btn, idx) => {
+      const rawFilter = btn.getAttribute("data-filter") || "all";
+      const rawName = btn.getAttribute("data-raw-name") || "";
+      const cleanedFilter = rawFilter === "all" ? "all" : cleanTopicKey(rawFilter.trim());
+      console.log(`[BlogFilter] Button ${idx}:`, {
+        text: (btn as HTMLElement).textContent?.trim(),
+        rawFilter,
+        rawName,
+        cleanedFilter,
+        buttonElement: btn
+      });
+    });
 
-        elementScrollNavLi.forEach(li => li.classList.remove("active"));
-        this.parentElement?.classList.add("active");
-
-        const items = elementHolder.querySelectorAll("article.item");
-
-        if (filter === "all") {
-          items.forEach(item => { 
-            (item as HTMLElement).style.display = "contents"; 
-          });
-        } else {
-          items.forEach(item => {
-            const itemTopic = item.getAttribute("data-topic");
-            (item as HTMLElement).style.display = itemTopic === filter ? "contents" : "none";
+    // Pre-process articles to extract clean topic keys
+    // Note: data-topics is already cleaned on server, but we clean again to ensure consistency
+    const articles = articleHolder.querySelectorAll("article.item");
+    console.log("[BlogFilter] Found", articles.length, "articles using selector 'article.item'");
+    
+    // Also try alternative selectors to see what we're actually getting
+    const allArticles = articleHolder.querySelectorAll("article");
+    console.log("[BlogFilter] Found", allArticles.length, "total article elements (any article tag)");
+    
+    // Log the actual HTML structure of first article for debugging
+    if (articles.length > 0) {
+      console.log("[BlogFilter] First article HTML structure:", {
+        outerHTML: (articles[0] as HTMLElement).outerHTML.substring(0, 500),
+        className: articles[0].className,
+        hasItemClass: articles[0].classList.contains("item"),
+        dataTopics: articles[0].getAttribute("data-topics"),
+        dataRawTopics: articles[0].getAttribute("data-raw-topics")
+      });
+    }
+    
+    const articleTopicMap = new Map<Element, string[]>();
+    
+    articles.forEach((article, idx) => {
+      const rawTopics = article.getAttribute("data-topics") || "";
+      const rawTopicNames = article.getAttribute("data-raw-topics") || "";
+      const debugTopics = article.getAttribute("data-debug-topics") || "[]";
+      const debugValidTopics = article.getAttribute("data-debug-valid-topics") || "[]";
+      
+      // Try to parse debug data
+      let parsedDebugTopics = [];
+      let parsedDebugValidTopics = [];
+      try {
+        parsedDebugTopics = JSON.parse(debugTopics);
+        parsedDebugValidTopics = JSON.parse(debugValidTopics);
+        
+        // Debug: Log raw JSON and parsed result for first few articles
+        if (idx < 3) {
+          console.log(`[BlogFilter] Article ${idx} JSON parsing:`, {
+            rawJSON: debugTopics.substring(0, 200),
+            parsedLength: parsedDebugTopics.length,
+            parsedFirst: parsedDebugTopics[0],
+            parsedType: typeof parsedDebugTopics[0],
+            parsedIsArray: Array.isArray(parsedDebugTopics),
+            parsedKeys: parsedDebugTopics.length > 0 ? Object.keys(parsedDebugTopics[0] || {}) : []
           });
         }
+      } catch (e) {
+        console.warn(`[BlogFilter] Failed to parse debug topics for article ${idx}:`, e, {
+          rawJSON: debugTopics.substring(0, 200)
+        });
+      }
+      
+      // Split by comma and clean each topic key
+      let cleanedTopics = rawTopics.split(",")
+        .map(t => t.trim()) // Trim whitespace
+        .map(t => cleanTopicKey(t)) // Clean the topic key
+        .filter(Boolean); // Remove empty strings
+      
+      // FALLBACK: Always try to extract from debug attribute if we have debug data
+      // This ensures we get topics even if server-side processing filtered them out
+      if (parsedDebugTopics.length > 0) {
+        const fallbackTopics = parsedDebugTopics
+          .filter((t: any) => t != null && t !== undefined) // Filter out null/undefined
+          .map((t: any) => {
+            // Try to get name from topic object - check multiple possible properties
+            const name = t?.name || t?.title || t?.label || '';
+            if (!name || typeof name !== 'string') {
+              return null;
+            }
+            // Clean the name and convert to topic class
+            return cleanTopicKey(name);
+          })
+          .filter(Boolean);
+        
+        // Merge with existing topics, avoiding duplicates
+        const allTopics = new Set([...cleanedTopics, ...fallbackTopics]);
+        cleanedTopics = Array.from(allTopics);
+        
+        if (fallbackTopics.length > 0 && idx < 3) {
+          console.log(`[BlogFilter] Article ${idx}: Extracted ${fallbackTopics.length} topics from debug data:`, fallbackTopics);
+        }
+      }
+      
+      articleTopicMap.set(article, cleanedTopics);
+      
+      // Log first few articles for debugging
+      if (idx < 3) {
+        const topicDetails = parsedDebugTopics.slice(0, 3).map((t: any, i: number) => {
+          const name = t?.name || '';
+          const stripped = name ? name.replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u180E\u00AD]/g, '').trim() : '';
+          return {
+            index: i,
+            topic: t,
+            name: name,
+            nameType: typeof name,
+            nameLength: name?.length || 0,
+            strippedName: stripped,
+            strippedLength: stripped.length,
+            slug: t?.slug,
+            slugCurrent: t?.slug?.current,
+            keys: Object.keys(t || {}),
+            fullTopicJSON: JSON.stringify(t)
+          };
+        });
+        
+        // Extract slugs from debug topics - check both slug.current and slug structure
+        const articleSlugsFromDebug = parsedDebugTopics
+          .filter((t: any) => t != null)
+          .map((t: any) => {
+            // Try different slug formats
+            if (t.slug?.current) return t.slug.current;
+            if (typeof t.slug === 'string') return t.slug;
+            return null;
+          })
+          .filter(Boolean);
+        
+        const articleSlugsFromData = article.getAttribute("data-topic-slugs") || "";
+        // Merge slugs from data attribute and debug data
+        const articleSlugsArray = [
+          ...articleSlugsFromData.split(",").map(s => s.trim()).filter(Boolean),
+          ...articleSlugsFromDebug
+        ];
+        // Remove duplicates
+        const uniqueArticleSlugs = Array.from(new Set(articleSlugsArray));
+        
+        console.log(`[BlogFilter] Article ${idx}:`, {
+          rawTopics,
+          rawTopicNames,
+          cleanedTopics,
+          articleSlugsFromData,
+          articleSlugsArray: uniqueArticleSlugs,
+          articleSlugsFromDebug,
+          debugTopicsRaw: parsedDebugTopics,
+          debugTopicsRawLength: parsedDebugTopics.length,
+          debugValidTopicsRaw: parsedDebugValidTopics,
+          debugValidTopicsRawLength: parsedDebugValidTopics.length,
+          debugTopicsDetails: topicDetails,
+          className: article.className,
+          hasItemClass: article.classList.contains("item"),
+          articleElement: article
+        });
+        
+        // Also log the first topic in detail
+        if (parsedDebugTopics.length > 0) {
+          console.log(`[BlogFilter] Article ${idx} FIRST TOPIC DETAIL:`, parsedDebugTopics[0]);
+        }
+      }
+    });
+
+    // Log all unique cleaned topic values across all articles
+    const allUniqueTopics = new Set<string>();
+    articleTopicMap.forEach(topics => {
+      topics.forEach(t => allUniqueTopics.add(t));
+    });
+    console.log("[BlogFilter] All unique topic keys found in articles:", Array.from(allUniqueTopics).sort());
+
+    filterButtons.forEach((button, btnIdx) => {
+      button.addEventListener("click", function(this: HTMLElement) {
+        const rawFilter = this.getAttribute("data-filter") || "all";
+        const rawName = this.getAttribute("data-raw-name") || "";
+        const topicSlug = this.getAttribute("data-topic-slug") || "";
+        // Clean the filter value to match the cleaning done on article topics
+        const filter = rawFilter === "all" ? "all" : cleanTopicKey(rawFilter.trim());
+
+        console.log("\n[BlogFilter] ===== FILTER CLICKED =====");
+        console.log("[BlogFilter] Button clicked:", {
+          index: btnIdx,
+          buttonText: this.textContent?.trim(),
+          rawFilter,
+          rawName,
+          topicSlug,
+          cleanedFilter: filter
+        });
+
+        // Update active state on list items
+        filterListItems.forEach(li => li.classList.remove("active"));
+        this.parentElement?.classList.add("active");
+
+        let visibleCount = 0;
+        let hiddenCount = 0;
+        const matchDetails: Array<{index: number, topics: string[], matches: boolean, title?: string}> = [];
+
+        // Re-query articles in case DOM changed (defensive)
+        const currentArticles = articleHolder.querySelectorAll("article.item");
+        console.log("[BlogFilter] Processing", currentArticles.length, "articles in click handler");
+
+        currentArticles.forEach((article, articleIdx) => {
+          const articleElement = article as HTMLElement;
+          const topicList = articleTopicMap.get(article) || [];
+          const rawTopics = article.getAttribute("data-topics") || "";
+          const articleTopicSlugs = article.getAttribute("data-topic-slugs") || "";
+          
+          // If article not in map, try to get topics directly
+          if (topicList.length === 0 && rawTopics) {
+            const cleanedTopics = rawTopics.split(",")
+              .map(t => t.trim())
+              .map(t => cleanTopicKey(t))
+              .filter(Boolean);
+            articleTopicMap.set(article, cleanedTopics);
+            console.log(`[BlogFilter] Article ${articleIdx} was missing from map, added:`, cleanedTopics);
+          }
+          
+          const finalTopicList = articleTopicMap.get(article) || [];
+          
+          // Try to get article title for better debugging
+          const titleElement = article.querySelector(".blog-index__post-title a");
+          const articleTitle = titleElement?.textContent?.trim() || `Article ${articleIdx}`;
+
+          // Declare articleSlugs at the proper scope level so it's accessible in console.log statements
+          let articleSlugs: string[] = [];
+
+          if (filter === "all") {
+            // Show all articles - remove inline style to restore default
+            articleElement.removeAttribute("style");
+            visibleCount++;
+            if (articleIdx < 3) {
+              console.log(`[BlogFilter] Article ${articleIdx} (${articleTitle}): Showing (all filter)`);
+            }
+          } else {
+            // Check if article has the selected topic (by name class or slug)
+            let hasMatchingTopic = finalTopicList.includes(filter);
+
+            // FALLBACK: If no match by name, try matching by slug
+            // Also try to extract slugs from debug data if data-topic-slugs is empty
+            // Always populate articleSlugs for debugging, even if we don't need it for matching
+            if (articleTopicSlugs) {
+              articleSlugs = articleTopicSlugs.split(",").map(s => s.trim()).filter(Boolean);
+            }
+
+            // If no slugs from data attribute, try to extract from debug topics
+            if (articleSlugs.length === 0) {
+              const debugTopicsAttr = article.getAttribute("data-debug-topics") || "[]";
+              try {
+                const debugTopics = JSON.parse(debugTopicsAttr);
+                articleSlugs = debugTopics
+                  .filter((t: any) => t != null)
+                  .map((t: any) => {
+                    if (t.slug?.current) return t.slug.current;
+                    if (typeof t.slug === 'string') return t.slug;
+                    return null;
+                  })
+                  .filter(Boolean);
+              } catch (e) {
+                // Ignore parse errors
+              }
+            }
+
+            if (!hasMatchingTopic && topicSlug) {
+              // articleSlugs is already populated above, just check for match
+              hasMatchingTopic = articleSlugs.includes(topicSlug);
+              
+              // Debug slug matching for first few articles
+              if (articleIdx < 3) {
+                console.log(`[BlogFilter] Article ${articleIdx} slug check:`, {
+                  filterSlug: topicSlug,
+                  articleSlugs,
+                  articleSlugsString: articleTopicSlugs,
+                  match: hasMatchingTopic,
+                  includesCheck: articleSlugs.includes(topicSlug)
+                });
+              }
+            }
+            
+            matchDetails.push({
+              index: articleIdx,
+              topics: finalTopicList,
+              matches: hasMatchingTopic,
+              title: articleTitle
+            });
+
+            if (hasMatchingTopic) {
+              // Show article - remove inline style to restore default
+              articleElement.removeAttribute("style");
+              visibleCount++;
+              if (articleIdx < 3) {
+                console.log(`[BlogFilter] Article ${articleIdx} (${articleTitle}): SHOWING - Matches filter "${filter}"`, {
+                  articleTopics: finalTopicList,
+                  articleSlugs: articleSlugs,
+                  filter,
+                  filterSlug: topicSlug,
+                  match: true,
+                  rawTopics
+                });
+              }
+            } else {
+              // Hide article - use !important via inline style to override display: contents
+              articleElement.style.setProperty("display", "none", "important");
+              hiddenCount++;
+              if (articleIdx < 3) {
+                console.log(`[BlogFilter] Article ${articleIdx} (${articleTitle}): HIDING - No match for filter "${filter}"`, {
+                  articleTopics: finalTopicList,
+                  articleSlugs: articleSlugs,
+                  filter,
+                  filterSlug: topicSlug,
+                  match: false,
+                  includesCheck: finalTopicList.includes(filter),
+                  topicListString: JSON.stringify(finalTopicList),
+                  filterString: JSON.stringify(filter),
+                  rawTopics
+                });
+              }
+            }
+          }
+        });
+
+        console.log("[BlogFilter] Filter results:", {
+          filter,
+          totalArticles: articles.length,
+          visibleCount,
+          hiddenCount,
+          matchDetails: matchDetails.slice(0, 5) // Show first 5 for debugging
+        });
+        console.log("[BlogFilter] ===== END FILTER =====\n");
       });
     });
   }
@@ -478,6 +1493,14 @@ posts?.forEach(post => {
 
         dropdown.classList.toggle("active");
       });
+
+      // Close dropdown when clicking on a link
+      const links = dropdown.querySelectorAll(".dropdown-links a, .dropdown-link");
+      links.forEach(link => {
+        link.addEventListener("click", () => {
+          dropdown.classList.remove("active");
+        });
+      });
     });
 
     document.addEventListener("click", (e) => {
@@ -494,8 +1517,107 @@ posts?.forEach(post => {
     });
   }
 
+  // Blog search functionality
+  function initBlogSearch() {
+    const searchInput = document.getElementById("blog-search-input") as HTMLInputElement;
+    const searchResults = document.getElementById("blog-search-results");
+
+    if (!searchInput || !searchResults) return;
+
+    // Helper function to escape HTML
+    function escapeHtml(text: string): string {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Helper function to highlight search term in text
+    function highlightSearchTerm(text: string, searchTerm: string): string {
+      const escapedText = escapeHtml(text);
+      const escapedSearchTerm = escapeHtml(searchTerm);
+      const regex = new RegExp(`(${escapedSearchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return escapedText.replace(regex, '<strong>$1</strong>');
+    }
+
+    let debounceTimer: ReturnType<typeof setTimeout>;
+    let abortController: AbortController | null = null;
+
+    searchInput.addEventListener("input", function() {
+      const query = this.value.trim();
+
+      // Clear previous timer
+      clearTimeout(debounceTimer);
+
+      // Cancel any pending requests
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
+
+      // Hide results if query is too short
+      if (query.length < 2) {
+        searchResults.classList.remove("active");
+        searchResults.innerHTML = "";
+        return;
+      }
+
+      // Debounce the search
+      debounceTimer = setTimeout(async () => {
+        // Show loading state
+        searchResults.innerHTML = '<div class="blog-search-results__loading">Searching...</div>';
+        searchResults.classList.add("active");
+
+        try {
+          abortController = new AbortController();
+          const response = await fetch(`/api/blog/search?q=${encodeURIComponent(query)}&limit=8`, {
+            signal: abortController.signal
+          });
+          const data = await response.json();
+
+          if (data.results && data.results.length > 0) {
+            const listItems = data.results.map((post: any) => {
+              const highlightedTitle = highlightSearchTerm(post.title, query);
+              return `<li><a href="/blog/${post.slug}">${highlightedTitle}</a></li>`;
+            }).join("");
+            searchResults.innerHTML = `<ul class="blog-search-results__list">${listItems}</ul>`;
+          } else {
+            searchResults.innerHTML = '<div class="blog-search-results__empty">No articles found</div>';
+          }
+        } catch (error: any) {
+          if (error.name !== 'AbortError') {
+            searchResults.innerHTML = '<div class="blog-search-results__empty">Search failed. Please try again.</div>';
+          }
+        }
+      }, 300);
+    });
+
+    // Close results when clicking outside
+    document.addEventListener("click", (e) => {
+      const target = e.target as Element;
+      if (!target.closest(".blog-header__search-wrapper")) {
+        searchResults.classList.remove("active");
+      }
+    });
+
+    // Close results on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchResults.classList.remove("active");
+        searchInput.blur();
+      }
+    });
+
+    // Reopen results when focusing on input with existing value
+    searchInput.addEventListener("focus", function() {
+      if (this.value.trim().length >= 2 && searchResults.innerHTML) {
+        searchResults.classList.add("active");
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initBlogFilter();
     initDropdowns();
+    initBlogSearch();
   });
 </script>
