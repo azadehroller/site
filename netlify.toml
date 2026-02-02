@@ -2,6 +2,51 @@
   for = "/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
+    # Performance headers
+    X-Content-Type-Options = "nosniff"
+    # Note: Netlify automatically handles Brotli/gzip compression
+
+# Cache static assets aggressively
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache blog posts for longer (1 hour CDN, 5 min browser)
+[[headers]]
+  for = "/blog/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
+    Netlify-CDN-Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
+
+# Never cache API routes
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "private, no-cache, no-store, must-revalidate"
+
+# Cache other pages (5 min CDN, 1 min browser)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=60, s-maxage=300, stale-while-revalidate=3600"
+    Netlify-CDN-Cache-Control = "public, max-age=300, stale-while-revalidate=3600"
+
 [build]
   command = "npm run build --workspace=astro-app"
   publish = "astro-app/dist"
@@ -22,3 +67,7 @@
 # - PUBLIC_SANITY_VISUAL_EDITING_ENABLED (set to 'true')
 # - PUBLIC_SANITY_STUDIO_URL (set to 'https://sa-rolls.sanity.studio')
 # - SANITY_API_READ_TOKEN (copy from astro-app/.env file)
+# - SANITY_WEBHOOK_SECRET (for cache invalidation webhook)
+# - NETLIFY_CACHE_PURGE_TOKEN (Personal Access Token from Netlify)
+# - NETLIFY_SITE_ID (Your Netlify site ID)
+# - SITE (Full site URL, e.g., https://sa-rolls.netlify.app)
