@@ -904,35 +904,114 @@ const hasContent = newsletterTitle || columns.length > 0;
   </a>
 )}
 
-<!-- HubSpot Form Embed Script -->
-<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+<!-- HubSpot Form Embed Script - Centralized Loader -->
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize HubSpot form if the container exists
-    var formContainer = document.getElementById('footer-newsletter-form');
-    if (formContainer && typeof window.hbspt !== 'undefined') {
-      window.hbspt.forms.create({
-        portalId: "3375779",
-        formId: "efa7bd0a-929a-4ea4-8480-1c6f77843cf2",
-        region: "na1",
-        target: "#footer-newsletter-form"
+  (function() {
+    'use strict';
+    
+    // Centralized HubSpot loader setup
+    if (!window.__hubspotLoaderSetup) {
+      window.__hubspotLoaderSetup = true;
+      window.__hubspotFormsInitialized = window.__hubspotFormsInitialized || {};
+      window.__hubspotReadyCallbacks = window.__hubspotReadyCallbacks || [];
+    }
+    
+    function waitForHubSpot(callback, maxAttempts) {
+      maxAttempts = maxAttempts || 50;
+      var attempts = 0;
+      
+      function check() {
+        if (window.hbspt && window.hbspt.forms) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(check, 100);
+        }
+      }
+      check();
+    }
+    
+    function loadScript(callback) {
+      if (window.hbspt && window.hbspt.forms) {
+        callback && callback();
+        return;
+      }
+      
+      if (window.__hubspotScriptLoading) {
+        callback && window.__hubspotReadyCallbacks.push(callback);
+        return;
+      }
+      
+      // Check if script tag already exists in DOM
+      var existingScript = document.querySelector('script[src*="js.hsforms.net"]');
+      if (existingScript || window.__hubspotScriptLoaded) {
+        window.__hubspotScriptLoaded = true;
+        waitForHubSpot(function() {
+          callback && callback();
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+        return;
+      }
+      
+      window.__hubspotScriptLoading = true;
+      callback && window.__hubspotReadyCallbacks.push(callback);
+      
+      var script = document.createElement('script');
+      script.src = '//js.hsforms.net/forms/embed/v2.js';
+      script.charset = 'utf-8';
+      script.async = true;
+      
+      script.onload = function() {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(function() {
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+      };
+      
+      document.head.appendChild(script);
+    }
+
+    function initFooterForm() {
+      var formContainer = document.getElementById('footer-newsletter-form');
+      if (!formContainer) return;
+      
+      // Skip if already initialized
+      if (window.__hubspotFormsInitialized['footer-newsletter-form']) return;
+      
+      loadScript(function() {
+        if (!window.hbspt || window.__hubspotFormsInitialized['footer-newsletter-form']) return;
+        
+        window.__hubspotFormsInitialized['footer-newsletter-form'] = true;
+        
+        window.hbspt.forms.create({
+          portalId: "3375779",
+          formId: "efa7bd0a-929a-4ea4-8480-1c6f77843cf2",
+          region: "na1",
+          target: "#footer-newsletter-form"
+        });
       });
     }
 
-    // Floating button animation handling
-    var floatingBtn = document.querySelector('.floating-button');
-    if (floatingBtn) {
-      // Check for reduced motion preference
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        floatingBtn.classList.add('finished');
-        return;
-      }
+    document.addEventListener('DOMContentLoaded', function() {
+      initFooterForm();
 
-      var displayDuration = 12000; // ms
-      
-      setTimeout(function() {
-        floatingBtn.classList.add('finished');
-      }, displayDuration);
-    }
-  });
+      // Floating button animation handling
+      var floatingBtn = document.querySelector('.floating-button');
+      if (floatingBtn) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          floatingBtn.classList.add('finished');
+          return;
+        }
+
+        var displayDuration = 12000;
+        
+        setTimeout(function() {
+          floatingBtn.classList.add('finished');
+        }, displayDuration);
+      }
+    });
+  })();
 </script>
