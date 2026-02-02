@@ -30,7 +30,9 @@ const dataset = PUBLIC_SANITY_STUDIO_DATASET || PUBLIC_SANITY_DATASET;
 export default defineConfig({
   // Server output is required for SSR and visual editing
   output: 'server',
-  adapter: netlify(),
+  adapter: netlify({
+    edgeMiddleware: true, // Use Edge Functions for faster cold starts (~50ms vs ~2s)
+  }),
   checker: {
     typescript: false,
   },
@@ -41,8 +43,7 @@ export default defineConfig({
     sanity({
       projectId,
       dataset,
-      useCdn: false,
-      // `false` if you want to ensure fresh data
+      useCdn: true, // Enable CDN for faster reads of published content
       apiVersion: "2024-12-08", // Set to date of setup to use the latest API version
       // No studioBasePath - using standalone studio
       stega: {
