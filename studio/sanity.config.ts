@@ -49,4 +49,27 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
   },
+  document: {
+    actions: (prev, context) => {
+      // Prevent publishing/unpublishing templates for both industries and features
+      if (context.schemaType === 'industry' || context.schemaType === 'feature') {
+        // Check if document is a template (check document, draft, and published)
+        const isTemplate = 
+          context.document?.isTemplate === true ||
+          context.draft?.isTemplate === true ||
+          context.published?.isTemplate === true
+        
+        if (isTemplate) {
+          return prev.filter((action) => {
+            // Check the action name/id - actions are objects with an 'action' property
+            const actionName = (action as any)?.action || (action as any)?.name || (action as any)?.id
+            
+            // Filter out publish and unpublish actions
+            return actionName !== 'publish' && actionName !== 'unpublish'
+          })
+        }
+      }
+      return prev
+    },
+  },
 })
