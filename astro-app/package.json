@@ -27,6 +27,8 @@
     "astro-portabletext": "0.10.0",
     "autoprefixer": "10.4.19",
     "groq": "3.48.1",
+    "gsap": "^3.14.2",
+    "lottie-web": "^5.13.0",
     "prettier-plugin-astro": "0.14.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
