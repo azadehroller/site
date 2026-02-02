@@ -11,8 +11,9 @@ const STEGA_REGEX = /[\u0000-\u001F\u007F-\u009F\u00AD\u034F\u061C\u115F\u1160\u
 /**
  * Remove stega/invisible Unicode characters from a string
  */
-export function cleanStega(str: string | undefined | null): string {
-  if (!str) return '';
+export function cleanStega(str: unknown): string {
+  // Return empty string for falsy values or non-strings
+  if (!str || typeof str !== 'string') return '';
   
   // First pass: remove known invisible characters
   let cleaned = str.replace(STEGA_REGEX, '');

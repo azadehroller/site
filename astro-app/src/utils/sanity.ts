@@ -342,7 +342,7 @@ export async function getHomepage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -723,7 +723,7 @@ export async function getHomepage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -1104,7 +1104,7 @@ export async function getHomepage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -1485,7 +1485,7 @@ export async function getHomepage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -1554,6 +1554,761 @@ export async function getHomepage(request?: Request) {
     }`,
     request,
   });
+}
+
+// Features Landing Page query - comprehensive column queries for all component types
+export async function getFeaturesLandingPage(request?: Request) {
+  return await loadQuery<FeaturesLandingPage | null>({
+    query: groq`*[_type == "featuresLandingPage"][0]{
+      _id,
+      _updatedAt,
+      title,
+      description,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          paddingLeft,
+          paddingLeftMobile,
+          paddingRight,
+          paddingRightMobile,
+          column1PaddingBottomMobile,
+          column2PaddingBottomMobile,
+          column3PaddingBottomMobile,
+          column4PaddingBottomMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttonList[]{
+                _key,
+                buttonSettings{
+                  modalTrigger,
+                  modalTriggerVideo,
+                  formId,
+                  videoId,
+                  btnLabel,
+                  buttonLink{
+                    href,
+                    openInNewTab,
+                    noFollow
+                  }
+                },
+                btnIcon{
+                  iconFieldSvg,
+                  iconPosition
+                },
+                buttonStyles{
+                  bgKind
+                }
+              },
+              styles{
+                layout{
+                  spacing{
+                    marginTop,
+                    marginBottom,
+                    marginLeft,
+                    marginRight
+                  },
+                  alignment
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'featuresDetail' => {
+              _type,
+              _key,
+              content {
+                eyebrow,
+                title,
+                text
+              },
+              features[]{
+                _key,
+                icon,
+                iconAsImage{ asset->{ _ref, url } },
+                image{ asset->{ _ref, url, metadata{ dimensions } }, alt },
+                title,
+                text,
+                linkLabel,
+                link {
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              styles {
+                layout,
+                contentLayout,
+                spacing {
+                  marginBottom
+                }
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset-> }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                testimonials[]{ 
+                  _key, 
+                  content, 
+                  author, 
+                  position, 
+                  logo{ asset-> },
+                  link{ href, openInNewTab, noFollow }
+                }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttonList[]{
+                _key,
+                buttonSettings{
+                  modalTrigger,
+                  modalTriggerVideo,
+                  formId,
+                  videoId,
+                  btnLabel,
+                  buttonLink{
+                    href,
+                    openInNewTab,
+                    noFollow
+                  }
+                },
+                btnIcon{
+                  iconFieldSvg,
+                  iconPosition
+                },
+                buttonStyles{
+                  bgKind
+                }
+              },
+              styles{
+                layout{
+                  spacing{
+                    marginTop,
+                    marginBottom,
+                    marginLeft,
+                    marginRight
+                  },
+                  alignment
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'featuresDetail' => {
+              _type,
+              _key,
+              content {
+                eyebrow,
+                title,
+                text
+              },
+              features[]{
+                _key,
+                icon,
+                iconAsImage{ asset->{ _ref, url } },
+                image{ asset->{ _ref, url, metadata{ dimensions } }, alt },
+                title,
+                text,
+                linkLabel,
+                link {
+                  href,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              styles {
+                layout,
+                contentLayout,
+                spacing {
+                  marginBottom
+                }
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset-> }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                testimonials[]{ 
+                  _key, 
+                  content, 
+                  author, 
+                  position, 
+                  logo{ asset-> },
+                  link{ href, openInNewTab, noFollow }
+                }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                }
+              }
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                }
+              }
+            }
+          }
+        },
+        _type == 'divider' => {
+          _type,
+          _key,
+          showDivider,
+          dividerType,
+          background,
+          darkBackgroundColor
+        }
+      },
+      announcementBar
+    }`,
+    request,
+  });
+}
+
+// FeaturesLandingPage interface
+export interface FeaturesLandingPage {
+  _id: string;
+  _updatedAt?: string;
+  _type: "featuresLandingPage";
+  title?: string;
+  description?: string;
+  sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
 }
 
 export async function getGetStartedPage(request?: Request) {
@@ -1894,7 +2649,7 @@ export async function getGetStartedPage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -2275,7 +3030,7 @@ export async function getGetStartedPage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -2656,7 +3411,7 @@ export async function getGetStartedPage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -3037,12 +3792,1582 @@ export async function getGetStartedPage(request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
               theme,
               useAnimations
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            }
+          }
+        },
+        _type == 'divider' => {
+          _type,
+          _key,
+          showDivider,
+          dividerType,
+          background,
+          darkBackgroundColor
+        }
+      },
+      announcementBar
+    }`,
+    request,
+  });
+}
+
+export async function getIndustriesLandingPage(request?: Request) {
+  return await loadQuery<IndustriesLandingPage | null>({
+    query: groq`*[_type == "industriesLandingPage" && !(_id in path("drafts.**"))][0]{
+      _id,
+      _updatedAt,
+      title,
+      seoTitle,
+      seoDescription,
+      sections[]{
+        ...,
+        _type == 'columnsBlock' => {
+          _type,
+          _key,
+          layout,
+          backgroundColor,
+          customBackgroundColor,
+          backgroundImage{ asset-> },
+          backgroundPosition,
+          backgroundSize,
+          backgroundGradient,
+          gradientColorStart,
+          gradientColorEnd,
+          paddingTop,
+          paddingTopMobile,
+          paddingBottom,
+          paddingBottomMobile,
+          column1[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttonList[]{
+                _key,
+                buttonSettings{
+                  modalTrigger,
+                  modalTriggerVideo,
+                  formId,
+                  videoId,
+                  btnLabel,
+                  buttonLink{
+                    href,
+                    openInNewTab,
+                    noFollow
+                  }
+                },
+                btnIcon{
+                  iconFieldSvg,
+                  iconPosition
+                },
+                buttonStyles{
+                  bgKind
+                }
+              },
+              styles{
+                layout{
+                  spacing{
+                    marginTop,
+                    marginBottom,
+                    marginLeft,
+                    marginRight
+                  },
+                  alignment
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  contentReference->{
+                    _id,
+                    _type,
+                    title,
+                    slug{ current }
+                  },
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'logoSet' => {
+              _type,
+              _key,
+              customTitle,
+              amerLogos[]{ _key, image{ asset-> }, alt },
+              apacLogos[]{ _key, image{ asset-> }, alt },
+              emeaLogos[]{ _key, image{ asset-> }, alt },
+              ukLogos[]{ _key, image{ asset-> }, alt },
+              theme,
+              textAlignment,
+              showDivider
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset-> }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                testimonials[]{ 
+                  _key, 
+                  content, 
+                  author, 
+                  position, 
+                  logo{ asset-> },
+                  link{ href, openInNewTab, noFollow }
+                }
+              }
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset->{ _ref, url }, alt },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile{ asset->{ _ref, url } }, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations,
+              ctaLabel,
+              ctaLink{ href, openInNewTab, noFollow }
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column2[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttonList[]{
+                _key,
+                buttonSettings{
+                  modalTrigger,
+                  modalTriggerVideo,
+                  formId,
+                  videoId,
+                  btnLabel,
+                  buttonLink{
+                    href,
+                    openInNewTab,
+                    noFollow
+                  }
+                },
+                btnIcon{
+                  iconFieldSvg,
+                  iconPosition
+                },
+                buttonStyles{
+                  bgKind
+                }
+              },
+              styles{
+                layout{
+                  spacing{
+                    marginTop,
+                    marginBottom,
+                    marginLeft,
+                    marginRight
+                  },
+                  alignment
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  contentReference->{
+                    _id,
+                    _type,
+                    title,
+                    slug{ current }
+                  },
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'logoSet' => {
+              _type,
+              _key,
+              customTitle,
+              amerLogos[]{ _key, image{ asset-> }, alt },
+              apacLogos[]{ _key, image{ asset-> }, alt },
+              emeaLogos[]{ _key, image{ asset-> }, alt },
+              ukLogos[]{ _key, image{ asset-> }, alt },
+              theme,
+              textAlignment,
+              showDivider
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset-> }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                testimonials[]{ 
+                  _key, 
+                  content, 
+                  author, 
+                  position, 
+                  logo{ asset-> },
+                  link{ href, openInNewTab, noFollow }
+                }
+              }
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset->{ _ref, url }, alt },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile{ asset->{ _ref, url } }, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations,
+              ctaLabel,
+              ctaLink{ href, openInNewTab, noFollow }
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            },
+            _type == 'widgetUserReviewCard' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              badges[]{ _key, image{ asset-> }, alt, link },
+              theme,
+              textAlignment,
+              eyebrowType,
+              headingType,
+              displayType,
+              textType
+            }
+          },
+          column3[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttonList[]{
+                _key,
+                buttonSettings{
+                  modalTrigger,
+                  modalTriggerVideo,
+                  formId,
+                  videoId,
+                  btnLabel,
+                  buttonLink{
+                    href,
+                    openInNewTab,
+                    noFollow
+                  }
+                },
+                btnIcon{
+                  iconFieldSvg,
+                  iconPosition
+                },
+                buttonStyles{
+                  bgKind
+                }
+              },
+              styles{
+                layout{
+                  spacing{
+                    marginTop,
+                    marginBottom,
+                    marginLeft,
+                    marginRight
+                  },
+                  alignment
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  contentReference->{
+                    _id,
+                    _type,
+                    title,
+                    slug{ current }
+                  },
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'logoSet' => {
+              _type,
+              _key,
+              customTitle,
+              amerLogos[]{ _key, image{ asset-> }, alt },
+              apacLogos[]{ _key, image{ asset-> }, alt },
+              emeaLogos[]{ _key, image{ asset-> }, alt },
+              ukLogos[]{ _key, image{ asset-> }, alt },
+              theme,
+              textAlignment,
+              showDivider
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset-> }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                testimonials[]{ 
+                  _key, 
+                  content, 
+                  author, 
+                  position, 
+                  logo{ asset-> },
+                  link{ href, openInNewTab, noFollow }
+                }
+              }
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset->{ _ref, url }, alt },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile{ asset->{ _ref, url } }, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations,
+              ctaLabel,
+              ctaLink{ href, openInNewTab, noFollow }
+            },
+            _type == 'featuresSelectorGlobalReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                heading {
+                  eyebrow,
+                  title,
+                  text,
+                  theme,
+                  textAlignment,
+                  eyebrowType,
+                  eyebrowStyle,
+                  headingType,
+                  displayType,
+                  textType
+                },
+                features[]{ 
+                  _key, 
+                  icon, 
+                  title, 
+                  link{ href, openInNewTab, noFollow } 
+                },
+                ctaLabel,
+                ctaLink{ href, openInNewTab, noFollow }
+              }
+            },
+            _type == 'faqs' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              items[]{ _key, title, content },
+              theme,
+              expandFirst
+            }
+          },
+          column4[]{
+            ...,
+            _type == 'image' => { ..., asset-> },
+            _type == 'imageVideoModal' => { ..., thumbnail{ ..., asset-> } },
+            _type == 'advancedImage' => {
+              _type,
+              _key,
+              image{ asset->{ _ref, url, metadata{ dimensions } } },
+              alt,
+              caption,
+              loading,
+              fetchpriority,
+              responsiveBehavior,
+              maxWidth,
+              customWidth,
+              customHeight,
+              aspectRatio,
+              showButton,
+              buttonLink,
+              buttonText,
+              buttonOpenInNewTab,
+              alignment,
+              borderRadius,
+              shadow,
+              objectFit
+            },
+            _type == 'headingComposition' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              addBorderLine
+            },
+            _type == 'buttonStack' => {
+              _type,
+              _key,
+              buttonList[]{
+                _key,
+                buttonSettings{
+                  modalTrigger,
+                  modalTriggerVideo,
+                  formId,
+                  videoId,
+                  btnLabel,
+                  buttonLink{
+                    href,
+                    openInNewTab,
+                    noFollow
+                  }
+                },
+                btnIcon{
+                  iconFieldSvg,
+                  iconPosition
+                },
+                buttonStyles{
+                  bgKind
+                }
+              },
+              styles{
+                layout{
+                  spacing{
+                    marginTop,
+                    marginBottom,
+                    marginLeft,
+                    marginRight
+                  },
+                  alignment
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'button' => {
+              _type,
+              _key,
+              settings{
+                buttonText,
+                link{
+                  href,
+                  urlType,
+                  contentReference->{
+                    _id,
+                    _type,
+                    title,
+                    slug{ current }
+                  },
+                  openInNewTab,
+                  noFollow
+                }
+              },
+              btnIcon{
+                iconFieldSvg,
+                iconPosition
+              },
+              styles{
+                background{
+                  bgKind
+                },
+                alignment{
+                  horizontalAlign,
+                  buttonWidth
+                },
+                animation{
+                  type
+                }
+              }
+            },
+            _type == 'logoSet' => {
+              _type,
+              _key,
+              customTitle,
+              amerLogos[]{ _key, image{ asset-> }, alt },
+              apacLogos[]{ _key, image{ asset-> }, alt },
+              emeaLogos[]{ _key, image{ asset-> }, alt },
+              ukLogos[]{ _key, image{ asset-> }, alt },
+              theme,
+              textAlignment,
+              showDivider
+            },
+            _type == 'logoSetReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                customTitle,
+                amerLogos[]{ _key, image{ asset-> }, alt },
+                apacLogos[]{ _key, image{ asset-> }, alt },
+                emeaLogos[]{ _key, image{ asset-> }, alt },
+                ukLogos[]{ _key, image{ asset-> }, alt },
+                theme,
+                textAlignment,
+                showDivider
+              }
+            },
+            _type == 'statsSet' => {
+              _type,
+              _key,
+              stats[]{ _key, tag, statsNumber, statsText },
+              theme,
+              textType,
+              spacingStyle
+            },
+            _type == 'quoteBlock' => {
+              _type,
+              _key,
+              quoteText,
+              quoteAuthor,
+              quoteTitle,
+              customerStoryLink{
+                href,
+                openInNewTab,
+                noFollow
+              },
+              linkLabel,
+              imageType,
+              avatar{ asset->{ _ref, url } },
+              avatarAlt,
+              logo{ asset->{ _ref, url } },
+              logoAlt,
+              theme,
+              styleVariant
+            },
+            _type == 'widgetStatsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                blurb,
+                stats,
+                horizontalLayout
+              }
+            },
+            _type == 'widgetUserReviewsReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                title,
+                text,
+                badges[]{ _key, image{ asset-> }, alt, link },
+                theme,
+                textAlignment,
+                eyebrowType,
+                headingType,
+                displayType,
+                textType
+              }
+            },
+            _type == 'testimonialCarouselReference' => {
+              _type,
+              _key,
+              reference->{
+                _id,
+                _type,
+                eyebrow,
+                testimonials[]{ 
+                  _key, 
+                  content, 
+                  author, 
+                  position, 
+                  logo{ asset-> },
+                  link{ href, openInNewTab, noFollow }
+                }
+              }
+            },
+            _type == 'featuresStackedContent' => {
+              _type,
+              _key,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              items[]{
+                _key,
+                eyebrow,
+                title,
+                text,
+                image{ asset->{ _id, url } },
+                imageAlt,
+                imagePosition,
+                imageRatio,
+                showStats,
+                statsNumber,
+                statsText,
+                statsIcon,
+                showQuote,
+                quoteText,
+                quoteAuthor,
+                quoteAuthorTitle,
+                quoteImageType,
+                quoteImage{ asset->{ _id, url } },
+                quoteImageAlt,
+                showCta,
+                ctaText,
+                ctaLink,
+                ctaOpenInNewTab,
+                ctaIcon,
+                ctaIconPosition,
+                ctaKind
+              }
+            },
+            _type == 'trustedPartner' => {
+              _type,
+              _key,
+              eyebrow,
+              title,
+              text,
+              theme,
+              textAlignment,
+              eyebrowType,
+              eyebrowStyle,
+              headingType,
+              displayType,
+              textType,
+              userReviews->{
+                _id,
+                _type,
+                badges[]{ _key, image{ asset-> }, alt, link }
+              },
+              backgroundColor,
+              customBackgroundColor,
+              backgroundImage{ asset-> },
+              backgroundPosition,
+              backgroundSize,
+              cardPadding,
+              borderRadius
+            },
+            _type == 'hubspotFormReference' => {
+              _type,
+              _key,
+              form->{
+                _id,
+                _type,
+                name,
+                portalId,
+                formId,
+                region
+              },
+              theme
+            },
+            _type == 'industrySelector' => {
+              _type,
+              _key,
+              heading {
+                eyebrow,
+                title,
+                text,
+                theme,
+                textAlignment,
+                eyebrowType,
+                eyebrowStyle,
+                headingType,
+                displayType,
+                textType
+              },
+              headerImage{ asset->{ _ref, url }, alt },
+              headerImageAlt,
+              industries[]{ 
+                _key, 
+                icon, 
+                animationFile{ asset->{ _ref, url } }, 
+                title, 
+                link{ href, openInNewTab, noFollow } 
+              },
+              theme,
+              useAnimations,
+              ctaLabel,
+              ctaLink{ href, openInNewTab, noFollow }
             },
             _type == 'featuresSelectorGlobalReference' => {
               _type,
@@ -3261,7 +5586,7 @@ export async function getPage(slug: string, request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -3458,7 +5783,7 @@ export async function getPage(slug: string, request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -3655,7 +5980,7 @@ export async function getPage(slug: string, request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -3852,7 +6177,7 @@ export async function getPage(slug: string, request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -4100,7 +6425,7 @@ export async function getFeature(slug: string, request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -4351,7 +6676,7 @@ export async function getFeature(slug: string, request?: Request) {
               industries[]{ 
                 _key, 
                 icon, 
-                animationFile, 
+                animationFile{ asset->{ url } }, 
                 title, 
                 link{ href, openInNewTab, noFollow } 
               },
@@ -4651,6 +6976,70 @@ export async function getPosts(request?: Request) {
   });
 }
 
+// Optimized: Get blog landing page data in a single query
+// This fetches posts (paginated), total count, topics, and editor picks all at once
+export async function getBlogLandingData(page: number = 1, perPage: number = 9, request?: Request) {
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  
+  return await loadQuery<{
+    posts: Post[],
+    total: number,
+    topics: BlogTopic[],
+    editorPicks: Post[]
+  }>({
+    query: groq`{
+      "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(publishedAt, _createdAt) desc) [$start...$end] {
+        _type,
+        _id,
+        _createdAt,
+        title,
+        slug,
+        excerpt,
+        featuredImage{
+          asset->{
+            _id,
+            url
+          },
+          alt
+        },
+        publishedAt,
+        "topics": topics[]->{ _id, name, slug },
+        "wordCount": length(pt::text(body))
+      },
+      "total": count(*[_type == "post" && defined(slug.current)]),
+      "topics": *[_type == "blogTopic"] | order(name asc) {
+        _id,
+        _type,
+        name,
+        slug,
+        description,
+        "postCount": count(*[_type == "post" && references(^._id)])
+      },
+      "editorPicks": *[_type == "post" && defined(slug.current) && "editor-picks" in topics[]->slug.current] | order(coalesce(publishedAt, _createdAt) desc) [0...4] {
+        _type,
+        _id,
+        _createdAt,
+        title,
+        slug,
+        excerpt,
+        featuredImage{
+          asset->{
+            _id,
+            url
+          },
+          alt
+        },
+        publishedAt,
+        "topics": topics[]->{ _id, name, slug },
+        "wordCount": length(pt::text(body))
+      }
+    }`,
+    params: { start, end },
+    request,
+  });
+}
+
 export async function getPost(slug: string, request?: Request) {
   return await loadQuery<Post>({
     query: groq`*[_type == "post" && slug.current == $slug][0]{
@@ -4718,7 +7107,7 @@ export async function getRelatedPosts(topicIds: string[], currentPostId: string,
       },
       publishedAt,
       "topics": topics[]->{ _id, name, slug },
-      body
+      "wordCount": length(pt::text(body))
     }`,
     params: { topicIds, currentPostId, limit },
     request,
@@ -4780,6 +7169,35 @@ export async function getTopic(slug: string, request?: Request) {
       description
     }`,
     params: { slug },
+    request,
+  });
+}
+
+// Search posts by query string
+export async function searchPosts(searchQuery: string, limit: number = 10, request?: Request) {
+  return await loadQuery<Post[]>({
+    query: groq`*[
+      _type == "post"
+      && defined(slug.current)
+      && (title match $searchQuery || excerpt match $searchQuery)
+    ] | order(coalesce(publishedAt, _createdAt) desc)[0...$limit] {
+      _type,
+      _id,
+      _createdAt,
+      title,
+      slug,
+      excerpt,
+      featuredImage{
+        asset->{
+          _id,
+          url
+        },
+        alt
+      },
+      publishedAt,
+      "topics": topics[]->{ _id, name, slug }
+    }`,
+    params: { searchQuery: `*${searchQuery}*`, limit },
     request,
   });
 }
@@ -5708,6 +8126,15 @@ export interface GetStartedPage extends SEOFields {
   announcementBar?: AnnouncementBarSettings;
 }
 
+export interface IndustriesLandingPage extends SEOFields {
+  _type: "industriesLandingPage";
+  _id: string;
+  _updatedAt?: string;
+  title?: string;
+  sections?: (ColumnsBlock | Divider)[];
+  announcementBar?: AnnouncementBarSettings;
+}
+
 export interface Page extends SEOFields {
   _type: "page";
   _id: string;
@@ -6001,7 +8428,7 @@ export async function getIndustry(slug: string, request?: Request) {
               industries[]{
                 _key,
                 icon,
-                animationFile,
+                animationFile{ asset->{ url } },
                 title,
                 link{
                   href,
@@ -6069,7 +8496,7 @@ export async function getIndustry(slug: string, request?: Request) {
               items[]{
                 _key,
                 icon,
-                animationFile,
+                animationFile{ asset->{ url } },
                 title,
                 content,
                 linkLabel,
@@ -6316,7 +8743,7 @@ export async function getIndustry(slug: string, request?: Request) {
               industries[]{
                 _key,
                 icon,
-                animationFile,
+                animationFile{ asset->{ url } },
                 title,
                 link{
                   href,
@@ -6384,7 +8811,7 @@ export async function getIndustry(slug: string, request?: Request) {
               items[]{
                 _key,
                 icon,
-                animationFile,
+                animationFile{ asset->{ url } },
                 title,
                 content,
                 linkLabel,
@@ -6475,7 +8902,7 @@ export async function getIndustry(slug: string, request?: Request) {
               items[]{
                 _key,
                 icon,
-                animationFile,
+                animationFile{ asset->{ url } },
                 title,
                 content,
                 linkLabel,
@@ -6538,7 +8965,7 @@ export async function getIndustry(slug: string, request?: Request) {
               items[]{
                 _key,
                 icon,
-                animationFile,
+                animationFile{ asset->{ url } },
                 title,
                 content,
                 linkLabel,
