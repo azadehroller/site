@@ -46,6 +46,22 @@ export const locations = {
       ],
     }),
   }),
+  industriesLandingPage: defineLocations({
+    select: {title: 'title'},
+    resolve: (doc) => ({
+      locations: [
+        {title: doc?.title || 'Industries', href: '/industries'},
+      ],
+    }),
+  }),
+  featuresLandingPage: defineLocations({
+    select: {title: 'title'},
+    resolve: (doc) => ({
+      locations: [
+        {title: doc?.title || 'Features', href: '/features'},
+      ],
+    }),
+  }),
   rawHtmlPage: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
     resolve: (doc) => {
@@ -83,6 +99,14 @@ export const locations = {
       ],
     }),
   }),
+  testPage: defineLocations({
+    select: {title: 'title'},
+    resolve: (doc) => ({
+      locations: [
+        {title: doc?.title || 'Test Page', href: '/test'},
+      ],
+    }),
+  }),
 }
 
 /**
@@ -103,6 +127,14 @@ export const resolve: DocumentResolver = {
       filter: `_type == "getStartedPage"`,
     },
     {
+      route: '/industries',
+      filter: `_type == "industriesLandingPage"`,
+    },
+    {
+      route: '/features',
+      filter: `_type == "featuresLandingPage"`,
+    },
+    {
       route: '/blog/:slug',
       filter: `_type == "post" && slug.current == $slug`,
     },
@@ -117,6 +149,10 @@ export const resolve: DocumentResolver = {
     {
       route: '/solutions/:slug',
       filter: `_type == "solution" && slug.current == $slug`,
+    },
+    {
+      route: '/test',
+      filter: `_type == "testPage"`,
     },
     {
       route: '/t',
