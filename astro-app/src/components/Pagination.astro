@@ -3,9 +3,10 @@ interface Props {
   currentPage: number;
   totalPages: number;
   baseUrl: string;
+  useQueryParams?: boolean;
 }
 
-const { currentPage, totalPages, baseUrl } = Astro.props;
+const { currentPage, totalPages, baseUrl, useQueryParams = false } = Astro.props;
 
 // Generate page numbers to show
 const getPageNumbers = () => {
@@ -45,71 +46,210 @@ const getPageNumbers = () => {
 const pageNumbers = getPageNumbers();
 
 const getPageUrl = (page: number) => {
-  return page === 1 ? '/' : `${baseUrl}/${page}`;
+  if (useQueryParams) {
+    // Use query parameters for topic pages
+    if (page === 1) {
+      return baseUrl;
+    }
+    return `${baseUrl}?page=${page}`;
+  } else {
+    // Use path segments for blog listing pages
+    return page === 1 ? '/' : `${baseUrl}/${page}`;
+  }
 };
 ---
 
-<nav class="flex justify-center items-center gap-2 py-8 mt-8" aria-label="Pagination">
-  {/* Previous button */}
-  {currentPage > 1 ? (
-    <a
-      href={getPageUrl(currentPage - 1)}
-      class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors text-gray-700 font-medium"
-      aria-label="Previous page"
-    >
-      ← Previous
-    </a>
-  ) : (
-    <span class="px-4 py-2 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
-      ← Previous
-    </span>
-  )}
+<nav class="blog-pagination" aria-label="Pagination">
+  <div class="blog-pagination__nav">
+    {/* Previous button */}
+    {currentPage > 1 ? (
+      <a
+        href={getPageUrl(currentPage - 1)}
+        class="blog-pagination__prev-link"
+        aria-label="Previous page"
+      >
+        <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#143D82"/>
+        </svg>
+        <span>Previous</span>
+      </a>
+    ) : (
+      <span class="blog-pagination__prev-link blog-pagination__prev-link--disabled">
+        <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#B0C1D4"/>
+        </svg>
+        <span>Previous</span>
+      </span>
+    )}
 
-  {/* Page numbers */}
-  <div class="hidden sm:flex gap-1">
-    {pageNumbers.map((page) => (
-      typeof page === 'number' ? (
-        page === currentPage ? (
-          <span
-            class="px-4 py-2 rounded-lg bg-black text-white font-medium"
-            aria-current="page"
-          >
-            {page}
-          </span>
+    {/* Page numbers */}
+    <div class="blog-pagination__items">
+      {pageNumbers.map((page) => (
+        typeof page === 'number' ? (
+          page === currentPage ? (
+            <span
+              class="blog-pagination__link blog-pagination__link--active"
+              aria-current="page"
+            >
+              {page}
+            </span>
+          ) : (
+            <a
+              href={getPageUrl(page)}
+              class="blog-pagination__link blog-pagination__number-link"
+            >
+              {page}
+            </a>
+          )
         ) : (
-          <a
-            href={getPageUrl(page)}
-            class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors text-gray-700"
-          >
-            {page}
-          </a>
+          <span class="blog-pagination__ellipsis">...</span>
         )
-      ) : (
-        <span class="px-2 py-2 text-gray-500">...</span>
-      )
-    ))}
+      ))}
+    </div>
+
+    {/* Next button */}
+    {currentPage < totalPages ? (
+      <a
+        href={getPageUrl(currentPage + 1)}
+        class="blog-pagination__next-link"
+        aria-label="Next page"
+      >
+        <span>Next</span>
+        <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#143D82"/>
+        </svg>
+      </a>
+    ) : (
+      <span class="blog-pagination__next-link blog-pagination__next-link--disabled">
+        <span>Next</span>
+        <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#B0C1D4"/>
+        </svg>
+      </span>
+    )}
   </div>
-
-  {/* Mobile page indicator */}
-  <span class="sm:hidden text-gray-600 font-medium">
-    Page {currentPage} of {totalPages}
-  </span>
-
-  {/* Next button */}
-  {currentPage < totalPages ? (
-    <a
-      href={getPageUrl(currentPage + 1)}
-      class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors text-gray-700 font-medium"
-      aria-label="Next page"
-    >
-      Next →
-    </a>
-  ) : (
-    <span class="px-4 py-2 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
-      Next →
-    </span>
-  )}
 </nav>
+
+<style>
+  .blog-pagination {
+    display: block;
+    margin-bottom: 3.3rem;
+    padding: 16px 0 0;
+    text-align: center;
+  }
+
+  @media (min-width: 992px) {
+    .blog-pagination {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  .blog-pagination__nav {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 992px) {
+    .blog-pagination__nav {
+      padding: 0;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .blog-pagination__nav a {
+    padding: 0 12px;
+  }
+
+  .blog-pagination__link {
+    color: #033180;
+    display: inline-flex;
+    font-size: 16px;
+    line-height: 1;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+
+  .blog-pagination__link:focus,
+  .blog-pagination__link:hover {
+    text-decoration: none;
+  }
+
+  .blog-pagination__number-link {
+    padding: 6px 9px;
+    font-weight: 500;
+  }
+
+  .blog-pagination__number-link:not(.blog-pagination__link--active):focus,
+  .blog-pagination__number-link:not(.blog-pagination__link--active):hover {
+    font-weight: 500;
+    text-decoration: underline;
+  }
+
+  .blog-pagination__link--active {
+    font-weight: 700;
+    pointer-events: none;
+  }
+
+  .blog-pagination__ellipsis {
+    pointer-events: none;
+    color: #033180;
+    font-size: 0.95rem;
+    padding: 6px;
+  }
+
+  .blog-pagination__prev-link,
+  .blog-pagination__next-link {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.25rem;
+    text-decoration: none;
+    color: #033180;
+    font-size: 16px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+
+  .blog-pagination__prev-link {
+    margin-right: 0.25rem;
+    text-align: right;
+  }
+
+  .blog-pagination__next-link {
+    margin-left: 0.25rem;
+    text-align: left;
+  }
+
+  .blog-pagination__prev-link svg {
+    transform: rotate(180deg);
+  }
+
+  .blog-pagination__prev-link--disabled,
+  .blog-pagination__next-link--disabled {
+    display: none;
+  }
+
+  @media (min-width: 992px) {
+    .blog-pagination__prev-link--disabled,
+    .blog-pagination__next-link--disabled {
+      display: inline-flex;
+      color: #B0C1D4;
+      cursor: default;
+      pointer-events: none;
+    }
+  }
+
+  .blog-pagination__items {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+</style>
 
 
 
