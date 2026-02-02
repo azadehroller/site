@@ -37,17 +37,6 @@ export default defineType({
           type: 'object',
           fields: [
             defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'url',
-              description: 'The link URL',
-              validation: (Rule) =>
-                Rule.uri({
-                  scheme: ['http', 'https', 'mailto', 'tel'],
-                  allowRelative: true,
-                }),
-            }),
-            defineField({
               name: 'urlType',
               title: 'URL Type',
               type: 'string',
@@ -61,6 +50,57 @@ export default defineType({
                 layout: 'dropdown',
               },
               initialValue: 'EXTERNAL',
+            }),
+            defineField({
+              name: 'href',
+              title: 'URL',
+              type: 'url',
+              description: 'The link URL (for External, Email Address, or File)',
+              hidden: ({parent}) => parent?.urlType === 'CONTENT',
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  const urlType = (context.parent as any)?.urlType
+                  if (urlType === 'CONTENT') {
+                    return true // Skip validation for CONTENT type
+                  }
+                  if (!value) {
+                    return 'URL is required'
+                  }
+                  return Rule.uri({
+                    scheme: ['http', 'https', 'mailto', 'tel'],
+                    allowRelative: true,
+                  }).validate(value)
+                }),
+            }),
+            defineField({
+              name: 'contentReference',
+              title: 'Content',
+              type: 'reference',
+              description: 'Search and select a page, feature, industry, or other content. Search by title (e.g., "Get Started", "Homepage", "Industries")',
+              hidden: ({parent}) => parent?.urlType !== 'CONTENT',
+              to: [
+                {type: 'page'},
+                {type: 'feature'},
+                {type: 'industry'},
+                {type: 'post'},
+                {type: 'solution'},
+                {type: 'partner'},
+                {type: 'competitor'},
+                {type: 'landingPage'},
+                {type: 'rawHtmlPage'},
+                // Singleton pages (no slugs, accessed via fixed routes)
+                {type: 'homepage'},
+                {type: 'getStartedPage'},
+                {type: 'industriesLandingPage'},
+                {type: 'featuresLandingPage'},
+                {type: 'blogLandingPage'},
+                {type: 'pricingPage'},
+                {type: 'partnersLandingPage'},
+                {type: 'competitorsLandingPage'},
+              ],
+              options: {
+                filter: '!(_id in path("drafts.**"))', // Only show published documents
+              },
             }),
             defineField({
               name: 'openInNewTab',

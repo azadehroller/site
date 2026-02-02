@@ -53,6 +53,7 @@ const regularBlocks = [
   {type: 'quoteBlock', title: '💬 Quote Block', icon: CommentIcon},
   // Features & Content
   {type: 'featuresStackedContent', title: '✨ Features Stacked Content', icon: SparklesIcon},
+  {type: 'featuresDetail', title: '📋 Features Detail', icon: SparklesIcon},
   {type: 'trustedPartner', title: '🤝 Trusted Partner', icon: UsersIcon},
   {type: 'industrySelector', title: '🏢 Industry Selector', icon: EarthGlobeIcon},
   // Lists & Tables
@@ -69,6 +70,8 @@ const regularBlocks = [
   {type: 'hubspotFormReference', title: '📝 HubSpot Form', icon: DocumentIcon},
   // Inline variants (not global references)
   {type: 'industrySelectorGlobal', title: '🏢 Industry Selector (Inline)', icon: EarthGlobeIcon},
+  // Testimonial Slider
+  {type: 'testimonialSlider', title: '💬 Testimonial Slider', icon: CommentIcon},
 ]
 
 // Global Blocks (references to singleton documents)

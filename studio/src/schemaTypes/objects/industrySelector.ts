@@ -17,7 +17,17 @@ const industryItem = {
       title: 'Icon (SVG)',
       type: 'text',
       rows: 4,
-      description: 'Paste SVG code for the industry icon.',
+      description: 'Paste SVG code for the industry icon. This will be used if no Lottie animation is provided.',
+      hidden: ({parent}) => !!parent?.animationFile,
+    }),
+    defineField({
+      name: 'animationFile',
+      title: 'Lottie Animation (JSON)',
+      type: 'file',
+      description: 'Upload a Lottie animation JSON file. If provided, this will be used instead of the SVG icon.',
+      options: {
+        accept: '.json,application/json',
+      },
     }),
     defineField({
       name: 'title',
@@ -54,10 +64,13 @@ const industryItem = {
   preview: {
     select: {
       title: 'title',
+      hasLottie: 'animationFile',
     },
     prepare(selection: Record<string, unknown>) {
+      const hasLottie = !!selection.hasLottie
       return {
         title: (selection.title as string) || 'Industry Item',
+        subtitle: hasLottie ? '🎬 Lottie Animation' : '🖼️ SVG Icon',
       }
     },
   },
@@ -71,8 +84,27 @@ export default defineType({
     {name: 'header', title: 'Header', default: true},
     {name: 'industries', title: 'Industries'},
     {name: 'cta', title: 'CTA'},
+    {name: 'settings', title: 'Settings'},
   ],
   fields: [
+    // Theme
+    defineField({
+      name: 'theme',
+      title: 'Theme',
+      type: 'string',
+      group: 'settings',
+      description: 'Choose the visual theme for this component',
+      options: {
+        list: [
+          {title: 'Light (OnDark - Blue background with white text)', value: 'light'},
+          {title: 'Dark (OnLight - White background with blue text)', value: 'dark'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'dark',
+      validation: (Rule) => Rule.required(),
+    }),
+
     // Heading - uses HeadingComposition type
     defineField({
       name: 'heading',
