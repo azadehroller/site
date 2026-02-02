@@ -10,6 +10,7 @@ import logoSet from './objects/logoSet'
 import widgetStatsReference from './objects/widgetStatsReference'
 import widgetUserReviewsReference from './objects/widgetUserReviewsReference'
 import featuresStackedContent from './objects/featuresStackedContent'
+import featuresDetail from './objects/featuresDetail'
 import headingComposition from './objects/headingComposition'
 import advancedImage from './objects/advancedImage'
 import trustedPartner from './objects/trustedPartner'
@@ -30,6 +31,7 @@ import industriesLandingPage from './documents/industriesLandingPage'
 import partnersLandingPage from './documents/partnersLandingPage'
 import competitorsLandingPage from './documents/competitorsLandingPage'
 import notFoundPage from './documents/notFoundPage'
+import testPage from './documents/testPage'
 import feature from './documents/feature'
 import industry from './documents/industry'
 import partner from './documents/partner'
@@ -57,6 +59,7 @@ import industrySelectorGlobal from './objects/industrySelectorGlobal'
 import industrySelectorGlobalReference from './objects/industrySelectorGlobalReference'
 import statsSetStackedGlobalReference from './objects/statsSetStackedGlobalReference'
 import widgetUserReviewCard from './objects/widgetUserReviewCard'
+import testimonialSlider from './objects/testimonialSlider'
 import blogTextBlock from './objects/blogTextBlock'
 import blogVideoBlock from './objects/blogVideoBlock'
 import blogImageBlock from './objects/blogImageBlock'
@@ -80,6 +83,7 @@ export const schemaTypes = [
   partnersLandingPage,
   competitorsLandingPage,
   notFoundPage,
+  testPage,
   // Document types - Collections
   feature,
   industry,
@@ -106,6 +110,7 @@ export const schemaTypes = [
   logoSet,
   widgetStatsReference,
   featuresStackedContent,
+  featuresDetail,
   headingComposition,
   advancedImage,
   trustedPartner,
@@ -157,6 +162,8 @@ export const schemaTypes = [
   statsSetStackedGlobalReference,
   // Widget User Review Card
   widgetUserReviewCard,
+  // Testimonial Slider
+  testimonialSlider,
   // Blog content blocks (standalone page sections)
   blogTextBlock,
   blogVideoBlock,

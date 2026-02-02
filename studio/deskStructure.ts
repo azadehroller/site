@@ -1,5 +1,6 @@
 // sanity/deskStructure.ts
 import type {StructureResolver} from 'sanity/structure'
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 import {
   DocumentIcon,
   CogIcon,
@@ -107,6 +108,14 @@ export const deskStructure: StructureResolver = (S, context) =>
                     .schemaType('notFoundPage')
                     .documentId('notFoundPage')
                 ),
+              S.listItem()
+                .title('Test Page')
+                .icon(EditIcon)
+                .child(
+                  S.document()
+                    .schemaType('testPage')
+                    .documentId('testPage')
+                ),
             ])
         ),
 
@@ -143,6 +152,7 @@ export const deskStructure: StructureResolver = (S, context) =>
         .child(
           S.documentTypeList('feature')
             .title('Features')
+            .defaultOrdering([{field: 'isTemplate', direction: 'desc'}, {field: 'orderRank', direction: 'asc'}, {field: 'title', direction: 'asc'}])
         ),
 
       // ==========================================
@@ -152,8 +162,63 @@ export const deskStructure: StructureResolver = (S, context) =>
         .title('Industries')
         .icon(EarthGlobeIcon)
         .child(
-          S.documentTypeList('industry')
-            .title('Industries')
+          async () => {
+            const client = context.getClient({apiVersion: '2024-01-01'})
+            
+            // Fetch ALL industries (both published and drafts) and sort together
+            // Templates first, regardless of publication status
+            const industries = await client.fetch(`
+              *[_type == "industry"] | order(
+                coalesce(isTemplate, false) desc,
+                orderRank asc,
+                title asc
+              ) {
+                _id,
+                _type,
+                title,
+                "slug": slug.current,
+                isTemplate,
+                orderRank
+              }
+            `)
+            
+            // Deduplicate: if both draft and published exist, prefer published
+            const seen = new Set<string>()
+            const uniqueIndustries = industries.filter((industry: any) => {
+              const normalizedId = industry._id.replace(/^drafts\./, '')
+              if (seen.has(normalizedId)) {
+                // If we've seen this ID, only keep the published version (non-draft)
+                return !industry._id.startsWith('drafts.')
+              }
+              seen.add(normalizedId)
+              return true
+            })
+            
+            return S.list()
+              .title('Industries')
+              .items(
+                uniqueIndustries.map((industry: any) => {
+                  const displayTitle = industry.isTemplate 
+                    ? `📋 ${industry.title || 'Untitled'} (Template)` 
+                    : industry.title || 'Untitled'
+                  
+                  // Use the actual _id for list item ID (must be unique)
+                  // Normalize ID for documentId (removes drafts. prefix)
+                  const listItemId = industry._id
+                  const documentId = industry._id.replace(/^drafts\./, '')
+                  
+                  return S.listItem()
+                    .title(displayTitle)
+                    .id(listItemId)
+                    .icon(EarthGlobeIcon) // Industry/business icon for each page
+                    .child(
+                      S.document()
+                        .schemaType('industry')
+                        .documentId(documentId)
+                    )
+                })
+              )
+          }
         ),
 
       // ==========================================

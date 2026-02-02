@@ -184,16 +184,6 @@ export default defineType({
       description: 'Original HubSpot post ID (used for data matching and syncing)',
     }),
 
-    // HubSpot URL for reference
-    defineField({
-      name: 'hubspotUrl',
-      title: 'HubSpot URL',
-      type: 'url',
-      group: 'hubspot',
-      readOnly: true,
-      description: 'Original HubSpot URL',
-    }),
-
     // SEO (custom for blog posts - inherits featured image)
     ...blogSeoFields,
 
