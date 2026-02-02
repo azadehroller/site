@@ -1,10 +1,11 @@
 ---
 /**
  * Blog Topic Template Page
- * Displays posts filtered by topic
+ * Displays posts filtered by topic with pagination
  */
 import Layout from "../../../layouts/Layout.astro";
-import { formatDate } from "../../../utils";
+import Card from "../../../components/Card.astro";
+import Pagination from "../../../components/Pagination.astro";
 import { getPostsByTopic, getTopic } from "../../../utils/sanity";
 
 export const prerender = false;
@@ -15,6 +16,17 @@ if (!slug) {
   return Astro.redirect("/blog");
 }
 
+// Get page number from query params (default to 1)
+const url = new URL(Astro.request.url);
+const pageParam = url.searchParams.get("page");
+const currentPage = parseInt(pageParam || "1", 10);
+const POSTS_PER_PAGE = 9;
+
+// Redirect page 1 with query param to clean URL
+if (pageParam === "1") {
+  return Astro.redirect(`/blog/topic/${slug}`, 301);
+}
+
 // Get topic info
 const { data: topic } = await getTopic(slug, Astro.request);
 
@@ -22,105 +34,391 @@ if (!topic) {
   return Astro.redirect("/blog");
 }
 
-// Get posts for this topic
-const { data: posts } = await getPostsByTopic(slug, Astro.request);
+// Get all posts for this topic
+const { data: allPosts } = await getPostsByTopic(slug, Astro.request);
+
+// Calculate pagination
+const totalPages = Math.ceil((allPosts?.length || 0) / POSTS_PER_PAGE);
+const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+const posts = (allPosts || []).slice(startIndex, startIndex + POSTS_PER_PAGE);
+
+// Redirect invalid page numbers
+if (currentPage > 1 && (currentPage > totalPages || currentPage < 1 || isNaN(currentPage))) {
+  return Astro.redirect(`/blog/topic/${slug}`);
+}
 
 const title = `${topic.name} - Blog`;
+const baseUrl = `/blog/topic/${slug}`;
 ---
 
 <Layout title={title}>
-  <div class="body-container-wrapper">
-    <div class="body-container body-container--blog">
+  {/* Blog Header */}
+  <div class="blog-header">
+    <div class="blog-header__inner">
+      <a class="blog-header__tag" href="/blog">Blog</a>
+      <h1 class="blog-header__title">{topic.name}</h1>
+    </div>
+  </div>
+
+  {/* Blog Content */}
+  <div class="blog-index__wrapper">
+    <div class="blog-index__section">
       
-      <!-- Topic Header -->
-      <div class="blog-topic-header">
-        <nav class="blog-post__breadcrumbs">
-          <a class="blog-header__tag" href="/blog">Blog</a>
-          <span>/</span>
-          <span class="blog-header__tag blog-header__tag--active">{topic.name}</span>
-        </nav>
-        
-        <h1 class="blog-topic-title">{topic.name}</h1>
-        
-        {topic.description && (
-          <p class="blog-topic-description">{topic.description}</p>
-        )}
-        
-        <p class="blog-topic-count">{posts?.length || 0} articles</p>
-      </div>
-      
-      <!-- Posts Grid -->
-      <div class="blog-index">
+      {/* Blog Posts Grid */}
+      <section id="js-section-holder" class="blog-index">
         {posts && posts.length > 0 ? (
-          posts.map((post) => {
-            const postDate = post.publishedAt || post._createdAt;
-            return (
-              <article class="blog-index__post">
-                {post.featuredImage?.asset?.url && (
-                  <a href={`/blog/${post.slug.current}`} class="blog-index__post-image">
-                    <img 
-                      src={post.featuredImage.asset.url} 
-                      alt={post.featuredImage.alt || post.title || ''} 
-                      loading="lazy"
-                    />
-                  </a>
-                )}
-                <div class="blog-index__post-content">
-                  <a class="blog-header__tag" href={`/blog/topic/${slug}`}>
-                    {topic.name}
-                  </a>
-                  <h2 class="blog-index__post-title">
-                    <a href={`/blog/${post.slug.current}`}>{post.title}</a>
-                  </h2>
-                  {post.excerpt && (
-                    <p class="blog-index__post-excerpt">{post.excerpt}</p>
-                  )}
-                  <div class="blog-index__post-content-meta">
-                    <span>{formatDate(postDate)}</span>
-                  </div>
-                </div>
-              </article>
-            );
-          })
+          posts.map((post) => (
+            <article class="blog-index__post">
+              <Card post={post} />
+            </article>
+          ))
         ) : (
           <p class="blog-no-posts">No articles found for this topic.</p>
         )}
+      </section>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <nav class="new-theme-pagination blog-pagination">
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            baseUrl={baseUrl}
+            useQueryParams={true}
+          />
+        </nav>
+      )}
+
+      {/* Newsletter Section */}
+      <div class="blog-post__section" style="overflow: hidden;">
+        <div class="blog-post__subscribe">
+          <div class="blog-post__subscribe-inner">
+            <div class="blog-post__subscribe-content text-light">
+              <h2>Enhance your guest experience</h2>
+              <p>
+                Get free education, tips and inspiration to help you run a successful venue.
+              </p>
+              <div class="form--primary">
+                {/* HubSpot form will be loaded here - using the newsletter form ID */}
+                <div class="hs-form-target" 
+                  data-portal-id="22392890" 
+                  data-form-id="efa7bd0a-929a-4ea4-8480-1c6f77843cf2" 
+                  data-region="na1">
+                </div>
+              </div>
+            </div>
+            <div class="blog-post__subscribe-illustration">
+              <img 
+                src="https://22392890.fs1.hubspotusercontent-na1.net/hubfs/22392890/website-theme-assets/blog_subscribe_illustration.svg" 
+                alt="ROLLER - Subscribe Blog Notifications" 
+                width="450" 
+                height="450"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      
+
     </div>
   </div>
 </Layout>
 
 <style>
-  .blog-topic-header {
-    text-align: center;
-    padding: 3rem 0;
-    margin-bottom: 2rem;
+  /* Blog Header Styles - matching BlogLanding.astro */
+  .blog-header {
+    background: linear-gradient(135deg, #0270e0 0%, #033180 100%);
+    color: #fff;
+    margin-bottom: 40px;
+    padding: 60px 0;
   }
-  
-  .blog-topic-title {
-    font-size: 2.5rem;
-    color: #033180;
-    margin: 1rem 0 0.5rem;
+
+  .blog-header__inner {
+    margin: 0 auto;
+    max-width: 1300px;
+    padding: 0 20px;
+    text-align: left;
   }
-  
-  .blog-topic-description {
-    font-size: 1.125rem;
-    color: #666;
-    max-width: 600px;
-    margin: 0 auto 1rem;
+
+  .blog-header__tag {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 1rem;
+    display: block;
+    text-transform: capitalize;
+    text-decoration: none;
+    font-weight: 800;
   }
-  
-  .blog-topic-count {
-    font-size: 0.875rem;
-    color: #999;
+
+  .blog-header__tag:hover {
+    text-decoration: underline;
   }
-  
+
+  .blog-header__title {
+    color: var(--white, #fff);
+    font-size: 2rem;
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .blog-header__title {
+      font-size: 3rem;
+    }
+  }
+
+  /* Blog Index Wrapper */
+  .blog-index__wrapper {
+    background-color: #fff;
+    margin: 0 auto;
+    max-width: 1300px;
+    padding: 0 20px;
+  }
+
+  .blog-index__section {
+    margin: 0 auto;
+    max-width: 1300px;
+  }
+
+  /* Blog Index Grid */
+  .blog-index {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 60px 0 30px;
+  }
+
+  @media (min-width: 768px) {
+    .blog-index {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .blog-index {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
   .blog-no-posts {
     grid-column: 1 / -1;
     text-align: center;
     padding: 3rem;
     color: #666;
+    font-size: 1.125rem;
+  }
+
+  /* Pagination Styles */
+  .new-theme-pagination.blog-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px 0;
+    padding: 16px 0 0;
+  }
+
+  /* Newsletter Subscribe Section */
+  .blog-post__section {
+    margin-bottom: 60px;
+  }
+
+  .blog-post__subscribe {
+    background-color: #033180;
+    border-radius: 20px;
+    color: var(--white, #fff);
+    margin: 60px 0;
+    padding: 60px 28px;
+    position: relative;
+  }
+
+  .blog-post__subscribe * {
+    color: #fff;
+  }
+
+  .blog-post__subscribe .blog-post__subscribe-inner {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .blog-post__subscribe .blog-post__subscribe-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 8px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .blog-post__subscribe .blog-post__subscribe-inner {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+
+  .blog-post__subscribe h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+  }
+
+  @media (min-width: 992px) {
+    .blog-post__subscribe h2 {
+      font-size: 42px;
+    }
+  }
+
+  .blog-post__subscribe p {
+    font-size: 1rem;
+    line-height: 28px;
+    margin-bottom: 30px;
+    opacity: 0.9;
+  }
+
+  .blog-post__subscribe-illustration img {
+    max-width: 365px;
+    width: 100%;
+  }
+
+  @media (min-width: 990px) {
+    .blog-post__subscribe {
+      margin: 100px 0 60px;
+      padding: 60px;
+    }
+
+    .blog-post__subscribe-illustration {
+      position: absolute;
+      right: 20px;
+      top: 115px;
+      transform: translateY(-50%);
+    }
+  }
+
+  .form--primary {
+    max-width: 500px;
   }
 </style>
 
+<script>
+  // Type declarations for HubSpot
+  declare global {
+    interface Window {
+      __hubspotLoaderSetup?: boolean;
+      __hubspotScriptLoaded?: boolean;
+      __hubspotScriptLoading?: boolean;
+      __hubspotFormsInitialized?: Record<string, boolean>;
+      __hubspotReadyCallbacks?: Array<() => void>;
+      hbspt?: {
+        forms: {
+          create: (options: {
+            portalId: string;
+            formId: string;
+            region: string;
+            target: Element | string;
+            cssClass: string;
+          }) => void;
+        };
+      };
+    }
+  }
+
+  // Centralized HubSpot loader - ensures script loads only once
+  (function() {
+    'use strict';
+    
+    // Skip setup if already done (e.g., by Footer or HubspotForm component)
+    if (!window.__hubspotLoaderSetup) {
+      window.__hubspotLoaderSetup = true;
+      window.__hubspotFormsInitialized = window.__hubspotFormsInitialized || {};
+      window.__hubspotReadyCallbacks = window.__hubspotReadyCallbacks || [];
+    }
+    
+    function waitForHubSpot(callback: () => void, maxAttempts = 50) {
+      let attempts = 0;
+      
+      function check() {
+        if (window.hbspt?.forms) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(check, 100);
+        }
+      }
+      check();
+    }
+    
+    function loadScript(callback?: () => void) {
+      if (window.hbspt?.forms) {
+        callback?.();
+        return;
+      }
+      
+      if (window.__hubspotScriptLoading) {
+        callback && window.__hubspotReadyCallbacks?.push(callback);
+        return;
+      }
+      
+      // Check if script tag already exists in DOM (e.g., from Footer)
+      const existingScript = document.querySelector('script[src*="js.hsforms.net"]');
+      if (existingScript || window.__hubspotScriptLoaded) {
+        window.__hubspotScriptLoaded = true;
+        waitForHubSpot(() => {
+          callback?.();
+          window.__hubspotReadyCallbacks?.forEach(cb => cb());
+          window.__hubspotReadyCallbacks = [];
+        });
+        return;
+      }
+      
+      window.__hubspotScriptLoading = true;
+      callback && window.__hubspotReadyCallbacks?.push(callback);
+      
+      const script = document.createElement('script');
+      script.src = '//js.hsforms.net/forms/embed/v2.js';
+      script.charset = 'utf-8';
+      script.async = true;
+      
+      script.onload = () => {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(() => {
+          window.__hubspotReadyCallbacks?.forEach(cb => cb());
+          window.__hubspotReadyCallbacks = [];
+        });
+      };
+      
+      document.head.appendChild(script);
+    }
+
+    // Initialize HubSpot forms
+    function initHubSpotForms() {
+      loadScript(() => {
+        const formTargets = document.querySelectorAll<HTMLElement>('.hs-form-target');
+        
+        formTargets.forEach(target => {
+          const targetId = target.id;
+          if (!targetId || window.__hubspotFormsInitialized?.[targetId]) return;
+          
+          const portalId = target.getAttribute('data-portal-id');
+          const formId = target.getAttribute('data-form-id');
+          const region = target.getAttribute('data-region') || 'na1';
+          
+          if (portalId && formId && window.hbspt) {
+            window.__hubspotFormsInitialized![targetId] = true;
+            
+            window.hbspt.forms.create({
+              portalId,
+              formId,
+              region,
+              target: `#${targetId}`,
+              cssClass: 'hs-form stacked hs-custom-form'
+            });
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHubSpotForms);
+    } else {
+      initHubSpotForms();
+    }
+  })();
+</script>

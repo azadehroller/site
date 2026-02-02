@@ -66,53 +66,22 @@ const readingTime = estimateReadingTime(post.body || []);
 // Get first topic for breadcrumb (filter out null references)
 const firstTopic = post.topics?.filter(t => t != null)?.[0];
 
-// Fetch author directly using raw reference (dereferencing may fail for draft references)
-const { data: postWithAuthorRef } = await loadQuery<{ authorRef: string | null }>({
-  query: `*[_type == "post" && slug.current == $slug][0]{ "authorRef": author._ref }`,
-  params: { slug: post.slug.current },
-  request: Astro.request,
-});
-
-// Fetch author data if reference exists
-let author = null;
-if (postWithAuthorRef?.authorRef) {
-  const { data: authorData } = await loadQuery<any>({
-    query: `*[_id == $authorId][0]{ _id, name, slug, bio, avatar, email }`,
-    params: { authorId: postWithAuthorRef.authorRef.replace(/^drafts\./, '') },
-    request: Astro.request,
-  });
-  author = authorData;
-}
-
+// Use author from getPost() - already dereferenced (no need for separate queries)
 // Fall back to default author if not found
-if (!author) {
-  author = {
-    name: 'ROLLER Software',
-    bio: 'The team at ROLLER collaborates with venue management experts, marketers, and customer experience professionals to bring you insights that help grow and optimize your attraction business.',
-    slug: { current: 'roller-software' },
-  };
-}
+const author = post.author || {
+  name: 'ROLLER Software',
+  bio: 'The team at ROLLER collaborates with venue management experts, marketers, and customer experience professionals to bring you insights that help grow and optimize your attraction business.',
+  slug: { current: 'roller-software' },
+};
 
-// Fetch related articles based on topics
-// Get raw topic references since dereferencing may fail for draft topics
-const { data: postWithRefs } = await loadQuery<{ topicRefs: string[] }>({
-  query: `*[_type == "post" && slug.current == $slug][0]{ "topicRefs": topics[]._ref }`,
-  params: { slug: post.slug.current },
-  request: Astro.request,
-});
-
-const topicIds = postWithRefs?.topicRefs || [];
-console.log('[Related Posts Debug]', {
-  postId: post._id,
-  topicIds,
-  topicsCount: topicIds.length
-});
+// Use topics from getPost() - already dereferenced (no need for separate queries)
+// Extract topic IDs for related posts query
+const topicIds = post.topics?.filter(t => t?._id).map(t => t._id) || [];
 
 let relatedPosts: typeof post[] = [];
 if (topicIds.length > 0) {
   const { data: related } = await getRelatedPosts(topicIds, post._id, 3, Astro.request);
   relatedPosts = related || [];
-  console.log('[Related Posts Debug] Found:', relatedPosts.length, 'posts');
 }
 
 // Prepare SEO props with fallback to featured image
@@ -132,7 +101,7 @@ const seoProps = {
 };
 ---
 
-<Layout title={cleanTitle || "Blog Post"} seo={seoProps}>
+<Layout title={cleanTitle || "Blog Post"} seo={seoProps} lcpImage={post.featuredImage?.asset?.url}>
   <article class="body-container-wrapper">
     <!-- Progress bar (hidden for now) -->
     <!-- <div class="blog-post__progressbar">
@@ -189,14 +158,15 @@ const seoProps = {
         <div class="blog-post__header-image">
           {post.featuredImage?.asset?.url && (
             <figure class="blog-post__header-img">
-              <img 
+              <img
                 src={post.featuredImage.asset.url}
-                class="hs-image-widget" 
-                style="width:820px;border-width:0px;border:0px;" 
-                width="820" 
+                class="hs-image-widget"
+                style="width:820px;border-width:0px;border:0px;"
+                width="820"
                 alt={cleanAlt}
                 title={cleanTitle}
                 loading="eager"
+                fetchpriority="high"
               />
             </figure>
           )}
@@ -336,7 +306,7 @@ const seoProps = {
                               <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180" />
                             </svg>
                           </span>
-                          {estimateReadingTime(relatedPost.body || [])} min
+                          {Math.max(1, Math.ceil((relatedPost.wordCount || 0) / 1000))} min
                         </span>
                       </div>
                     </div>
@@ -1251,14 +1221,18 @@ const seoProps = {
   // Type declarations for HubSpot
   declare global {
     interface Window {
-      hubspotFormsLoaded?: boolean;
+      __hubspotLoaderSetup?: boolean;
+      __hubspotScriptLoaded?: boolean;
+      __hubspotScriptLoading?: boolean;
+      __hubspotFormsInitialized?: Record<string, boolean>;
+      __hubspotReadyCallbacks?: Array<() => void>;
       hbspt?: {
         forms: {
           create: (options: {
             portalId: string;
             formId: string;
             region: string;
-            target: Element;
+            target: Element | string;
             cssClass: string;
           }) => void;
         };
@@ -1294,49 +1268,106 @@ const seoProps = {
     });
   }
 
-  // Load HubSpot Forms script for newsletter
-  if (!window.hubspotFormsLoaded) {
-    window.hubspotFormsLoaded = true;
-    var script = document.createElement('script');
-    script.src = '//js.hsforms.net/forms/embed/v2.js';
-    script.charset = 'utf-8';
-    script.async = true;
-    document.head.appendChild(script);
-  }
-
-  // Initialize HubSpot forms
-  function initHubSpotForms() {
-    var formTargets = document.querySelectorAll('.hs-form-target');
+  // Centralized HubSpot loader - ensures script loads only once
+  (function() {
+    'use strict';
     
-    formTargets.forEach(function(target) {
-      var portalId = target.getAttribute('data-portal-id');
-      var formId = target.getAttribute('data-form-id');
-      var region = target.getAttribute('data-region') || 'na1';
-      
-      if (portalId && formId && window.hbspt && !(target as HTMLElement).dataset.initialized) {
-        (target as HTMLElement).dataset.initialized = 'true';
-        window.hbspt.forms.create({
-          portalId: portalId,
-          formId: formId,
-          region: region,
-          target: target,
-          cssClass: 'hs-form stacked hs-custom-form'
-        });
-      }
-    });
-  }
-
-  function waitForHubSpot() {
-    if (window.hbspt && window.hbspt.forms) {
-      initHubSpotForms();
-    } else {
-      setTimeout(waitForHubSpot, 100);
+    // Skip setup if already done (e.g., by Footer or HubspotForm component)
+    if (!window.__hubspotLoaderSetup) {
+      window.__hubspotLoaderSetup = true;
+      window.__hubspotFormsInitialized = window.__hubspotFormsInitialized || {};
+      window.__hubspotReadyCallbacks = window.__hubspotReadyCallbacks || [];
     }
-  }
+    
+    function waitForHubSpot(callback: () => void, maxAttempts = 50) {
+      let attempts = 0;
+      
+      function check() {
+        if (window.hbspt?.forms) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(check, 100);
+        }
+      }
+      check();
+    }
+    
+    function loadScript(callback?: () => void) {
+      if (window.hbspt?.forms) {
+        callback?.();
+        return;
+      }
+      
+      if (window.__hubspotScriptLoading) {
+        callback && window.__hubspotReadyCallbacks?.push(callback);
+        return;
+      }
+      
+      // Check if script tag already exists in DOM (e.g., from Footer)
+      const existingScript = document.querySelector('script[src*="js.hsforms.net"]');
+      if (existingScript || window.__hubspotScriptLoaded) {
+        window.__hubspotScriptLoaded = true;
+        waitForHubSpot(() => {
+          callback?.();
+          window.__hubspotReadyCallbacks?.forEach(cb => cb());
+          window.__hubspotReadyCallbacks = [];
+        });
+        return;
+      }
+      
+      window.__hubspotScriptLoading = true;
+      callback && window.__hubspotReadyCallbacks?.push(callback);
+      
+      const script = document.createElement('script');
+      script.src = '//js.hsforms.net/forms/embed/v2.js';
+      script.charset = 'utf-8';
+      script.async = true;
+      
+      script.onload = () => {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(() => {
+          window.__hubspotReadyCallbacks?.forEach(cb => cb());
+          window.__hubspotReadyCallbacks = [];
+        });
+      };
+      
+      document.head.appendChild(script);
+    }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', waitForHubSpot);
-  } else {
-    waitForHubSpot();
-  }
+    // Initialize HubSpot forms
+    function initHubSpotForms() {
+      loadScript(() => {
+        const formTargets = document.querySelectorAll<HTMLElement>('.hs-form-target');
+        
+        formTargets.forEach(target => {
+          const targetId = target.id;
+          if (!targetId || window.__hubspotFormsInitialized?.[targetId]) return;
+          
+          const portalId = target.getAttribute('data-portal-id');
+          const formId = target.getAttribute('data-form-id');
+          const region = target.getAttribute('data-region') || 'na1';
+          
+          if (portalId && formId && window.hbspt) {
+            window.__hubspotFormsInitialized![targetId] = true;
+            
+            window.hbspt.forms.create({
+              portalId,
+              formId,
+              region,
+              target: `#${targetId}`,
+              cssClass: 'hs-form stacked hs-custom-form'
+            });
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHubSpotForms);
+    } else {
+      initHubSpotForms();
+    }
+  })();
 </script>

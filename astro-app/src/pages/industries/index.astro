@@ -1,0 +1,33 @@
+---
+/**
+ * Industries Landing Page Route
+ * Fetches the Industries Landing singleton from Sanity and renders it
+ */
+import IndustriesTemplate from "../../templates/page/Industries.astro";
+import { getIndustriesLandingPage } from "../../utils/sanity";
+
+const { data: page, perspective } = await getIndustriesLandingPage(Astro.request);
+
+// Debug logging in development
+if (import.meta.env.DEV) {
+  console.log('[industries/index] Page data:', {
+    hasPage: !!page,
+    pageId: page?._id,
+    isDraft: page?._id?.startsWith('drafts.'),
+    sectionsCount: page?.sections?.length || 0,
+    title: page?.title,
+    perspective
+  });
+  
+  if (!page) {
+    console.warn('[industries/index] ⚠️  No Industries Landing Page found. Make sure the document exists and is PUBLISHED in Sanity Studio.');
+  } else if (!page.sections || page.sections.length === 0) {
+    console.warn('[industries/index] ⚠️  Industries Landing Page found but has no sections. Add content in Sanity Studio and PUBLISH the document.');
+    console.warn('[industries/index] Full page object:', JSON.stringify(page, null, 2));
+  } else {
+    console.log('[industries/index] ✅ Page loaded successfully with', page.sections.length, 'sections');
+  }
+}
+---
+
+<IndustriesTemplate page={page} />

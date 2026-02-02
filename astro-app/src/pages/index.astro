@@ -14,6 +14,31 @@ const sections = homepage?.sections || [];
 const documentId = homepage?._id || '';
 const documentType = 'homepage';
 
+// Extract LCP image from first section for preloading
+// Check column1 of first columnsBlock for imageVideoModal, advancedImage, or image
+function findFirstImage(sections: any[]): string | undefined {
+  for (const section of sections) {
+    if (section._type === 'columnsBlock' && section.column1) {
+      for (const item of section.column1) {
+        // Check imageVideoModal thumbnail
+        if (item._type === 'imageVideoModal' && item.thumbnail?.asset?.url) {
+          return item.thumbnail.asset.url;
+        }
+        // Check advancedImage
+        if (item._type === 'advancedImage' && item.image?.asset?.url) {
+          return item.image.asset.url;
+        }
+        // Check regular image
+        if (item._type === 'image' && item.asset?.url) {
+          return item.asset.url;
+        }
+      }
+    }
+  }
+  return undefined;
+}
+const lcpImageUrl = findFirstImage(sections);
+
 // Helper to get divider background color class
 const getDividerBgClass = (divider: DividerType): string => {
   const background = cleanStega(divider.background) || 'light';
@@ -25,7 +50,7 @@ const getDividerBgClass = (divider: DividerType): string => {
 };
 ---
 
-<Layout title={title} announcementBar={homepage?.announcementBar}>
+<Layout title={title} announcementBar={homepage?.announcementBar} lcpImage={lcpImageUrl}>
   <main class="homepage">
     {sections.length > 0 ? (
       sections.map((section) => {
