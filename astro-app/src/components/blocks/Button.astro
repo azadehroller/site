@@ -1,9 +1,19 @@
 ---
 import { cleanStega } from '../../utils/stega';
 
+interface ContentReference {
+  _id?: string;
+  _type?: string;
+  title?: string;
+  slug?: {
+    current?: string;
+  };
+}
+
 interface ButtonLink {
   href?: string;
   urlType?: 'EXTERNAL' | 'EMAIL_ADDRESS' | 'CONTENT' | 'FILE';
+  contentReference?: ContentReference;
   openInNewTab?: boolean;
   noFollow?: boolean;
 }
@@ -51,14 +61,67 @@ const {
   id,
 } = Astro.props;
 
+// Helper function to resolve content reference to URL
+function resolveContentReference(ref: ContentReference | undefined): string {
+  if (!ref || !ref._type) return '#';
+  
+  // Handle singleton pages (they don't have slugs, use fixed routes)
+  const singletonRoutes: Record<string, string> = {
+    'homepage': '/',
+    'getStartedPage': '/get-started',
+    'industriesLandingPage': '/industries',
+    'featuresLandingPage': '/features',
+    'blogLandingPage': '/blog',
+    'pricingPage': '/pricing',
+    'partnersLandingPage': '/partners',
+    'competitorsLandingPage': '/competitors',
+  };
+  
+  // Check if it's a singleton page
+  if (singletonRoutes[ref._type]) {
+    return singletonRoutes[ref._type];
+  }
+  
+  // For regular pages, use slug
+  const slug = ref.slug?.current;
+  if (!slug) return '#';
+  
+  // Map document types to URL paths
+  const typeMap: Record<string, string> = {
+    'page': '',
+    'feature': '/features',
+    'industry': '/industries',
+    'post': '/blog',
+    'solution': '/solutions',
+    'partner': '/partners',
+    'competitor': '/competitors',
+    'landingPage': '',
+    'rawHtmlPage': '',
+  };
+  
+  const basePath = typeMap[ref._type] || '';
+  return basePath ? `${basePath}/${slug}` : `/${slug}`;
+}
+
 // Clean stega encoding for values used in CSS/computation
 // BUT preserve stega in visible text content for visual editing click-to-edit
+const urlType = cleanStega(rawSettings?.link?.urlType) || 'EXTERNAL';
+const contentRef = rawSettings?.link?.contentReference;
+
+// Resolve href based on urlType
+let resolvedHref = '';
+if (urlType === 'CONTENT' && contentRef) {
+  resolvedHref = resolveContentReference(contentRef);
+} else {
+  resolvedHref = cleanStega(rawSettings?.link?.href) || '';
+}
+
 const settings = {
   // PRESERVE stega in buttonText for visual editing
   buttonText: rawSettings?.buttonText || 'Button',
   link: {
-    href: cleanStega(rawSettings?.link?.href) || '',
-    urlType: cleanStega(rawSettings?.link?.urlType) || 'EXTERNAL',
+    href: resolvedHref,
+    urlType: urlType,
     openInNewTab: rawSettings?.link?.openInNewTab || false,
     noFollow: rawSettings?.link?.noFollow || false,
   },
@@ -82,7 +145,7 @@ const styles = {
   },
 };
 
-// Build href
+// Build href (already resolved from contentReference if needed)
 let href = settings.link.href;
 if (settings.link.urlType === 'EMAIL_ADDRESS' && href && !href.startsWith('mailto:')) {
   href = `mailto:${href}`;

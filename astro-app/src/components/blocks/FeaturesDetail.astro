@@ -1,0 +1,236 @@
+---
+import { PortableText } from "astro-portabletext";
+import { urlFor } from "../../utils/image";
+import { cleanStega } from "../../utils/stega";
+import { createBlockEditInfo, createDataSanityAttrs, type SanityEditInfo } from "../../utils/visualEditing";
+import type { FeaturesDetail as FeaturesDetailType } from "../../utils/sanity";
+
+interface Props {
+  content: FeaturesDetailType;
+  // Visual editing props
+  columnName?: string;
+  sectionKey?: string;
+  documentId?: string;
+  documentType?: string;
+}
+
+const { content, columnName, sectionKey, documentId, documentType } = Astro.props;
+
+// Get edit info for visual editing
+const editInfo = createBlockEditInfo(documentId, documentType, sectionKey, columnName, content._key);
+const editAttrs = createDataSanityAttrs(editInfo);
+
+// Extract values
+const eyebrow = content.content?.eyebrow || 'Deliver Superior Experience';
+const title = content.content?.title || 'Sell online & in-venue';
+const text = content.content?.text;
+const features = content.features || [];
+const layout = cleanStega(content.styles?.layout) || 'default';
+const contentLayout = cleanStega(content.styles?.contentLayout) || 'default';
+const marginBottom = content.styles?.spacing?.marginBottom || '0px';
+
+// Generate unique ID for this component instance
+const componentId = `features_detail_${content._key || Math.random().toString(36).substr(2, 9)}`;
+const featuresListId = layout === 'widget' ? 'js-features-list' : 'features-list';
+
+// Helper function to get div classes based on layout
+function getDivClasses(layout: string, contentLayout: string): string {
+  if ((layout === 'widget' && contentLayout === 'default') || layout === 'integration') {
+    return 'text-left pt-4 md:pt-6 block lg:flex';
+  }
+  return 'text-left block lg:flex gap-4';
+}
+
+// Helper function to get features list classes
+function getFeaturesListClasses(layout: string, contentLayout: string): string {
+  if (layout === 'widget' && contentLayout === 'column_item') {
+    return 'overflow-hidden max-h-0 sm:max-h-full sm:flex sm:basis-9/12 py-0 md:pt-7 lg:pt-0';
+  } else if (contentLayout === 'default') {
+    return 'overflow-hidden max-h-0 sm:max-h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 py-0 md:pt-0 lg:pt-0';
+  }
+  return 'features-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5';
+}
+
+// Helper function to build link href
+function buildHref(link: any): string {
+  if (!link?.href) return '';
+  // Handle email links
+  if (link.href.startsWith('mailto:')) {
+    return link.href;
+  }
+  return link.href;
+}
+
+// Helper function to build rel attribute
+function buildRel(link: any): string {
+  const rel = [];
+  if (link?.noFollow) rel.push('nofollow');
+  if (link?.openInNewTab) rel.push('noopener');
+  return rel.join(' ');
+}
+---
+
+<section 
+  id={componentId} 
+  class={`my-2 ${layout === 'widget' ? 'mo-card bg-neutral-white rounded-[32px] box-shadow-onlight px-4 md:px-6 relative' : ''}`}
+  style={`margin-bottom: ${marginBottom};`}
+  {...editAttrs}
+>
+  {((layout === 'widget' && contentLayout === 'default') || layout === 'integration') && (
+    <div>
+      {title && (
+        <div class="flex flex-col gap-4 sm:flex-auto">
+          <div class="text-secondary-50 uppercase font-extrabold">{eyebrow}</div>
+          <h3 class="text-primary-50 mb-0">{title}</h3>
+          {text && (
+            <div class="text-primary-50 pb-3 md:pb-0">
+              <PortableText value={text} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )}
+  
+  <div class={getDivClasses(layout, contentLayout)}>
+    {contentLayout === 'column_item' && layout === 'widget' && (
+      <div class="flex basis-3/12">
+        {title && (
+          <div class="flex flex-col gap-4 sm:flex-auto">
+            <div class="text-secondary-50 uppercase font-extrabold">{eyebrow}</div>
+            <h3 class="text-primary-50 mb-0">{title}</h3>
+            {text && (
+              <div class="text-primary-50 pb-3 md:pb-0">
+                <PortableText value={text} />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )}
+    
+    <div id={featuresListId} class={getFeaturesListClasses(layout, contentLayout)}>
+      {features.map((item) => {
+        const href = buildHref(item.link);
+        const rel = buildRel(item.link);
+        const linkLabel = item.linkLabel || 'Read more';
+        
+        return (
+          <div class={`relative ${layout === 'widget' || layout === 'default' ? 'before:absolute before:w-[2px] before:h-[100%] before:bg-secondary-50 before:top-0 before:left-0' : ''} ps-3 pe-3 text-primary-50 flex flex-col flex-nowrap basis-1/3`}>
+            {layout === 'integration' ? (
+              <div>
+                {item.image?.asset?.url && (
+                  <img 
+                    src={urlFor(item.image).width(800).url() || ''} 
+                    alt={item.image.alt || ''} 
+                    loading="lazy"
+                    width={item.image.asset?.metadata?.dimensions?.width}
+                    height={item.image.asset?.metadata?.dimensions?.height}
+                  />
+                )}
+              </div>
+            ) : (
+              <>
+                {item.iconAsImage?.asset?.url ? (
+                  <img 
+                    src={urlFor(item.iconAsImage).width(64).height(64).url() || ''} 
+                    width="64" 
+                    height="64" 
+                    loading="lazy" 
+                    alt=""
+                  />
+                ) : item.icon ? (
+                  <div set:html={item.icon} />
+                ) : null}
+              </>
+            )}
+            
+            {layout === 'integration' && href ? (
+              <a href={href}>
+                <div class="py-4 font-semibold">{item.title}</div>
+              </a>
+            ) : (
+              <div class="py-4 font-semibold">{item.title}</div>
+            )}
+            
+            {item.text && (
+              <div class="text-base block">{item.text}</div>
+            )}
+            
+            {href && (layout === 'widget' || layout === 'default') && (
+              <a 
+                href={href} 
+                class="mt-auto pt-5 underline"
+                target={item.link?.openInNewTab ? '_blank' : undefined}
+                rel={rel || undefined}
+              >
+                {linkLabel}
+              </a>
+            )}
+          </div>
+        );
+      })}
+    </div>
+    
+    {(layout === 'widget' || layout === 'integration') && (
+      <button 
+        id="js-expand" 
+        class="btn-expand absolute bottom-[-18px] left-[50%] right-[50%] translate-x-[-50%] px-4 py-2 bg-secondary-50 focus:bg-secondary-50 hover:bg-secondary-70 rounded-3xl text-neutral-white flex sm:hidden rounded-[980px] font-semibold min-w-[174px] m-auto items-center justify-center"
+      >
+        Show more
+      </button>
+    )}
+  </div>
+</section>
+
+<style>
+  .btn-expand:after {
+    content: '';
+    display: block;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath fill='%23fff' d='m7.41 8.295 4.59 4.58 4.59-4.58L18 9.705l-6 6-6-6 1.41-1.41Z'/%3E%3C/svg%3E");
+    width: 24px;
+    height: 24px;
+  }
+
+  .btn-expand.active:after {
+    content: '';
+    display: block;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none'%3E%3Cpath fill='%23fff' d='m7.41 8.295 4.59 4.58 4.59-4.58L18 9.705l-6 6-6-6 1.41-1.41Z'/%3E%3C/svg%3E");
+    width: 24px;
+    height: 24px;
+    transform: rotate(180deg);
+  }
+</style>
+
+<script define:vars={{ componentId, featuresListId }}>
+  // Scope to this specific component instance
+  const section = document.getElementById(componentId);
+  if (section) {
+    const buttonElem = section.querySelectorAll("#js-expand");
+    
+    function toggleButtonText(e: HTMLButtonElement) {
+      if (e.innerHTML === "Show more") {
+        e.innerHTML = "Show less";
+      } else {
+        e.innerHTML = "Show more";
+      }
+    }
+    
+    function expandFeaturedCard() {
+      buttonElem.forEach((e) => {
+        e.addEventListener("click", function(this: HTMLButtonElement) {
+          this.classList.toggle("active");
+          toggleButtonText(e);
+          const t = this.previousElementSibling as HTMLElement;
+          if (t && t.style.maxHeight) {
+            t.style.maxHeight = null;
+          } else if (t) {
+            t.style.maxHeight = t.scrollHeight + "px";
+          }
+        });
+      });
+    }
+    
+    expandFeaturedCard();
+  }
+</script>

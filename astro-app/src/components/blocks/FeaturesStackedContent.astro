@@ -26,7 +26,10 @@ interface FeatureItem {
   quoteAuthorTitle?: string;
   quoteImageType?: 'avatar' | 'logo';
   quoteImage?: {
-    asset?: { url?: string };
+    asset?: {
+      url?: string;
+      metadata?: { dimensions?: { width?: number; height?: number } };
+    };
   };
   quoteImageAlt?: string;
   // CTA
@@ -179,13 +182,13 @@ const eyebrowStyleClass = eyebrowStyle === 'gradient' ? 'gradient' : 'text-secon
                 {item.quoteImage?.asset?.url && (
                   <figure class={item.quoteImageType === 'avatar' 
                     ? 'w-[72px] h-[72px] rounded-full bg-neutral-white grid items-center overflow-hidden' 
-                    : 'w-[130px] h-[72px] grid items-center'} data-sanity-edit-target>
+                    : 'w-auto h-auto max-w-[130px] grid items-center'} data-sanity-edit-target>
                     <img 
                       src={item.quoteImage.asset.url} 
                       alt={cleanStega(item.quoteImageAlt) || ''} 
                       class="object-cover" 
-                      width={item.quoteImageType === 'avatar' ? 72 : 130} 
-                      height={72}
+                      width={item.quoteImageType === 'avatar' ? 72 : (item.quoteImage?.asset?.metadata?.dimensions?.width ?? 130)}
+                      height={item.quoteImageType === 'avatar' ? 72 : (item.quoteImage?.asset?.metadata?.dimensions?.height ?? 130)}
                       loading="lazy"
                       data-sanity-edit-target
                     />

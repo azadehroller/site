@@ -306,6 +306,12 @@ function sanitizeHtml(html: string | undefined): string {
     width: 72px;
     height: 72px;
     position: relative;
+    flex-shrink: 0;
+  }
+
+  .quote-avatar-container img {
+    width: 72px;
+    height: 72px;
   }
 
   .quote-logo-container {
@@ -313,6 +319,12 @@ function sanitizeHtml(html: string | undefined): string {
     width: 148px;
     height: 80px;
     position: relative;
+    flex-shrink: 0;
+  }
+
+  .quote-logo-container img {
+    width: 148px;
+    height: 80px;
   }
 
   /* Prevent layout shifts during image loading */
@@ -368,7 +380,7 @@ function sanitizeHtml(html: string | undefined): string {
   .quote-module img {
     display: block;
     max-width: 100%;
-    height: auto;
+    /* Use explicit width/height from attributes to prevent layout shift */
   }
 
   /* Loading state for images */

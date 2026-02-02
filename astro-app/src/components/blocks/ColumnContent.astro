@@ -11,6 +11,7 @@ import WidgetStats from "../globals/WidgetStats.astro";
 import WidgetUserReviews from "../globals/WidgetUserReviews.astro";
 import TestimonialCarousel from "../globals/TestimonialCarousel.astro";
 import FeaturesStackedContent from "./FeaturesStackedContent.astro";
+import FeaturesDetail from "./FeaturesDetail.astro";
 import HeadingComposition from "./HeadingComposition.astro";
 import AdvancedImage from "./AdvancedImage.astro";
 import TrustedPartner from "./TrustedPartner.astro";
@@ -26,7 +27,8 @@ import CardSegmentation from "./CardSegmentation.astro";
 import IndustrySelectorGlobal from "../globals/IndustrySelectorGlobal.astro";
 import WidgetUserReviewCard from "./WidgetUserReviewCard.astro";
 import StatsSetStackedGlobal from "../globals/StatsSetStackedGlobal.astro";
-import type { ColumnContent as ColumnContentType, TextBlock, ImageBlock, ImageVideoModal as ImageVideoModalType, RotatingTextBlock, ButtonStack as ButtonStackType, SingleButton as SingleButtonType, LogoSet as LogoSetType, LogoSetReference, StatsSet as StatsSetType, QuoteBlock as QuoteBlockType, WidgetStatsReference, WidgetUserReviewsReference, TestimonialCarouselReference, FeaturesStackedContent as FeaturesStackedContentType, HeadingComposition as HeadingCompositionType, AdvancedImage as AdvancedImageType, TrustedPartner as TrustedPartnerType, HubspotFormReference, IndustrySelector as IndustrySelectorType, FeaturesSelectorGlobalReference, FAQs as FAQsType, ResultsList as ResultsListType, ComparisonTable as ComparisonTableType, FeaturesPricingCard as FeaturesPricingCardType, FeaturesHorizontalSlider as FeaturesHorizontalSliderType, CardSegmentation as CardSegmentationType, IndustrySelectorGlobal as IndustrySelectorGlobalType, IndustrySelectorGlobalReference as IndustrySelectorGlobalReferenceType, WidgetUserReviewCard as WidgetUserReviewCardType, StatsSetStackedGlobalReference as StatsSetStackedGlobalReferenceType } from "../../utils/sanity";
+import TestimonialSlider from "./TestimonialSlider.astro";
+import type { ColumnContent as ColumnContentType, TextBlock, ImageBlock, ImageVideoModal as ImageVideoModalType, RotatingTextBlock, ButtonStack as ButtonStackType, SingleButton as SingleButtonType, LogoSet as LogoSetType, LogoSetReference, StatsSet as StatsSetType, QuoteBlock as QuoteBlockType, WidgetStatsReference, WidgetUserReviewsReference, TestimonialCarouselReference, FeaturesStackedContent as FeaturesStackedContentType, FeaturesDetail as FeaturesDetailType, HeadingComposition as HeadingCompositionType, AdvancedImage as AdvancedImageType, TrustedPartner as TrustedPartnerType, HubspotFormReference, IndustrySelector as IndustrySelectorType, FeaturesSelectorGlobalReference, FAQs as FAQsType, ResultsList as ResultsListType, ComparisonTable as ComparisonTableType, FeaturesPricingCard as FeaturesPricingCardType, FeaturesHorizontalSlider as FeaturesHorizontalSliderType, CardSegmentation as CardSegmentationType, IndustrySelectorGlobal as IndustrySelectorGlobalType, IndustrySelectorGlobalReference as IndustrySelectorGlobalReferenceType, WidgetUserReviewCard as WidgetUserReviewCardType, StatsSetStackedGlobalReference as StatsSetStackedGlobalReferenceType } from "../../utils/sanity";
 import { urlFor } from "../../utils/image";
 import { cleanStega } from "../../utils/stega";
 import { createBlockEditInfo, createDataSanityAttrs, type SanityEditInfo } from "../../utils/visualEditing";
@@ -316,6 +318,19 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
           />
         </div>
       );
+    } else if (item._type === 'featuresDetail') {
+      const featuresDetailData = item as FeaturesDetailType;
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <FeaturesDetail
+            content={featuresDetailData}
+            columnName={columnName}
+            sectionKey={sectionKey}
+            documentId={documentId}
+            documentType={documentType}
+          />
+        </div>
+      );
     } else if (item._type === 'headingComposition') {
       const headingData = item as HeadingCompositionType;
       return (
@@ -536,6 +551,16 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
           />
         </div>
       ) : null;
+    } else if ((item as any)._type === 'testimonialSlider') {
+      const sliderData = item as any; // TestimonialSlider type
+      return (
+        <div class="content-block-wrapper" {...editAttrs}>
+          <TestimonialSlider
+            slides={sliderData.slides}
+            id={cleanStega(sliderData._key)}
+          />
+        </div>
+      );
     }
   })}
 </div>

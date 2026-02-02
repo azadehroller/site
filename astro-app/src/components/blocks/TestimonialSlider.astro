@@ -1,0 +1,312 @@
+---
+/**
+ * Testimonial Slider - A horizontal card slider for customer testimonials
+ * Based on HubSpot testimonial-slider module design
+ * Features: Horizontal scrolling cards, navigation buttons, company logos
+ */
+import { cleanStega } from "../../utils/stega";
+
+interface TestimonialLink {
+  href?: string;
+  openInNewTab?: boolean;
+  noFollow?: boolean;
+}
+
+interface TestimonialSlide {
+  _key?: string;
+  content?: string; // HTML content with potential bold/strong tags
+  logo?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+  logoUrl?: string; // External logo URL (takes priority)
+  logoAlt?: string; // Alt text for logo
+  link?: TestimonialLink;
+  buttonText?: string;
+}
+
+interface Props {
+  slides?: TestimonialSlide[];
+  showFilter?: boolean;
+  id?: string;
+}
+
+const { 
+  slides = [], 
+  showFilter = false,
+  id = 'testimonial-slider'
+} = Astro.props;
+
+// Generate unique component ID
+const componentId = cleanStega(id) || `testimonial-slider-${Date.now()}`;
+const sliderId = `js-testimonial-slider-${componentId}`;
+
+// Helper to build rel attribute for links
+function buildRel(link?: TestimonialLink): string | undefined {
+  if (!link) return undefined;
+  const rels: string[] = [];
+  if (link.noFollow) rels.push('nofollow');
+  if (link.openInNewTab) rels.push('noopener');
+  return rels.length > 0 ? rels.join(' ') : undefined;
+}
+
+// Arrow icon SVG
+const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><rect width="40" height="40" fill="#FF490C" rx="20"></rect><path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"></path></svg>`;
+---
+
+<section id={componentId} class="testimonial-slider relative" data-sanity-edit-target data-slider-id={sliderId}>
+  <div class="h-[463px] overflow-hidden w-screen relative right-[50%] left-[50%] ml-[-50vw] mr-[-50vw]">
+    <ul 
+      id={sliderId}
+      class="testimonial-slider__list flex mt-0 list-none h-[540px] overflow-x-auto snap-x snap-mandatory"
+    >
+      {slides.map((slide, index) => {
+        // Use external URL if provided, otherwise fall back to Sanity asset
+        const logoUrl = cleanStega(slide.logoUrl) || slide.logo?.asset?.url;
+        const logoAlt = cleanStega(slide.logoAlt) || cleanStega(slide.logo?.alt) || 'Company logo';
+        const href = cleanStega(slide.link?.href);
+        const relAttr = buildRel(slide.link);
+        const targetAttr = slide.link?.openInNewTab ? '_blank' : undefined;
+        const buttonText = cleanStega(slide.buttonText) || 'Learn more';
+        
+        return (
+          <li 
+            class="js-testimonial-item snap-start snap-always shrink-0 mr-5 last:mr-0 h-[460px]"
+            data-filter=""
+            data-sanity-edit-target
+          >
+            <div class="slide-center relative flex h-[460px] flex-col bg-neutral-white w-[304px] rounded-2xl mo-card-md">
+              <div class="flex flex-col gap-4 h-full">
+                {/* Logo */}
+                <div>
+                  {logoUrl ? (
+                    <img 
+                      src={logoUrl} 
+                      alt={logoAlt}
+                      loading="lazy"
+                      width="80"
+                      height="44"
+                      class="object-fill h-[2.75rem] w-[5rem]"
+                    />
+                  ) : (
+                    <div class="h-[2.75rem] w-[5rem] bg-neutral-90 rounded"></div>
+                  )}
+                </div>
+                
+                {/* Quote content with red left border */}
+                <div 
+                  class="leading-6 mb-xs text-primary-50 relative before:absolute before:w-[2px] before:h-[100%] before:bg-secondary-50 before:top-0 before:left-0 pl-3"
+                  data-sanity-edit-target
+                  set:html={slide.content || ''}
+                />
+                
+                {/* Button */}
+                <div class="button-wrapper pb-3 flex items-end grow">
+                  {href ? (
+                    <a 
+                      class="relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold text-md transition ease-in-out duration-300 w-full sm:w-auto whitespace-nowrap bg-transparent text-primary-50 py-2 font-serif hover:opacity-80"
+                      href={href}
+                      target={targetAttr}
+                      rel={relAttr}
+                    >
+                      <div class="flex justify-center items-center order-1 mr-0 ml-2" set:html={arrowIcon} />
+                      <span>{buttonText}</span>
+                    </a>
+                  ) : (
+                    <span class="relative inline-flex items-center text-primary-50 py-2 font-serif font-semibold">
+                      <div class="flex justify-center items-center order-1 mr-0 ml-2" set:html={arrowIcon} />
+                      <span>{buttonText}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+  
+  {/* Navigation buttons */}
+  <div class="slider-nav-wrapper flex justify-center absolute top-[50%] translate-y-[-50%] w-screen right-[50%] left-[50%] ml-[-50vw] mr-[-50vw] pointer-events-none">
+    <button
+      class="js-slider-prev slider-nav-btn slider-nav-btn--prev transition-all opacity-60 hover:opacity-100 bg-neutral-60 hover:bg-neutral-70 w-[3.5rem] h-[3.5rem] rounded-full items-center justify-center absolute top-[50%] translate-y-[-50%] left-[18px] pointer-events-auto"
+      aria-label="Previous slide"
+      type="button"
+    >
+      <span class="sr-only">Previous slide</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+        <path fill="#fff" d="m17.835 3.87-1.78-1.77-9.89 9.9 9.9 9.9 1.77-1.77L9.705 12l8.13-8.13Z"/>
+      </svg>
+    </button>
+    <button
+      class="js-slider-next slider-nav-btn slider-nav-btn--next transition-all opacity-60 hover:opacity-100 bg-neutral-60 hover:bg-neutral-70 w-[3.5rem] h-[3.5rem] rounded-full items-center justify-center absolute top-[50%] translate-y-[-50%] right-[18px] pointer-events-auto"
+      aria-label="Next slide"
+      type="button"
+    >
+      <span class="sr-only">Next slide</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+        <path fill="#fff" d="m6.165 20.13 1.77 1.77 9.9-9.9-9.9-9.9-1.77 1.77 8.13 8.13-8.13 8.13Z"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<style>
+  .testimonial-slider {
+    --container-size: 1247px;
+  }
+  
+  .slide-center {
+    transform: translateX(calc(max(var(--container-size), 100vw) / 2 - calc(var(--container-size) / 2)));
+  }
+  
+  /* Card styling */
+  .mo-card-md {
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .testimonial-slider__list {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .testimonial-slider__list::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Ensure quote content displays HTML properly */
+  .testimonial-slider [data-sanity-edit-target] :global(strong),
+  .testimonial-slider [data-sanity-edit-target] :global(b) {
+    font-weight: 700;
+  }
+  
+  /* Navigation buttons - hidden on mobile, flex on md+ */
+  .slider-nav-btn {
+    display: none;
+    cursor: pointer;
+  }
+  
+  @media (min-width: 768px) {
+    .slider-nav-btn {
+      display: flex;
+    }
+  }
+  
+  /* Disabled state - reduce opacity but keep visible */
+  .slider-nav-btn[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  
+  .slider-nav-btn:not([disabled]):hover {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Testimonial slider navigation script
+  function initTestimonialSliders() {
+    const sliders = document.querySelectorAll('.testimonial-slider');
+    
+    sliders.forEach((slider) => {
+      const SLIDE_WIDTH = 304;
+      const SLIDE_MARGIN = 20; // mr-5 = 1.25rem = 20px
+      const SLIDE_TOTAL = SLIDE_WIDTH + SLIDE_MARGIN;
+      
+      const sliderId = slider.getAttribute('data-slider-id');
+      const listEl = sliderId ? document.getElementById(sliderId) : null;
+      const prevBtn = slider.querySelector('.js-slider-prev');
+      const nextBtn = slider.querySelector('.js-slider-next');
+      const slideItems = slider.querySelectorAll('.js-testimonial-item');
+      
+      if (!listEl || !prevBtn || !nextBtn || slideItems.length === 0) {
+        return;
+      }
+      
+      const totalSlides = slideItems.length;
+      
+      // Get current scroll position directly from the element
+      function getScrollLeft() {
+        return listEl ? listEl.scrollLeft : 0;
+      }
+      
+      // Check if at the start
+      function isAtStart() {
+        return getScrollLeft() <= 10;
+      }
+      
+      // Check if at the end
+      function isAtEnd() {
+        if (!listEl) return false;
+        const maxScroll = listEl.scrollWidth - listEl.clientWidth;
+        return getScrollLeft() >= maxScroll - 10;
+      }
+      
+      // Scroll by one slide width
+      function scrollNext() {
+        if (!listEl || isAtEnd()) return;
+        listEl.scrollBy({
+          left: SLIDE_TOTAL,
+          behavior: 'smooth'
+        });
+      }
+      
+      function scrollPrev() {
+        if (!listEl || isAtStart()) return;
+        listEl.scrollBy({
+          left: -SLIDE_TOTAL,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Update button disabled states
+      function updateButtons() {
+        if (prevBtn) {
+          if (isAtStart()) {
+            prevBtn.setAttribute('disabled', '');
+          } else {
+            prevBtn.removeAttribute('disabled');
+          }
+        }
+        if (nextBtn) {
+          if (isAtEnd()) {
+            nextBtn.setAttribute('disabled', '');
+          } else {
+            nextBtn.removeAttribute('disabled');
+          }
+        }
+      }
+      
+      // Scroll event handler with debounce
+      let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+      listEl.addEventListener('scroll', () => {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(updateButtons, 50);
+      });
+      
+      // Button click handlers
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        scrollPrev();
+      });
+      
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        scrollNext();
+      });
+      
+      // Initial state
+      updateButtons();
+    });
+  }
+  
+  // Initialize on DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTestimonialSliders);
+  } else {
+    initTestimonialSliders();
+  }
+</script>

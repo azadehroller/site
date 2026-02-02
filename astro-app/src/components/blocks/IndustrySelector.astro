@@ -3,6 +3,7 @@
  * IndustrySelector - A grid of industry links with icons
  * Based on FeaturesSelector structure
  * Uses HeadingComposition for the header section
+ * Supports Lottie animations for icons
  */
 import { cleanStega } from "../../utils/stega";
 import HeadingComposition from "./HeadingComposition.astro";
@@ -15,9 +16,16 @@ interface IndustryLink {
   noFollow?: boolean;
 }
 
+interface AnimationFile {
+  asset?: {
+    url?: string;
+  };
+}
+
 interface IndustryItem {
   _key?: string;
   icon?: string;
+  animationFile?: AnimationFile;
   title?: string;
   link?: IndustryLink;
 }
@@ -31,6 +39,8 @@ interface Props {
   ctaLabel?: string;
   ctaLink?: IndustryLink;
   id?: string;
+  // Theme
+  theme?: 'light' | 'dark';
 }
 
 const {
@@ -38,7 +48,8 @@ const {
   industries = [],
   ctaLabel = 'See all industries',
   ctaLink,
-  id = 'industry-selector'
+  id = 'industry-selector',
+  theme = 'dark'
 } = Astro.props;
 
 // Generate unique ID for component
@@ -57,17 +68,35 @@ const ctaRelParts: string[] = [];
 if (ctaNoFollow) ctaRelParts.push('nofollow');
 if (ctaOpenInNewTab) ctaRelParts.push('noopener');
 const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
+
+// Check if any industry has Lottie animation
+const hasLottieAnimations = industries.some(industry => industry.animationFile?.asset?.url);
+
+// Debug: Log industries data to see what's coming from Sanity
+console.log('[IndustrySelector] Industries data:', JSON.stringify(industries.map(i => ({
+  title: i.title,
+  hasIcon: !!i.icon,
+  animationFile: i.animationFile
+})), null, 2));
 ---
 
-<div 
+<div
   id={componentId}
-  class="industry-selector mx-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col lg:p-6 rounded-[32px] py-6 px-6 mb-0 md:mb-4"
+  class:list={[
+    "industry-selector mx-auto gap-5 rounded-[32px] py-6 px-6 mb-0 md:mb-4",
+    theme === 'light'
+      ? "bg-widget-industries  box-shadow-ondark-blue-10 flex flex-col lg:grid lg:grid-cols-3"
+      : " box-shadow-onlight bg-primary-50 flex flex-col lg:p-6"
+  ]}
   data-sanity-edit-target
 >
   {/* Header Section using HeadingComposition */}
   {hasHeading && heading && (
-    <header class="text-primary-50 grid gap-4" data-sanity-edit-target>
-      <HeadingComposition 
+    <header class:list={[
+      "grid gap-4",
+      theme === 'light' ? "text-primary-50 flex flex-col" : " text-neutral-white "
+    ]} data-sanity-edit-target>
+      <HeadingComposition
         eyebrow={heading.eyebrow}
         title={heading.title}
         text={heading.text}
@@ -80,33 +109,56 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
         textType={heading.textType}
         addBorderLine={heading.addBorderLine}
       />
+      {theme === 'light' && (
+        <img
+          src="/images/industry-selector-graph.svg"
+          alt={heading.title || "Industry Selector"}
+          width="368"
+          height="368"
+          class="hidden lg:block mt-4"
+        />
+      )}
     </header>
   )}
 
   {/* Desktop grid view */}
-  <div class="hidden md:flex flex-wrap gap-3 ms-auto me-auto dark">
+  <div class:list={[
+    "hidden md:flex flex-wrap gap-3 ms-auto me-auto",
+    theme === 'light' ? "col-span-2" : "dark"
+  ]}>
     {industries.map((industry) => {
       const industryTitle = industry.title;
       const industryIcon = industry.icon;
+      const lottieUrl = industry.animationFile?.asset?.url;
       const href = cleanStega(industry.link?.href) || '/';
       const openInNewTab = industry.link?.openInNewTab;
       const noFollow = industry.link?.noFollow;
-      
+
       // Build rel attribute
       const relParts: string[] = [];
       if (noFollow) relParts.push('nofollow');
       if (openInNewTab) relParts.push('noopener');
       const rel = relParts.length > 0 ? relParts.join(' ') : undefined;
-      
+
       return (
-        <a 
+        <a
           href={href}
-          class="industry-item-link flex items-center justify-center gap-2 mo-card-features text-primary-50 font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-3xl rounded-2xl"
+          class:list={[
+            "industry-item-link flex items-center justify-center gap-2 mo-card-features font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-[var(--shadow-on-dark-bg)] hover:bg-white  rounded-2xl",
+            theme === 'light' ? "text-primary-50 hover:text-neutral-white" : "text-neutral-white hover:text-primary-50"
+          ]}
           target={openInNewTab ? '_blank' : undefined}
           rel={rel}
           data-sanity-edit-target
         >
-          {industryIcon && (
+          {/* Lottie animation container - takes priority over SVG icon */}
+          {lottieUrl ? (
+            <div 
+              class="lottie-container" 
+              data-lottie-src={lottieUrl}
+              data-sanity-edit-target
+            />
+          ) : industryIcon && (
             <span class="industry-icon" set:html={industryIcon} data-sanity-edit-target />
           )}
           <span data-sanity-edit-target>{industryTitle}</span>
@@ -146,6 +198,14 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
   /* Container shadows */
   .box-shadow-onlight {
     box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+  .box-shadow-ondark-blue-10 {
+    box-shadow: 0px 8px 16px 0px rgba(1, 19, 50, 0.25), 0px 24px 40px 0px rgba(1, 19, 50, 0.50);
+  }
+
+  .box-shadow-ondark-blue-10:hover {
+    box-shadow: 0px 8px 16px 0px rgba(1, 19, 50, 0.25), 0px 24px 40px 0px rgba(1, 19, 50, 0.50);
   }
 
   .box-shadow-onlight-navy-40 {
@@ -193,11 +253,6 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
   }
 
-  /* Shadow on hover */
-  .hover\:shadow-3xl:hover {
-    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
-  }
-
   /* Icon container */
   .industry-icon {
     display: flex;
@@ -208,6 +263,21 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
   .industry-icon :global(svg) {
     width: 64px;
     height: 64px;
+  }
+
+  /* Lottie animation container */
+  .lottie-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+  }
+
+  .lottie-container :global(svg) {
+    width: 100%;
+    height: 100%;
   }
 
   /* Dropdown styles */
@@ -286,3 +356,82 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
   });
 })();
 </script>
+
+<!-- Lottie Animation Script -->
+<script>
+  import lottie from 'lottie-web';
+  import type { AnimationItem } from 'lottie-web';
+
+  // Store animation instances to prevent duplicate initialization
+  const animations = new Map<HTMLElement, AnimationItem>();
+
+  function initLottieAnimations() {
+    const lottieContainers = document.querySelectorAll<HTMLElement>('.lottie-container[data-lottie-src]');
+    
+    console.log('[Lottie] Found containers:', lottieContainers.length);
+    
+    lottieContainers.forEach((container) => {
+      const lottieSrc = container.getAttribute('data-lottie-src');
+      if (!lottieSrc) {
+        console.log('[Lottie] No src found for container');
+        return;
+      }
+
+      // Skip if already initialized
+      if (animations.has(container)) {
+        console.log('[Lottie] Container already initialized');
+        return;
+      }
+
+      console.log('[Lottie] Loading animation from:', lottieSrc);
+
+      // Load the Lottie animation
+      const animation = lottie.loadAnimation({
+        container: container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: false,
+        path: lottieSrc,
+      });
+
+      // Log when animation is loaded
+      animation.addEventListener('DOMLoaded', () => {
+        console.log('[Lottie] Animation loaded successfully');
+      });
+
+      animation.addEventListener('data_failed', () => {
+        console.error('[Lottie] Failed to load animation data from:', lottieSrc);
+      });
+
+      // Store animation reference
+      animations.set(container, animation);
+
+      // Find parent link for hover events
+      const parentLink = container.closest('.industry-item-link');
+      if (parentLink) {
+        // Play animation on hover
+        parentLink.addEventListener('mouseenter', () => {
+          console.log('[Lottie] Playing animation');
+          animation.play();
+        });
+
+        // Stop animation on mouse leave
+        parentLink.addEventListener('mouseleave', () => {
+          console.log('[Lottie] Stopping animation');
+          animation.stop();
+        });
+      }
+    });
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLottieAnimations);
+  } else {
+    initLottieAnimations();
+  }
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initLottieAnimations);
+</script>
+

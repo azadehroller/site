@@ -377,107 +377,151 @@ form .hs_recaptcha {
 </style>
 
 <script is:inline>
-  // Load HubSpot Forms script once
-  if (!window.hubspotFormsLoaded) {
-    window.hubspotFormsLoaded = true;
-    var script = document.createElement('script');
-    script.src = '//js.hsforms.net/forms/embed/v2.js';
-    script.charset = 'utf-8';
-    script.async = true;
-    document.head.appendChild(script);
-  }
-
-  // Track initialized forms to prevent double initialization
-  if (!window.hubspotFormsInitialized) {
-    window.hubspotFormsInitialized = {};
-  }
-
-  // URL parameter helper (from original HubSpot module)
-  var getUrlParameters = function(url, names) {
-    if (!Array.isArray(names)) {
-      console.error('Names must be an array');
-      return {};
+  // Centralized HubSpot loader - ensures script loads only once
+  (function() {
+    'use strict';
+    
+    // Skip if already set up
+    if (window.__hubspotLoaderSetup) {
+      initForms();
+      return;
+    }
+    window.__hubspotLoaderSetup = true;
+    
+    window.__hubspotFormsInitialized = window.__hubspotFormsInitialized || {};
+    window.__hubspotReadyCallbacks = window.__hubspotReadyCallbacks || [];
+    
+    function waitForHubSpot(callback, maxAttempts) {
+      maxAttempts = maxAttempts || 50;
+      var attempts = 0;
+      
+      function check() {
+        if (window.hbspt && window.hbspt.forms) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(check, 100);
+        }
+      }
+      check();
     }
     
-    var params = {};
-    var searchParams = new URLSearchParams(url.search);
-
-    names.forEach(function(name) {
-      var value = searchParams.get(name);
-      params[name] = value !== null ? value : null;
-    });
-    
-    return params;
-  };
-
-  // Set input values from URL params (from original HubSpot module)
-  var setInputValues = function(formInputs, formValues) {
-    formInputs.forEach(function(inputName) {
-      var el = document.querySelector('input[name="' + inputName + '"]');
-      if (el && formValues[inputName]) {
-        el.value = formValues[inputName];
-      }
-    });
-  };
-
-  // Form ready callback (from original HubSpot module)
-  var onFormReady = function() {
-    var url = new URL(window.location.href);
-    var params = getUrlParameters(url, ['customer_ref_id', 'promo_code']);
-    setInputValues(['customer_ref_id', 'promo_code'], params);
-  };
-
-  // Initialize all HubSpot forms on the page
-  var initHubSpotForms = function() {
-    var formTargets = document.querySelectorAll('.hs-form-target');
-    
-    formTargets.forEach(function(target) {
-      var targetId = target.id;
-      
-      // Skip if already initialized
-      if (window.hubspotFormsInitialized[targetId]) {
+    function loadScript(callback) {
+      if (window.hbspt && window.hbspt.forms) {
+        callback && callback();
         return;
       }
       
-      var portalId = target.getAttribute('data-portal-id');
-      var formId = target.getAttribute('data-form-id');
-      var region = target.getAttribute('data-region') || 'na1';
-      
-      if (portalId && formId && window.hbspt) {
-        // Mark as initialized
-        window.hubspotFormsInitialized[targetId] = true;
-        
-        try {
-          window.hbspt.forms.create({
-            portalId: portalId,
-            formId: formId,
-            region: region,
-            target: '#' + targetId,
-            cssClass: 'hs-form stacked hs-custom-form',
-            onFormReady: onFormReady
-          });
-        } catch (error) {
-          console.log('Hubspot error: ', error);
-          // Remove from initialized so it can retry
-          delete window.hubspotFormsInitialized[targetId];
-        }
+      if (window.__hubspotScriptLoading) {
+        callback && window.__hubspotReadyCallbacks.push(callback);
+        return;
       }
-    });
-  };
-
-  // Wait for HubSpot script to load
-  var waitForHubSpot = function() {
-    if (window.hbspt && window.hbspt.forms) {
-      initHubSpotForms();
-    } else {
-      setTimeout(waitForHubSpot, 100);
+      
+      // Check if script tag already exists in DOM (e.g., from Footer)
+      var existingScript = document.querySelector('script[src*="js.hsforms.net"]');
+      if (existingScript || window.__hubspotScriptLoaded) {
+        window.__hubspotScriptLoaded = true;
+        waitForHubSpot(function() {
+          callback && callback();
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+        return;
+      }
+      
+      window.__hubspotScriptLoading = true;
+      callback && window.__hubspotReadyCallbacks.push(callback);
+      
+      var script = document.createElement('script');
+      script.src = '//js.hsforms.net/forms/embed/v2.js';
+      script.charset = 'utf-8';
+      script.async = true;
+      
+      script.onload = function() {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(function() {
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+      };
+      
+      document.head.appendChild(script);
     }
-  };
 
-  // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', waitForHubSpot);
-  } else {
-    waitForHubSpot();
-  }
+    // URL parameter helper (from original HubSpot module)
+    function getUrlParameters(url, names) {
+      if (!Array.isArray(names)) return {};
+      var params = {};
+      var searchParams = new URLSearchParams(url.search);
+      names.forEach(function(name) {
+        var value = searchParams.get(name);
+        params[name] = value !== null ? value : null;
+      });
+      return params;
+    }
+
+    // Set input values from URL params
+    function setInputValues(formInputs, formValues) {
+      formInputs.forEach(function(inputName) {
+        var el = document.querySelector('input[name="' + inputName + '"]');
+        if (el && formValues[inputName]) {
+          el.value = formValues[inputName];
+        }
+      });
+    }
+
+    // Form ready callback
+    function onFormReady() {
+      var url = new URL(window.location.href);
+      var params = getUrlParameters(url, ['customer_ref_id', 'promo_code']);
+      setInputValues(['customer_ref_id', 'promo_code'], params);
+    }
+
+    // Initialize all HubSpot forms on the page
+    function initForms() {
+      loadScript(function() {
+        var formTargets = document.querySelectorAll('.hs-form-target');
+        
+        formTargets.forEach(function(target) {
+          var targetId = target.id;
+          
+          // Skip if already initialized
+          if (window.__hubspotFormsInitialized[targetId]) {
+            return;
+          }
+          
+          var portalId = target.getAttribute('data-portal-id');
+          var formId = target.getAttribute('data-form-id');
+          var region = target.getAttribute('data-region') || 'na1';
+          
+          if (portalId && formId && window.hbspt) {
+            // Mark as initialized
+            window.__hubspotFormsInitialized[targetId] = true;
+            
+            try {
+              window.hbspt.forms.create({
+                portalId: portalId,
+                formId: formId,
+                region: region,
+                target: '#' + targetId,
+                cssClass: 'hs-form stacked hs-custom-form',
+                onFormReady: onFormReady
+              });
+            } catch (error) {
+              console.log('[HubSpot] Form creation error:', error);
+              delete window.__hubspotFormsInitialized[targetId];
+            }
+          }
+        });
+      });
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initForms);
+    } else {
+      initForms();
+    }
+  })();
 </script>
