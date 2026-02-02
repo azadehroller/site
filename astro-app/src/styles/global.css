@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Google Fonts moved to Layout.astro as preload link for better performance */
 
 /* Tell Tailwind where to scan for classes */
 @source "../layouts/**/*.astro";
@@ -7,16 +7,11 @@
 @source "../templates/**/*.astro";
 @source "../components/**/*.astro";
 
-
-
-
-/* Google Fonts */
-
-/* Minimal custom theme configuration */
-@theme {
-  --font-family-sans: Inter, system-ui, sans-serif;
-  --font-family-serif: 'PT Serif', serif;
+/* Custom hover utilities */
+.hover\:text-primary-50:hover {
+  color: var(--primary-50, #033180) !important;
 }
+
 :root {
   /* Container widths */
   --container-sm: 544px;
@@ -136,7 +131,21 @@
 
   /* Column gap */
   --column-gap: 2.13%;
+   --tw-ring-offset-shadow: 0 0 #0000;
+    --shadow-on-dark-bg:
+    0px 4px 8px 0px rgba(3, 49, 128, 0.08),
+    0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  }
+
+/* Google Fonts */
+
+/* Minimal custom theme configuration */
+@theme {
+  --font-family-sans: Inter, system-ui, sans-serif;
+  --font-family-serif: 'PT Serif', serif;
+  --color-primary-50: var(--primary-50, #033180);
 }
+
 :where(html) {
   --container-sm: 544px;
   --container-md: 768px;
@@ -290,9 +299,7 @@
     color: var(--secondary-50, #6366f1);
   }
 
-  .text-neutral-white {
-    color: #ffffff;
-  }
+ 
 
   .text-gx-80 {
     color: var(--gx-80, #374151);
@@ -310,9 +317,7 @@
     background-color: var(--secondary-70, #cc2d00);
   }
 
-  .text-neutral-white {
-    color: #ffffff;
-  }
+ 
 
   .text-primary-50 {
     color: var(--primary-50, #011840);
@@ -1443,3 +1448,9 @@ form .hs-button:hover {
     width: 100% !important;
   }
 }
+/* Custom Tailwind utilities */
+/* .hover\:shadow-3xl:hover {
+    --tw-shadow: 0px 8px 16px 0px rgba(18, 77, 178, 0.05), 0px 24px 40px 0px rgba(18, 77, 178, 0.10);
+    --tw-shadow-colored: 0px 8px 16px 0px var(--tw-shadow-color), 0px 24px 40px 0px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)
+} */
