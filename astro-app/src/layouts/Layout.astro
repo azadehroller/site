@@ -37,9 +37,11 @@ interface Props {
   headerTheme?: 'default' | 'dark' | 'light' | 'industry_report';
   announcementBar?: AnnouncementBarSettings;
   seo?: SEOProps;
+  /** URL of the LCP image to preload for faster rendering */
+  lcpImage?: string;
 }
 
-const { title, headDocument, headerTheme = 'default', announcementBar, seo } = Astro.props;
+const { title, headDocument, headerTheme = 'default', announcementBar, seo, lcpImage } = Astro.props;
 
 // SEO values with fallbacks
 const pageTitle = seo?.seoTitle || title;
@@ -57,9 +59,11 @@ const visualEditingEnabled = true; // Temporarily enabled for testing - was: imp
 // Localhost/dev: disable external trackers (gtag/GTM, Facebook, etc.) that may be blocked by course policy.
 const enableThirdPartyScripts = import.meta.env.PROD;
 
-// Fetch header and footer data from Sanity
-const { data: headerData } = await getHeader(Astro.request);
-const { data: footerData } = await getFooter(Astro.request);
+// Fetch header and footer data from Sanity in parallel for better TTFB
+const [{ data: headerData }, { data: footerData }] = await Promise.all([
+  getHeader(Astro.request),
+  getFooter(Astro.request)
+]);
 
 ---
 
@@ -68,7 +72,12 @@ const { data: footerData } = await getFooter(Astro.request);
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
+    <!-- Preload LCP image for faster rendering (reduces resource load delay) -->
+    {lcpImage && (
+      <link rel="preload" as="image" href={lcpImage} fetchpriority="high" />
+    )}
+
     <!-- SEO Meta Tags -->
     {noIndex ? (
       <meta name="robots" content="noindex, nofollow" />
@@ -97,6 +106,25 @@ const { data: footerData } = await getFooter(Astro.request);
     <ViewTransitions />
      
     <link rel="shortcut icon" href="https://www.roller.software/hubfs/ROLLER%20Chevron%20(1).png">
+
+    <!-- Google Fonts - Non-blocking load with preconnect and media swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Combined all fonts into single request, loaded non-blocking via media swap -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    >
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    >
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    </noscript>
     {enableThirdPartyScripts && (
       <>
         <!-- Third-party trackers (prod only) -->
@@ -394,9 +422,7 @@ a.cta_button{-moz-box-sizing:content-box !important;-webkit-box-sizing:content-b
 
 <!-- <link rel="stylesheet" href="https://www.roller.software/hubfs/hub_generated/template_assets/1/37604089735/1741740594287/template_main.css">
 <link rel="stylesheet" href="https://www.roller.software/hubfs/hub_generated/module_assets/1/37604089733/1741949070863/module_menu-section.min.css"> -->
-    {enableThirdPartyScripts && (
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    )}
+    <!-- jQuery removed for performance - was blocking render and outdated (1.7.2 from 2011) -->
 
     
     <!-- Incorrect canonical URL - should be dynamic per page
@@ -750,20 +776,7 @@ window.VWO.eB = window._vwoCc && window._vwoCc.dBL ? false : true;
       </>
     )}
 
-    <!-- Google fonts -->
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@500;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Google fonts loaded at top of head with preload + media swap for non-blocking -->
 
 
 
