@@ -1,0 +1,71 @@
+/* Storybook-specific styles */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* Ensure stories have proper background */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Story container styling */
+.astrobook-story-container {
+  padding: 1rem;
+}
+
+/* ===================================
+   RotatingText Component Fixes
+   =================================== */
+
+/* Ensure rotating text wrapper has enough height */
+[class*="rotation-wrapper-"] {
+  min-height: 60px;
+  overflow: visible !important;
+}
+
+/* Ensure rotating text items are visible */
+[class*="js-rotating-text-item-"] {
+  overflow: visible !important;
+}
+
+/* Fix for rotating text visibility in Storybook */
+[class*="rotation-wrapper-"].js-loaded [class*="js-rotating-text-item-"].active {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Ensure proper height for different heading sizes */
+[class*="rotation-wrapper-"] h1,
+[class*="rotation-wrapper-"] h2,
+[class*="rotation-wrapper-"] h3 {
+  white-space: nowrap;
+}
+
+/* ===================================
+   Theme Background Helpers
+   Dark theme components need dark backgrounds
+   =================================== */
+
+/* Header elements with white text need dark background */
+header.text-neutral-white {
+  background-color: var(--primary-50, #033180);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+/* GX Score theme background */
+header.text-gx-80 {
+  background-color: var(--gx-10, #f5f3ff);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+/* Light theme - ensure visibility on light background */
+header.text-primary-50 {
+  background-color: var(--neutral-white, #ffffff);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-20, #e5e5e5);
+}
