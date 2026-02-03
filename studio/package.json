@@ -22,7 +22,7 @@
     "@sanity/block-tools": "^3.70.0",
     "@sanity/orderable-document-list": "^1.4.1",
     "@sanity/presentation": "^2.0.0",
-    "@sanity/vision": "^4.22.0",
+    "@sanity/vision": "^5.7.0",
     "jsdom": "^26.1.0",
     "nanoid": "^3.3.11",
     "react": "^19.2.3",
