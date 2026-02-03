@@ -4,6 +4,7 @@ import { loadEnv } from "vite";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import tailwindcss from '@tailwindcss/vite';
+import astrobook from 'astrobook';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -52,5 +53,10 @@ export default defineConfig({
       },
     }),
     react(), // Required for visual editing
+    astrobook({
+      directory: 'src/stories', // Directory containing story files
+      subpath: '/storybook', // URL path for storybook UI
+      css: ['./src/styles/global.css', './src/styles/storybook.css'], // Include global styles
+    }),
   ],
 });

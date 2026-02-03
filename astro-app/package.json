@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "storybook": "astro dev --open /storybook",
     "check": "NODE_OPTIONS='--max-old-space-size=8192' astro check",
     "typecheck": "NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
     "build": "NODE_OPTIONS='--max-old-space-size=8192' astro build",
@@ -39,6 +40,7 @@
     "@portabletext/types": "2.0.13",
     "@sanity/types": "3.48.1",
     "@tailwindcss/vite": "^4.1.18",
+    "astrobook": "^0.8.10",
     "eslint": "9.20.1",
     "prettier": "3.3.2",
     "rimraf": "5.0.1",
