@@ -19,7 +19,7 @@ const documentId = page?._id || '';
 const documentType = 'featuresLandingPage';
 ---
 
-<Layout title={page?.title || "Features"}>
+<Layout title={page?.title || "Features"} headerTheme={page?.headerTheme} announcementBar={page?.announcementBar}>
   <div class="features-landing-page">
     {page?.sections?.map((section: ColumnsBlock | Divider) => {
       if (section._type === "columnsBlock") {

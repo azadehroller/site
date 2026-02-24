@@ -97,12 +97,15 @@ const {
   navItems = [],
   megaMenus = [],
   buttons = [],
-  headerTheme = 'default',
+  headerTheme = 'light',
 } = Astro.props;
 
 // Get the theme class for the header
-const getThemeClass = (theme: string): string => {
-  switch (theme) {
+// Strip stega/invisible characters before comparing (Sanity Visual Editing encodes values)
+const getThemeClass = (theme: string | null | undefined): string => {
+  if (!theme) return 'light';
+  const clean = theme.replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u180E\u00AD\uDB40-\uDBFF\uE000-\uF8FF\u0000-\u001F\u007F-\u009F]/g, '').trim();
+  switch (clean) {
     case 'dark':
       return 'dark';
     case 'light':

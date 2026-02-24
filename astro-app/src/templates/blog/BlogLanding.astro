@@ -32,15 +32,17 @@ let posts = providedPosts;
 let totalPages = providedTotalPages;
 let topics = providedTopics;
 let editorPicks: Post[] = [];
+let headerTheme: string | undefined;
 
 if (!posts || !topics) {
   // Single query fetches: paginated posts, total count, topics, and editor picks
   const { data } = await getBlogLandingData(currentPage, postsPerPage, Astro.request);
-  
+
   posts = posts || data.posts;
   topics = topics || data.topics;
   editorPicks = data.editorPicks || [];
   totalPages = totalPages || Math.ceil(data.total / postsPerPage);
+  headerTheme = data.settings?.headerTheme;
 }
 
 // Helper function to calculate reading time from pre-computed character count
@@ -92,7 +94,7 @@ function toTopicClass(name: string | undefined): string {
 const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
 ---
 
-<Layout title={title} lcpImage={lcpImageUrl}>
+<Layout title={title} headerTheme={headerTheme} lcpImage={lcpImageUrl}>
   {/* Blog Header */}
   <div class="blog-header">
     <div class="blog-header__inner">
