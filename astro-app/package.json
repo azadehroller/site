@@ -9,14 +9,13 @@
     "check": "NODE_OPTIONS='--max-old-space-size=8192' astro check",
     "typecheck": "NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
     "build": "NODE_OPTIONS='--max-old-space-size=8192' astro build",
-    "preview": "astro preview",
+    "preview": "astro build --config astro.preview.config.mjs && astro preview --config astro.preview.config.mjs",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/check": "0.7.0",
     "@astrojs/netlify": "^5.5.4",
     "@astrojs/react": "^4.4.0",
-    "@astrojs/vercel": "^7.7.2",
     "@sanity/astro": "^3.2.10",
     "@sanity/client": "^7.12.0",
     "@sanity/image-url": "1.0.2",
@@ -26,7 +25,6 @@
     "@types/react-dom": "^19.2.0",
     "astro": "^4.11.3",
     "astro-portabletext": "0.10.0",
-    "autoprefixer": "10.4.19",
     "groq": "3.48.1",
     "gsap": "^3.14.2",
     "lottie-web": "^5.13.0",
@@ -37,6 +35,7 @@
     "sanity": "^4.10.2"
   },
   "devDependencies": {
+    "@astrojs/node": "^8.3.4",
     "@portabletext/types": "2.0.13",
     "@sanity/types": "3.48.1",
     "@tailwindcss/vite": "^4.1.18",

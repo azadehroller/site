@@ -21,7 +21,6 @@ export default defineCliConfig({
     autoUpdates: true,
   },
   vite: (config: any) => {
-    // Inject environment variables during build
     return {
       ...config,
       define: {
@@ -29,6 +28,21 @@ export default defineCliConfig({
         'process.env.SANITY_STUDIO_PREVIEW_URL': JSON.stringify(
           process.env.SANITY_STUDIO_PREVIEW_URL || ''
         ),
+      },
+      resolve: {
+        ...config.resolve,
+        dedupe: [
+          ...(config.resolve?.dedupe ?? []),
+          'sanity',
+          '@sanity/types',
+          'react',
+          'react-dom',
+          'styled-components',
+        ],
+      },
+      optimizeDeps: {
+        ...config.optimizeDeps,
+        holdUntilCrawlEnd: true,
       },
     }
   },

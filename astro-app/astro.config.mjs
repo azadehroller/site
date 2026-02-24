@@ -39,6 +39,11 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // Production build: minify JS/CSS (default true; set explicitly so it's guaranteed)
+    build: {
+      minify: 'esbuild', // fast; use true for default (esbuild)
+      cssMinify: true,
+    },
   },
   integrations: [
     sanity({
