@@ -1,0 +1,58 @@
+---
+// Debug page to check visual editing state
+const cookieHeader = Astro.request.headers.get('cookie') || '';
+const isPreview = /\bsanity-preview=true\b/.test(cookieHeader);
+const visualEditingEnvVar = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+const visualEditingEnabled = visualEditingEnvVar === 'true' && isPreview;
+
+// Get all request info
+const allHeaders = Object.fromEntries(Astro.request.headers.entries());
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Visual Editing Debug</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+    h1 { color: #00ff00; }
+    .section { margin: 20px 0; padding: 15px; background: #2a2a2a; border-radius: 5px; }
+    .label { color: #888; font-weight: bold; }
+    .value { color: #00ff00; }
+    .error { color: #ff4444; }
+    pre { background: #000; padding: 10px; border-radius: 3px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Visual Editing Debug</h1>
+
+  <div class="section">
+    <div><span class="label">Cookie Header:</span> <span class="value">{cookieHeader || '(empty)'}</span></div>
+    <div><span class="label">Has sanity-preview=true:</span> <span class={isPreview ? 'value' : 'error'}>{isPreview ? '✓ YES' : '✗ NO'}</span></div>
+    <div><span class="label">Env Var (PUBLIC_SANITY_VISUAL_EDITING_ENABLED):</span> <span class="value">{visualEditingEnvVar}</span></div>
+    <div><span class="label">Visual Editing Enabled:</span> <span class={visualEditingEnabled ? 'value' : 'error'}>{visualEditingEnabled ? '✓ YES' : '✗ NO'}</span></div>
+  </div>
+
+  <div class="section">
+    <h2>All Request Headers:</h2>
+    <pre>{JSON.stringify(allHeaders, null, 2)}</pre>
+  </div>
+
+  <div class="section">
+    <h2>Environment Variables:</h2>
+    <pre>{JSON.stringify({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED,
+      PUBLIC_SANITY_PROJECT_ID: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
+      PUBLIC_SANITY_DATASET: import.meta.env.PUBLIC_SANITY_DATASET,
+      DEV: import.meta.env.DEV,
+      PROD: import.meta.env.PROD,
+    }, null, 2)}</pre>
+  </div>
+
+  <script>
+    console.log('Client-side cookie check:', document.cookie);
+    console.log('Visual Editing Loaded:', !!window.__SANITY_VISUAL_EDITING__);
+  </script>
+</body>
+</html>

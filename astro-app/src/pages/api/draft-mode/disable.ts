@@ -15,20 +15,20 @@ export const GET: APIRoute = async ({ request, redirect, cookies }) => {
   const referer = request.headers.get('referer')
   const backTo = referer && referer.startsWith('http') ? referer : '/'
 
-  // Redirect with CORS headers
+  // Redirect with CORS headers (dynamic origin to support both local and production Studio)
   const response = redirect(backTo, 307)
-  response.headers.set('Access-Control-Allow-Origin', 'https://sa-rolls.sanity.studio')
+  response.headers.set('Access-Control-Allow-Origin', request.headers.get('origin') || '*')
   response.headers.set('Access-Control-Allow-Credentials', 'true')
 
   return response
 }
 
 // Handle preflight requests for CORS
-export const OPTIONS: APIRoute = async () => {
+export const OPTIONS: APIRoute = async ({ request }) => {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': 'https://sa-rolls.sanity.studio',
+      'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Allow-Credentials': 'true',
