@@ -6,12 +6,16 @@ import { loadQuery } from "./loadQuery";
 // Re-export groq for use in other files
 export { groq };
 
-export async function getHomepage(request?: Request) {
+export async function getHomepage(request?: Request, experimentParams?: { experiment: string; variant: string }) {
   return await loadQuery<Homepage | null>({
     query: groq`*[_type == "homepage"][0]{
       _id,
       _updatedAt,
-      title,
+      "title": coalesce(
+        newTitle.variants[experimentId == $experiment && variantId == $variant][0].value,
+        newTitle.default,
+        title
+      ),
       sections[]{
         ...,
         _type == 'columnsBlock' => {
@@ -69,7 +73,16 @@ export async function getHomepage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -450,7 +463,16 @@ export async function getHomepage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -831,7 +853,16 @@ export async function getHomepage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -1212,7 +1243,16 @@ export async function getHomepage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -1550,8 +1590,13 @@ export async function getHomepage(request?: Request) {
           darkBackgroundColor
         }
       },
+      headerTheme,
       announcementBar
     }`,
+    params: {
+      experiment: experimentParams?.experiment ?? '',
+      variant: experimentParams?.variant ?? '',
+    },
     request,
   });
 }
@@ -1629,7 +1674,16 @@ export async function getFeaturesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -1921,7 +1975,16 @@ export async function getFeaturesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -2200,7 +2263,16 @@ export async function getFeaturesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'button' => {
               _type,
@@ -2255,7 +2327,16 @@ export async function getFeaturesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'button' => {
               _type,
@@ -2294,6 +2375,7 @@ export async function getFeaturesLandingPage(request?: Request) {
           darkBackgroundColor
         }
       },
+      headerTheme,
       announcementBar
     }`,
     request,
@@ -2308,6 +2390,7 @@ export interface FeaturesLandingPage {
   title?: string;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -2376,7 +2459,16 @@ export async function getGetStartedPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -2757,7 +2849,16 @@ export async function getGetStartedPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -3138,7 +3239,16 @@ export async function getGetStartedPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -3519,7 +3629,16 @@ export async function getGetStartedPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -3857,6 +3976,7 @@ export async function getGetStartedPage(request?: Request) {
           darkBackgroundColor
         }
       },
+      headerTheme,
       announcementBar
     }`,
     request,
@@ -3928,7 +4048,16 @@ export async function getIndustriesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -4317,7 +4446,16 @@ export async function getIndustriesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -4706,7 +4844,16 @@ export async function getIndustriesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -5081,7 +5228,16 @@ export async function getIndustriesLandingPage(request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -5497,7 +5653,16 @@ export async function getPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -5694,7 +5859,16 @@ export async function getPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -5891,7 +6065,16 @@ export async function getPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -6088,7 +6271,16 @@ export async function getPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -6323,7 +6515,16 @@ export async function getFeature(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -6574,7 +6775,16 @@ export async function getFeature(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -6824,7 +7034,16 @@ export async function getFeature(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'logoSetReference' => {
               _type,
@@ -6881,7 +7100,16 @@ export async function getFeature(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'logoSetReference' => {
               _type,
@@ -6986,9 +7214,11 @@ export async function getBlogLandingData(page: number = 1, perPage: number = 9, 
     posts: Post[],
     total: number,
     topics: BlogTopic[],
-    editorPicks: Post[]
+    editorPicks: Post[],
+    settings: { headerTheme?: string } | null
   }>({
     query: groq`{
+      "settings": *[_type == "blogLandingPage"][0]{ headerTheme },
       "posts": *[_type == "post" && defined(slug.current)] | order(coalesce(publishedAt, _createdAt) desc) [$start...$end] {
         _type,
         _id,
@@ -7334,6 +7564,15 @@ export interface AdvancedImage {
   objectFit?: 'contain' | 'cover' | 'fill' | 'none';
 }
 
+export interface HeadingCompositionVariant {
+  _key?: string;
+  variantLabel?: string;
+  targetRegions?: string[];
+  eyebrow?: string;
+  title?: string;
+  text?: PortableTextBlock[];
+}
+
 export interface HeadingComposition {
   _type: "headingComposition";
   _key?: string;
@@ -7341,6 +7580,9 @@ export interface HeadingComposition {
   eyebrow?: string;
   title?: string;
   text?: PortableTextBlock[];
+  // A/B Testing
+  experimentActive?: boolean;
+  variants?: HeadingCompositionVariant[];
   // Styles
   theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
   textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -8114,6 +8356,7 @@ export interface Homepage extends SEOFields {
   _updatedAt?: string;
   title?: string;
   sections?: (ColumnsBlock | Divider)[];
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -8123,6 +8366,7 @@ export interface GetStartedPage extends SEOFields {
   _updatedAt?: string;
   title?: string;
   sections?: (ColumnsBlock | Divider)[];
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -8236,7 +8480,16 @@ export async function getIndustry(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -8551,7 +8804,16 @@ export async function getIndustry(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -8866,7 +9128,16 @@ export async function getIndustry(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -8957,7 +9228,16 @@ export async function getIndustry(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'resultsList' => {
               _type,
@@ -9012,6 +9292,7 @@ export interface PartnersLandingPage extends SEOFields {
   title?: string;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -9031,6 +9312,7 @@ export interface CompetitorsLandingPage extends SEOFields {
   title?: string;
   description?: string;
   sections?: (ColumnsBlock | Divider)[];
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -9540,6 +9822,7 @@ export async function getPartnersLandingPage(request?: Request) {
           }
         }
       },
+      headerTheme,
       announcementBar
     }`,
     request,
@@ -9942,6 +10225,7 @@ export async function getCompetitorsLandingPage(request?: Request) {
           }
         }
       },
+      headerTheme,
       announcementBar
     }`,
     request,
@@ -10150,6 +10434,131 @@ export async function getFooter(request?: Request) {
 }
 
 /**
+ * Fetch all layout data (header, footer, chatbot) in a single query
+ * This reduces 3 API calls to 1, improving performance by ~150-250ms
+ * Uses 'global' cache type for 30-minute caching (vs 5 minutes for default)
+ * @param request - Optional request object for SSR context
+ */
+export async function getLayoutData(request?: Request) {
+  return await loadQuery<{
+    header: HeaderGlobal | null;
+    footer: FooterGlobal | null;
+    chatbot: ChatbotConfig | null;
+  }>({
+    query: groq`{
+      "header": *[_type == "headerGlobal"][0]{
+        _id,
+        _type,
+        logo{ asset->{ url } },
+        logoDark{ asset->{ url } },
+        logoAlt,
+        logoLink,
+        navItems[]{
+          _key,
+          label,
+          href,
+          hasMegaMenu
+        },
+        megaMenus[]{
+          _key,
+          parentLabel,
+          menuType,
+          useAlternateLayout,
+          subIntros[]{ _key, title },
+          introTitle,
+          introDescription,
+          items[]{
+            _key,
+            title,
+            description,
+            icon,
+            link{
+              href,
+              openInNewTab
+            },
+            topFeatures[]{
+              title,
+              link
+            }
+          },
+          featuredLabel,
+          featuredItems[]{
+            _key,
+            title,
+            label,
+            image{ asset->{ url } },
+            link{
+              href,
+              openInNewTab
+            }
+          },
+          ctaLabel,
+          ctaLink
+        },
+        buttons[]{
+          _key,
+          label,
+          href,
+          variant,
+          openInNewTab
+        }
+      },
+      "footer": *[_type == "footerGlobal"][0]{
+        _id,
+        _type,
+        newsletterTitle,
+        newsletterDescription,
+        newsletterButtonText,
+        newsletterPlaceholder,
+        quickLinks[]{
+          label,
+          url,
+          icon,
+          isExternal
+        },
+        columns[]{
+          title,
+          links[]{
+            label,
+            url,
+            isExternal
+          }
+        },
+        copyrightText,
+        legalLinks[]{
+          label,
+          url,
+          isExternal
+        },
+        socialLinks[]{
+          platform,
+          url,
+          icon
+        },
+        socialText,
+        showFloatingButton,
+        floatingButtonUrl,
+        floatingButtonPrimaryText,
+        floatingButtonSecondaryText
+      },
+      "chatbot": *[_type == "chatbotConfig" && _id == "chatbotConfig"][0]{
+        enabled,
+        displayName,
+        welcomeMessage,
+        systemPrompt,
+        fallbackMessage,
+        errorMessage,
+        maxChunks,
+        similarityThreshold,
+        maxTokens
+      }
+    }`,
+    request,
+    queryType: 'global',
+  });
+}
+
+/**
  * Fetch Features Selector Global
  * Returns the global features selector configuration from Sanity
  */
@@ -10273,7 +10682,16 @@ export async function getLandingPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -10549,7 +10967,16 @@ export async function getLandingPage(slug: string, request?: Request) {
                 headingType,
                 displayType,
                 textType,
-                addBorderLine
+                addBorderLine,
+                experimentActive,
+                variants[]{
+                  _key,
+                  variantLabel,
+                  targetRegions,
+                  eyebrow,
+                  title,
+                  text
+                }
               },
               industries[]{
                 _key,
@@ -10578,7 +11005,16 @@ export async function getLandingPage(slug: string, request?: Request) {
                   headingType,
                   displayType,
                   textType,
-                  addBorderLine
+                  addBorderLine,
+                  experimentActive,
+                  variants[]{
+                    _key,
+                    variantLabel,
+                    targetRegions,
+                    eyebrow,
+                    title,
+                    text
+                  }
                 },
                 industries[]{
                   _key,
@@ -10645,7 +11081,16 @@ export async function getLandingPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -10921,7 +11366,16 @@ export async function getLandingPage(slug: string, request?: Request) {
                 headingType,
                 displayType,
                 textType,
-                addBorderLine
+                addBorderLine,
+                experimentActive,
+                variants[]{
+                  _key,
+                  variantLabel,
+                  targetRegions,
+                  eyebrow,
+                  title,
+                  text
+                }
               },
               industries[]{
                 _key,
@@ -10950,7 +11404,16 @@ export async function getLandingPage(slug: string, request?: Request) {
                   headingType,
                   displayType,
                   textType,
-                  addBorderLine
+                  addBorderLine,
+                  experimentActive,
+                  variants[]{
+                    _key,
+                    variantLabel,
+                    targetRegions,
+                    eyebrow,
+                    title,
+                    text
+                  }
                 },
                 industries[]{
                   _key,
@@ -11016,7 +11479,16 @@ export async function getLandingPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -11074,7 +11546,16 @@ export async function getLandingPage(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -11193,7 +11674,16 @@ export async function getSolution(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -11385,7 +11875,16 @@ export async function getSolution(slug: string, request?: Request) {
                   headingType,
                   displayType,
                   textType,
-                  addBorderLine
+                  addBorderLine,
+                  experimentActive,
+                  variants[]{
+                    _key,
+                    variantLabel,
+                    targetRegions,
+                    eyebrow,
+                    title,
+                    text
+                  }
                 },
                 industries[]{
                   _key,
@@ -11551,7 +12050,16 @@ export async function getSolution(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'statsSet' => {
               _type,
@@ -11743,7 +12251,16 @@ export async function getSolution(slug: string, request?: Request) {
                   headingType,
                   displayType,
                   textType,
-                  addBorderLine
+                  addBorderLine,
+                  experimentActive,
+                  variants[]{
+                    _key,
+                    variantLabel,
+                    targetRegions,
+                    eyebrow,
+                    title,
+                    text
+                  }
                 },
                 industries[]{
                   _key,
@@ -11861,7 +12378,16 @@ export async function getSolution(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -11933,7 +12459,16 @@ export async function getSolution(slug: string, request?: Request) {
               headingType,
               displayType,
               textType,
-              addBorderLine
+              addBorderLine,
+              experimentActive,
+              variants[]{
+                _key,
+                variantLabel,
+                targetRegions,
+                eyebrow,
+                title,
+                text
+              }
             },
             _type == 'buttonStack' => {
               _type,
@@ -11965,6 +12500,40 @@ export async function getSolution(slug: string, request?: Request) {
       announcementBar
     }`,
     params: { slug },
+    request,
+  });
+}
+
+// Chatbot Configuration types
+export interface ChatbotConfig {
+  enabled: boolean;
+  displayName?: string;
+  welcomeMessage?: string;
+  systemPrompt: string;
+  fallbackMessage: string;
+  errorMessage?: string;
+  maxChunks: number;
+  similarityThreshold: number;
+  maxTokens: number;
+}
+
+/**
+ * Fetch chatbot configuration from Sanity.
+ * Returns the singleton chatbot config document.
+ */
+export async function getChatbotConfig(request?: Request) {
+  return await loadQuery<ChatbotConfig | null>({
+    query: groq`*[_type == "chatbotConfig" && _id == "chatbotConfig"][0]{
+      enabled,
+      displayName,
+      welcomeMessage,
+      systemPrompt,
+      fallbackMessage,
+      errorMessage,
+      maxChunks,
+      similarityThreshold,
+      maxTokens
+    }`,
     request,
   });
 }
