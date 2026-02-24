@@ -123,7 +123,7 @@ const eyebrowStyleClass = eyebrowStyle === 'gradient' ? 'gradient' : 'text-secon
 ---
 
 <section id={cleanStega(id)} class="features-stacked-content grid gap-7" data-sanity-edit-target>
-  {items.map((item, index) => {
+  {(items ?? []).map((item, index) => {
     // PRESERVE stega in visible text content for visual editing click-to-edit
     // Only clean stega for values used in CSS classes, URLs, or HTML attributes
     const eyebrow = item.eyebrow; // Keep stega for click-to-edit

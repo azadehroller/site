@@ -6,6 +6,7 @@
  */
 import { cleanStega } from '../../utils/stega';
 import { createBlockEditInfo, createDataSanityAttrs } from '../../utils/visualEditing';
+import { urlFor, isImageReady } from '../../utils/image';
 
 interface BadgeItem {
   _key?: string;
@@ -165,17 +166,33 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
   {badges && badges.length > 0 && (
     <div class="flex lg:justify-end gap-4 lg:w-1/4">
       {badges.map((badge) => {
-        // Support multiple possible URL paths from Sanity
-        const imageUrl = badge.image?.asset?.url || badge.image?.url || '';
+        // Use optimized Sanity image URL (232px width for 2x retina on 116px display)
+        let imageUrl = '';
+        if (badge.image?.asset) {
+          try {
+            imageUrl = urlFor(badge.image as import("@sanity/types").Image)
+              .width(232)
+              .height(366)
+              .format('webp')
+              .quality(85)
+              .url();
+          } catch (e) {
+            // Fallback to raw URL if optimization fails
+            imageUrl = badge.image.asset.url || '';
+          }
+        } else {
+          // Fallback for non-standard image structures
+          imageUrl = badge.image?.url || '';
+        }
         const badgeLink = cleanStega(badge.link);
         const badgeAlt = cleanStega(badge.alt) || 'Badge';
-        
+
         return imageUrl ? (
           <div>
             {badgeLink ? (
-              <a 
-                href={badgeLink} 
-                target="_blank" 
+              <a
+                href={badgeLink}
+                target="_blank"
                 rel="noopener noreferrer"
                 aria-label={badgeAlt}
               >

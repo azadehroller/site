@@ -357,81 +357,95 @@ console.log('[IndustrySelector] Industries data:', JSON.stringify(industries.map
 })();
 </script>
 
-<!-- Lottie Animation Script -->
-<script>
-  import lottie from 'lottie-web';
-  import type { AnimationItem } from 'lottie-web';
+<!-- Lottie Animation Script - Load from CDN to avoid bundling 300KB library in hoisted.js -->
+{hasLottieAnimations && (
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+)}
 
-  // Store animation instances to prevent duplicate initialization
-  const animations = new Map<HTMLElement, AnimationItem>();
+{hasLottieAnimations && (
+  <script is:inline>
+    (function() {
+      'use strict';
 
-  function initLottieAnimations() {
-    const lottieContainers = document.querySelectorAll<HTMLElement>('.lottie-container[data-lottie-src]');
-    
-    console.log('[Lottie] Found containers:', lottieContainers.length);
-    
-    lottieContainers.forEach((container) => {
-      const lottieSrc = container.getAttribute('data-lottie-src');
-      if (!lottieSrc) {
-        console.log('[Lottie] No src found for container');
-        return;
-      }
+      // Store animation instances to prevent duplicate initialization
+      var animations = new Map();
 
-      // Skip if already initialized
-      if (animations.has(container)) {
-        console.log('[Lottie] Container already initialized');
-        return;
-      }
+      function initLottieAnimations() {
+        // Wait for lottie library to load
+        if (typeof lottie === 'undefined') {
+          console.log('[Lottie] Library not loaded yet, retrying...');
+          setTimeout(initLottieAnimations, 100);
+          return;
+        }
 
-      console.log('[Lottie] Loading animation from:', lottieSrc);
+        var lottieContainers = document.querySelectorAll('.lottie-container[data-lottie-src]');
 
-      // Load the Lottie animation
-      const animation = lottie.loadAnimation({
-        container: container,
-        renderer: 'svg',
-        loop: true,
-        autoplay: false,
-        path: lottieSrc,
-      });
+        console.log('[Lottie] Found containers:', lottieContainers.length);
 
-      // Log when animation is loaded
-      animation.addEventListener('DOMLoaded', () => {
-        console.log('[Lottie] Animation loaded successfully');
-      });
+        lottieContainers.forEach(function(container) {
+          var lottieSrc = container.getAttribute('data-lottie-src');
+          if (!lottieSrc) {
+            console.log('[Lottie] No src found for container');
+            return;
+          }
 
-      animation.addEventListener('data_failed', () => {
-        console.error('[Lottie] Failed to load animation data from:', lottieSrc);
-      });
+          // Skip if already initialized
+          if (animations.has(container)) {
+            console.log('[Lottie] Container already initialized');
+            return;
+          }
 
-      // Store animation reference
-      animations.set(container, animation);
+          console.log('[Lottie] Loading animation from:', lottieSrc);
 
-      // Find parent link for hover events
-      const parentLink = container.closest('.industry-item-link');
-      if (parentLink) {
-        // Play animation on hover
-        parentLink.addEventListener('mouseenter', () => {
-          console.log('[Lottie] Playing animation');
-          animation.play();
+          // Load the Lottie animation
+          var animation = lottie.loadAnimation({
+            container: container,
+            renderer: 'svg',
+            loop: true,
+            autoplay: false,
+            path: lottieSrc,
+          });
+
+          // Log when animation is loaded
+          animation.addEventListener('DOMLoaded', function() {
+            console.log('[Lottie] Animation loaded successfully');
+          });
+
+          animation.addEventListener('data_failed', function() {
+            console.error('[Lottie] Failed to load animation data from:', lottieSrc);
+          });
+
+          // Store animation reference
+          animations.set(container, animation);
+
+          // Find parent link for hover events
+          var parentLink = container.closest('.industry-item-link');
+          if (parentLink) {
+            // Play animation on hover
+            parentLink.addEventListener('mouseenter', function() {
+              console.log('[Lottie] Playing animation');
+              animation.play();
+            });
+
+            // Stop animation on mouse leave
+            parentLink.addEventListener('mouseleave', function() {
+              console.log('[Lottie] Stopping animation');
+              animation.stop();
+            });
+          }
         });
-
-        // Stop animation on mouse leave
-        parentLink.addEventListener('mouseleave', () => {
-          console.log('[Lottie] Stopping animation');
-          animation.stop();
-        });
       }
-    });
-  }
 
-  // Initialize on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLottieAnimations);
-  } else {
-    initLottieAnimations();
-  }
+      // Initialize on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLottieAnimations);
+      } else {
+        initLottieAnimations();
+      }
 
-  // Re-initialize on Astro page transitions
-  document.addEventListener('astro:page-load', initLottieAnimations);
-</script>
+      // Re-initialize on Astro page transitions
+      document.addEventListener('astro:page-load', initLottieAnimations);
+    })();
+  </script>
+)}
 

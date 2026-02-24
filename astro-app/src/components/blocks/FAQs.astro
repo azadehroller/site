@@ -86,7 +86,7 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
 
     {/* FAQ accordion */}
     <dl class="mt-2">
-      {items.map((item, index) => {
+      {(items ?? []).map((item, index) => {
         const itemTitle = item.title;
         const itemContent = item.content;
         const isFirstAndExpanded = index === 0 && expandFirst;
@@ -150,7 +150,7 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
 </section>
 
 {/* SEO: FAQ structured data */}
-{items.length > 0 && (
+{(items ?? []).length > 0 && (
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "FAQPage",

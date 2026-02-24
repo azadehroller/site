@@ -7,13 +7,26 @@
 import { PortableText } from "astro-portabletext";
 import type { PortableTextBlock } from "@portabletext/types";
 import { cleanStega } from '../../utils/stega';
+import { pickVariantIndex, variantMatchesGeo } from '../../utils/experiments';
 import RawHtml from "../RawHtml.astro";
+
+interface HeadingVariant {
+  _key?: string;
+  variantLabel?: string;
+  targetRegions?: string[];
+  eyebrow?: string;
+  title?: string;
+  text?: PortableTextBlock[];
+}
 
 interface Props {
   // Content
   eyebrow?: string;
   title?: string;
   text?: PortableTextBlock[];
+  // A/B Testing
+  experimentActive?: boolean;
+  variants?: HeadingVariant[];
   // Styles
   theme?: 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight';
   textAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -31,6 +44,8 @@ const {
   eyebrow: rawEyebrow,
   title: rawTitle,
   text: rawText,
+  experimentActive = false,
+  variants: rawVariants,
   theme: rawTheme = 'dark',
   textAlignment: rawTextAlignment = 'LEFT',
   eyebrowType: rawEyebrowType = 'div',
@@ -51,10 +66,37 @@ const headingType = cleanStega(rawHeadingType) || 'h2';
 const displayType = cleanStega(rawDisplayType) || 'h2';
 const textType = cleanStega(rawTextType) || 'lg';
 
-// Keep stega encoding in visible text content for visual editing click-to-edit
-const eyebrow = rawEyebrow;
-const title = rawTitle;
-const text = rawText;
+const variants = rawVariants ?? [];
+
+// Resolve A/B variant: only when experimentActive is ON
+// 1. Filter variants to those matching the visitor's region
+// 2. Among the matching set, use the bucket value to pick one (0 = control)
+const hcAbTest = Astro.locals.abTestHeadingComposition;
+const geo = Astro.locals.geo;
+
+const eligibleVariants = (experimentActive && variants.length > 0)
+  ? variants.filter((v) => variantMatchesGeo(v.targetRegions, geo ?? { countryCode: 'XX', region: 'UNKNOWN' }))
+  : [];
+
+const variantIndex = (eligibleVariants.length > 0 && hcAbTest)
+  ? pickVariantIndex(hcAbTest.bucketValue, eligibleVariants.length)
+  : 0;
+const selectedVariant = variantIndex > 0 ? eligibleVariants[variantIndex - 1] : undefined;
+
+const eyebrow = selectedVariant?.eyebrow ?? rawEyebrow;
+const title = selectedVariant?.title ?? rawTitle;
+const text = selectedVariant?.text ?? rawText;
+
+if (import.meta.env.DEV && variants.length > 0) {
+  console.log(
+    `[AB headingComposition] active=${experimentActive}` +
+    ` geo=${geo?.countryCode}/${geo?.region}` +
+    ` eligible=${eligibleVariants.length}/${variants.length}` +
+    ` bucket=${hcAbTest?.bucketValue?.toFixed(3)}` +
+    ` → index=${variantIndex} (${variantIndex === 0 ? 'control' : selectedVariant?.variantLabel || 'variant'})` +
+    ` | title="${cleanStega(title || '')}"`
+  );
+}
 
 // Theme-based text color classes
 const getTextColorClass = (): string => {

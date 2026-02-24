@@ -339,6 +339,8 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
             eyebrow={headingData.eyebrow}
             title={headingData.title}
             text={headingData.text}
+            experimentActive={headingData.experimentActive}
+            variants={headingData.variants}
             theme={cleanStega(headingData.theme) as 'light' | 'dark' | 'gxscore' | 'smb' | 'enterprise' | 'industry_report' | 'industry_report_onlight' | undefined}
             textAlignment={cleanStega(headingData.textAlignment) as 'LEFT' | 'CENTER' | 'RIGHT' | undefined}
             eyebrowType={cleanStega(headingData.eyebrowType) as 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | undefined}

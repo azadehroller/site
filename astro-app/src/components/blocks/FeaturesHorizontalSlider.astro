@@ -253,105 +253,146 @@ const cssVars = {
   declare global {
     interface Window {
       Swiper: new (el: HTMLElement, options: object) => object;
+      __swiperLoadPromise?: Promise<void>;
     }
   }
 
-  // Dynamic import for Swiper
-  async function initFeaturesSlider() {
-    // Check if Swiper is already loaded
-    if (typeof window.Swiper === 'undefined') {
+  // Load Swiper library once
+  async function loadSwiper() {
+    if (window.__swiperLoadPromise) {
+      return window.__swiperLoadPromise;
+    }
+
+    if (typeof window.Swiper !== 'undefined') {
+      return Promise.resolve();
+    }
+
+    window.__swiperLoadPromise = (async () => {
       // Load Swiper CSS
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = 'https://unpkg.com/swiper@8/swiper-bundle.min.css';
       document.head.appendChild(link);
-      
+
       // Load Swiper JS
-      await new Promise((resolve) => {
+      await new Promise<void>((resolve) => {
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/swiper@8/swiper-bundle.min.js';
-        script.onload = resolve;
+        script.onload = () => resolve();
         document.head.appendChild(script);
       });
+    })();
+
+    return window.__swiperLoadPromise;
+  }
+
+  // Initialize a single slider
+  async function initSlider(container: Element) {
+    const swiperEl = container.querySelector('.swiper');
+    if (!swiperEl) return;
+
+    // Load Swiper if not already loaded
+    await loadSwiper();
+
+    const slides = container.querySelectorAll('.swiper-slide');
+    const autoplayDelay = parseInt(container.getAttribute('data-autoplay-delay') || '5000');
+
+    // Build slide data from data attributes
+    const slideData: Record<number, { name: string; content: string; link: string; label: string; newTab: boolean; noFollow: boolean }> = {};
+    slides.forEach((slide, index) => {
+      const el = slide as HTMLElement;
+      slideData[index] = {
+        name: el.dataset.name || '',
+        content: el.dataset.content || '',
+        link: el.dataset.link || '',
+        label: el.dataset.label || 'Learn more',
+        newTab: el.dataset.newTab === 'true',
+        noFollow: el.dataset.noFollow === 'true',
+      };
+    });
+
+    // Initialize Swiper
+    new window.Swiper(swiperEl as HTMLElement, {
+      effect: 'fade',
+      fadeEffect: {
+        crossFade: true,
+      },
+      autoHeight: true,
+      autoplay: {
+        delay: autoplayDelay,
+        disableOnInteraction: false,
+      },
+      loop: true,
+      watchSlidesProgress: true,
+      pagination: {
+        el: container.querySelector('.pag') as HTMLElement,
+        clickable: true,
+        renderBullet: function(index: number, className: string) {
+          const slide = slideData[index];
+          if (!slide) return '';
+
+          const target = slide.newTab ? ' target="_blank"' : '';
+          const rel = slide.noFollow ? ' rel="nofollow noopener"' : slide.newTab ? ' rel="noopener"' : '';
+
+          return `
+            <div class="flex flex-col gap-3">
+              <div class="pag-container ${className}">
+                <div class="pag-content flex flex-col gap-3 h-full cursor-auto">
+                  <div class="pag-progress-bar"></div>
+                  <div class="pag-title text-2xl font-semibold">${slide.name}</div>
+                  <div class="pag-text text-base">${slide.content}</div>
+                </div>
+              </div>
+              <a class="inline-flex items-center pag-link text-base font-semibold mt-auto w-max group" href="${slide.link}"${target}${rel}>
+                <span>${slide.label}</span>
+                <span>
+                  <svg class="pag-svg mr-0 ml-2 transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+                    <rect width="40" height="40" rx="20"/>
+                    <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+                  </svg>
+                </span>
+              </a>
+            </div>
+          `;
+        },
+      },
+    });
+  }
+
+  // Use Intersection Observer to lazy-load sliders when they come into view
+  function observeSliders() {
+    const sliders = document.querySelectorAll('.features-horizontal-slider');
+
+    // Fallback for browsers without IntersectionObserver
+    if (!window.IntersectionObserver) {
+      sliders.forEach(initSlider);
+      return;
     }
 
-    // Initialize all feature sliders on the page
-    document.querySelectorAll('.features-horizontal-slider').forEach((container) => {
-      const swiperEl = container.querySelector('.swiper');
-      const slides = container.querySelectorAll('.swiper-slide');
-      const autoplayDelay = parseInt(container.getAttribute('data-autoplay-delay') || '5000');
-      
-      // Build slide data from data attributes
-      const slideData: Record<number, { name: string; content: string; link: string; label: string; newTab: boolean; noFollow: boolean }> = {};
-      slides.forEach((slide, index) => {
-        const el = slide as HTMLElement;
-        slideData[index] = {
-          name: el.dataset.name || '',
-          content: el.dataset.content || '',
-          link: el.dataset.link || '',
-          label: el.dataset.label || 'Learn more',
-          newTab: el.dataset.newTab === 'true',
-          noFollow: el.dataset.noFollow === 'true',
-        };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          initSlider(entry.target);
+          observer.unobserve(entry.target);
+        }
       });
+    }, {
+      rootMargin: '200px' // Start loading 200px before slider comes into view
+    });
 
-      // Initialize Swiper
-      new window.Swiper(swiperEl as HTMLElement, {
-        effect: 'fade',
-        fadeEffect: {
-          crossFade: true,
-        },
-        autoHeight: true,
-        autoplay: {
-          delay: autoplayDelay,
-          disableOnInteraction: false,
-        },
-        loop: true,
-        watchSlidesProgress: true,
-        pagination: {
-          el: container.querySelector('.pag') as HTMLElement,
-          clickable: true,
-          renderBullet: function(index: number, className: string) {
-            const slide = slideData[index];
-            if (!slide) return '';
-            
-            const target = slide.newTab ? ' target="_blank"' : '';
-            const rel = slide.noFollow ? ' rel="nofollow noopener"' : slide.newTab ? ' rel="noopener"' : '';
-            
-            return `
-              <div class="flex flex-col gap-3">
-                <div class="pag-container ${className}">
-                  <div class="pag-content flex flex-col gap-3 h-full cursor-auto">
-                    <div class="pag-progress-bar"></div>
-                    <div class="pag-title text-2xl font-semibold">${slide.name}</div>
-                    <div class="pag-text text-base">${slide.content}</div>
-                  </div>
-                </div>
-                <a class="inline-flex items-center pag-link text-base font-semibold mt-auto w-max group" href="${slide.link}"${target}${rel}>
-                  <span>${slide.label}</span>
-                  <span>
-                    <svg class="pag-svg mr-0 ml-2 transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
-                      <rect width="40" height="40" rx="20"/>
-                      <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
-                    </svg>
-                  </span>
-                </a>
-              </div>
-            `;
-          },
-        },
-      });
+    sliders.forEach((slider) => {
+      observer.observe(slider);
     });
   }
 
   // Initialize on page load
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFeaturesSlider);
+    document.addEventListener('DOMContentLoaded', observeSliders);
   } else {
-    initFeaturesSlider();
+    observeSliders();
   }
 
-  // Re-initialize on Astro page transitions
-  document.addEventListener('astro:page-load', initFeaturesSlider);
+  // Re-observe on Astro page transitions
+  document.addEventListener('astro:page-load', observeSliders);
 </script>
 
