@@ -1,0 +1,1087 @@
+---
+/**
+ * ChatWidget - AI Documentation Chatbot Component
+ * A floating chat widget that connects to the /api/chat endpoint.
+ *
+ * Features:
+ * - Floating toggle button (bottom-right)
+ * - Expandable chat panel
+ * - Message history within session
+ * - Loading states with typing indicator
+ * - Source citations as clickable links
+ * - Keyboard accessible (Escape to close)
+ */
+
+import type { ChatbotConfig } from '../../utils/sanity';
+
+interface Props {
+  config: ChatbotConfig;
+}
+
+const { config } = Astro.props;
+
+const displayName = config.displayName || 'ROLLER Assistant';
+const welcomeMessage =
+  config.welcomeMessage ||
+  'Hi! I can help you find information in the ROLLER documentation. What would you like to know?';
+---
+
+<div id="chat-widget" class="chat-widget" data-chatbot>
+  <!-- Toggle Button -->
+  <button
+    id="chat-toggle"
+    type="button"
+    class="chat-toggle"
+    aria-label="Open chat assistant"
+    aria-expanded="false"
+    aria-controls="chat-panel"
+  >
+    <!-- Chat icon (when closed) -->
+    <svg id="chat-icon-open" class="chat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+      ></path>
+    </svg>
+    <!-- Close icon (when open) -->
+    <svg
+      id="chat-icon-close"
+      class="chat-icon chat-icon-hidden"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
+      ></path>
+    </svg>
+  </button>
+
+  <!-- Chat Panel -->
+  <div
+    id="chat-panel"
+    class="chat-panel chat-panel-hidden"
+    role="dialog"
+    aria-labelledby="chat-title"
+  >
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-header-icon">
+        <svg class="chat-header-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+          ></path>
+        </svg>
+      </div>
+      <h2 id="chat-title" class="chat-title">{displayName}</h2>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="chat-messages" class="chat-messages" aria-live="polite" aria-atomic="false">
+      <!-- Welcome message -->
+      <div class="chat-message chat-message-bot">
+        <div class="chat-bubble chat-bubble-bot">
+          <p class="chat-text">{welcomeMessage}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <form id="chat-form" class="chat-form">
+      <div class="chat-input-wrapper">
+        <textarea
+          id="chat-input"
+          placeholder="Ask a question..."
+          class="chat-input"
+          autocomplete="off"
+          aria-label="Type your question"
+          rows="1"
+        ></textarea>
+        <!-- Mic button — hidden by default; revealed by JS only when SpeechRecognition is supported -->
+        <button
+          id="chat-mic"
+          type="button"
+          class="chat-mic chat-mic-hidden"
+          aria-label="Use microphone"
+        >
+          <svg class="chat-mic-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
+            ></path>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 10v2a7 7 0 0 1-14 0v-2"
+            ></path>
+            <line stroke-linecap="round" stroke-width="2" x1="12" y1="19" x2="12" y2="23"></line>
+            <line stroke-linecap="round" stroke-width="2" x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </button>
+        <button
+          id="chat-submit"
+          type="submit"
+          class="chat-submit"
+          aria-label="Send message"
+        >
+          <svg class="chat-submit-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
+      </div>
+      <p id="chat-error" class="chat-error chat-error-hidden"></p>
+    </form>
+  </div>
+</div>
+
+<style>
+  .chat-widget {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+  }
+
+  .chat-toggle {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background-color: var(--primary-50);
+    color: var(--neutral-white);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-xlarge);
+    transition: background-color 0.2s, transform 0.2s;
+  }
+
+  .chat-toggle:hover {
+    background-color: var(--primary-60);
+    transform: scale(1.05);
+  }
+
+  .chat-toggle:focus {
+    outline: 2px solid var(--primary-30);
+    outline-offset: 2px;
+  }
+
+  .chat-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .chat-icon-hidden {
+    display: none;
+  }
+
+  .chat-panel {
+    position: absolute;
+    bottom: 5rem;
+    right: 0;
+    width: 28rem;
+    max-width: calc(100vw - 3rem);
+    height: 500px;
+    max-height: calc(100vh - 200px);
+    background-color: var(--neutral-white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-xxlarge);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-panel-hidden {
+    display: none;
+  }
+
+  .chat-header {
+    background-color: var(--primary-50);
+    color: var(--neutral-white);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .chat-header-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--primary-40);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-header-svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .chat-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chat-message {
+    display: flex;
+  }
+
+  .chat-message-bot {
+    justify-content: flex-start;
+  }
+
+  .chat-message-user {
+    justify-content: flex-end;
+  }
+
+  .chat-bubble {
+    max-width: 85%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+  }
+
+  .chat-bubble-bot {
+    background-color: var(--neutral-10);
+    border-top-left-radius: 0;
+  }
+
+  .chat-bubble-user {
+    background-color: var(--primary-50);
+    color: var(--neutral-white);
+    border-bottom-right-radius: 0;
+  }
+
+  .chat-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0;
+    color: #033180;
+    font-weight: 700;
+  }
+
+  .chat-bubble-user .chat-text {
+    color: #033180;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  :global(.chat-paragraph) {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #033180;
+  }
+
+  :global(.chat-paragraph:last-child) {
+    margin-bottom: 0;
+  }
+
+  :global(.chat-paragraph-user) {
+    color: #033180;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: .5rem;
+    background: var(--primary-10);
+    border-radius: 10px 10px 0 10px;
+    display: inline-flex;
+  }
+
+  :global(.chat-section-header) {
+    margin: 1rem 0 0.5rem 0;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: #033180;
+    font-weight: 700;
+  }
+
+  :global(.chat-section-header:first-child) {
+    margin-top: 0;
+  }
+
+  :global(.chat-section-header-user) {
+    color: #033180;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  :global(.chat-ordered-list),
+  :global(.chat-unordered-list) {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #033180;
+  }
+
+  :global(.chat-ordered-list) {
+    list-style-type: decimal;
+    list-style-position: outside;
+  }
+
+  :global(.chat-unordered-list) {
+    list-style-type: disc;
+    list-style-position: outside;
+  }
+
+  :global(.chat-ordered-list li),
+  :global(.chat-unordered-list li) {
+    margin-bottom: 0.35rem;
+    padding-left: 0.25rem;
+    display: list-item;
+  }
+
+  :global(.chat-ordered-list li:last-child),
+  :global(.chat-unordered-list li:last-child) {
+    margin-bottom: 0;
+  }
+
+  .chat-bubble-user :global(.chat-ordered-list),
+  .chat-bubble-user :global(.chat-unordered-list) {
+    color: #033180;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .chat-sources {
+    margin-top: 0.75rem;
+  }
+
+  :global(.chat-sources-separator) {
+    border: none;
+    border-top: .5px solid #084dc5;
+    margin: 1rem 0;
+  }
+
+  :global(.chat-sources-title) {
+    font-size: 0.875rem;
+    color: var(--neutral-60);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+  }
+
+  :global(.chat-source-link) {
+    display: inline-block;
+    color: #074dc5 !important;
+    text-decoration: none;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  :global(.chat-source-link:hover) {
+    text-decoration: underline;
+    color: #0541a0 !important;
+  }
+
+  :global(.chat-cta-wrapper) {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  :global(.chat-cta-btn) {
+    display: inline-block;
+    padding: 0.5rem 1.125rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    line-height: 1;
+  }
+
+  :global(.chat-cta-btn:hover) {
+    opacity: 0.85;
+    color: #ffffff !important;
+    text-decoration: none;
+  }
+
+  :global(.chat-cta-get-started) {
+    background-color: var(--secondary-50, #ff290c);
+  }
+
+  :global(.chat-cta-book-demo) {
+    background-color: var(--primary-50, #033180);
+  }
+
+  .chat-form {
+    border-top: 1px solid var(--neutral-20);
+    padding: 0.75rem;
+  }
+
+  .chat-input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end; /* keeps mic + send buttons pinned to the bottom as textarea grows */
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--neutral-30);
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    line-height: 1.5;
+    outline: none;
+    resize: none;         /* hide the drag handle */
+    overflow-y: hidden;   /* no scrollbar until max-height is reached */
+    max-height: 9rem;     /* ~5 lines before scrolling kicks in */
+    transition: border-color 0.2s;
+  }
+
+  .chat-input:focus {
+    border-color: var(--primary-50);
+    box-shadow: 0 0 0 2px var(--primary-10);
+  }
+
+  .chat-submit {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--secondary-50);
+    color: var(--neutral-white);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+
+  .chat-submit:hover {
+    background-color: var(--secondary-70);
+  }
+
+  .chat-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .chat-submit-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .chat-mic-hidden {
+    display: none;
+  }
+
+  .chat-mic {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--neutral-10);
+    color: var(--primary-50);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+  }
+
+  .chat-mic:hover {
+    background-color: var(--neutral-20);
+  }
+
+  .chat-mic-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  /* Pulsing red ring while listening — shown on Chrome/Edge only */
+  .chat-mic-listening {
+    background-color: #fee2e2;
+    color: #dc2626;
+    animation: mic-pulse 1.2s infinite ease-in-out;
+  }
+
+  @keyframes mic-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.35); }
+    50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+  }
+
+  .chat-error {
+    color: var(--error-50);
+    font-size: 0.75rem;
+    margin: 0.5rem 0.5rem 0;
+  }
+
+  .chat-error-hidden {
+    display: none;
+  }
+
+  :global(.thinking-text) {
+    font-size: 0.875rem;
+    color: var(--primary-50);
+    font-weight: 500;
+    margin: 0 0 0.5rem 0;
+    animation: blink 1s infinite ease-in-out;
+  }
+
+  @keyframes blink {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 0.5rem 0;
+  }
+
+  .typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: var(--neutral-40);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+  }
+
+  .typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
+  }
+  .typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes typing {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-4px);
+    }
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 640px) {
+    .chat-panel {
+      width: calc(100vw - 2rem);
+      right: -0.5rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    'use strict';
+
+    // DOM elements
+    const elements = {
+      widget: document.getElementById('chat-widget'),
+      toggle: document.getElementById('chat-toggle'),
+      panel: document.getElementById('chat-panel'),
+      form: document.getElementById('chat-form'),
+      input: document.getElementById('chat-input'),
+      messages: document.getElementById('chat-messages'),
+      error: document.getElementById('chat-error'),
+      iconOpen: document.getElementById('chat-icon-open'),
+      iconClose: document.getElementById('chat-icon-close'),
+    };
+
+    // State
+    let conversationId = null;
+    let isLoading = false;
+
+    // Toggle chat panel
+    const toggleChat = () => {
+      const isHidden = elements.panel.classList.contains('chat-panel-hidden');
+
+      elements.panel.classList.toggle('chat-panel-hidden');
+      elements.iconOpen.classList.toggle('chat-icon-hidden');
+      elements.iconClose.classList.toggle('chat-icon-hidden');
+
+      elements.toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+
+      if (isHidden) {
+        elements.input.focus();
+      }
+    };
+
+    elements.toggle.addEventListener('click', toggleChat);
+
+    // ── Auto-resize textarea ─────────────────────────────────────────────────
+    // minInputHeight is captured lazily on the first autoResize() call, not at
+    // script init. At init the panel has display:none so scrollHeight === 0,
+    // which would cause the textarea to collapse to 0px on every resize.
+    let minInputHeight = 0;
+
+    const autoResize = () => {
+      if (!minInputHeight) {
+        // First call: panel is now visible — capture the true 1-row height.
+        // Clear any inline style first so we read the CSS/rows-defined height.
+        elements.input.style.height = '';
+        minInputHeight = elements.input.scrollHeight;
+      }
+      elements.input.style.height    = minInputHeight + 'px'; // reset to 1-row floor
+      const next = elements.input.scrollHeight;
+      const max  = parseInt(getComputedStyle(elements.input).maxHeight, 10);
+      elements.input.style.height    = Math.min(next, max) + 'px';
+      elements.input.style.overflowY = next > max ? 'auto' : 'hidden';
+    };
+
+    // Resize on every keystroke
+    elements.input.addEventListener('input', autoResize);
+
+    // Submit on Enter; allow Shift+Enter for a real newline
+    elements.input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        elements.form.requestSubmit();
+      }
+    });
+    // ── End auto-resize ───────────────────────────────────────────────────────
+
+    // Handle form submission
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      if (isLoading) return;
+
+      const question = elements.input.value.trim();
+      if (!question) return;
+
+      // Clear input, reset its height, and hide any error
+      elements.input.value = '';
+      autoResize();
+      hideError();
+
+      // Add user message to chat
+      addMessage(question, 'user');
+
+      // Show loading indicator
+      const loadingEl = showLoading();
+      isLoading = true;
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            question,
+            conversationId,
+          }),
+        });
+
+        const data = await response.json();
+
+        // Remove loading indicator
+        loadingEl.remove();
+
+        if (!response.ok) {
+          isLoading = false;
+          showError(data.error || 'An error occurred. Please try again.');
+          return;
+        }
+
+        // Update conversation ID
+        if (data.conversationId) {
+          conversationId = data.conversationId;
+        }
+
+        // Type the bot response word by word; isLoading is cleared when typing finishes
+        typeBotMessage(data.answer, data.sources);
+      } catch (error) {
+        loadingEl.remove();
+        isLoading = false;
+        showError('Failed to connect. Please check your connection and try again.');
+      }
+    };
+
+    elements.form.addEventListener('submit', handleSubmit);
+
+    const formatMessageContent = (content, messageType) => {
+      const lines = content.split('\n');
+      let html = '';
+      let inOrderedList = false;
+      let inUnorderedList = false;
+
+      // Add extra class for user messages
+      const paragraphClass = messageType === 'user' ? 'chat-paragraph chat-paragraph-user' : 'chat-paragraph';
+      const headerClass = messageType === 'user' ? 'chat-section-header chat-section-header-user' : 'chat-section-header';
+
+      // First pass: detect consecutive numbered items
+      const numberedGroups = [];
+      let currentGroup = [];
+
+      lines.forEach((line, i) => {
+        const trimmedLine = line.trim();
+        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.+)$/);
+
+        if (numberedMatch) {
+          currentGroup.push(i);
+        } else if (currentGroup.length > 0) {
+          if (currentGroup.length > 1) {
+            numberedGroups.push(currentGroup);
+          }
+          currentGroup = [];
+        }
+      });
+
+      if (currentGroup.length > 1) {
+        numberedGroups.push(currentGroup);
+      }
+
+      // Check if line index is part of a multi-item numbered list
+      const isInNumberedGroup = (idx) => numberedGroups.some(group => group.includes(idx));
+
+      // Second pass: format content
+      lines.forEach((line, i) => {
+        const trimmedLine = line.trim();
+
+        // Check for numbered list (1. , 2. , etc.)
+        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.+)$/);
+        // Check for bullet points (-, *, •)
+        const bulletMatch = trimmedLine.match(/^[-*•]\s+(.+)$/);
+        // Check for section headers (lines ending with colon, typically short)
+        const isHeader = trimmedLine.endsWith(':') && trimmedLine.length < 100 && !numberedMatch && !bulletMatch;
+
+        if (numberedMatch && isInNumberedGroup(i)) {
+          if (!inOrderedList) {
+            if (inUnorderedList) {
+              html += '</ul>';
+              inUnorderedList = false;
+            }
+            html += '<ol class="chat-ordered-list">';
+            inOrderedList = true;
+          }
+          html += `<li>${numberedMatch[2]}</li>`;
+        } else if (bulletMatch) {
+          if (!inUnorderedList) {
+            if (inOrderedList) {
+              html += '</ol>';
+              inOrderedList = false;
+            }
+            html += '<ul class="chat-unordered-list">';
+            inUnorderedList = true;
+          }
+          html += `<li>${bulletMatch[1]}</li>`;
+        } else {
+          if (inOrderedList) {
+            html += '</ol>';
+            inOrderedList = false;
+          }
+          if (inUnorderedList) {
+            html += '</ul>';
+            inUnorderedList = false;
+          }
+          if (trimmedLine) {
+            if (isHeader) {
+              html += `<h3 class="${headerClass}">${trimmedLine}</h3>`;
+            } else {
+              html += `<p class="${paragraphClass}">${trimmedLine}</p>`;
+            }
+          }
+        }
+      });
+
+      if (inOrderedList) html += '</ol>';
+      if (inUnorderedList) html += '</ul>';
+
+      return html;
+    };
+
+    const createCtaButtons = () => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'chat-cta-wrapper';
+
+      const getStarted = document.createElement('a');
+      getStarted.className = 'chat-cta-btn chat-cta-get-started';
+      getStarted.textContent = 'Get Started';
+      getStarted.href = '/get-started';
+
+      const bookDemo = document.createElement('a');
+      bookDemo.className = 'chat-cta-btn chat-cta-book-demo';
+      bookDemo.textContent = 'Book a Demo';
+      bookDemo.href = '/';
+
+      wrapper.appendChild(getStarted);
+      wrapper.appendChild(bookDemo);
+      return wrapper;
+    };
+
+    const createSourceLink = (source) => {
+      const linkWrapper = document.createElement('div');
+      linkWrapper.style.marginBottom = '0.25rem';
+
+      const element = source.url ? document.createElement('a') : document.createElement('span');
+      element.className = 'chat-source-link';
+      element.textContent = `→ ${source.title}`;
+
+      if (source.url) {
+        element.href = source.url;
+        element.target = '_blank';
+        element.rel = 'noopener noreferrer';
+      }
+
+      linkWrapper.appendChild(element);
+      return linkWrapper;
+    };
+
+    const addMessage = (content, type, sources = []) => {
+      const messageEl = document.createElement('div');
+      messageEl.className = `chat-message chat-message-${type}`;
+
+      const bubbleEl = document.createElement('div');
+      bubbleEl.className = `chat-bubble chat-bubble-${type}`;
+
+      const textEl = document.createElement('div');
+      textEl.className = 'chat-text';
+      textEl.innerHTML = formatMessageContent(content, type);
+      bubbleEl.appendChild(textEl);
+
+      // Add sources for bot messages
+      if (type === 'bot' && sources.length > 0) {
+        const sourcesEl = document.createElement('div');
+        sourcesEl.className = 'chat-sources';
+
+        const separator = document.createElement('hr');
+        separator.className = 'chat-sources-separator';
+        sourcesEl.appendChild(separator);
+
+        const sourcesTitle = document.createElement('p');
+        sourcesTitle.className = 'chat-sources-title';
+        sourcesTitle.textContent = 'Sources:';
+        sourcesEl.appendChild(sourcesTitle);
+
+        sources.forEach(source => {
+          sourcesEl.appendChild(createSourceLink(source));
+        });
+
+        bubbleEl.appendChild(sourcesEl);
+      }
+
+      messageEl.appendChild(bubbleEl);
+      elements.messages.appendChild(messageEl);
+
+      // Scroll to bottom
+      elements.messages.scrollTop = elements.messages.scrollHeight;
+    };
+
+    // ── Typewriter effect for bot responses ───────────────────────────────────
+    // Reveals the answer character-by-character so users read from the top.
+    // Sources are appended only after typing completes.
+    // isLoading stays true during typing so a second question can't be sent mid-type.
+    const typeBotMessage = (content, sources = []) => {
+      const messageEl = document.createElement('div');
+      messageEl.className = 'chat-message chat-message-bot';
+
+      const bubbleEl = document.createElement('div');
+      bubbleEl.className = 'chat-bubble chat-bubble-bot';
+
+      const textEl = document.createElement('div');
+      textEl.className = 'chat-text';
+      bubbleEl.appendChild(textEl);
+      messageEl.appendChild(bubbleEl);
+      elements.messages.appendChild(messageEl);
+
+      // Scroll so the TOP of the new bubble is visible — user reads from the start
+      messageEl.scrollIntoView({ behavior: 'instant', block: 'start' });
+
+      let displayed = 0;
+      const CHARS_PER_TICK = 4;  // characters revealed per tick
+      const TICK_MS        = 16; // ~60 fps — feels like natural typing
+
+      const tick = () => {
+        if (displayed >= content.length) {
+          // ── Typing complete ──────────────────────────────────────────────
+          // Swap plain text for fully formatted HTML (lists, headers, etc.)
+          textEl.innerHTML = formatMessageContent(content, 'bot');
+
+          // Append sources after the formatted text
+          if (sources.length > 0) {
+            const sourcesEl = document.createElement('div');
+            sourcesEl.className = 'chat-sources';
+
+            const separator = document.createElement('hr');
+            separator.className = 'chat-sources-separator';
+            sourcesEl.appendChild(separator);
+
+            const sourcesTitle = document.createElement('p');
+            sourcesTitle.className = 'chat-sources-title';
+            sourcesTitle.textContent = 'Sources:';
+            sourcesEl.appendChild(sourcesTitle);
+
+            sources.forEach(source => sourcesEl.appendChild(createSourceLink(source)));
+            bubbleEl.appendChild(sourcesEl);
+          }
+
+          // Append CTA buttons at the end of every bot response
+          bubbleEl.appendChild(createCtaButtons());
+
+          // Scroll to reveal sources + buttons
+          elements.messages.scrollTop = elements.messages.scrollHeight;
+
+          // Unlock input now that the full response is shown
+          isLoading = false;
+          return;
+        }
+
+        // Reveal next batch of characters as plain text (formatting applied at the end)
+        displayed = Math.min(displayed + CHARS_PER_TICK, content.length);
+        textEl.textContent = content.slice(0, displayed);
+
+        // Keep the newest typed content in view
+        elements.messages.scrollTop = elements.messages.scrollHeight;
+
+        setTimeout(tick, TICK_MS);
+      };
+
+      tick();
+    };
+    // ── End typewriter ────────────────────────────────────────────────────────
+
+    const showLoading = () => {
+      const loadingEl = document.createElement('div');
+      loadingEl.className = 'chat-message chat-message-bot';
+      loadingEl.innerHTML = `
+        <div class="chat-bubble chat-bubble-bot">
+          <p class="chat-text thinking-text">Thinking...</p>
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      `;
+      elements.messages.appendChild(loadingEl);
+      elements.messages.scrollTop = elements.messages.scrollHeight;
+      return loadingEl;
+    };
+
+    const showError = (message) => {
+      elements.error.textContent = message;
+      elements.error.classList.remove('chat-error-hidden');
+    };
+
+    const hideError = () => {
+      elements.error.classList.add('chat-error-hidden');
+    };
+
+    // Close chat on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !elements.panel.classList.contains('chat-panel-hidden')) {
+        elements.toggle.click();
+      }
+    });
+
+    // ── Speech-to-text ──────────────────────────────────────────────────────
+    // Supported on Chrome and Edge. Hidden automatically on Safari / Firefox.
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const micBtn = document.getElementById('chat-mic');
+
+    if (SpeechRecognition && micBtn) {
+      // Reveal the button only in supporting browsers
+      micBtn.classList.remove('chat-mic-hidden');
+
+      let recognition = null;
+      let isListening = false;
+
+      // Stop recording and immediately update the listening flag so onresult
+      // fired during teardown doesn't overwrite the input after submission.
+      const stopListening = () => {
+        if (!isListening) return;
+        isListening = false;
+        micBtn.classList.remove('chat-mic-listening');
+        recognition.stop();
+      };
+
+      const startListening = () => {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        // continuous = true  → keeps recording through pauses; never auto-stops
+        // interimResults = true → fires onresult as you speak so text appears immediately
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          isListening = true;
+          micBtn.classList.add('chat-mic-listening');
+        };
+
+        recognition.onresult = (e) => {
+          // Guard: don't update the input after stopListening() has been called
+          if (!isListening) return;
+
+          // Accumulate all results (interim + final) into one transcript string
+          let transcript = '';
+          for (let i = 0; i < e.results.length; i++) {
+            transcript += e.results[i][0].transcript;
+          }
+          elements.input.value = transcript;
+          // Grow the textarea to show the full transcript as it comes in
+          autoResize();
+        };
+
+        recognition.onend = () => {
+          // Only reset visual state; isListening flag is already managed by stopListening()
+          isListening = false;
+          micBtn.classList.remove('chat-mic-listening');
+        };
+
+        recognition.onerror = (e) => {
+          // 'no-speech' is routine with continuous mode — ignore it
+          if (e.error === 'no-speech') return;
+          isListening = false;
+          micBtn.classList.remove('chat-mic-listening');
+        };
+
+        recognition.start();
+      };
+
+      // Toggle mic on button click
+      micBtn.addEventListener('click', () => {
+        if (isLoading) return;
+        isListening ? stopListening() : startListening();
+      });
+
+      // Stop recording when the message is sent (button click or Enter key)
+      // Use capture phase so we stop before the submit handler reads the input
+      elements.form.addEventListener('submit', stopListening, { capture: true });
+    }
+    // ── End speech-to-text ──────────────────────────────────────────────────
+  })();
+</script>

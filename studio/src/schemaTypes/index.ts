@@ -43,6 +43,7 @@ import { rawHtmlPage } from './documents/rawHtmlPage'
 import { widgetStats, widgetUserReviews, testimonialCarousel, logoSetGlobal, featuresSelectorGlobal, headerGlobal } from './documents/globals'
 import { industrySelectorGlobalDoc } from './documents/industrySelectorGlobalDoc'
 import { statsSetStackedGlobalDoc } from './documents/statsSetStackedGlobalDoc'
+import { chatbotConfig } from './documents/chatbotConfig'
 import testimonialCarouselReference from './objects/testimonialCarouselReference'
 import logoSetReference from './objects/logoSetReference'
 import { hubspotForm } from './documents/formsGlobal'
@@ -158,6 +159,8 @@ export const schemaTypes = [
   industrySelectorGlobalReference,
   // Stats Set Stacked Global Document (singleton)
   statsSetStackedGlobalDoc,
+  // Chatbot Configuration (singleton)
+  chatbotConfig,
   // Stats Set Stacked Global Reference
   statsSetStackedGlobalReference,
   // Widget User Review Card
