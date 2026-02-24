@@ -5,7 +5,7 @@ import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './src/schemaTypes'
 import {presentationTool} from 'sanity/presentation'
 import {resolve} from './src/lib/presentation/resolve'
-
+import {fieldLevelExperiments} from '@sanity/personalization-plugin'
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
@@ -45,6 +45,28 @@ export default defineConfig({
       },
       allowOrigins: ['http://localhost:*', 'https://sa-rolls.netlify.app', 'https://*.sanity.studio'],
     }),
+
+    fieldLevelExperiments({
+      // Field types that you want to be able to experiment on
+      fields: ['string'], 
+      // Hardcoded experiments and variants
+      experiments: [
+        {
+          id: 'homepage-title',
+          label: 'Homepage Title',
+          variants: [
+            {
+              id: 'control',
+              label: 'Control',
+            },
+            {
+              id: 'variant',
+              label: 'Variant',
+            },
+          ],
+        },
+      ],
+    })
   ],
   schema: {
     types: schemaTypes,
@@ -72,4 +94,4 @@ export default defineConfig({
       return prev
     },
   },
-})
+} as Parameters<typeof defineConfig>[0])

@@ -40,10 +40,33 @@ export default defineType({
     }),
     // Settings
     defineField({
+      name: 'headerTheme',
+      title: 'Header Theme',
+      type: 'string',
+      group: 'settings',
+      description: 'Set the header theme for this page. This affects the header appearance.',
+      options: {
+        list: [
+          {title: 'Dark', value: 'dark'},
+          {title: 'Light', value: 'light'},
+          {title: 'Industry Report', value: 'industry_report'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'light',
+    }),
+    defineField({
       name: 'announcementBar',
       title: 'Announcement Bar',
       type: 'announcementBarSettings',
       group: 'settings',
+    }),
+    defineField({
+      name: 'newTitle',
+      title: 'New Title (Experiment)',
+      type: 'experimentString',
+      description: 'A/B test variant for the homepage title',
+      group: 'content',
     }),
     // SEO
     ...seoFields,

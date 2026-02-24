@@ -13,6 +13,7 @@ export default defineType({
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'styles', title: 'Styles'},
+    {name: 'abTesting', title: 'A/B Testing'},
   ],
   fields: [
     // Content fields
@@ -213,6 +214,119 @@ export default defineType({
       description: 'Add a red border line on the left side',
       group: 'styles',
       initialValue: false,
+    }),
+    // A/B Testing
+    defineField({
+      name: 'experimentActive',
+      title: 'Activate Experiment',
+      type: 'boolean',
+      group: 'abTesting',
+      description:
+        'When OFF, the default content fields (Content tab) are always shown. Turn ON to start splitting traffic across the variants below.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'variants',
+      title: 'Content Variants',
+      type: 'array',
+      group: 'abTesting',
+      description:
+        'Add alternate versions of the eyebrow, title, and text. Traffic is split evenly across control (the default fields in the Content tab) and every variant listed here. Variants are only used when "Activate Experiment" is ON.',
+      of: [
+        {
+          type: 'object',
+          name: 'headingVariant',
+          title: 'Variant',
+          fields: [
+            defineField({
+              name: 'variantLabel',
+              title: 'Variant Label',
+              type: 'string',
+              description: 'Internal label (not shown on the site)',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'targetRegions',
+              title: 'Target Regions',
+              type: 'array',
+              of: [{type: 'string'}],
+              description:
+                'Leave empty to show to all regions. Select one or more to restrict this variant to visitors from those regions.',
+              options: {
+                list: [
+                  {title: 'Americas (AMER)', value: 'AMER'},
+                  {title: 'Europe / Middle East / Africa (EMEA)', value: 'EMEA'},
+                  {title: 'Asia Pacific (APAC)', value: 'APAC'},
+                  {title: 'United Kingdom (UK)', value: 'UK'},
+                  {title: 'United States', value: 'US'},
+                  {title: 'Canada', value: 'CA'},
+                  {title: 'Germany', value: 'DE'},
+                  {title: 'France', value: 'FR'},
+                  {title: 'Australia', value: 'AU'},
+                  {title: 'India', value: 'IN'},
+                  {title: 'Japan', value: 'JP'},
+                  {title: 'Brazil', value: 'BR'},
+                  {title: 'Mexico', value: 'MX'},
+                  {title: 'Singapore', value: 'SG'},
+                  {title: 'Netherlands', value: 'NL'},
+                  {title: 'Spain', value: 'ES'},
+                  {title: 'Italy', value: 'IT'},
+                  {title: 'Sweden', value: 'SE'},
+                  {title: 'Israel', value: 'IL'},
+                  {title: 'South Africa', value: 'ZA'},
+                  {title: 'United Arab Emirates', value: 'AE'},
+                ],
+              },
+            }),
+            defineField({
+              name: 'eyebrow',
+              title: 'Eyebrow',
+              type: 'string',
+            }),
+            defineField({
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+            }),
+            defineField({
+              name: 'text',
+              title: 'Text',
+              type: 'array',
+              of: [
+                {type: 'block'},
+                {
+                  type: 'object',
+                  name: 'rawHtml',
+                  title: 'Raw HTML',
+                  icon: () => '🔧',
+                  fields: [
+                    defineField({
+                      name: 'html',
+                      title: 'HTML Code',
+                      type: 'text',
+                      rows: 10,
+                    }),
+                  ],
+                },
+              ],
+            }),
+          ],
+          preview: {
+            select: {
+              label: 'variantLabel',
+              title: 'title',
+              regions: 'targetRegions',
+            },
+            prepare({label, title, regions}: {label?: string; title?: string; regions?: string[]}) {
+              const regionStr = regions?.length ? regions.join(', ') : 'All regions'
+              return {
+                title: label || 'Unnamed variant',
+                subtitle: `${regionStr} — ${title || '(no title override)'}`,
+              }
+            },
+          },
+        },
+      ],
     }),
   ],
   preview: {

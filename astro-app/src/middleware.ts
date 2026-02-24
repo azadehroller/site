@@ -1,18 +1,45 @@
 import type { MiddlewareHandler } from 'astro';
+import { resolveAbTest, resolveComponentAbTest, resolveGeo } from './utils/experiments';
 
 // Enable logging in development to see caching behavior
 const DEBUG_CACHE = import.meta.env.DEV;
 
 /**
- * Middleware for adding caching headers to responses.
- * This dramatically improves performance by allowing:
- * 1. Edge CDN (Netlify) to cache pages
- * 2. Browser to cache pages
- * 3. Stale-while-revalidate for instant loads
+ * Middleware for adding caching headers to responses
+ * and assigning A/B test cookies to new visitors.
  */
 export const onRequest: MiddlewareHandler = async (context, next) => {
-  const response = await next();
   const url = new URL(context.request.url);
+
+  // Resolve A/B test data BEFORE rendering so pages can read it from locals
+  if (!url.pathname.startsWith('/api/') && !url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|webp|avif|svg|woff|woff2|ttf|eot)$/)) {
+    const { userGroup, userId, isNew } = resolveAbTest(context.request);
+    context.locals.abTest = { userGroup, userId, isNew };
+
+    const hcTest = resolveComponentAbTest('headingComposition', context.request);
+    context.locals.abTestHeadingComposition = hcTest;
+
+    context.locals.geo = resolveGeo(context.request);
+  }
+
+  const response = await next();
+
+  // Set cookies for new visitors after the response is created
+  if (context.locals.abTest?.isNew) {
+    const { userGroup, userId } = context.locals.abTest;
+    const cookieValue = JSON.stringify({ userGroup, userId });
+    response.headers.append(
+      'Set-Cookie',
+      `ab-test=${encodeURIComponent(cookieValue)}; Path=/; Max-Age=31536000; SameSite=Lax`
+    );
+  }
+  if (context.locals.abTestHeadingComposition?.isNew) {
+    const { bucketValue } = context.locals.abTestHeadingComposition;
+    response.headers.append(
+      'Set-Cookie',
+      `ab-headingComposition=${bucketValue}; Path=/; Max-Age=31536000; SameSite=Lax`
+    );
+  }
   
   // Check if this is a preview/draft mode request
   const isPreview = context.cookies.get('sanity-preview')?.value === 'true';
@@ -36,7 +63,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   }
   
   // Blog posts - cache longer since they change less frequently
-  // stale-while-revalidate allows serving cached content while fetching fresh
   if (url.pathname.startsWith('/blog/') && url.pathname !== '/blog/') {
     response.headers.set(
       'Cache-Control', 
@@ -45,14 +71,10 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → BLOG POST (5min browser, 1hr CDN)`);
     }
-    // max-age=300: Browser caches for 5 minutes
-    // s-maxage=3600: CDN caches for 1 hour
-    // stale-while-revalidate=86400: Serve stale for up to 24h while refreshing in background
     return response;
   }
   
   // Other pages (landing pages, industries, etc.)
-  // Shorter cache but still beneficial
   response.headers.set(
     'Cache-Control',
     'public, max-age=60, s-maxage=300, stale-while-revalidate=3600'
@@ -60,9 +82,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   if (DEBUG_CACHE) {
     console.log(`[Cache] ${url.pathname} → PAGE (1min browser, 5min CDN)`);
   }
-  // max-age=60: Browser caches for 1 minute
-  // s-maxage=300: CDN caches for 5 minutes
-  // stale-while-revalidate=3600: Serve stale for up to 1 hour while refreshing
   
   return response;
 };

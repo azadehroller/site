@@ -3,10 +3,20 @@ import Layout from "../layouts/Layout.astro";
 import Columns from "../components/blocks/Columns.astro";
 import ColumnContent from "../components/blocks/ColumnContent.astro";
 import Divider from "../components/blocks/Divider.astro";
+import ExperimentTracking from "../components/ExperimentTracking.astro";
 import { getHomepage, type ColumnsBlock, type Divider as DividerType } from "../utils/sanity";
 import { cleanStega } from "../utils/stega";
+import { urlFor, isImageReady } from "../utils/image";
+import { getExperimentValue } from "../utils/experiments";
 
-const { data: homepage } = await getHomepage(Astro.request);
+// Read A/B test data assigned by middleware (available on first load, no second refresh needed)
+const abTest = Astro.locals.abTest;
+const { variant } = abTest ? getExperimentValue('homepage-title', abTest) : { variant: undefined };
+
+const { data: homepage } = await getHomepage(Astro.request, {
+  experiment: 'homepage-title',
+  variant: variant?.id || '',
+});
 const title = homepage?.title || "Home";
 const sections = homepage?.sections || [];
 
@@ -15,24 +25,65 @@ const documentId = homepage?._id || '';
 const documentType = 'homepage';
 
 // Extract LCP image from first section for preloading
-// Check column1 of first columnsBlock for imageVideoModal, advancedImage, or image
+// Check ALL columns of first columnsBlock for images with eager loading (most likely to be LCP)
+// IMPORTANT: Use same optimization as the rendered image to avoid downloading duplicate images
 function findFirstImage(sections: any[]): string | undefined {
+  let fallbackImageUrl: string | undefined;
+
   for (const section of sections) {
-    if (section._type === 'columnsBlock' && section.column1) {
-      for (const item of section.column1) {
-        // Check imageVideoModal thumbnail
-        if (item._type === 'imageVideoModal' && item.thumbnail?.asset?.url) {
-          return item.thumbnail.asset.url;
-        }
-        // Check advancedImage
-        if (item._type === 'advancedImage' && item.image?.asset?.url) {
-          return item.image.asset.url;
-        }
-        // Check regular image
-        if (item._type === 'image' && item.asset?.url) {
-          return item.asset.url;
+    if (section._type === 'columnsBlock') {
+      // Check all columns (column1, column2, column3, column4)
+      const columns = [section.column1, section.column2, section.column3, section.column4].filter(Boolean);
+
+      for (const column of columns) {
+        for (const item of column) {
+          // Prioritize items with eager loading (most likely to be LCP)
+          const isEager = cleanStega(item.thumbnail?.loading) === 'eager' ||
+                         cleanStega(item.loading) === 'eager';
+
+          // Check imageVideoModal thumbnail - use optimized URL matching ImageVideoModal component
+          if (item._type === 'imageVideoModal' && item.thumbnail) {
+            const imageObj = item.thumbnail.image || item.thumbnail;
+            if (isImageReady(imageObj)) {
+              // Match ImageVideoModal default dimensions (548x310)
+              const url = urlFor(imageObj).width(548).height(310).url();
+              // If this image has eager loading, return it immediately as it's likely the LCP
+              if (isEager) return url;
+              // Otherwise store it as a fallback
+              if (!fallbackImageUrl) fallbackImageUrl = url;
+            }
+            // Fallback to asset URL if image not ready
+            if (item.thumbnail.asset?.url && !fallbackImageUrl) {
+              fallbackImageUrl = item.thumbnail.asset.url;
+            }
+          }
+          // Check advancedImage - use optimized URL
+          if (item._type === 'advancedImage' && item.image) {
+            if (isImageReady(item.image)) {
+              const url = urlFor(item.image).width(1200).url();
+              if (isEager) return url;
+              if (!fallbackImageUrl) fallbackImageUrl = url;
+            }
+            if (item.image.asset?.url && !fallbackImageUrl) {
+              fallbackImageUrl = item.image.asset.url;
+            }
+          }
+          // Check regular image - use optimized URL
+          if (item._type === 'image') {
+            if (isImageReady(item)) {
+              const url = urlFor(item).width(1200).url();
+              if (isEager) return url;
+              if (!fallbackImageUrl) fallbackImageUrl = url;
+            }
+            if (item.asset?.url && !fallbackImageUrl) {
+              fallbackImageUrl = item.asset.url;
+            }
+          }
         }
       }
+      // If we found an eager image, it's already been returned
+      // Otherwise return the first image we found
+      if (fallbackImageUrl) return fallbackImageUrl;
     }
   }
   return undefined;
@@ -50,7 +101,7 @@ const getDividerBgClass = (divider: DividerType): string => {
 };
 ---
 
-<Layout title={title} announcementBar={homepage?.announcementBar} lcpImage={lcpImageUrl}>
+<Layout title={title} headerTheme={homepage?.headerTheme} announcementBar={homepage?.announcementBar} lcpImage={lcpImageUrl}>
   <main class="homepage">
     {sections.length > 0 ? (
       sections.map((section) => {
@@ -141,10 +192,27 @@ const getDividerBgClass = (divider: DividerType): string => {
       </section>
     )}
   </main>
+  {abTest && (
+    <ExperimentTracking
+      userGroup={abTest.userGroup}
+      userId={abTest.userId}
+    />
+  )}
 </Layout>
 
 <style>
   .homepage {
     min-height: 50vh;
+  }
+  .ab-debug-banner {
+    background: #1a1a2e;
+    color: #e94560;
+    padding: 8px 16px;
+    font-family: monospace;
+    font-size: 13px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
   }
 </style>
