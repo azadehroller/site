@@ -1,5 +1,6 @@
 ---
 import { cleanStega } from "../../utils/stega";
+import { urlFor, isImageReady } from "../../utils/image";
 
 interface BadgeItem {
   _key?: string;
@@ -130,27 +131,36 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
   )}
   
   {badges && badges.length > 0 && (
-    <ul class="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-6  lg:flex w-full px-0 gap-x-5 gap-y-3 md:gap-5 list-none" data-sanity-edit-target>
+    <ul class="flex flex-wrap justify-start items-end px-0 gap-x-5 gap-y-3 md:gap-5 list-none" data-sanity-edit-target>
       {badges.map((badge) => {
-        const imageUrl = badge.image?.asset?.url || '';
+        let imageUrl = '';
+        if (badge.image?.asset) {
+          try {
+            imageUrl = urlFor(badge.image as import("@sanity/types").Image)
+              .height(288)
+              .format('webp')
+              .quality(85)
+              .url();
+          } catch (e) {
+            imageUrl = badge.image.asset.url || '';
+          }
+        }
         const badgeLink = cleanStega(badge.link);
         const badgeAlt = cleanStega(badge.alt) || 'Badge';
-        
+
         return imageUrl ? (
-          <li class="user-review-badge flex justify-center items-center w-full lg:w-[80px]">
+          <li class="user-review-badge flex-shrink-0">
             {badgeLink ? (
-              <a 
-                href={badgeLink} 
-                aria-label=`Read more about ${badgeAlt} - ${badgeLink}`
-                target="_blank" 
+              <a
+                href={badgeLink}
+                aria-label={`Read more about ${badgeAlt}`}
+                target="_blank"
                 rel="noopener noreferrer"
-                aria-label={badgeAlt}
-                class="w-full flex justify-center"
               >
                 <img
                   src={imageUrl}
                   alt={badgeAlt}
-                  class="badge-img object-contain w-[80px] lg:h-[144px]"
+                  class="badge-img h-[100px] md:h-[120px] lg:h-[144px] max-w-[96px] object-contain"
                   loading="lazy"
                 />
               </a>
@@ -158,7 +168,7 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
               <img
                 src={imageUrl}
                 alt={badgeAlt}
-                class="badge-img object-contain w-[80px] lg:h-[144px]"
+                class="badge-img h-[100px] md:h-[120px] lg:h-[144px] max-w-[96px] object-contain"
                 loading="lazy"
               />
             )}

@@ -43,7 +43,7 @@ const components = {
 
 {content.length > 0 && (
   <div class="blog-text-block">
-    <PortableText value={content} components={components} />
+    <PortableText value={content} components={components} onMissingComponent={false} />
   </div>
 )}
 

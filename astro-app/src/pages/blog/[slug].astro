@@ -181,6 +181,7 @@ const seoProps = {
             <div class="blog-post__body">
               {post.body && <PortableText
                 value={post.body}
+                onMissingComponent={false}
                 components={{
                   type: {
                     // Standalone blog section blocks
