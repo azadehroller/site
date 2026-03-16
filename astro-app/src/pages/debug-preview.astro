@@ -1,4 +1,9 @@
 ---
+// Block access in production
+if (import.meta.env.MODE === 'production') {
+  return new Response(null, { status: 404 });
+}
+
 // Debug page to check visual editing state
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 const isPreview = /\bsanity-preview=true\b/.test(cookieHeader);

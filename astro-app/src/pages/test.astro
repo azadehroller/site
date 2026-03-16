@@ -9,6 +9,11 @@ import type { ColumnsBlock, Divider } from "../utils/sanity";
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
+// Block access in production
+if (import.meta.env.MODE === 'production') {
+  return new Response(null, { status: 404 });
+}
+
 // Define TestPage interface
 interface TestPage {
   _id: string;
