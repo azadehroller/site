@@ -1617,7 +1617,7 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("astro:page-load", () => {
     initBlogFilter();
     initDropdowns();
     initBlogSearch();
