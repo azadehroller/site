@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import TestimonialSlider from '../components/blocks/TestimonialSlider.astro';
+import TestimonialSlider from '@components/blocks/TestimonialSlider.astro';
 
 const meta: Meta<typeof TestimonialSlider> = {
   title: 'Components/TestimonialSlider',

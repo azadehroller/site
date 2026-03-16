@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import Columns from '../components/blocks/Columns.astro';
+import Columns from '@components/blocks/Columns.astro';
 
 const meta: Meta<typeof Columns> = {
   title: 'Components/Columns',

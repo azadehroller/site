@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import RotatingText from '../components/blocks/RotatingText.astro';
+import RotatingText from '@components/blocks/RotatingText.astro';
 
 const meta: Meta<typeof RotatingText> = {
   title: 'Components/RotatingText',

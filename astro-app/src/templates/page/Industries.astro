@@ -3,12 +3,12 @@
  * Industries Landing Page Template
  * Renders the Industries Landing singleton page from Sanity
  */
-import Layout from "../../layouts/Layout.astro";
-import Columns from "../../components/blocks/Columns.astro";
-import ColumnContent from "../../components/blocks/ColumnContent.astro";
-import Divider from "../../components/blocks/Divider.astro";
-import type { IndustriesLandingPage, ColumnsBlock, Divider as DividerType } from "../../utils/sanity";
-import { cleanStega } from "../../utils/stega";
+import Layout from "@layouts/Layout.astro";
+import Columns from "@components/blocks/Columns.astro";
+import ColumnContent from "@components/blocks/ColumnContent.astro";
+import Divider from "@components/blocks/Divider.astro";
+import type { IndustriesLandingPage, ColumnsBlock, Divider as DividerType } from "@utils/sanity";
+import { cleanStega } from "@utils/stega";
 
 interface Props {
   page: IndustriesLandingPage | null;

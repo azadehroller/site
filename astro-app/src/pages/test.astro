@@ -1,10 +1,10 @@
 ---
-import Columns from "../components/blocks/Columns.astro";
-import ColumnContent from "../components/blocks/ColumnContent.astro";
-import Layout from "../layouts/Layout.astro";
-import { loadQuery } from "../utils/loadQuery";
+import Columns from "@components/blocks/Columns.astro";
+import ColumnContent from "@components/blocks/ColumnContent.astro";
+import Layout from "@layouts/Layout.astro";
+import { loadQuery } from "@utils/loadQuery";
 import groq from "groq";
-import type { ColumnsBlock, Divider } from "../utils/sanity";
+import type { ColumnsBlock, Divider } from "@utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;

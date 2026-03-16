@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import FAQs from '../components/blocks/FAQs.astro';
+import FAQs from '@components/blocks/FAQs.astro';
 
 const meta: Meta<typeof FAQs> = {
   title: 'Components/FAQs',

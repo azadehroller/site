@@ -4,9 +4,9 @@
  * Based on HubSpot module: features-selector-global.module
  * Uses HeadingComposition for the header section
  */
-import { cleanStega } from "../../utils/stega";
-import HeadingComposition from "../blocks/HeadingComposition.astro";
-import type { HeadingComposition as HeadingCompositionType } from "../../utils/sanity";
+import { cleanStega } from "@utils/stega";
+import HeadingComposition from "@components/blocks/HeadingComposition.astro";
+import type { HeadingComposition as HeadingCompositionType } from "@utils/sanity";
 
 interface FeatureLink {
   href?: string;

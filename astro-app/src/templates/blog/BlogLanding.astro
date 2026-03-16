@@ -1,11 +1,11 @@
 ---
-import Card from "../../components/ui/Card.astro";
-import Welcome from "../../components/ui/Welcome.astro";
-import Layout from "../../layouts/Layout.astro";
-import Pagination from "../../components/ui/Pagination.astro";
-import { getBlogLandingData } from "../../utils/sanity";
-import { formatDate } from "../../utils";
-import type { Post, BlogTopic } from "../../utils/sanity";
+import Card from "@components/ui/Card.astro";
+import Welcome from "@components/ui/Welcome.astro";
+import Layout from "@layouts/Layout.astro";
+import Pagination from "@components/ui/Pagination.astro";
+import { getBlogLandingData } from "@utils/sanity";
+import { formatDate } from "@utils";
+import type { Post, BlogTopic } from "@utils/sanity";
 
 interface Props {
   title?: string;

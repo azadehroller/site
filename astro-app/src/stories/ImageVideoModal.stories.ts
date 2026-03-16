@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import ImageVideoModal from '../components/blocks/ImageVideoModal.astro';
+import ImageVideoModal from '@components/blocks/ImageVideoModal.astro';
 
 const meta: Meta<typeof ImageVideoModal> = {
   title: 'Components/ImageVideoModal',

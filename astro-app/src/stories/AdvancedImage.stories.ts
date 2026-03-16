@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import AdvancedImage from '../components/blocks/AdvancedImage.astro';
+import AdvancedImage from '@components/blocks/AdvancedImage.astro';
 
 const meta: Meta<typeof AdvancedImage> = {
   title: 'Components/AdvancedImage',

@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createHmac } from 'crypto';
-import { clearQueryCache } from '../../utils/loadQuery';
+import { clearQueryCache } from '@utils/loadQuery';
 
 /**
  * Webhook endpoint for Sanity to trigger cache purge/revalidation.

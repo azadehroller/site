@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { searchPosts } from '../../../utils/sanity';
+import { searchPosts } from '@utils/sanity';
 
 export const GET: APIRoute = async ({ request, url }) => {
   const query = url.searchParams.get('q') || '';

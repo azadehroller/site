@@ -4,10 +4,10 @@
  * Uses HeadingComposition for the header and WidgetUserReviews for the badges
  * Features rounded card design with background color/image support
  */
-import { cleanStega } from '../../utils/stega';
-import { createBlockEditInfo, createDataSanityAttrs } from '../../utils/visualEditing';
+import { cleanStega } from '@utils/stega';
+import { createBlockEditInfo, createDataSanityAttrs } from '@utils/visualEditing';
 import HeadingComposition from './HeadingComposition.astro';
-import WidgetUserReviews from '../globals/WidgetUserReviews.astro';
+import WidgetUserReviews from '@components/globals/WidgetUserReviews.astro';
 
 interface BadgeItem {
   _key?: string;

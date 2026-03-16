@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import CardSegmentation from '../components/blocks/CardSegmentation.astro';
+import CardSegmentation from '@components/blocks/CardSegmentation.astro';
 
 const meta: Meta<typeof CardSegmentation> = {
   title: 'Components/CardSegmentation',

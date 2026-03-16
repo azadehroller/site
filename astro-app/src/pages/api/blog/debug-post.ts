@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { loadQuery } from '../../../utils/loadQuery';
+import { loadQuery } from '@utils/loadQuery';
 import groq from 'groq';
 
 export const GET: APIRoute = async ({ url, request }) => {

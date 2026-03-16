@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import FeaturesDetail from '../components/blocks/FeaturesDetail.astro';
+import FeaturesDetail from '@components/blocks/FeaturesDetail.astro';
 
 const meta: Meta<typeof FeaturesDetail> = {
   title: 'Components/FeaturesDetail',

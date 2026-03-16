@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import LogoSet from '../components/blocks/LogoSet.astro';
+import LogoSet from '@components/blocks/LogoSet.astro';
 
 const meta: Meta<typeof LogoSet> = {
   title: 'Components/LogoSet',

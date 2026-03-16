@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import StatsSet from '../components/blocks/StatsSet.astro';
+import StatsSet from '@components/blocks/StatsSet.astro';
 
 const meta: Meta<typeof StatsSet> = {
   title: 'Components/StatsSet',

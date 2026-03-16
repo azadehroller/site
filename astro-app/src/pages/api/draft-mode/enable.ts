@@ -1,7 +1,7 @@
 // /src/pages/api/draft-mode/enable.ts
 import type { APIRoute } from 'astro'
 import { validatePreviewUrl } from '@sanity/preview-url-secret'
-import { clientWithToken } from '../../../utils/sanityClientWithToken'
+import { clientWithToken } from '@utils/sanityClientWithToken'
 
 /**
  * Enable draft mode for visual editing with Sanity Presentation Tool.

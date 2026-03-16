@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import ComparisonTable from '../components/blocks/ComparisonTable.astro';
+import ComparisonTable from '@components/blocks/ComparisonTable.astro';
 
 const meta: Meta<typeof ComparisonTable> = {
   title: 'Components/ComparisonTable',

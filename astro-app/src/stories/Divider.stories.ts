@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import Divider from '../components/blocks/Divider.astro';
+import Divider from '@components/blocks/Divider.astro';
 
 const meta: Meta<typeof Divider> = {
   title: 'Components/Divider',

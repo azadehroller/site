@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import HeadingComposition from '../components/blocks/HeadingComposition.astro';
+import HeadingComposition from '@components/blocks/HeadingComposition.astro';
 
 const meta: Meta<typeof HeadingComposition> = {
   title: 'Components/HeadingComposition',

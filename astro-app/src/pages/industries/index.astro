@@ -3,8 +3,8 @@
  * Industries Landing Page Route
  * Fetches the Industries Landing singleton from Sanity and renders it
  */
-import IndustriesTemplate from "../../templates/page/Industries.astro";
-import { getIndustriesLandingPage } from "../../utils/sanity";
+import IndustriesTemplate from "@templates/page/Industries.astro";
+import { getIndustriesLandingPage } from "@utils/sanity";
 
 const { data: page, perspective } = await getIndustriesLandingPage(Astro.request);
 

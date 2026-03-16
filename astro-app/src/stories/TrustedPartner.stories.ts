@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import TrustedPartner from '../components/blocks/TrustedPartner.astro';
+import TrustedPartner from '@components/blocks/TrustedPartner.astro';
 
 const meta: Meta<typeof TrustedPartner> = {
   title: 'Components/TrustedPartner',

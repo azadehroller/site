@@ -6,9 +6,9 @@
  */
 import { PortableText } from "astro-portabletext";
 import type { PortableTextBlock } from "@portabletext/types";
-import { cleanStega } from '../../utils/stega';
-import { pickVariantIndex, variantMatchesGeo } from '../../utils/experiments';
-import RawHtml from "../ui/RawHtml.astro";
+import { cleanStega } from '@utils/stega';
+import { pickVariantIndex, variantMatchesGeo } from '@utils/experiments';
+import RawHtml from "@components/ui/RawHtml.astro";
 
 interface HeadingVariant {
   _key?: string;

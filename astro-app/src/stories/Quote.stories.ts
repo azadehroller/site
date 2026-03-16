@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import Quote from '../components/blocks/Quote.astro';
+import Quote from '@components/blocks/Quote.astro';
 
 const meta: Meta<typeof Quote> = {
   title: 'Components/Quote',

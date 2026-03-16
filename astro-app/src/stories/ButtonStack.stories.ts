@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from 'astrobook';
-import ButtonStack from '../components/blocks/ButtonStack.astro';
+import ButtonStack from '@components/blocks/ButtonStack.astro';
 
 const meta: Meta<typeof ButtonStack> = {
   title: 'Components/ButtonStack',

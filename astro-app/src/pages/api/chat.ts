@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
-import { getChatbotConfig } from '../../utils/sanity';
-// import { embedQuestion } from '../../utils/ai/ollama';  // Removed — embeddings no longer needed (keyword search replaced vector search)
-import { generateAnswer } from '../../utils/ai/ollama';    // Kept — Ollama still generates the answer
-// import { queryVectorDb } from '../../utils/ai/vectorDb'; // Removed — replaced by Sanity content keyword search
-import { findRelevantContent } from '../../utils/sanityCmsContent';
-import { checkRateLimit } from '../../utils/rateLimit';
+import { getChatbotConfig } from '@utils/sanity';
+// import { embedQuestion } from '@utils/ai/ollama';  // Removed — embeddings no longer needed (keyword search replaced vector search)
+import { generateAnswer } from '@utils/ai/ollama';    // Kept — Ollama still generates the answer
+// import { queryVectorDb } from '@utils/ai/vectorDb'; // Removed — replaced by Sanity content keyword search
+import { findRelevantContent } from '@utils/sanityCmsContent';
+import { checkRateLimit } from '@utils/rateLimit';
 
 interface ChatRequest {
   question: string;

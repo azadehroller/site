@@ -1,13 +1,13 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Columns from "../components/blocks/Columns.astro";
-import ColumnContent from "../components/blocks/ColumnContent.astro";
-import Divider from "../components/blocks/Divider.astro";
-import ExperimentTracking from "../components/tracking/ExperimentTracking.astro";
-import { getHomepage, type ColumnsBlock, type Divider as DividerType } from "../utils/sanity";
-import { cleanStega } from "../utils/stega";
-import { urlFor, isImageReady } from "../utils/image";
-import { getExperimentValue } from "../utils/experiments";
+import Layout from "@layouts/Layout.astro";
+import Columns from "@components/blocks/Columns.astro";
+import ColumnContent from "@components/blocks/ColumnContent.astro";
+import Divider from "@components/blocks/Divider.astro";
+import ExperimentTracking from "@components/tracking/ExperimentTracking.astro";
+import { getHomepage, type ColumnsBlock, type Divider as DividerType } from "@utils/sanity";
+import { cleanStega } from "@utils/stega";
+import { urlFor, isImageReady } from "@utils/image";
+import { getExperimentValue } from "@utils/experiments";
 
 // Read A/B test data assigned by middleware (available on first load, no second refresh needed)
 const abTest = Astro.locals.abTest;
