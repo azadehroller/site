@@ -4,8 +4,8 @@
  * Displays posts filtered by topic with pagination
  */
 import Layout from "../../../layouts/Layout.astro";
-import Card from "../../../components/Card.astro";
-import Pagination from "../../../components/Pagination.astro";
+import Card from "../../../components/ui/Card.astro";
+import Pagination from "../../../components/ui/Pagination.astro";
 import { getPostsByTopic, getTopic } from "../../../utils/sanity";
 
 export const prerender = false;

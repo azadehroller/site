@@ -4,7 +4,7 @@ import { ViewTransitions } from 'astro:transitions';
 import '../styles/global.css';
 import Footer from '../components/globals/Footer.astro';
 import Header from '../components/globals/Header.astro';
-import AnnouncementBar from '../components/AnnouncementBar.astro';
+import AnnouncementBar from '../components/globals/AnnouncementBar.astro';
 import ChatWidget from '../components/chat/ChatWidget.astro';
 import { getLayoutData, type AnnouncementBarSettings } from '../utils/sanity';
 
@@ -14,7 +14,7 @@ import { getLayoutData, type AnnouncementBarSettings } from '../utils/sanity';
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 const isPreview = /\bsanity-preview=true\b/.test(cookieHeader);
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true' && isPreview;
-const VisualEditingIdle = visualEditingEnabled ? (await import('../components/VisualEditingIdle.astro')).default : null;
+const VisualEditingIdle = visualEditingEnabled ? (await import('../components/ui/VisualEditingIdle.astro')).default : null;
 
 interface SEOImage {
   asset?: {

@@ -1,0 +1,156 @@
+---
+/**
+ * AnnouncementBar Component
+ * Displays a promotional banner above the header
+ * Based on the HubSpot announcement.module
+ */
+
+interface Props {
+  display?: boolean;
+  text?: string;
+  ctaText?: string;
+  link?: {
+    href?: string;
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+  countdownDate?: string;
+  theme?: 'default' | 'industry_report' | 'new_design' | 'product_launch';
+}
+
+const {
+  display = true,
+  text,
+  ctaText,
+  link,
+  countdownDate,
+  theme = 'default'
+} = Astro.props;
+
+// Don't render if display is false or no text
+if (!display || !text) {
+  return null;
+}
+
+// Build rel attribute
+const relParts: string[] = [];
+if (link?.noFollow) relParts.push('nofollow');
+if (link?.openInNewTab) relParts.push('noopener');
+const relAttr = relParts.length > 0 ? relParts.join(' ') : undefined;
+
+// Theme-based background classes
+// Note: -mobile classes have responsive media queries that switch to desktop gradient at md breakpoint
+const themeClasses: Record<string, string> = {
+  default: 'bg-announcement',
+  industry_report: 'bg-industry-report',
+  new_design: 'bg-new-design-mobile',
+  product_launch: 'bg-product-launch-mobile'
+};
+
+const bgClass = themeClasses[theme] || themeClasses.default;
+---
+
+<div
+  id="announcement-bar"
+  class={`js-banner ${bgClass} text-neutral-white`}
+>
+  <div class="container banner-text">
+    <a
+      href={link?.href || '#'}
+      target={link?.openInNewTab ? '_blank' : undefined}
+      rel={relAttr}
+      class="block"
+    >
+      <div class="flex flex-col md:flex-row items-start gap-1 px-4 py-3 md:items-center md:justify-between md:gap-3">
+        <div class="font-extrabold text-lg md:flex-1">{text}</div>
+        {ctaText && (
+          <div class="font-semibold underline whitespace-nowrap">{ctaText}</div>
+        )}
+        {countdownDate && (
+          <div id="js-countdown-timer" class="font-semibold underline text-md whitespace-nowrap" data-target-date={countdownDate}></div>
+        )}
+      </div>
+    </a>
+  </div>
+</div>
+
+<script is:inline>
+  // Announcement bar height measurement - stores height in CSS variable
+  (function initAnnouncementBar() {
+    function updateAnnouncementBarHeight() {
+      var bar = document.getElementById('announcement-bar');
+      if (bar) {
+        var height = bar.offsetHeight;
+        document.documentElement.style.setProperty('--announcement-bar-height', height + 'px');
+      } else {
+        document.documentElement.style.setProperty('--announcement-bar-height', '0px');
+      }
+    }
+
+    function init() {
+      // Initial measurement
+      updateAnnouncementBarHeight();
+
+      // Update on resize
+      window.addEventListener('resize', updateAnnouncementBarHeight);
+
+      // Countdown timer functionality
+      var timerElement = document.getElementById('js-countdown-timer');
+      if (timerElement) {
+        var targetDateStr = timerElement.dataset.targetDate;
+        if (targetDateStr) {
+          var targetDate = new Date(targetDateStr).getTime();
+          if (!isNaN(targetDate)) {
+            countdownTimer(targetDate, timerElement);
+            document.body.classList.add('js-timer-active');
+          }
+        }
+      }
+    }
+
+    function countdownTimer(targetDate, displayElement) {
+      var rafId;
+
+      function updateTimer() {
+        var now = Date.now();
+        var timeRemaining = targetDate - now;
+
+        if (timeRemaining <= 0) {
+          displayElement.textContent = 'Event started!';
+          if (rafId) cancelAnimationFrame(rafId);
+        } else {
+          var days = Math.floor(timeRemaining / 86400000);
+          var hours = Math.floor((timeRemaining % 86400000) / 3600000);
+          var minutes = Math.floor((timeRemaining % 3600000) / 60000);
+          var seconds = Math.floor((timeRemaining % 60000) / 1000);
+
+          displayElement.textContent = days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's';
+
+          setTimeout(function() {
+            rafId = requestAnimationFrame(updateTimer);
+          }, 1000);
+        }
+      }
+
+      rafId = requestAnimationFrame(updateTimer);
+    }
+
+    // Run on DOMContentLoaded or immediately if already loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+<style is:global>
+  .banner-text a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .banner-text a:hover {
+    opacity: 0.95;
+  }
+</style>

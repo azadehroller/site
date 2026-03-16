@@ -1,0 +1,47 @@
+---
+// astro-portabletext passes the block data as `node`
+const { node } = Astro.props;
+let html = node?.html || '';
+
+// Convert HubSpot video_player tags to actual HubSpot video iframes
+// Portal ID: 3375779 (from the original HubSpot embed)
+const HUBSPOT_PORTAL_ID = '3375779';
+
+html = html.replace(
+  /\{%\s*video_player[^%]*player_id=['"]([\d]+)['"][^%]*%\}/gi,
+  (_match: string, playerId: string) => {
+    return `<div class="hs-video-widget">
+      <div class="hs-video-container" style="max-width: 1920px; margin: 0 auto;">
+        <div class="hs-video-wrapper" style="position: relative; height: 0; padding-bottom: 56.25%">
+          <iframe 
+            referrerpolicy="origin" 
+            sandbox="allow-forms allow-scripts allow-same-origin allow-popups" 
+            allow="autoplay; fullscreen;" 
+            style="position: absolute !important; width: 100% !important; height: 100% !important; left: 0; top: 0; border: 0 none; pointer-events: initial" 
+            title="HubSpot Video" 
+            loading="lazy" 
+            src="https://play.hubspotvideo.com/v/${HUBSPOT_PORTAL_ID}/id/${playerId}?renderContext=hubl-iframe&locale=en-us"
+          ></iframe>
+        </div>
+      </div>
+    </div>`;
+  }
+);
+
+// Fallback: remove any remaining video_player tags that don't match the pattern
+html = html.replace(/\{%\s*video_player[^%]*%\}/gi, '');
+
+// Remove other HubSpot template tags like {{cta(...)}}
+html = html.replace(/\{\{[^}]+\}\}/g, '');
+
+// Remove HubSpot comment tags
+html = html.replace(/\{%\s*comment\s*%\}[\s\S]*?\{%\s*endcomment\s*%\}/gi, '');
+
+// Clean up any remaining HubSpot {% %} tags
+html = html.replace(/\{%[^%]*%\}/g, '');
+
+// Remove invisible Unicode characters (zero-width spaces, etc.) that HubSpot sometimes adds
+html = html.replace(/[\u200B-\u200D\uFEFF\u2060\u180E]/g, '');
+---
+
+<div set:html={html}></div>
