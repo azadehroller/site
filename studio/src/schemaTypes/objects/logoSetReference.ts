@@ -18,12 +18,29 @@ export default defineType({
       to: [{type: 'logoSetGlobal'}],
       description: 'Reference to the global Logo Set configuration',
     }),
+    defineField({
+      name: 'pageTitle',
+      title: 'Page-specific Title',
+      type: 'string',
+      description:
+        'Override the global title for this page only. Leave blank to use the global title.',
+    }),
+    defineField({
+      name: 'centerPageTitle',
+      title: 'Center Title',
+      type: 'boolean',
+      description: 'Center the title on this page. Works with both the global title and any page-specific title override.',
+      initialValue: false,
+    }),
   ],
   preview: {
-    prepare() {
+    select: {
+      pageTitle: 'pageTitle',
+    },
+    prepare({pageTitle}: {pageTitle?: string}) {
       return {
         title: 'Logo Set (Global)',
-        subtitle: 'Global logo set component',
+        subtitle: pageTitle ? `Title override: "${pageTitle}"` : 'Global logo set component',
       }
     },
   },

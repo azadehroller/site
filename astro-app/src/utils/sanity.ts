@@ -168,6 +168,8 @@ export async function getHomepage(request?: Request, experimentParams?: { experi
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -558,6 +560,8 @@ export async function getHomepage(request?: Request, experimentParams?: { experi
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -948,6 +952,8 @@ export async function getHomepage(request?: Request, experimentParams?: { experi
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -1338,6 +1344,8 @@ export async function getHomepage(request?: Request, experimentParams?: { experi
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -1831,6 +1839,8 @@ export async function getFeaturesLandingPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -2132,6 +2142,8 @@ export async function getFeaturesLandingPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -2554,6 +2566,8 @@ export async function getGetStartedPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -2944,6 +2958,8 @@ export async function getGetStartedPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -3334,6 +3350,8 @@ export async function getGetStartedPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -3724,6 +3742,8 @@ export async function getGetStartedPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -4149,6 +4169,8 @@ export async function getIndustriesLandingPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -4547,6 +4569,8 @@ export async function getIndustriesLandingPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -4945,6 +4969,8 @@ export async function getIndustriesLandingPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -5329,6 +5355,8 @@ export async function getIndustriesLandingPage(request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -8044,6 +8072,8 @@ export interface LogoSetGlobal {
 export interface LogoSetReference {
   _type: "logoSetReference";
   _key?: string;
+  pageTitle?: string;
+  centerPageTitle?: boolean;
   reference?: LogoSetGlobal;
 }
 
@@ -10755,6 +10785,8 @@ export async function getLandingPage(slug: string, request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -11154,6 +11186,8 @@ export async function getLandingPage(slug: string, request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -11747,6 +11781,8 @@ export async function getSolution(slug: string, request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,
@@ -12123,6 +12159,8 @@ export async function getSolution(slug: string, request?: Request) {
             _type == 'logoSetReference' => {
               _type,
               _key,
+              pageTitle,
+              centerPageTitle,
               reference->{
                 _id,
                 _type,

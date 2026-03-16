@@ -207,13 +207,13 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
       return logoSetData ? (
         <div class="content-block-wrapper" {...editAttrs}>
           <LogoSet
-            customTitle={logoSetData.customTitle}
+            customTitle={logoSetRef.pageTitle || logoSetData.customTitle}
             amerLogos={logoSetData.amerLogos}
             apacLogos={logoSetData.apacLogos}
             emeaLogos={logoSetData.emeaLogos}
             ukLogos={logoSetData.ukLogos}
             theme={logoSetData.theme}
-            textAlignment={logoSetData.textAlignment}
+            textAlignment={logoSetRef.centerPageTitle ? 'center' : logoSetData.textAlignment}
             showDivider={logoSetData.showDivider}
           />
         </div>
