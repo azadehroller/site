@@ -6,7 +6,7 @@
  * Uses the 'mistral' model for both embeddings and generation.
  */
 
-const OLLAMA_URL = 'http://localhost:11434';
+const OLLAMA_URL = import.meta.env.OLLAMA_URL || 'http://localhost:11434';
 const MODEL = 'mistral';
 
 interface OllamaEmbeddingResponse {
