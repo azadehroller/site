@@ -1,0 +1,42 @@
+---
+/**
+ * BlogRawHtmlBlock - STANDALONE raw HTML section for blog posts
+ * Renders raw HTML content for complex embeds/widgets
+ */
+
+interface BlogRawHtmlData {
+  _type: 'blogRawHtmlBlock';
+  _key: string;
+  label?: string;
+  html?: string;
+}
+
+interface Props {
+  node?: BlogRawHtmlData;
+  value?: BlogRawHtmlData;
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+const html = blockData?.html || '';
+---
+
+{html && (
+  <div class="blog-raw-html-block" set:html={html} />
+)}
+
+<style>
+  .blog-raw-html-block {
+    margin: 2rem 0;
+  }
+  
+  /* Ensure embedded content displays properly */
+  .blog-raw-html-block :global(iframe) {
+    max-width: 100%;
+  }
+  
+  .blog-raw-html-block :global(.hs-embed-wrapper) {
+    margin: 2rem auto;
+  }
+</style>
+

@@ -1,0 +1,72 @@
+---
+/**
+ * BlogTableBlock Component
+ * Renders HTML tables from blog content
+ */
+
+interface BlogTableData {
+  _type: 'blogTableBlock';
+  _key?: string;
+  label?: string;
+  tableHtml?: string;
+  caption?: string;
+}
+
+interface Props {
+  node?: BlogTableData;
+  value?: BlogTableData;
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+const tableHtml = blockData?.tableHtml;
+const caption = blockData?.caption;
+---
+
+{tableHtml && (
+  <div class="blog-table-block">
+    {caption && <p class="table-caption">{caption}</p>}
+    <div class="table-wrapper" set:html={tableHtml} />
+  </div>
+)}
+
+<style>
+  .blog-table-block {
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+  
+  .table-caption {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+  }
+  
+  .table-wrapper :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+  
+  .table-wrapper :global(th),
+  .table-wrapper :global(td) {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+  }
+  
+  .table-wrapper :global(th) {
+    background-color: #f7fafc;
+    font-weight: 600;
+  }
+  
+  .table-wrapper :global(tr:nth-child(even)) {
+    background-color: #f9fafb;
+  }
+  
+  .table-wrapper :global(tr:hover) {
+    background-color: #f1f5f9;
+  }
+</style>
+

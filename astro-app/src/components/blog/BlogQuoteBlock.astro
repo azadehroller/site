@@ -1,0 +1,158 @@
+---
+/**
+ * BlogQuoteBlock - Customer testimonial/quote with company logo
+ * Matches HubSpot blockquote-wrapper structure
+ */
+import { cleanStega } from '../utils/stega';
+import { urlFor } from '../utils/image';
+
+interface Props {
+  node?: {
+    _type: 'blogQuoteBlock';
+    _key: string;
+    label?: string;
+    quote?: string;
+    personName?: string;
+    personTitle?: string;
+    companyLogo?: any;
+    stats?: string;
+  };
+  value?: {
+    _type: 'blogQuoteBlock';
+    _key: string;
+    label?: string;
+    quote?: string;
+    personName?: string;
+    personTitle?: string;
+    companyLogo?: any;
+    stats?: string;
+  };
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+
+// Clean Sanity stega encoding
+const quote = cleanStega(blockData?.quote || '');
+const personName = cleanStega(blockData?.personName || '');
+const personTitle = cleanStega(blockData?.personTitle || '');
+const stats = cleanStega(blockData?.stats || '');
+const companyLogo = blockData?.companyLogo;
+
+const logoUrl = companyLogo ? urlFor(companyLogo).width(56).url() : null;
+const logoAlt = companyLogo?.alt || personName || 'Company logo';
+---
+
+<div class="blockquote-wrapper">
+  {stats && (
+    <div class="blockquote__data">
+      <div class="blockquote__stat">
+        <span class="blockquote__stat--text">{stats}</span>
+      </div>
+    </div>
+  )}
+
+  <blockquote>
+    {quote}
+  </blockquote>
+
+  <div class="blockquote__profile">
+    {logoUrl && (
+      <div class="blockquote__profile--logo">
+        <img src={logoUrl} alt={logoAlt} loading="lazy" />
+      </div>
+    )}
+
+    <div class="blockquote__profile--content">
+      {personName && (
+        <div class="blockquote__profile--content__title">
+          {personName}
+        </div>
+      )}
+      {personTitle && (
+        <div>{personTitle}</div>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .blockquote-wrapper {
+    border-left: 4px solid #00b5fa;
+    margin: 2rem 0;
+    padding: 10px 0 10px 15px;
+  }
+
+  .blockquote-wrapper blockquote {
+    border-left: 0;
+    font-weight: 800;
+    font-size: var(--h4, 24px);
+    padding: 16px 0;
+    margin: 0;
+    font-style: normal;
+    color: #033180;
+  }
+
+  .blockquote__stat {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 8px;
+  }
+
+  .blockquote__stat .blockquote__stat--text {
+    font-size: 40px;
+    font-weight: 800;
+    color: #033180;
+  }
+
+  .blockquote__data {
+    font-size: 14px;
+    color: #033180;
+  }
+
+  .blockquote__profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .blockquote__profile .blockquote__profile--logo {
+    background: #fff;
+    width: 56px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .blockquote__profile .blockquote__profile--logo img {
+    object-fit: contain;
+    object-position: center;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .blockquote__profile .blockquote__profile--content {
+    font-size: 14px;
+    color: #033180;
+  }
+
+  .blockquote__profile .blockquote__profile--content__title {
+    font-weight: 800;
+  }
+
+  @media (min-width: 768px) {
+    .blockquote__profile {
+      gap: 16px;
+    }
+
+    .blockquote__data {
+      font-size: 16px;
+    }
+
+    .blockquote__profile .blockquote__profile--content {
+      font-size: 16px;
+    }
+  }
+</style>

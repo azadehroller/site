@@ -1,0 +1,141 @@
+---
+/**
+ * BlogTableData - Renders a structured, user-friendly table from Sanity data
+ * No HTML needed - uses structured headers and rows
+ */
+
+interface TableRow {
+  _key: string;
+  _type: 'object';
+  cells: string[];
+}
+
+interface BlogTableDataType {
+  _type: 'blogTableData';
+  _key: string;
+  label?: string;
+  headers: string[];
+  rows: TableRow[];
+  showStripes?: boolean;
+  responsive?: boolean;
+}
+
+interface Props {
+  node?: BlogTableDataType;
+  value?: BlogTableDataType;
+}
+
+const { node, value } = Astro.props;
+const blockData = node || value;
+
+const headers = blockData?.headers || [];
+const rows = blockData?.rows || [];
+const showStripes = blockData?.showStripes !== false; // default true
+const responsive = blockData?.responsive !== false; // default true
+---
+
+{headers.length > 0 && rows.length > 0 && (
+  <div class="blog-table-wrapper" data-responsive={responsive}>
+    <table class:list={["blog-table", { "striped": showStripes }]}>
+      <thead>
+        <tr>
+          {headers.map((header) => (
+            <th>{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            {row.cells.map((cell) => (
+              <td>{cell}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+<style>
+  .blog-table-wrapper {
+    margin: 2rem 0;
+    width: 100%;
+  }
+
+  .blog-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    background-color: #fff;
+    border: 0 !important;
+  }
+
+  .blog-table thead {
+    background-color: #f0f6ff;
+    font-weight: 700;
+  }
+
+  .blog-table th,
+  .blog-table td {
+    border: 1px solid #99acc2;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .blog-table th {
+    font-weight: 700;
+    color: #033180;
+  }
+
+  .blog-table td {
+    color: #033180;
+  }
+
+  .blog-table.striped tbody tr:nth-child(even) {
+    background-color: #f9fbff;
+  }
+
+  .blog-table thead th p,
+  .blog-table tbody td p {
+    margin-bottom: 0;
+  }
+
+  /* Responsive table for mobile */
+  @media (max-width: 768px) {
+    .blog-table-wrapper[data-responsive="true"] {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .blog-table-wrapper[data-responsive="true"] .blog-table {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .blog-table-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .blog-table-wrapper::-webkit-scrollbar-track {
+      background: #f0f0f0;
+    }
+
+    .blog-table-wrapper::-webkit-scrollbar-thumb {
+      background-color: #99acc2;
+      border-radius: 4px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .blog-table {
+      font-size: 0.85rem;
+    }
+
+    .blog-table th,
+    .blog-table td {
+      padding: 0.5rem;
+    }
+  }
+</style>
