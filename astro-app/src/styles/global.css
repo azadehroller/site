@@ -12,6 +12,17 @@
   color: var(--primary-50, #033180) !important;
 }
 
+/* Sanity Visual Editing overlay — must be confined to the viewport so its
+   absolutely-positioned child divs (translate to large Y values) don't
+   extend the page scroll height beyond the footer. */
+sanity-visual-editing {
+  position: fixed !important;
+  inset: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  z-index: 9998;
+}
+
 :root {
   /* Container widths */
   --container-sm: 544px;
