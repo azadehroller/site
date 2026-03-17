@@ -565,7 +565,8 @@ a.cta_button{-moz-box-sizing:content-box !important;-webkit-box-sizing:content-b
       floatingButtonPrimaryText={footerData?.floatingButtonPrimaryText}
       floatingButtonSecondaryText={footerData?.floatingButtonSecondaryText}
     />
-    {chatbotConfig?.enabled && <ChatWidget config={chatbotConfig} />}
+    {/* Chatbot temporarily disabled */}
+    {/* {chatbotConfig?.enabled && <ChatWidget config={chatbotConfig} />} */}
     {/* View Transitions at end of body so script doesn't block head / above-the-fold parse */}
     {viewTransitionsEnabled && <ViewTransitions />}
     {/* Visual Editing: only when enabled; hydrates on idle so it never blocks LCP */}
