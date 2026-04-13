@@ -59,7 +59,8 @@ export default defineType({
       group: 'content',
     }),
     // Order rank for drag-and-drop ordering
-    orderRankField({type: 'feature', newItemPosition: 'before'}),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    orderRankField({type: 'feature', newItemPosition: 'before'}) as any,
     defineField({
       name: 'isTemplate',
       title: 'Is Template',

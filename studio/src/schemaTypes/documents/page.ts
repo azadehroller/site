@@ -91,7 +91,8 @@ export default defineType({
     }),
 
     // Order rank for drag-and-drop ordering
-    orderRankField({type: 'page', newItemPosition: 'before'}),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    orderRankField({type: 'page', newItemPosition: 'before'}) as any,
 
     // --------------------
     // Settings
