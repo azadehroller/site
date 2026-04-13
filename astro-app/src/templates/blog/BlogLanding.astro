@@ -3,8 +3,10 @@ import Card from "@components/ui/Card.astro";
 import Welcome from "@components/ui/Welcome.astro";
 import Layout from "@layouts/Layout.astro";
 import Pagination from "@components/ui/Pagination.astro";
-import { getBlogLandingData } from "@utils/sanity";
-import { formatDate } from "@utils/index";
+import BlogHeader from "@components/blog/BlogHeader.astro";
+import BlogEditorPicks from "@components/blog/BlogEditorPicks.astro";
+import BlogTopicFilters from "@components/blog/BlogTopicFilters.astro";
+import { getBlogLandingData, getLayoutData, type LayoutSanityResult } from "@utils/sanity";
 import type { Post, BlogTopic } from "@utils/sanity";
 
 interface Props {
@@ -15,6 +17,8 @@ interface Props {
   totalPages?: number;
   baseUrl?: string;
   topics?: (BlogTopic & { postCount?: number })[];
+  /** From route when fetching in parallel with blog data (e.g. paginated /blog/page/N) */
+  layoutSanity?: LayoutSanityResult;
 }
 
 const { 
@@ -25,6 +29,7 @@ const {
   totalPages: providedTotalPages,
   baseUrl = "/blog/page",
   topics: providedTopics,
+  layoutSanity: layoutSanityProp,
 } = Astro.props;
 
 // Use provided data or fetch everything in a single optimized query
@@ -33,17 +38,23 @@ let totalPages = providedTotalPages;
 let topics = providedTopics;
 let editorPicks: Post[] = [];
 let headerTheme: string | undefined;
+let layoutSanityFetched: LayoutSanityResult | undefined;
 
 if (!posts || !topics) {
-  // Single query fetches: paginated posts, total count, topics, and editor picks
-  const { data } = await getBlogLandingData(currentPage, postsPerPage, Astro.request);
+  const [{ data }, layoutRes] = await Promise.all([
+    getBlogLandingData(currentPage, postsPerPage, Astro.request),
+    layoutSanityProp ? Promise.resolve(layoutSanityProp) : getLayoutData(Astro.request),
+  ]);
 
   posts = posts || data.posts;
   topics = topics || data.topics;
   editorPicks = data.editorPicks || [];
   totalPages = totalPages || Math.ceil(data.total / postsPerPage);
   headerTheme = data.settings?.headerTheme;
+  layoutSanityFetched = layoutSanityProp ? undefined : layoutRes;
 }
+
+const layoutSanityForLayout = layoutSanityProp ?? layoutSanityFetched;
 
 // Helper function to calculate reading time from pre-computed character count
 // wordCount field from Sanity is actually character count from length(pt::text(body))
@@ -53,262 +64,52 @@ function estimateReadingTime(charCount: number | undefined): number {
   return Math.max(1, Math.ceil(charCount / 1000));
 }
 
-// Get unique topics from current page posts for quick filter
-const currentPageTopics = new Set<string>();
-posts?.forEach(post => {
-  post.topics?.filter(t => t != null).forEach(topic => {
-    if (topic.name && topic.name !== 'Editor Picks') {
-      currentPageTopics.add(topic.name);
-    }
-  });
-});
-
 // Helper function to strip Sanity stega (invisible Unicode) characters
-// These are zero-width characters used for Visual Editing click-to-edit
 function stripStega(str: string | undefined): string {
   if (!str) return '';
-  // Remove ALL invisible/zero-width Unicode characters and control characters
-  // This covers stega encoding characters used by Sanity
   return str
     .replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u180E\u00AD\uDB40-\uDBFF]/g, '')
-    .replace(/[\uE000-\uF8FF]/g, '') // Private use area
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, ''); // Control characters
+    .replace(/[\uE000-\uF8FF]/g, '')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
 }
 
 // Helper to create a clean class name from topic name
-// Uses hyphens (e.g., "water-parks") to match filter button format
 function toTopicClass(name: string | undefined): string {
   if (!name) return '';
-  // First strip stega, then only keep alphanumeric and basic punctuation
   const cleaned = stripStega(name);
-  // Convert to lowercase and replace spaces with hyphens, preserve existing hyphens
   return cleaned
     .toLowerCase()
-    .replace(/[^a-z0-9\s\-]/g, '') // Remove all non-alphanumeric except space and hyphen
-    .replace(/\s+/g, '-') // Convert spaces to hyphens
-    .replace(/-+/g, '-') // Collapse multiple hyphens
-    .replace(/^-|-$/g, ''); // Trim leading/trailing hyphens
+    .replace(/[^a-z0-9\s\-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 // Get LCP image URL for preloading (main editor pick featured image)
 const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
 ---
 
-<Layout title={title} headerTheme={headerTheme} lcpImage={lcpImageUrl}>
-  {/* Blog Header */}
-  <div class="blog-header">
-    <div class="blog-header__inner">
-      <h1 class="blog-header__heading">{title}</h1>
-      <p class="blog-header__text">
-        Insights, tips, and trends to help you run a successful attraction business.
-      </p>
-      <div class="blog-header__search-wrapper">
-        <div class="blog-header__search">
-          <div class="blog-header__search--input">
-            <input 
-              type="text" 
-              id="blog-search-input"
-              class="blog-search-input" 
-              placeholder="Search articles..."
-              aria-label="Search articles"
-              autocomplete="off"
-            />
-          </div>
-          <div class="blog-header__search--icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-              <path fill="#fff" fill-rule="evenodd" d="M14.71 14h.79l4.99 5L19 20.49l-5-4.99v-.79l-.27-.28A6.471 6.471 0 0 1 9.5 16 6.5 6.5 0 1 1 16 9.5c0 1.61-.59 3.09-1.57 4.23l.28.27ZM5 9.5C5 11.99 7.01 14 9.5 14S14 11.99 14 9.5 11.99 5 9.5 5 5 7.01 5 9.5Z" clip-rule="evenodd"/>
-            </svg>
-          </div>
-        </div>
-        <div id="blog-search-results" class="blog-search-results" aria-live="polite"></div>
-      </div>
-    </div>
-  </div>
+<Layout title={title} headerTheme={headerTheme as 'default' | 'dark' | 'light' | 'industry_report' | undefined} lcpImage={lcpImageUrl} layoutSanity={layoutSanityForLayout}>
 
-  {/* Blog Content */}
+  <BlogHeader title={title} />
+
   <div class="blog-index__wrapper">
     <div class="blog-index__section">
-      
-      {/* Editor Picks Section */}
-      {editorPicks && editorPicks.length > 0 && (
-        <>
-          <div class="blog-index__section-header">
-            <h2 class="h2">Editor Picks</h2>
-            <span>
-              <a href="/blog/topic/editor-picks">
-                View all
-                <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#143D82"/>
-                </svg>
-              </a>
-            </span>
-          </div>
-          <section class="blog-index blog-index-picks">
-            {editorPicks.length > 0 && (() => {
-              const mainPick = editorPicks[0];
-              const displayDate = mainPick.publishedAt || mainPick._createdAt;
-              const firstTopic = mainPick.topics?.filter(t => t != null)?.[0];
-              const readingTime = estimateReadingTime(mainPick.wordCount);
-              
-              return (
-                <article class="blog-index__post">
-                  {mainPick.featuredImage?.asset?.url && (
-                    <a href={`/blog/${mainPick.slug.current}`} class="blog-index__post-image blog-index__post-image-featured">
-                      <img
-                        src={mainPick.featuredImage.asset.url}
-                        alt={mainPick.featuredImage.alt || mainPick.title || ""}
-                        width="703"
-                        height="380"
-                        loading="eager"
-                        fetchpriority="high"
-                      />
-                    </a>
-                  )}
-                  <div class="blog-index__post-content">
-                    {firstTopic && (
-                      <a class="blog-header__tag" href={`/blog/topic/${firstTopic.slug?.current}`}>
-                        {firstTopic.name}
-                      </a>
-                    )}
-                    <h3 class="blog-index__main-editor-pick-title">
-                      <a href={`/blog/${mainPick.slug.current}`}>{mainPick.title}</a>
-                    </h3>
-                    <p class="blog-index__post-date text-secondary">
-                      <time datetime={displayDate}>
-                        Published: {formatDate(displayDate)}
-                      </time>
-                      <span> | </span>
-                      <span class="blog-post__readingtime">
-                        <span class="blog-post__readingtime-icon">
-                          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"/>
-                          </svg>
-                        </span>
-                        {readingTime} min. read
-                      </span>
-                    </p>
-                  </div>
-                </article>
-              );
-            })()}
 
-            <div class="blog-index-picks__sidebar">
-              {editorPicks.slice(1, 4).map((pick) => {
-                const displayDate = pick.publishedAt || pick._createdAt;
-                const firstTopic = pick.topics?.filter(t => t != null)?.[0];
-                const readingTime = estimateReadingTime(pick.wordCount);
-                
-                return (
-                  <article class="blog-index__post blog-index__summary">
-                    <section class="blog-index__post-content">
-                      {firstTopic && (
-                        <a class="blog-header__tag" href={`/blog/topic/${firstTopic.slug?.current}`}>
-                          {firstTopic.name}
-                        </a>
-                      )}
-                      <h3 class="blog-index__summary-title">
-                        <a href={`/blog/${pick.slug.current}`}>{pick.title}</a>
-                      </h3>
-                      <p class="blog-index__post-date text-secondary">
-                        <time datetime={displayDate}>
-                          Published: {formatDate(displayDate)}
-                        </time>
-                        <span> | </span>
-                        <span class="blog-post__readingtime">
-                          <span class="blog-post__readingtime-icon">
-                            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"/>
-                            </svg>
-                          </span>
-                          {readingTime} mins
-                        </span>
-                      </p>
-                      <div class="blog-index__post-content-meta">
-                      </div>
-                    </section>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
-        </>
+      {editorPicks && editorPicks.length > 0 && (
+        <BlogEditorPicks picks={editorPicks} estimateReadingTime={estimateReadingTime} />
       )}
 
-      {/* Section Header */}
       <div class="blog-heading">
         <h2 class="h2">Latest Articles</h2>
       </div>
 
-      {/* Topic Filters and Browse Category */}
-      <div class="blog-filter-options">
-        <nav id="js-scroll-nav" aria-label="Filter articles by topic">
-          <ul role="list">
-            <li class="active">
-              <button type="button" class="filter-btn" data-filter="all" data-topic-slug="">All articles</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="payments" data-raw-name="Payments" data-topic-slug="payments">Payments</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="go-karting" data-raw-name="Go-Karting" data-topic-slug="go-karting">Go-Karting</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="ticketing" data-raw-name="Ticketing" data-topic-slug="ticketing">Ticketing</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="rage-rooms" data-raw-name="Rage Rooms" data-topic-slug="rage-rooms">Rage Rooms</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="trampoline-parks" data-raw-name="Trampoline Parks" data-topic-slug="trampoline-parks">Trampoline Parks</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="bowling" data-raw-name="Bowling" data-topic-slug="bowling">Bowling</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="roller-skating" data-raw-name="Roller Skating" data-topic-slug="roller-skating">Roller Skating</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="obstacle-courses" data-raw-name="Obstacle Courses" data-topic-slug="obstacle-courses">Obstacle Courses</button>
-            </li>
-            <li>
-              <button type="button" class="filter-btn" data-filter="point-of-sale" data-raw-name="Point of Sale" data-topic-slug="point-of-sale">Point of Sale</button>
-            </li>
-          </ul>
-        </nav>
-
-        {/* Browse Category Dropdown */}
-        {topics && topics.length > 0 && (
-          <div class="blog-dropdown dropdown" data-dropdown>
-            <button type="button" class="btn--dropdown" data-dropdown-button aria-label="Browse categories">
-              Browse categories
-              <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12">
-                <path d="M6 9L1 4h10L6 9z" fill="currentColor"/>
-              </svg>
-            </button>
-            <div class="dropdown-menu">
-              <div class="dropdown-links">
-                {topics
-                  .filter(topic => (topic as any).postCount > 0)
-                  .sort((a, b) => ((b as any).postCount || 0) - ((a as any).postCount || 0))
-                  .map((topic) => (
-                    <a 
-                      href={`/blog/topic/${topic.slug?.current}`}
-                      class="dropdown-link"
-                    >
-                      {topic.name} ({((topic as any).postCount || 0)})
-                    </a>
-                  ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <BlogTopicFilters topics={topics ?? []} />
 
       {/* Blog Posts Grid */}
       <section id="js-section-holder" class="blog-index blog-index-latest">
         {posts && posts.length ? (
           posts.map((post, postIdx) => {
-            // Debug: Log post topics for first few posts
             if (postIdx < 3) {
               console.log(`[Server] Post ${postIdx} (${post.title?.substring(0, 30)}...):`, {
                 hasTopics: !!post.topics,
@@ -318,12 +119,8 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
               });
             }
 
-            // Get all topic classes for filtering (supports multiple topics per post)
-            // More defensive filtering to handle edge cases
-            // Handle both array of topics and potential different structures
             const rawTopics = post.topics || [];
-            
-            // Debug: Log each step of filtering for first few posts
+
             if (postIdx < 3) {
               const step1 = rawTopics.filter(t => t != null);
               const step2 = step1.filter(t => {
@@ -334,13 +131,9 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
               const step3 = step2.map(t => {
                 const topicAny = t as any;
                 const name = t.name || topicAny.title || topicAny.label || '';
-                return {
-                  ...t,
-                  name: stripStega(name).trim()
-                };
+                return { ...t, name: stripStega(name).trim() };
               });
               const step4 = step3.filter(t => t.name.length > 0);
-              
               console.log(`[Server] Post ${postIdx} filtering steps:`, {
                 rawTopicsLength: rawTopics.length,
                 step1_afterNullCheck: step1.length,
@@ -365,60 +158,35 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
                 })
               });
             }
-            
-            const validTopics = Array.isArray(rawTopics) 
+
+            const validTopics = Array.isArray(rawTopics)
               ? rawTopics
                   .filter(t => t != null)
                   .filter(t => {
-                    // Handle different possible structures (using type assertion for safety)
                     const topicAny = t as any;
                     const name = t.name || topicAny.title || topicAny.label || '';
                     return name != null && name !== '' && typeof name === 'string';
                   })
                   .map(t => {
-                    // Extract name from different possible structures
                     const topicAny = t as any;
                     const name = t.name || topicAny.title || topicAny.label || '';
-                    return {
-                      ...t,
-                      name: stripStega(name).trim() // Strip stega and trim
-                    };
+                    return { ...t, name: stripStega(name).trim() };
                   })
-                  .filter(t => t.name.length > 0) // Filter out empty names after cleaning
+                  .filter(t => t.name.length > 0)
               : [];
-            
-            // Debug: Log valid topics for first few posts
+
             if (postIdx < 3) {
               console.log(`[Server] Post ${postIdx} validTopics:`, {
                 validTopicsLength: validTopics.length,
                 validTopics: validTopics.map(t => ({ name: t.name, slug: t.slug?.current }))
               });
             }
-            
-            const topicClasses = validTopics
-              .map(t => toTopicClass(t.name))
-              .filter(Boolean)
-              .join(' ') || '';
-            
-            // Store topics as comma-separated for data attribute
-            const topicData = validTopics
-              .map(t => toTopicClass(t.name))
-              .filter(Boolean)
-              .join(',') || '';
-            
-            // Store raw topic names (already cleaned above)
-            const rawTopicNames = validTopics
-              .map(t => t.name)
-              .filter(Boolean)
-              .join(',') || '';
 
-            // Store topic slugs for matching (more reliable than names)
-            const topicSlugs = validTopics
-              .map(t => t.slug?.current || '')
-              .filter(Boolean)
-              .join(',') || '';
+            const topicClasses = validTopics.map(t => toTopicClass(t.name)).filter(Boolean).join(' ') || '';
+            const topicData = validTopics.map(t => toTopicClass(t.name)).filter(Boolean).join(',') || '';
+            const rawTopicNames = validTopics.map(t => t.name).filter(Boolean).join(',') || '';
+            const topicSlugs = validTopics.map(t => t.slug?.current || '').filter(Boolean).join(',') || '';
 
-            // Debug: Log final topic data for first few posts
             if (postIdx < 3) {
               console.log(`[Server] Post ${postIdx} final topic data:`, {
                 topicClasses,
@@ -429,13 +197,12 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
                 validTopics: validTopics.map(t => ({ name: t.name, slug: t.slug?.current }))
               });
             }
-            
-            // Filter out null topics before stringifying for debug
+
             const nonNullTopics = (post.topics || []).filter(t => t != null);
-            
+
             return (
-              <article 
-                class={`blog-index__post ${topicClasses} item`} 
+              <article
+                class={`blog-index__post ${topicClasses} item`}
                 data-topics={topicData}
                 data-raw-topics={rawTopicNames}
                 data-topic-slugs={topicSlugs}
@@ -451,12 +218,11 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
         )}
       </section>
 
-      {/* Pagination */}
       {totalPages && totalPages > 1 && (
-        <Pagination 
-          currentPage={currentPage} 
-          totalPages={totalPages} 
-          baseUrl={baseUrl} 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          baseUrl={baseUrl}
         />
       )}
 
@@ -465,149 +231,6 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
 </Layout>
 
 <style>
-  /* Blog Header Styles */
-  .blog-header {
-    background: linear-gradient(135deg, #0270e0 0%, #033180 100%);
-    color: #fff;
-    margin-bottom: 40px;
-    padding: 60px 0;
-  }
-
-  .blog-header__inner {
-    margin: 0 auto;
-    max-width: 1300px;
-    padding: 0 20px;
-    text-align: center;
-  }
-
-  .blog-header__heading {
-    margin-bottom: 16px;
-    font-size: 2rem;
-    text-transform: capitalize;
-  }
-
-  @media (min-width: 768px) {
-    .blog-header__heading {
-      font-size: 3rem;
-    }
-  }
-
-  .blog-header__text {
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 28px;
-    max-width: 600px;
-    margin: 0 auto;
-    opacity: 0.9;
-  }
-
-  @media (min-width: 992px) {
-    .blog-header__text {
-      font-size: 18px;
-      line-height: 32px;
-    }
-  }
-
-  .blog-header__search {
-    align-items: center;
-    display: flex;
-    padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50px;
-    backdrop-filter: blur(10px);
-  }
-
-  .blog-header__search--input {
-    flex: 1;
-  }
-
-  .blog-search-input {
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    width: 100%;
-  }
-
-  .blog-search-input::placeholder {
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .blog-header__search--icon {
-    display: flex;
-    align-items: center;
-  }
-
-  /* Search Results Dropdown */
-  .blog-header__search-wrapper {
-    position: relative;
-    max-width: 400px;
-    margin: 1.6rem auto 0;
-  }
-
-  .blog-search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    max-height: 320px;
-    overflow-y: auto;
-    z-index: 100;
-    display: none;
-    margin-top: 8px;
-    text-align: left;
-  }
-
-  .blog-search-results.active {
-    display: block;
-  }
-
-  /* Use :global() for dynamically inserted content */
-  .blog-search-results :global(.blog-search-results__list) {
-    list-style: none;
-    margin: 0;
-    padding: 12px 0;
-  }
-
-  .blog-search-results :global(.blog-search-results__list li) {
-    margin: 0;
-    padding: 0;
-    text-align: left;
-  }
-
-  .blog-search-results :global(.blog-search-results__list li a) {
-    display: block;
-    padding: 12px 20px;
-    text-decoration: none;
-    color: #023180;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.15s ease;
-    text-align: left;
-  }
-
-  .blog-search-results :global(.blog-search-results__list li a:hover) {
-    background-color: #f5f8ff;
-  }
-
-  .blog-search-results :global(.blog-search-results__list li a strong) {
-    font-weight: 700;
-    color: #023180;
-  }
-
-  .blog-search-results :global(.blog-search-results__loading),
-  .blog-search-results :global(.blog-search-results__empty) {
-    padding: 16px 20px;
-    text-align: left;
-    color: #666;
-    font-size: 14px;
-  }
-
-  /* Blog Index Wrapper */
   .blog-index__wrapper {
     background-color: #fff;
     margin: 0 auto;
@@ -629,441 +252,6 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
   .blog-heading h2 {
     font-size: 32px;
     color: #033180;
-  }
-
-  /* Editor Picks Section Styles */
-  .blog-index__section-header {
-    align-items: center;
-    border-bottom: 1px solid #cbd7ee;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-  }
-
-  .blog-index__section-header h2 {
-    font-size: 32px;
-    color: #033180;
-    margin: 0;
-  }
-
-  .blog-index__section-header h4 {
-    color: #033180;
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  .blog-index__section-header span {
-    display: flex;
-    justify-content: end;
-  }
-
-  .blog-index__section-header span a {
-    align-items: center;
-    color: #033180;
-    display: flex;
-    font-weight: 500;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  .blog-index__section-header span a:hover {
-    color: #0270e0;
-  }
-
-  .blog-index__section-header span a svg {
-    margin: 0 10px;
-  }
-
-  .blog-index.blog-index-picks {
-    display: flex;
-    flex-direction: column;
-    gap: 0 54px;
-    grid-auto-columns: 1fr;
-    grid-template-columns: 1.4fr 1fr;
-    padding: 0;
-  }
-
-  @media (min-width: 992px) {
-    .blog-index.blog-index-picks {
-      display: grid;
-    }
-  }
-
-  .blog-index.blog-index-picks .blog-index__post {
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .blog-index.blog-index-picks > .blog-index__post {
-    border-bottom: 1px solid #cbd7ee;
-  }
-
-  .blog-index.blog-index-picks > .blog-index__post:hover {
-    transform: none;
-  }
-
-  @media (min-width: 992px) {
-    .blog-index.blog-index-picks .blog-index__post {
-      border-bottom: 0;
-    }
-  }
-
-  .blog-index.blog-index-picks .blog-index__main-editor-pick-title {
-    font-size: var(--size-4, 24px);
-  }
-
-  @media (min-width: 768px) {
-    .blog-index.blog-index-picks .blog-index__main-editor-pick-title {
-      font-size: 32px;
-    }
-  }
-
-  .blog-index.blog-index-picks .blog-index__summary-title {
-    font-size: 18px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
-  }
-
-  .blog-index.blog-index-picks .blog-index__summary-title a {
-    color: #033180;
-    text-decoration: none;
-  }
-
-  .blog-index.blog-index-picks .blog-index__summary-title a:hover {
-    text-decoration: underline;
-  }
-
-  .blog-index.blog-index-picks > .blog-index__post .blog-index__post-content {
-    padding: 24px 0;
-  }
-
-  .blog-index-picks__sidebar {
-    padding: 0;
-  }
-
-  .blog-index-picks__sidebar h3 {
-    padding: 8px 0;
-  }
-
-  .blog-index-picks .blog-index__summary {
-    display: flex;
-    flex-direction: row-reverse;
-    padding: 0;
-    padding-bottom: 14px;
-  }
-
-  .blog-index-picks .blog-index__summary:not(:first-child) {
-    padding: 28px 0 14px;
-  }
-
-  @media (max-width: 1080px) {
-    .blog-index-picks .blog-index__summary:first-child {
-      padding: 28px 0 0;
-    }
-  }
-
-  .blog-index-picks .blog-index__summary:not(:last-child) {
-    border-bottom: 1px solid #cbd7ee;
-  }
-
-  .blog-index-picks .blog-index__summary .blog-index__post-content {
-    flex: auto;
-    padding: 0 16px 0 0;
-  }
-
-  @media (max-width: 768px) {
-    .blog-index-picks .blog-index__summary .blog-index__post-content {
-      padding: 0;
-    }
-  }
-
-  .blog-index-picks .blog-index__summary .blog-index__post-image {
-    display: flex;
-  }
-
-  @media (max-width: 1080px) {
-    .blog-index-picks .blog-index__summary .blog-index__post-image {
-      display: none;
-    }
-  }
-
-  @media (min-width: 992px) {
-    .blog-index-picks .blog-index__summary .blog-index__post-image,
-    .blog-index-picks .blog-index__summary .blog-index__post-image img {
-      height: 80px;
-      width: 130px;
-    }
-  }
-
-  .blog-index-picks .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name span {
-    color: #033180;
-    font-size: 16px;
-  }
-
-  @media (max-width: 768px) {
-    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary {
-      display: flex;
-    }
-
-    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-image img {
-      height: 54px;
-      width: 85px;
-    }
-
-    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name {
-      font-size: 14px;
-      padding: 0 8px 0 0;
-    }
-
-    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name span {
-      font-size: 14px;
-    }
-
-    .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name .blog-post__readingtime {
-      font-size: 14px;
-      padding: 0 8px;
-    }
-  }
-
-  @media (min-width: 992px) {
-    .blog-index.blog-index-picks .blog-index-picks__sidebar .blog-index__post {
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: auto;
-      justify-content: right;
-      justify-items: baseline;
-    }
-  }
-
-  .blog-index-picks h2 {
-    font-size: 32px;
-    padding: 8px 0 0;
-  }
-
-  @media (min-width: 992px) {
-    .blog-index-picks h2 {
-      font-size: 42px;
-      padding: 8px 0 0;
-    }
-  }
-
-  .blog-index-picks .blog-post__meta-avatar {
-    display: flex;
-    align-items: center;
-  }
-
-  .blog-index-picks .blog-post__meta-avatar img {
-    height: 38px;
-    width: 38px;
-  }
-
-  .blog-index-picks .blog-post__meta-name {
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    position: relative;
-  }
-
-  .blog-index-picks .blog-post__meta-name span {
-    color: #757382;
-    font-size: 14px;
-  }
-
-  .blog-index-picks .blog-post__readingtime {
-    position: relative;
-  }
-
-  .blog-index-picks .blog-post__separator {
-    background: #eee;
-    height: 31px;
-    width: 1px;
-  }
-
-  /* Topic Filter Styles */
-  .blog-filter-options {
-    position: relative;
-    align-items: baseline;
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0 0 16px;
-    white-space: nowrap;
-    gap: 8px;
-  }
-
-  .blog-filter-options nav {
-    display: none;
-  }
-
-  @media (min-width: 992px) {
-    .blog-filter-options nav {
-      display: flex;
-      padding: 8px 0 0;
-    }
-
-    .blog-filter-options nav ul {
-      margin: 0;
-      padding: 0;
-    }
-  }
-
-  .blog-filter-options nav ul {
-    align-items: center;
-    display: flex;
-    list-style-type: none;
-    margin: 0;
-    padding: 8px 0;
-  }
-
-  .blog-filter-options nav li {
-    padding: 0 8px 0 1px;
-  }
-
-  .blog-filter-options nav li .filter-btn {
-    border: none;
-    border-radius: 100px;
-    box-shadow: 0 0 0 1px #cbd7ee;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 8px 12px;
-    transition: background 0.2s ease, color 0.2s ease;
-    color: #033180;
-    background: transparent;
-    cursor: pointer;
-    font-family: inherit;
-  }
-
-  .blog-filter-options nav li.active .filter-btn,
-  .blog-filter-options nav li:hover .filter-btn {
-    background: #033180;
-    color: #fff;
-  }
-
-  /* Browse Category Dropdown */
-  .blog-dropdown {
-    position: relative;
-    margin-left: 8px;
-  }
-
-  @media (min-width: 992px) {
-    .blog-dropdown {
-      margin-left: 16px;
-    }
-  }
-
-  @media (max-width: 991px) {
-    .blog-dropdown {
-      margin-left: 0;
-      margin-top: 8px;
-      width: 100%;
-    }
-
-    .blog-dropdown .btn--dropdown {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .blog-dropdown .dropdown-menu {
-      left: 0;
-      right: 0;
-      width: 100%;
-    }
-  }
-
-  .blog-dropdown .btn--dropdown {
-    border: 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5.5px 12px;
-    font-size: 14px;
-    font-weight: 700;
-    box-shadow: 0 0 0 1px #cbd7ee;
-    border-radius: 100px;
-    background: transparent;
-    transition: background 0.2s ease, transform 0.2s ease;
-    cursor: pointer;
-    color: #033180;
-    font-family: inherit;
-  }
-
-  .blog-dropdown .btn--dropdown svg {
-    transition: transform 0.2s ease;
-    pointer-events: none;
-  }
-
-  .blog-dropdown .btn--dropdown:hover,
-  .blog-dropdown.active .btn--dropdown {
-    color: #fff;
-    background: #033180;
-  }
-
-  .blog-dropdown.active .btn--dropdown svg {
-    transform: rotate(180deg);
-  }
-
-  .blog-dropdown .dropdown-menu {
-    position: absolute;
-    z-index: 10;
-    right: 0;
-    left: auto;
-    top: calc(100% + 0.9rem);
-    background-color: #fff;
-    padding: 28px 28px 28px 20px;
-    border-radius: 4px;
-    border: 1px solid rgba(2, 49, 128, 0.1);
-    display: none;
-    min-width: 300px;
-    pointer-events: none;
-    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  .blog-dropdown.active .dropdown-menu {
-    display: block;
-    pointer-events: auto;
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .dropdown-links {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  @media (min-width: 591px) {
-    .dropdown-links {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1200px) {
-    .dropdown-links {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-
-  .dropdown-links a,
-  .dropdown-links .dropdown-link {
-    font-size: 14px;
-    padding: 10px 8px;
-    color: #001F4A;
-    transition: background-color 150ms ease-in-out;
-    text-decoration: none;
-    display: block;
-  }
-
-  .dropdown-links a:hover,
-  .dropdown-links .dropdown-link:hover {
-    background: #f1f3f9;
-    border-radius: 4px;
   }
 
   /* Blog Index Grid */
@@ -1100,7 +288,6 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
     display: none !important;
   }
 </style>
-
 <script>
   // Helper to strip Sanity stega (invisible Unicode) characters on client side
   // Must match server-side stripStega() function exactly

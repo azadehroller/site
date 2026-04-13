@@ -7,14 +7,15 @@ import Layout from "@layouts/Layout.astro";
 import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Divider from "@components/blocks/Divider.astro";
-import type { GetStartedPage, ColumnsBlock, Divider as DividerType } from "@utils/sanity";
+import type { GetStartedPage, ColumnsBlock, Divider as DividerType, LayoutSanityResult } from "@utils/sanity";
 import { cleanStega } from "@utils/stega";
 
 interface Props {
   page: GetStartedPage | null;
+  layoutSanity?: LayoutSanityResult;
 }
 
-const { page } = Astro.props;
+const { page, layoutSanity } = Astro.props;
 
 const title = page?.title || "Get Started";
 const seoTitle = page?.seoTitle || title;
@@ -35,7 +36,7 @@ const getDividerBgClass = (divider: DividerType): string => {
 };
 ---
 
-<Layout title={seoTitle} headerTheme={page?.headerTheme} announcementBar={page?.announcementBar}>
+<Layout title={seoTitle} headerTheme={page?.headerTheme} announcementBar={page?.announcementBar} layoutSanity={layoutSanity}>
   <main class="get-started-page">
     {sections.length > 0 ? (
       sections.map((section) => {

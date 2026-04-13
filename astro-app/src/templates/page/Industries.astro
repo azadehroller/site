@@ -7,14 +7,15 @@ import Layout from "@layouts/Layout.astro";
 import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Divider from "@components/blocks/Divider.astro";
-import type { IndustriesLandingPage, ColumnsBlock, Divider as DividerType } from "@utils/sanity";
+import type { IndustriesLandingPage, ColumnsBlock, Divider as DividerType, LayoutSanityResult } from "@utils/sanity";
 import { cleanStega } from "@utils/stega";
 
 interface Props {
   page: IndustriesLandingPage | null;
+  layoutSanity?: LayoutSanityResult;
 }
 
-const { page } = Astro.props;
+const { page, layoutSanity } = Astro.props;
 
 // Debug in development
 if (import.meta.env.DEV && !page) {
@@ -48,7 +49,7 @@ const getDividerBgClass = (divider: DividerType): string => {
 };
 ---
 
-<Layout title={seoTitle} headerTheme={headerTheme} announcementBar={page?.announcementBar}>
+<Layout title={seoTitle} headerTheme={headerTheme} announcementBar={page?.announcementBar} layoutSanity={layoutSanity}>
   <main class="industries-landing-page">
     {sections.length > 0 ? (
       sections.map((section) => {
