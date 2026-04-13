@@ -11,6 +11,11 @@ const DEBUG_CACHE = import.meta.env.DEV;
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(context.request.url);
 
+  // Block _debug routes in production
+  if (url.pathname.startsWith('/_debug') && !import.meta.env.DEV) {
+    return new Response(null, { status: 404 });
+  }
+
   // Resolve A/B test data BEFORE rendering so pages can read it from locals
   if (!url.pathname.startsWith('/api/') && !url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|webp|avif|svg|woff|woff2|ttf|eot)$/)) {
     const { userGroup, userId, isNew } = resolveAbTest(context.request);
@@ -62,10 +67,22 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     return response;
   }
   
-  // Blog posts - cache longer since they change less frequently
-  if (url.pathname.startsWith('/blog/') && url.pathname !== '/blog/') {
+  // Blog index - cache like blog posts (was falling through to generic 5min rule)
+  if (url.pathname === '/blog' || url.pathname === '/blog/') {
     response.headers.set(
-      'Cache-Control', 
+      'Cache-Control',
+      'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400'
+    );
+    if (DEBUG_CACHE) {
+      console.log(`[Cache] ${url.pathname} → BLOG INDEX (5min browser, 1hr CDN)`);
+    }
+    return response;
+  }
+
+  // Blog posts - cache longer since they change less frequently
+  if (url.pathname.startsWith('/blog/')) {
+    response.headers.set(
+      'Cache-Control',
       'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400'
     );
     if (DEBUG_CACHE) {
