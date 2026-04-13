@@ -1,0 +1,208 @@
+---
+interface QuickLink {
+  _key?: string;
+  label: string;
+  url: string;
+  icon?: string;
+  isExternal?: boolean;
+}
+
+interface FooterLink {
+  _key?: string;
+  label: string;
+  url: string;
+  isExternal?: boolean;
+}
+
+interface FooterColumn {
+  _key?: string;
+  title: string;
+  links: FooterLink[];
+}
+
+interface Props {
+  quickLinks?: QuickLink[];
+  columns?: FooterColumn[];
+}
+
+const { quickLinks = [], columns = [] } = Astro.props;
+---
+
+{quickLinks.length > 0 && (
+  <>
+    <div class="footer-quick-links">
+      {quickLinks.map((link) => (
+        <a
+          href={link.url}
+          class="footer-quick-link"
+          target={link.isExternal ? '_blank' : undefined}
+          rel={link.isExternal ? 'noopener noreferrer' : undefined}
+        >
+          {link.icon && (
+            <span class="footer-quick-link__icon" set:html={link.icon}></span>
+          )}
+          {link.label}
+        </a>
+      ))}
+    </div>
+    <div class="footer-divider"></div>
+  </>
+)}
+
+{columns.length > 0 && (
+  <nav class="footer-nav" aria-label="Footer Navigation">
+    {columns.map((column) => (
+      <div class="footer-nav-column">
+        <h3 class="footer-nav-column__title">{column.title}</h3>
+        {column.links && column.links.length > 0 && (
+          <div class="footer-nav-column__links">
+            {column.links.map((link) => (
+              <a
+                href={link.url}
+                class="footer-nav-link"
+                target={link.isExternal ? '_blank' : undefined}
+                rel={link.isExternal ? 'noopener noreferrer' : undefined}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    ))}
+  </nav>
+)}
+
+<style>
+  .footer-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    width: 100%;
+  }
+
+  .footer-quick-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 16px 0;
+    list-style: none;
+    margin: 0;
+  }
+
+  .footer-quick-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 18px;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-quick-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  .footer-quick-link__icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 32px;
+    font-size: 14px;
+  }
+
+  .footer-nav-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .footer-nav-column__title {
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 18px;
+    color: #ffffff;
+    margin: 0;
+    display: inline-block;
+    cursor: auto;
+    margin-bottom: var(--size-3, 12px);
+  }
+
+  .footer-nav-column__title:hover {
+    text-decoration: none;
+  }
+
+  .footer-nav-column__links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: var(--size-3, 12px);
+  }
+
+  .footer-nav-column__links a {
+    display: block;
+    line-height: 1.5;
+    padding: 0.125rem 0;
+  }
+
+  .footer-nav-link {
+    color: #f2f2f2;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 18px;
+    transition: opacity 0.2s ease;
+  }
+
+  .footer-nav-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 1024px) {
+    .footer-nav {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .footer-nav {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-quick-links {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-nav {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media only screen and (min-width: 720px) {
+    .footer-quick-links {
+      display: flex;
+      gap: var(--size-6, 24px);
+    }
+
+    .footer-nav {
+      grid-template-columns: repeat(5, 1fr);
+      font-size: 14px;
+    }
+
+    .footer-nav-column__links a {
+      padding: 0.125rem 0;
+    }
+  }
+</style>

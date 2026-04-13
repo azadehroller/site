@@ -1,0 +1,180 @@
+---
+import { formatDate } from "@utils/index";
+import type { Post } from "@utils/sanity";
+
+interface Props {
+  relatedPosts: Post[];
+}
+
+const { relatedPosts } = Astro.props;
+---
+
+{relatedPosts.length > 0 && (
+  <div class="blog-related blog-related__wrapper">
+    <div class="blog-post__section">
+      <h2>Related articles</h2>
+      <div class="blog-index">
+        {relatedPosts.map((relatedPost) => {
+          const relatedTopic = relatedPost.topics?.filter(t => t != null)?.[0];
+          const relatedDate = relatedPost.publishedAt || relatedPost._createdAt;
+          return (
+            <article class="blog-index__post">
+              {relatedPost.featuredImage?.asset?.url && (
+                <a href={`/blog/${relatedPost.slug.current}`} class="blog-index__post-image">
+                  <img
+                    src={relatedPost.featuredImage.asset.url}
+                    alt={relatedPost.featuredImage.alt || relatedPost.title || ''}
+                    loading="lazy"
+                  />
+                </a>
+              )}
+              <div class="blog-index__post-content">
+                {relatedTopic && (
+                  <a class="blog-header__tag" href={`/blog/topic/${relatedTopic.slug?.current}`}>
+                    {relatedTopic.name}
+                  </a>
+                )}
+                <h3 class="blog-index__post-title">
+                  <a href={`/blog/${relatedPost.slug.current}`}>{relatedPost.title}</a>
+                </h3>
+                <div class="blog-index__post-content-meta">
+                  <span>{formatDate(relatedDate)}</span>
+                  <span> | </span>
+                  <span class="blog-post__readingtime">
+                    <span class="blog-post__readingtime-icon">
+                      <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180" />
+                      </svg>
+                    </span>
+                    {Math.max(1, Math.ceil(((relatedPost as any).wordCount || 0) / 1000))} min
+                  </span>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .blog-related__wrapper {
+    padding: 0;
+    background: transparent;
+  }
+
+  .blog-post__section {
+    margin: 0 auto;
+    padding: 0;
+    margin-bottom: 60px;
+  }
+
+  .blog-related__wrapper .blog-post__section {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .blog-related__wrapper .blog-post__section h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #033180;
+    margin-bottom: 30px;
+  }
+
+  @media (min-width: 992px) {
+    .blog-related__wrapper .blog-post__section h2 {
+      font-size: 26px;
+    }
+  }
+
+  .blog-related__wrapper .blog-index {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 20px 0 40px;
+  }
+
+  @media (min-width: 768px) {
+    .blog-related__wrapper .blog-index {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .blog-related__wrapper .blog-index {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .blog-related__wrapper .blog-index__post {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 24px 40px 0 rgba(7, 77, 197, 0.1), 0 8px 16px 0 rgba(7, 77, 197, 0.05);
+    background-color: #fff;
+    padding: 0;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .blog-related__wrapper .blog-index__post:hover {
+    box-shadow: 0 24px 60px 0 rgba(7, 77, 197, 0.2), 0 8px 24px 0 rgba(7, 77, 197, 0.15);
+    transform: translateY(-4px);
+  }
+
+  .blog-related__wrapper .blog-index__post-image {
+    display: block;
+  }
+
+  .blog-related__wrapper .blog-index__post-image img {
+    border-radius: 4px 4px 0 0;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .blog-related__wrapper .blog-index__post-content {
+    padding: 20px;
+  }
+
+  .blog-related__wrapper .blog-index__post-content h3 {
+    margin-top: 8px;
+    font-size: 18px;
+  }
+
+  .blog-related__wrapper .blog-index__post-content h3 a {
+    color: #033180;
+    text-decoration: none;
+  }
+
+  .blog-related__wrapper .blog-index__post-content h3 a:hover {
+    text-decoration: underline;
+  }
+
+  .blog-related__wrapper .blog-index__post-content-meta {
+    font-size: 14px;
+    color: #033180;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .blog-related__wrapper .blog-header__tag {
+    color: rgb(255, 41, 12);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  .blog-post__readingtime {
+    align-items: center;
+    display: flex;
+  }
+
+  .blog-post__readingtime-icon {
+    padding: 0 4px 0 0;
+    display: flex;
+    align-items: center;
+  }
+</style>

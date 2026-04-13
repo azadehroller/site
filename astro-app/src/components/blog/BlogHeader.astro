@@ -1,0 +1,178 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="blog-header">
+  <div class="blog-header__inner">
+    <h1 class="blog-header__heading">{title}</h1>
+    <p class="blog-header__text">
+      Insights, tips, and trends to help you run a successful attraction business.
+    </p>
+    <div class="blog-header__search-wrapper">
+      <div class="blog-header__search">
+        <div class="blog-header__search--input">
+          <input
+            type="text"
+            id="blog-search-input"
+            class="blog-search-input"
+            placeholder="Search articles..."
+            aria-label="Search articles"
+            autocomplete="off"
+          />
+        </div>
+        <div class="blog-header__search--icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+            <path fill="#fff" fill-rule="evenodd" d="M14.71 14h.79l4.99 5L19 20.49l-5-4.99v-.79l-.27-.28A6.471 6.471 0 0 1 9.5 16 6.5 6.5 0 1 1 16 9.5c0 1.61-.59 3.09-1.57 4.23l.28.27ZM5 9.5C5 11.99 7.01 14 9.5 14S14 11.99 14 9.5 11.99 5 9.5 5 5 7.01 5 9.5Z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+      </div>
+      <div id="blog-search-results" class="blog-search-results" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .blog-header {
+    background: linear-gradient(135deg, #0270e0 0%, #033180 100%);
+    color: #fff;
+    margin-bottom: 40px;
+    padding: 60px 0;
+  }
+
+  .blog-header__inner {
+    margin: 0 auto;
+    max-width: 1300px;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .blog-header__heading {
+    margin-bottom: 16px;
+    font-size: 2rem;
+    text-transform: capitalize;
+  }
+
+  @media (min-width: 768px) {
+    .blog-header__heading {
+      font-size: 3rem;
+    }
+  }
+
+  .blog-header__text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 28px;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.9;
+  }
+
+  @media (min-width: 992px) {
+    .blog-header__text {
+      font-size: 18px;
+      line-height: 32px;
+    }
+  }
+
+  .blog-header__search {
+    align-items: center;
+    display: flex;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+  }
+
+  .blog-header__search--input {
+    flex: 1;
+  }
+
+  .blog-search-input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    width: 100%;
+  }
+
+  .blog-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .blog-header__search--icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .blog-header__search-wrapper {
+    position: relative;
+    max-width: 400px;
+    margin: 1.6rem auto 0;
+  }
+
+  .blog-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    margin-top: 8px;
+    text-align: left;
+  }
+
+  .blog-search-results.active {
+    display: block;
+  }
+
+  /* Use :global() for dynamically inserted content */
+  .blog-search-results :global(.blog-search-results__list) {
+    list-style: none;
+    margin: 0;
+    padding: 12px 0;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li) {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li a) {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #023180;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.15s ease;
+    text-align: left;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li a:hover) {
+    background-color: #f5f8ff;
+  }
+
+  .blog-search-results :global(.blog-search-results__list li a strong) {
+    font-weight: 700;
+    color: #023180;
+  }
+
+  .blog-search-results :global(.blog-search-results__loading),
+  .blog-search-results :global(.blog-search-results__empty) {
+    padding: 16px 20px;
+    text-align: left;
+    color: #666;
+    font-size: 14px;
+  }
+</style>

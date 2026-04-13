@@ -1,0 +1,200 @@
+---
+interface Props {
+  url: string;
+  primaryText?: string;
+  secondaryText?: string;
+}
+
+const { url, primaryText, secondaryText } = Astro.props;
+---
+
+<a href={url} class="floating-button" aria-label={primaryText || 'Contact us'}>
+  <div class="floating-button-wrap" aria-live="polite">
+    <div class="floating-button-text">
+      <span class="floating-button-front">{primaryText}</span>
+      <span class="floating-button-back">{secondaryText}</span>
+    </div>
+  </div>
+  <div class="floating-button-icon" aria-hidden="true">
+    <svg width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8.12372 12.5883C9.80372 15.89 12.5104 18.585 15.8121 20.2767L18.3787 17.71C18.6937 17.395 19.1604 17.29 19.5687 17.43C20.8754 17.8617 22.2871 18.095 23.7337 18.095C24.3754 18.095 24.9004 18.62 24.9004 19.2617V23.3333C24.9004 23.975 24.3754 24.5 23.7337 24.5C12.7787 24.5 3.90039 15.6217 3.90039 4.66667C3.90039 4.025 4.42539 3.5 5.06706 3.5H9.15039C9.79206 3.5 10.3171 4.025 10.3171 4.66667C10.3171 6.125 10.5504 7.525 10.9821 8.83167C11.1104 9.24 11.0171 9.695 10.6904 10.0217L8.12372 12.5883Z" fill="white"/>
+    </svg>
+  </div>
+</a>
+
+<style>
+  .floating-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 50px;
+    padding: 0;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    cursor: pointer;
+    overflow: hidden;
+    height: 48px;
+    text-decoration: none;
+  }
+
+  .floating-button-wrap {
+    width: 200px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 8px 0 8px 18px;
+    background: #081B45;
+    border-radius: 50px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    font-size: 16px;
+    line-height: 24px;
+    color: #fff;
+    overflow: hidden;
+    opacity: 1;
+    transform: translateX(0);
+    transition: transform 400ms ease, opacity 300ms ease;
+    will-change: transform, opacity;
+  }
+
+  .floating-button-text {
+    position: relative;
+    width: 100%;
+    height: 24px;
+  }
+
+  .floating-button-text span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-decoration: none;
+    color: inherit;
+    pointer-events: auto;
+    white-space: nowrap;
+  }
+
+  .floating-button-front {
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .floating-button-back {
+    z-index: 0;
+    opacity: 0;
+  }
+
+  @keyframes fadeFrontSeq {
+    0% { opacity: 0; }
+    8% { opacity: 1; }
+    25% { opacity: 1; }
+    33% { opacity: 0; }
+    50% { opacity: 0; }
+    58% { opacity: 1; }
+    75% { opacity: 1; }
+    83% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes fadeBackSeq {
+    0% { opacity: 0; }
+    25% { opacity: 0; }
+    33% { opacity: 1; }
+    50% { opacity: 1; }
+    58% { opacity: 0; }
+    75% { opacity: 0; }
+    83% { opacity: 1; }
+    98% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .floating-button-front {
+    animation: fadeBackSeq 12s linear 1 forwards;
+  }
+
+  .floating-button-back {
+    animation: fadeFrontSeq 12s linear 1 forwards;
+  }
+
+  .floating-button:hover .floating-button-text span {
+    animation: none !important;
+  }
+
+  .floating-button:hover .floating-button-front {
+    opacity: 1 !important;
+    text-decoration: underline;
+  }
+
+  .floating-button:hover .floating-button-back {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .floating-button.finished .floating-button-wrap {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+
+  .floating-button.finished:hover .floating-button-wrap {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .floating-button-icon {
+    position: absolute;
+    right: 0;
+    background: #ff290c;
+    border-radius: 50%;
+    height: 48px;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+  }
+
+  .floating-button:hover .floating-button-icon {
+    background: #B31803;
+  }
+
+  .floating-button-icon svg {
+    fill: #fff;
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .floating-button-front,
+    .floating-button-back {
+      animation: none !important;
+    }
+
+    .floating-button.finished .floating-button-wrap,
+    .floating-button-wrap {
+      transform: translateX(110%) !important;
+      opacity: 0 !important;
+    }
+
+    .floating-button:hover .floating-button-wrap {
+      transform: translateX(0) !important;
+      opacity: 1 !important;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const floatingBtn = document.querySelector('.floating-button');
+    if (!floatingBtn) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      floatingBtn.classList.add('finished');
+      return;
+    }
+
+    setTimeout(() => {
+      floatingBtn.classList.add('finished');
+    }, 12000);
+  });
+</script>

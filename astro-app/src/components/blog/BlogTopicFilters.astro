@@ -1,0 +1,253 @@
+---
+import type { BlogTopic } from "@utils/sanity";
+
+interface Props {
+  topics: (BlogTopic & { postCount?: number })[];
+}
+
+const { topics } = Astro.props;
+---
+
+<div class="blog-filter-options">
+  <nav id="js-scroll-nav" aria-label="Filter articles by topic">
+    <ul role="list">
+      <li class="active">
+        <button type="button" class="filter-btn" data-filter="all" data-topic-slug="">All articles</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="payments" data-raw-name="Payments" data-topic-slug="payments">Payments</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="go-karting" data-raw-name="Go-Karting" data-topic-slug="go-karting">Go-Karting</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="ticketing" data-raw-name="Ticketing" data-topic-slug="ticketing">Ticketing</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="rage-rooms" data-raw-name="Rage Rooms" data-topic-slug="rage-rooms">Rage Rooms</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="trampoline-parks" data-raw-name="Trampoline Parks" data-topic-slug="trampoline-parks">Trampoline Parks</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="bowling" data-raw-name="Bowling" data-topic-slug="bowling">Bowling</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="roller-skating" data-raw-name="Roller Skating" data-topic-slug="roller-skating">Roller Skating</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="obstacle-courses" data-raw-name="Obstacle Courses" data-topic-slug="obstacle-courses">Obstacle Courses</button>
+      </li>
+      <li>
+        <button type="button" class="filter-btn" data-filter="point-of-sale" data-raw-name="Point of Sale" data-topic-slug="point-of-sale">Point of Sale</button>
+      </li>
+    </ul>
+  </nav>
+
+  {topics && topics.length > 0 && (
+    <div class="blog-dropdown dropdown" data-dropdown>
+      <button type="button" class="btn--dropdown" data-dropdown-button aria-label="Browse categories">
+        Browse categories
+        <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12">
+          <path d="M6 9L1 4h10L6 9z" fill="currentColor"/>
+        </svg>
+      </button>
+      <div class="dropdown-menu">
+        <div class="dropdown-links">
+          {topics
+            .filter(topic => (topic as any).postCount > 0)
+            .sort((a, b) => ((b as any).postCount || 0) - ((a as any).postCount || 0))
+            .map((topic) => (
+              <a
+                href={`/blog/topic/${topic.slug?.current}`}
+                class="dropdown-link"
+              >
+                {topic.name} ({((topic as any).postCount || 0)})
+              </a>
+            ))}
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  .blog-filter-options {
+    position: relative;
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 0 16px;
+    white-space: nowrap;
+    gap: 8px;
+  }
+
+  .blog-filter-options nav {
+    display: none;
+  }
+
+  @media (min-width: 992px) {
+    .blog-filter-options nav {
+      display: flex;
+      padding: 8px 0 0;
+    }
+
+    .blog-filter-options nav ul {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .blog-filter-options nav ul {
+    align-items: center;
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  .blog-filter-options nav li {
+    padding: 0 8px 0 1px;
+  }
+
+  .blog-filter-options nav li .filter-btn {
+    border: none;
+    border-radius: 100px;
+    box-shadow: 0 0 0 1px #cbd7ee;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 12px;
+    transition: background 0.2s ease, color 0.2s ease;
+    color: #033180;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .blog-filter-options nav li.active .filter-btn,
+  .blog-filter-options nav li:hover .filter-btn {
+    background: #033180;
+    color: #fff;
+  }
+
+  .blog-dropdown {
+    position: relative;
+    margin-left: 8px;
+  }
+
+  @media (min-width: 992px) {
+    .blog-dropdown {
+      margin-left: 16px;
+    }
+  }
+
+  @media (max-width: 991px) {
+    .blog-dropdown {
+      margin-left: 0;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .blog-dropdown .btn--dropdown {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .blog-dropdown .dropdown-menu {
+      left: 0;
+      right: 0;
+      width: 100%;
+    }
+  }
+
+  .blog-dropdown .btn--dropdown {
+    border: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5.5px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 0 0 1px #cbd7ee;
+    border-radius: 100px;
+    background: transparent;
+    transition: background 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+    color: #033180;
+    font-family: inherit;
+  }
+
+  .blog-dropdown .btn--dropdown svg {
+    transition: transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .blog-dropdown .btn--dropdown:hover,
+  .blog-dropdown.active .btn--dropdown {
+    color: #fff;
+    background: #033180;
+  }
+
+  .blog-dropdown.active .btn--dropdown svg {
+    transform: rotate(180deg);
+  }
+
+  .blog-dropdown .dropdown-menu {
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    left: auto;
+    top: calc(100% + 0.9rem);
+    background-color: #fff;
+    padding: 28px 28px 28px 20px;
+    border-radius: 4px;
+    border: 1px solid rgba(2, 49, 128, 0.1);
+    display: none;
+    min-width: 300px;
+    pointer-events: none;
+    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  .blog-dropdown.active .dropdown-menu {
+    display: block;
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .dropdown-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  @media (min-width: 591px) {
+    .dropdown-links {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .dropdown-links {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .dropdown-links a,
+  .dropdown-links .dropdown-link {
+    font-size: 14px;
+    padding: 10px 8px;
+    color: #001F4A;
+    transition: background-color 150ms ease-in-out;
+    text-decoration: none;
+    display: block;
+  }
+
+  .dropdown-links a:hover,
+  .dropdown-links .dropdown-link:hover {
+    background: #f1f3f9;
+    border-radius: 4px;
+  }
+</style>

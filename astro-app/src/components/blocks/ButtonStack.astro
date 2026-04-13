@@ -13,6 +13,7 @@ interface ButtonSettings {
   formId?: string;
   videoId?: string;
   btnLabel?: string;
+  position?: 'left' | 'right';
   buttonLink?: ButtonLink;
 }
 
@@ -146,7 +147,9 @@ const hasVideo = buttonList.some(
     // Clean version for ID generation only
     const cleanBtnLabel = cleanStega(buttonSettings.btnLabel) || 'Button';
     const buttonLink = buttonSettings.buttonLink;
-    
+    const rowPosition = cleanStega(buttonSettings.position) || 'left';
+    const rowOrderClass = rowPosition === 'right' ? 'sm:order-2' : 'sm:order-1';
+
     const iconFieldSvg = cleanStega(btnIcon.iconFieldSvg);
     const iconPosition = cleanStega(btnIcon.iconPosition) || 'left';
     const bgKind = cleanStega(buttonStyles.bgKind) || 'primary';
@@ -187,7 +190,7 @@ const hasVideo = buttonList.some(
 
     return (
       <>
-        <li class="ml-0">
+        <li class={`ml-0 ${rowOrderClass}`}>
           {videoId && modalTriggerVideo ? (
             <div
               class={`wistia_embed wistia_async_${videoId.replace(/[^a-z0-9_-]/gi, '')} popover=true popoverContent=html`}
