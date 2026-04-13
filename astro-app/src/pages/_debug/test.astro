@@ -3,6 +3,7 @@ import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Layout from "@layouts/Layout.astro";
 import { loadQuery } from "@utils/loadQuery";
+import { getLayoutData } from "@utils/sanity";
 import groq from "groq";
 import type { ColumnsBlock, Divider } from "@utils/sanity";
 
@@ -22,8 +23,8 @@ interface TestPage {
   sections?: (ColumnsBlock | Divider)[];
 }
 
-// Query for the test page
-const { data: testPage } = await loadQuery<TestPage | null>({
+const [{ data: testPage }, layoutSanity] = await Promise.all([
+  loadQuery<TestPage | null>({
   query: groq`*[_type == "testPage"][0]{
     _id,
     title,
@@ -120,7 +121,9 @@ const { data: testPage } = await loadQuery<TestPage | null>({
     }
   }`,
   request: Astro.request,
-});
+}),
+  getLayoutData(Astro.request),
+]);
 
 if (!testPage) {
   return Astro.redirect('/404');
@@ -131,7 +134,7 @@ const documentId = testPage?._id || '';
 const documentType = 'testPage';
 ---
 
-<Layout title={testPage?.title || "Test Page"}>
+<Layout title={testPage?.title || "Test Page"} layoutSanity={layoutSanity}>
   <div class="test-page-container">
     {testPage?.sections?.map((section: ColumnsBlock | Divider) => {
       if (section._type === "columnsBlock") {

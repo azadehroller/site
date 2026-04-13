@@ -1,19 +1,22 @@
 ---
 import CompetitorsLanding from "@templates/competitors/CompetitorsLanding.astro";
 import Layout from "@layouts/Layout.astro";
-import { getCompetitorsLandingPage } from "@utils/sanity";
+import { getCompetitorsLandingPage, getLayoutData } from "@utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
-const { data: competitorsLanding } = await getCompetitorsLandingPage(Astro.request);
+const [{ data: competitorsLanding }, layoutSanity] = await Promise.all([
+  getCompetitorsLandingPage(Astro.request),
+  getLayoutData(Astro.request),
+]);
 
 // Document info for visual editing
 const documentId = competitorsLanding?._id || '';
 const documentType = 'competitorsLandingPage';
 ---
 
-<Layout title={competitorsLanding?.title || "Competitors"} headerTheme={competitorsLanding?.headerTheme} announcementBar={competitorsLanding?.announcementBar}>
+<Layout title={competitorsLanding?.title || "Competitors"} headerTheme={competitorsLanding?.headerTheme} announcementBar={competitorsLanding?.announcementBar} layoutSanity={layoutSanity}>
   <CompetitorsLanding 
     competitorsLanding={competitorsLanding}
     documentId={documentId}

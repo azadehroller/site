@@ -2,13 +2,16 @@
 import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Layout from "@layouts/Layout.astro";
-import { getIndustry, type ColumnsBlock } from "@utils/sanity";
+import { getIndustry, getLayoutData, type ColumnsBlock } from "@utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
 const { slug } = Astro.params;
-const { data: industry } = await getIndustry(slug as string, Astro.request);
+const [{ data: industry }, layoutSanity] = await Promise.all([
+  getIndustry(slug as string, Astro.request),
+  getLayoutData(Astro.request),
+]);
 
 if (!industry) {
   return Astro.redirect('/404');
@@ -19,7 +22,7 @@ const documentId = industry?._id || '';
 const documentType = 'industry';
 ---
 
-<Layout title={industry?.title || "Industry"} announcementBar={industry?.announcementBar}>
+<Layout title={industry?.title || "Industry"} announcementBar={industry?.announcementBar} layoutSanity={layoutSanity}>
   {industry?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;

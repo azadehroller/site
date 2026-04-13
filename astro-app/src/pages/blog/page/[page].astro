@@ -1,6 +1,6 @@
 ---
 import BlogLanding from "@templates/blog/BlogLanding.astro";
-import { getPosts } from "@utils/sanity";
+import { getPosts, getLayoutData } from "@utils/sanity";
 
 const POSTS_PER_PAGE = 9;
 
@@ -13,7 +13,10 @@ if (currentPage === 1) {
   return Astro.redirect('/blog');
 }
 
-const { data: allPosts } = await getPosts(Astro.request);
+const [{ data: allPosts }, layoutSanity] = await Promise.all([
+  getPosts(Astro.request),
+  getLayoutData(Astro.request),
+]);
 const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 
 // Handle invalid page numbers
@@ -32,5 +35,6 @@ const posts = allPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
   postsPerPage={POSTS_PER_PAGE}
   posts={posts}
   totalPages={totalPages}
+  layoutSanity={layoutSanity}
 />
 

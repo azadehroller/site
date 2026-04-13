@@ -4,7 +4,7 @@ import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Divider from "@components/blocks/Divider.astro";
 import ExperimentTracking from "@components/tracking/ExperimentTracking.astro";
-import { getHomepage, type ColumnsBlock, type Divider as DividerType } from "@utils/sanity";
+import { getHomepage, getLayoutData, type ColumnsBlock, type Divider as DividerType } from "@utils/sanity";
 import { cleanStega } from "@utils/stega";
 import { urlFor, isImageReady } from "@utils/image";
 import { getExperimentValue } from "@utils/experiments";
@@ -13,10 +13,13 @@ import { getExperimentValue } from "@utils/experiments";
 const abTest = Astro.locals.abTest;
 const { variant } = abTest ? getExperimentValue('homepage-title', abTest) : { variant: undefined };
 
-const { data: homepage } = await getHomepage(Astro.request, {
-  experiment: 'homepage-title',
-  variant: variant?.id || '',
-});
+const [{ data: homepage }, layoutSanity] = await Promise.all([
+  getHomepage(Astro.request, {
+    experiment: 'homepage-title',
+    variant: variant?.id || '',
+  }),
+  getLayoutData(Astro.request),
+]);
 const title = homepage?.title || "Home";
 const sections = homepage?.sections || [];
 
@@ -101,7 +104,7 @@ const getDividerBgClass = (divider: DividerType): string => {
 };
 ---
 
-<Layout title={title} headerTheme={homepage?.headerTheme} announcementBar={homepage?.announcementBar} lcpImage={lcpImageUrl}>
+<Layout title={title} headerTheme={homepage?.headerTheme} announcementBar={homepage?.announcementBar} lcpImage={lcpImageUrl} layoutSanity={layoutSanity}>
   <main class="homepage">
     {sections.length > 0 ? (
       sections.map((section) => {

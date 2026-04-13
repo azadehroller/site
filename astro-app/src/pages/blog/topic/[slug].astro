@@ -6,7 +6,7 @@
 import Layout from "@layouts/Layout.astro";
 import Card from "@components/ui/Card.astro";
 import Pagination from "@components/ui/Pagination.astro";
-import { getPostsByTopic, getTopic } from "@utils/sanity";
+import { getPostsByTopic, getTopic, getLayoutData } from "@utils/sanity";
 
 export const prerender = false;
 
@@ -27,15 +27,15 @@ if (pageParam === "1") {
   return Astro.redirect(`/blog/topic/${slug}`, 301);
 }
 
-// Get topic info
-const { data: topic } = await getTopic(slug, Astro.request);
+const [{ data: topic }, { data: allPosts }, layoutSanity] = await Promise.all([
+  getTopic(slug, Astro.request),
+  getPostsByTopic(slug, Astro.request),
+  getLayoutData(Astro.request),
+]);
 
 if (!topic) {
   return Astro.redirect("/blog");
 }
-
-// Get all posts for this topic
-const { data: allPosts } = await getPostsByTopic(slug, Astro.request);
 
 // Calculate pagination
 const totalPages = Math.ceil((allPosts?.length || 0) / POSTS_PER_PAGE);
@@ -51,7 +51,7 @@ const title = `${topic.name} - Blog`;
 const baseUrl = `/blog/topic/${slug}`;
 ---
 
-<Layout title={title}>
+<Layout title={title} layoutSanity={layoutSanity}>
   {/* Blog Header */}
   <div class="blog-header">
     <div class="blog-header__inner">

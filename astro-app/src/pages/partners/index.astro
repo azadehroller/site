@@ -1,19 +1,22 @@
 ---
 import PartnersLanding from "@templates/partners/PartnersLanding.astro";
 import Layout from "@layouts/Layout.astro";
-import { getPartnersLandingPage } from "@utils/sanity";
+import { getPartnersLandingPage, getLayoutData } from "@utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
-const { data: partnersLanding } = await getPartnersLandingPage(Astro.request);
+const [{ data: partnersLanding }, layoutSanity] = await Promise.all([
+  getPartnersLandingPage(Astro.request),
+  getLayoutData(Astro.request),
+]);
 
 // Document info for visual editing
 const documentId = partnersLanding?._id || '';
 const documentType = 'partnersLandingPage';
 ---
 
-<Layout title={partnersLanding?.title || "Partners"} headerTheme={partnersLanding?.headerTheme} announcementBar={partnersLanding?.announcementBar}>
+<Layout title={partnersLanding?.title || "Partners"} headerTheme={partnersLanding?.headerTheme} announcementBar={partnersLanding?.announcementBar} layoutSanity={layoutSanity}>
   <PartnersLanding 
     partnersLanding={partnersLanding}
     documentId={documentId}

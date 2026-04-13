@@ -2,13 +2,16 @@
 import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Layout from "@layouts/Layout.astro";
-import { getFeaturesLandingPage, type ColumnsBlock, type Divider } from "@utils/sanity";
+import { getFeaturesLandingPage, getLayoutData, type ColumnsBlock, type Divider } from "@utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
 // Fetch the features landing page using the comprehensive query
-const { data: page } = await getFeaturesLandingPage(Astro.request);
+const [{ data: page }, layoutSanity] = await Promise.all([
+  getFeaturesLandingPage(Astro.request),
+  getLayoutData(Astro.request),
+]);
 
 if (!page) {
   return Astro.redirect('/404');
@@ -19,7 +22,7 @@ const documentId = page?._id || '';
 const documentType = 'featuresLandingPage';
 ---
 
-<Layout title={page?.title || "Features"} headerTheme={page?.headerTheme} announcementBar={page?.announcementBar}>
+<Layout title={page?.title || "Features"} headerTheme={page?.headerTheme} announcementBar={page?.announcementBar} layoutSanity={layoutSanity}>
   <div class="features-landing-page">
     {page?.sections?.map((section: ColumnsBlock | Divider) => {
       if (section._type === "columnsBlock") {

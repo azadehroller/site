@@ -5,7 +5,7 @@
  */
 import Layout from "@layouts/Layout.astro";
 import { formatDate } from "@utils/index";
-import { getPostsByAuthor, getAuthor } from "@utils/sanity";
+import { getPostsByAuthor, getAuthor, getLayoutData } from "@utils/sanity";
 
 export const prerender = false;
 
@@ -15,20 +15,21 @@ if (!slug) {
   return Astro.redirect("/blog");
 }
 
-// Get author info
-const { data: author } = await getAuthor(slug, Astro.request);
+const [{ data: author }, layoutSanity] = await Promise.all([
+  getAuthor(slug, Astro.request),
+  getLayoutData(Astro.request),
+]);
 
 if (!author) {
   return Astro.redirect("/blog");
 }
 
-// Get posts by this author
 const { data: posts } = await getPostsByAuthor(author._id, Astro.request);
 
 const title = `${author.name} - Blog Author`;
 ---
 
-<Layout title={title}>
+<Layout title={title} layoutSanity={layoutSanity}>
   <div class="body-container-wrapper">
     <div class="body-container body-container--blog">
       

@@ -4,9 +4,12 @@
  * Fetches the Industries Landing singleton from Sanity and renders it
  */
 import IndustriesTemplate from "@templates/page/Industries.astro";
-import { getIndustriesLandingPage } from "@utils/sanity";
+import { getIndustriesLandingPage, getLayoutData } from "@utils/sanity";
 
-const { data: page, perspective } = await getIndustriesLandingPage(Astro.request);
+const [{ data: page, perspective }, layoutSanity] = await Promise.all([
+  getIndustriesLandingPage(Astro.request),
+  getLayoutData(Astro.request),
+]);
 
 // Debug logging in development
 if (import.meta.env.DEV) {
@@ -30,4 +33,4 @@ if (import.meta.env.DEV) {
 }
 ---
 
-<IndustriesTemplate page={page} />
+<IndustriesTemplate page={page} layoutSanity={layoutSanity} />

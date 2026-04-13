@@ -4,10 +4,13 @@
  * Fetches the Get Started singleton from Sanity and renders it
  */
 import GetStartedTemplate from "@templates/page/GetStarted.astro";
-import { getGetStartedPage } from "@utils/sanity";
+import { getGetStartedPage, getLayoutData } from "@utils/sanity";
 
-const { data: page } = await getGetStartedPage(Astro.request);
+const [{ data: page }, layoutSanity] = await Promise.all([
+  getGetStartedPage(Astro.request),
+  getLayoutData(Astro.request),
+]);
 ---
 
-<GetStartedTemplate page={page} />
+<GetStartedTemplate page={page} layoutSanity={layoutSanity} />
 

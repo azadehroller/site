@@ -3,15 +3,18 @@ import Card from "@components/ui/Card.astro";
 import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Layout from "@layouts/Layout.astro";
-import { getPage, getLandingPage, type ColumnsBlock, type Post } from "@utils/sanity";
+import { getPage, getLandingPage, getLayoutData, type ColumnsBlock, type Post } from "@utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
 
 const { slug } = Astro.params;
 
-// First try to find a landing page, then fall back to regular page
-const { data: landingPage } = await getLandingPage(slug as string, Astro.request);
+// Landing + layout in parallel; regular page only if no landing match
+const [{ data: landingPage }, layoutSanity] = await Promise.all([
+  getLandingPage(slug as string, Astro.request),
+  getLayoutData(Astro.request),
+]);
 const { data: regularPage } = landingPage ? { data: null } : await getPage(slug as string, Astro.request);
 
 const page = landingPage || regularPage;
@@ -27,7 +30,7 @@ const documentType = landingPage ? 'landingPage' : 'page';
 const headerTheme = landingPage?.headerTheme || regularPage?.headerTheme || 'default';
 ---
 
-<Layout title={page?.title || "Page"} headerTheme={headerTheme} announcementBar={landingPage?.announcementBar}>
+<Layout title={page?.title || "Page"} headerTheme={headerTheme} announcementBar={landingPage?.announcementBar} layoutSanity={layoutSanity}>
   {page?.sections?.map((section) => {
     if (section._type === "columnsBlock") {
       const columnsBlock = section as ColumnsBlock;
