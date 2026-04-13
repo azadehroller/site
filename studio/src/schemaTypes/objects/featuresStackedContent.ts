@@ -142,17 +142,20 @@ export default defineType({
               name: 'eyebrow',
               title: 'Eyebrow',
               type: 'string',
+              initialValue: 'Lorem ipsum',
             }),
             defineField({
               name: 'title',
               title: 'Title',
               type: 'string',
+              initialValue: 'Lorem ipsum dolor sit amet',
             }),
             defineField({
               name: 'text',
               title: 'Description',
               type: 'text',
               rows: 4,
+              initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
             }),
             // Image
             defineField({
@@ -167,6 +170,7 @@ export default defineType({
               name: 'imageAlt',
               title: 'Image Alt Text',
               type: 'string',
+              initialValue: 'Feature image',
             }),
             defineField({
               name: 'imagePosition',

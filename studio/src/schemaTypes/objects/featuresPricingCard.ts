@@ -65,6 +65,7 @@ const pricingCard = {
       type: 'text',
       rows: 2,
       description: 'Description of the tier',
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     }),
     defineField({
       name: 'showDivider',

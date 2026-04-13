@@ -35,6 +35,7 @@ const statsItem = {
       type: 'text',
       description: 'Description text for the statistic (supports basic HTML like <strong>, <a>)',
       rows: 3,
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       validation: (Rule) => Rule.required(),
     }),
   ],

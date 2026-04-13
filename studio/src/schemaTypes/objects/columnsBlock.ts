@@ -148,6 +148,7 @@ export default defineType({
       type: 'string',
       description: 'Enter a custom hex color (e.g., #ff5500)',
       group: 'background',
+      initialValue: '#ffffff',
       hidden: ({parent}) => parent?.backgroundColor !== 'custom',
     }),
     defineField({
@@ -219,6 +220,7 @@ export default defineType({
       type: 'string',
       description: 'Hex color for the top of the gradient (e.g., #033180)',
       group: 'background',
+      initialValue: '#033180',
       hidden: ({parent}) => parent?.backgroundGradient !== 'custom',
       validation: (Rule) =>
         Rule.custom((value, context) => {
@@ -238,6 +240,7 @@ export default defineType({
       type: 'string',
       description: 'Hex color for the bottom of the gradient (e.g., #011840)',
       group: 'background',
+      initialValue: '#011840',
       hidden: ({parent}) => parent?.backgroundGradient !== 'custom',
       validation: (Rule) =>
         Rule.custom((value, context) => {

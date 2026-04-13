@@ -39,6 +39,7 @@ export default defineType({
       title: 'Text',
       type: 'string',
       description: 'The main announcement text',
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       hidden: ({parent}) => !parent?.enabled,
     }),
     defineField({
@@ -46,6 +47,7 @@ export default defineType({
       title: 'CTA Text',
       type: 'string',
       description: 'The call-to-action button/link text',
+      initialValue: 'Learn more',
       hidden: ({parent}) => !parent?.enabled,
     }),
     defineField({

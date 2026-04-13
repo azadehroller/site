@@ -22,6 +22,7 @@ export default defineType({
       title: 'Eyebrow Text',
       type: 'string',
       description: 'Small text above the title (optional)',
+      initialValue: 'Lorem ipsum',
     }),
     defineField({
       name: 'title',
@@ -140,6 +141,7 @@ export default defineType({
         ],
       },
       description: 'Override the visual display size',
+      initialValue: '',
     }),
     defineField({
       name: 'textType',
@@ -154,6 +156,7 @@ export default defineType({
           {title: 'Extra Large', value: '2xl'},
         ],
       },
+      initialValue: 'base',
       hidden: ({parent}) => !parent?.text,
     }),
     defineField({

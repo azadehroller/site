@@ -46,6 +46,7 @@ const featureItem = {
       title: 'Text',
       type: 'text',
       rows: 3,
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     }),
     defineField({
       name: 'linkLabel',

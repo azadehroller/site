@@ -23,6 +23,7 @@ export default defineType({
       type: 'string',
       description: 'Small text above the title (optional)',
       group: 'content',
+      initialValue: 'Lorem ipsum',
     }),
     defineField({
       name: 'title',
@@ -40,6 +41,7 @@ export default defineType({
       description: 'Description text below the title',
       group: 'content',
       rows: 3,
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     }),
     // Badge images
     defineField({

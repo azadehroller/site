@@ -23,6 +23,7 @@ export default defineType({
       type: 'string',
       description: 'Small text displayed above the heading (e.g., "USER REVIEWS")',
       group: 'content',
+      initialValue: 'Lorem ipsum',
     }),
     defineField({
       name: 'title',
@@ -30,6 +31,7 @@ export default defineType({
       type: 'string',
       description: 'Main heading text',
       group: 'content',
+      initialValue: 'Lorem ipsum dolor sit amet',
     }),
     defineField({
       name: 'text',
@@ -38,6 +40,7 @@ export default defineType({
       description: 'Body text content below the heading',
       group: 'content',
       rows: 3,
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     }),
     // Style fields (same as HeadingComposition)
     defineField({

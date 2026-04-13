@@ -43,6 +43,7 @@ const resultItem = {
       type: 'text',
       rows: 3,
       description: 'The description/content for this item',
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     }),
     defineField({
       name: 'linkLabel',

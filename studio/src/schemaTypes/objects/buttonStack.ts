@@ -69,6 +69,20 @@ export default defineType({
                   validation: (Rule) => Rule.required(),
                 }),
                 defineField({
+                  name: 'position',
+                  title: 'Row position',
+                  type: 'string',
+                  description: 'Order when multiple buttons sit in one row (desktop)',
+                  options: {
+                    list: [
+                      {title: 'Left', value: 'left'},
+                      {title: 'Right', value: 'right'},
+                    ],
+                    layout: 'radio',
+                  },
+                  initialValue: 'left',
+                }),
+                defineField({
                   name: 'buttonLink',
                   title: 'Button Link',
                   type: 'object',
@@ -272,7 +286,7 @@ export default defineType({
                 ],
                 layout: 'radio',
               },
-              initialValue: 'CENTER',
+              initialValue: 'LEFT',
             }),
           ],
         }),

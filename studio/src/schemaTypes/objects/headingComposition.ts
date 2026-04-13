@@ -23,6 +23,7 @@ export default defineType({
       type: 'string',
       description: 'Small text displayed above the heading',
       group: 'content',
+      initialValue: 'Lorem ipsum',
     }),
     defineField({
       name: 'title',
@@ -30,6 +31,7 @@ export default defineType({
       type: 'string',
       description: 'Main heading text',
       group: 'content',
+      initialValue: 'Lorem ipsum dolor sit amet',
     }),
     defineField({
       name: 'text',
@@ -37,6 +39,22 @@ export default defineType({
       type: 'array',
       description: 'Rich text content - supports formatted text and raw HTML blocks',
       group: 'content',
+      initialValue: [
+        {
+          _type: 'block',
+          _key: 'default',
+          style: 'normal',
+          children: [
+            {
+              _type: 'span',
+              _key: 'default-span',
+              text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+              marks: [],
+            },
+          ],
+          markDefs: [],
+        },
+      ],
       of: [
         {type: 'block'},
         // Raw HTML blocks for pasting HTML directly
@@ -282,11 +300,13 @@ export default defineType({
               name: 'eyebrow',
               title: 'Eyebrow',
               type: 'string',
+              initialValue: 'Lorem ipsum',
             }),
             defineField({
               name: 'title',
               title: 'Title',
               type: 'string',
+              initialValue: 'Lorem ipsum dolor sit amet',
             }),
             defineField({
               name: 'text',

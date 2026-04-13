@@ -28,6 +28,7 @@ export default defineType({
       description: 'The quote text to display',
       group: 'content',
       rows: 4,
+      initialValue: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -36,6 +37,7 @@ export default defineType({
       type: 'string',
       description: 'Name of the person being quoted',
       group: 'content',
+      initialValue: 'Lorem Ipsum',
     }),
     defineField({
       name: 'quoteTitle',
@@ -43,6 +45,7 @@ export default defineType({
       type: 'string',
       description: 'Job title or role of the author',
       group: 'content',
+      initialValue: 'Lorem Ipsum Dolor',
     }),
     defineField({
       name: 'customerStoryLink',
