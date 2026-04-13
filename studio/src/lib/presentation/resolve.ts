@@ -6,23 +6,42 @@ function normalizeId(id: string | undefined): string {
   return id.replace(/^drafts\./, '')
 }
 
+/**
+ * Slug from presentation preview snapshot (`select: { slug: 'slug.current' }`).
+ * `resolve` may run with `doc === null` while loading, or before slug is set — never coerce to the string "undefined" in URLs.
+ */
+function presentationSlug(doc: {slug?: unknown} | null | undefined): string | undefined {
+  const s = doc?.slug
+  if (typeof s === 'string' && s.length > 0) return s
+  if (s && typeof s === 'object' && 'current' in s) {
+    const c = (s as {current?: unknown}).current
+    if (typeof c === 'string' && c.length > 0) return c
+  }
+  return undefined
+}
+
 // Configures the "Used on x pages" banner
 export const locations = {
   // Map document types to frontend routes
   post: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
-    resolve: (doc) => ({
-      locations: [
-        {title: doc?.title || 'Untitled', href: `/blog/${doc?.slug}`},
-        {title: 'Blog Index', href: `/blog`},
-      ],
-    }),
+    resolve: (doc) => {
+      const slug = presentationSlug(doc)
+      return {
+        locations: slug
+          ? [
+              {title: doc?.title || 'Untitled', href: `/blog/${slug}`},
+              {title: 'Blog Index', href: '/blog'},
+            ]
+          : [{title: 'Blog Index', href: '/blog'}],
+      }
+    },
   }),
   page: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
     resolve: (doc) => {
-      const slug = doc?.slug || ''
-      const href = `/${slug}`
+      const slug = presentationSlug(doc) ?? ''
+      const href = slug === '' ? '/' : `/${slug}`
       return {
         locations: [
           {title: doc?.title || 'Untitled Page', href},
@@ -65,7 +84,7 @@ export const locations = {
   rawHtmlPage: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
     resolve: (doc) => {
-      const slug = doc?.slug || '/'
+      const slug = presentationSlug(doc) ?? '/'
       // Handle root slug "/" as homepage
       const href = slug === '/' ? '/' : `/${slug}`
       return {
@@ -77,27 +96,36 @@ export const locations = {
   }),
   feature: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
-    resolve: (doc) => ({
-      locations: [
-        {title: doc?.title || 'Feature', href: `/features/${doc?.slug}`},
-      ],
-    }),
+    resolve: (doc) => {
+      const slug = presentationSlug(doc)
+      return {
+        locations: slug
+          ? [{title: doc?.title || 'Feature', href: `/features/${slug}`}]
+          : [{title: 'Features', href: '/features'}],
+      }
+    },
   }),
   industry: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
-    resolve: (doc) => ({
-      locations: [
-        {title: doc?.title || 'Industry', href: `/industries/${doc?.slug}`},
-      ],
-    }),
+    resolve: (doc) => {
+      const slug = presentationSlug(doc)
+      return {
+        locations: slug
+          ? [{title: doc?.title || 'Industry', href: `/industries/${slug}`}]
+          : [{title: 'Industries', href: '/industries'}],
+      }
+    },
   }),
   solution: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
-    resolve: (doc) => ({
-      locations: [
-        {title: doc?.title || 'Solution', href: `/solutions/${doc?.slug}`},
-      ],
-    }),
+    resolve: (doc) => {
+      const slug = presentationSlug(doc)
+      return {
+        locations: slug
+          ? [{title: doc?.title || 'Solution', href: `/solutions/${slug}`}]
+          : [{title: 'Solutions', href: '/solutions'}],
+      }
+    },
   }),
   testPage: defineLocations({
     select: {title: 'title'},
