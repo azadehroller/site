@@ -6,7 +6,7 @@ import Footer from '@components/globals/Footer.astro';
 import Header from '@components/globals/Header.astro';
 import AnnouncementBar from '@components/globals/AnnouncementBar.astro';
 import ChatWidget from '@components/chat/ChatWidget.astro';
-import { getLayoutData, type AnnouncementBarSettings } from '@utils/sanity';
+import { getLayoutData, type AnnouncementBarSettings, type LayoutSanityResult } from '@utils/sanity';
 
 // Visual Editing: Only load for authenticated Sanity editors (via preview cookie)
 // This keeps React/Sanity out of main bundle for normal users (performance optimization)
@@ -47,9 +47,13 @@ interface Props {
   seo?: SEOProps;
   /** URL of the LCP image to preload for faster rendering */
   lcpImage?: string;
+  /**
+   * When provided, Layout skips `getLayoutData` (fetch alongside page data via `Promise.all` for lower TTFB).
+   */
+  layoutSanity?: LayoutSanityResult;
 }
 
-const { title, headDocument, headerTheme = 'light', announcementBar, seo, lcpImage } = Astro.props;
+const { title, headDocument, headerTheme = 'light', announcementBar, seo, lcpImage, layoutSanity } = Astro.props;
 
 // SEO values with fallbacks
 const pageTitle = seo?.seoTitle || title;
@@ -69,9 +73,14 @@ const viewTransitionsEnabled = import.meta.env.PUBLIC_VIEW_TRANSITIONS_ENABLED !
 // Set PUBLIC_ENABLE_THIRD_PARTY_SCRIPTS=true in .env to enable locally for testing
 const enableThirdPartyScripts = import.meta.env.PROD || import.meta.env.PUBLIC_ENABLE_THIRD_PARTY_SCRIPTS === 'true';
 
-// Fetch header, footer, and chatbot config from Sanity in a single merged query
-// This reduces 3 API calls to 1, improving performance by ~150-250ms
-const { data: layoutData, perspective } = await getLayoutData(Astro.request);
+// Usercentrics draft testing (dev): see comments next to the CMP script in <head>
+const usercentricsClearStorage =
+  import.meta.env.DEV && import.meta.env.PUBLIC_USERCENTRICS_CLEAR_STORAGE === 'true'
+const usercentricsDebug =
+  import.meta.env.DEV && import.meta.env.PUBLIC_USERCENTRICS_DEBUG === 'true'
+
+// Fetch header/footer/chatbot unless the page already loaded it in parallel (see layoutSanity prop)
+const { data: layoutData, perspective } = layoutSanity ?? (await getLayoutData(Astro.request));
 const headerData = layoutData?.header;
 const footerData = layoutData?.footer;
 const chatbotConfig = layoutData?.chatbot;
@@ -87,6 +96,54 @@ if (import.meta.env.DEV) {
   });
 }
 
+/** Site-wide Organization schema (JSON-LD). Built in frontmatter and stringified for safe output. */
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  legalName: 'ROLLER Networks Pty Ltd',
+  name: 'ROLLER',
+  description:
+    'Software for attractions, leisure, and entertainment venues — ticketing, POS, memberships, and more.',
+  logo: 'https://3375779.fs1.hubspotusercontent-na1.net/hubfs/3375779/ROLLER%20Logo.svg',
+  url: 'https://www.roller.software/',
+  foundingDate: '2010',
+  sameAs: [
+    'https://www.facebook.com/ROLLERSOFTWARE/',
+    'https://www.youtube.com/channel/UC7k0OBldm_7etXYmUrJopvA',
+    'https://www.instagram.com/rollersoftware/',
+    'https://www.linkedin.com/company/roller/',
+  ],
+  contactPoint: [
+    {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      areaServed: 'Worldwide',
+      url: 'https://www.roller.software/support',
+    },
+    {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      areaServed: 'US',
+      telephone: '+1 855 939 3313',
+      url: 'https://www.roller.software/support',
+    },
+    {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      areaServed: 'UK',
+      telephone: '+44 808 258 0167',
+      url: 'https://www.roller.software/support',
+    },
+    {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      areaServed: 'AU',
+      telephone: '+61 3 8592 6384',
+      url: 'https://www.roller.software/support',
+    },
+  ],
+} as const;
+
 ---
 
 <!DOCTYPE html>
@@ -94,6 +151,60 @@ if (import.meta.env.DEV) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content={Astro.generator} />
+
+    <!--
+      Usercentrics CMP (draft): load early in <head> per https://usercentrics.com/docs/web/implementation/ui/
+      If the SDK loads but no banner: (1) existing consent in storage — use PUBLIC_USERCENTRICS_CLEAR_STORAGE=true
+      (2) Admin geolocation/rules — isConsentRequired is false outside target regions (3) draft not saved in Admin
+      (4) domain not allowlisted for localhost — add in Usercentrics Admin → Implementation
+    -->
+    {usercentricsClearStorage && (
+      <script is:inline>
+        (function () {
+          try {
+            function clearKeys(store) {
+              for (var i = store.length - 1; i >= 0; i--) {
+                var k = store.key(i)
+                if (k && (/^uc/i.test(k) || /usercentrics/i.test(k))) store.removeItem(k)
+              }
+            }
+            clearKeys(localStorage)
+            clearKeys(sessionStorage)
+          } catch (e) {}
+        })()
+      </script>
+    )}
+    <script
+      is:inline
+      id="usercentrics-cmp"
+      src="https://web.cmp.usercentrics.eu/ui/loader.js"
+      data-settings-id="2IPQ2tsbqQMCiu"
+      data-draft="true"
+    ></script>
+    {usercentricsDebug && (
+      <script is:inline>
+        window.addEventListener('UC_UI_INITIALIZED', function () {
+          var cmp = window.__ucCmp
+          if (!cmp) {
+            console.warn('[Usercentrics] UC_UI_INITIALIZED fired but window.__ucCmp is missing')
+            return
+          }
+          cmp
+            .isConsentRequired()
+            .then(function (required) {
+              console.info(
+                '[Usercentrics] isConsentRequired =',
+                required,
+                '— if false, your Admin rules/geolocation usually mean no banner in this region/browser; draft must also be saved in Admin.'
+              )
+            })
+            .catch(function (err) {
+              console.warn('[Usercentrics] isConsentRequired failed', err)
+            })
+        })
+      </script>
+    )}
 
     <!-- Preload LCP image for faster rendering (reduces resource load delay) -->
     {lcpImage && (
@@ -124,35 +235,16 @@ if (import.meta.env.DEV) {
     <meta name="twitter:title" content={pageTitle} />
     {metaDescription && <meta name="twitter:description" content={metaDescription} />}
     {ogImage && <meta name="twitter:image" content={ogImage} />}
-    
+
+    <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="https://www.roller.software/hubfs/ROLLER%20Chevron%20(1).png">
 
-    <!-- Google Fonts - Non-blocking load with preconnect and media swap -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Combined all fonts into single request, loaded non-blocking via media swap -->
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-    >
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    >
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    </noscript>
     {enableThirdPartyScripts && (
       <>
-        <!-- Third-party trackers (prod only) -->
-        <!-- =========================
-          Marketing Scripts (INERT)
-          Hydrated only after consent
-        ========================= -->
-
+        <!-- USERCENTRICS TEST: inert marketing tags (were hydrated via consent-controller) — re-enable after testing -->
+        <!--
         <script type="text/plain"
           data-src="https://app.posthog.com/static/array.js"
           data-attrs='{"async":true}'>
@@ -198,324 +290,38 @@ if (import.meta.env.DEV) {
           data-src="https://snap.licdn.com/li.lms-analytics/insight.min.js"
           data-attrs='{"async":true}'>
         </script>
+        -->
 
       </>
     )}
-    
-    <!-- Schema.org JSON-LD for Roller software - not needed for this project
-    <script type="application/ld+json">
-       {
-        "@context": "http://schema.org",
-        "@type": "Organization",
-        "legalName": "ROLLER Networks Pty Ltd",
-        "description": "",
-        "logo": "https://3375779.fs1.hubspotusercontent-na1.net/hubfs/3375779/ROLLER%20Logo.svg",
-        "name": "",
-        "sameAs": [
-          "https://www.facebook.com/ROLLERSOFTWARE/",
-          "https://www.youtube.com/channel/UC7k0OBldm_7etXYmUrJopvA",
-          "https://www.instagram.com/rollersoftware/",
-          "https://www.linkedin.com/company/roller/"
-        ],
-        "foundingDate": "2010",
-        "contactPoint": [
-        {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "areaServed": "Worldwide",
-        "url": "https://www.roller.software/support"
-        },
-        {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "areaServed": "US",
-        "telephone": "+1 855 939 3313",
-        "url": "https://www.roller.software/support"
-        },
-        {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "areaServed": "UK",
-        "telephone": "+44 808 258 0167",
-        "url": "https://www.roller.software/support"
-        },
-        {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "areaServed": "AU",
-        "telephone": "+61 3 8592 6384",
-        "url": "https://www.roller.software/support"
-        }
-        ],
-        "url": "https://www.roller.software/"
-      }
-    </script>
-    -->
-    
-
-    <!-- Unused fonts - Open Sans and Material Icons not used in this project
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet" media="all" onload="this.media='all'">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&amp;display=swap" rel="stylesheet" media="all" onload="this.media='all'">
-    -->
-    <!-- Font Awesome kit - not used in this project
-    <script src="https://kit.fontawesome.com/5e9935c036.js" async="" defer="" crossorigin="anonymous"></script>
-    -->
-    <!-- Legacy countries/currency script - not used in this project
-    <script is:inline>
-      const userCountryId = "au";
-
-      const countriesObj = {
-        af: "Afghanistan",
-        ax: "Åland Islands",
-        al: "Albania",
-        dz: "Algeria",
-        ad: "Andorra",
-        ao: "Angola",
-        am: "Armenia",
-        at: "Austria",
-        az: "Azerbaijan",
-        bh: "Bahrain",
-        by: "Belarus",
-        be: "Belgium",
-        bj: "Benin",
-        ba: "Bosnia and Herzegovina",
-        bw: "Botswana",
-        bv: "Bouvet Island",
-        bg: "Bulgaria",
-        bf: "Burkina Faso",
-        bi: "Burundi",
-        cm: "Cameroon",
-        cv: "Cabo Verde",
-        cf: "Central African Republic",
-        td: "Chad",
-        km: "Comoros",
-        cd: "Congo (Democratic Republic of the)",
-        cg: "Congo",
-        ci: "Côte d’Ivoire",
-        hr: "Croatia",
-        cy: "Cyprus",
-        cz: "Czech Republic",
-        dk: "Denmark",
-        dj: "Djibouti",
-        eg: "Egypt",
-        gq: "Equatorial Guinea",
-        er: "Eritrea",
-        ee: "Estonia",
-        et: "Ethiopia",
-        fk: "Falkland Islands",
-        fo: "Faroe Islands",
-        fi: "Finland",
-        fr: "France",
-        ga: "Gabon",
-        gm: "Gambia",
-        ge: "Georgia",
-        de: "Germany",
-        gh: "Ghana",
-        gi: "Gibraltar",
-        gr: "Greece",
-        gl: "Greenland",
-        gg: "Guernsey",
-        gn: "Guinea",
-        va: "Vatican City",
-        hu: "Hungary",
-        is: "Iceland",
-        ir: "Iran",
-        iq: "Iraq",
-        ie: "Ireland",
-        im: "Isle of Man",
-        il: "Israel",
-        it: "Italy",
-        je: "Jersey",
-        jo: "Jordan",
-        kz: "Kazakhstan",
-        ke: "Kenya",
-        kv: "Korea (Democratic People’s Republic of)",
-        kr: "Korea (Republic of)",
-        kw: "Kuwait",
-        lv: "Latvia",
-        lb: "Lebanon",
-        ls: "Lesotho",
-        lr: "Liberia",
-        ly: "Libya",
-        li: "Liechtenstein",
-        lt: "Lithuania",
-        lx: "Luxembourg",
-        mk: "Macedonia",
-        mg: "Madagascar",
-        mw: "Malawi",
-        ml: "Mali",
-        mt: "Malta",
-        mr: "Mauritania",
-        mu: "Mauritius",
-        yt: "Mayotte",
-        md: "Moldova",
-        mc: "Monaco",
-        me: "Montenegro",
-        ma: "Morocco",
-        mz: "Mozambique",
-        na: "Namibia",
-        nl: "Netherlands",
-        ne: "Niger",
-        ng: "Nigeria",
-        no: "Norway",
-        om: "Oman",
-        ps: "Palestine",
-        pl: "Poland",
-        pt: "Portugal",
-        qa: "Qatar",
-        re: "Réunion",
-        ro: "Romania",
-        ru: "Russia",
-        rw: "Rwanda",
-        sh: "Saint Helena",
-        sm: "San Marino",
-        st: "Sao Tome and Principe",
-        sa: "Saudi Arabia",
-        sn: "Senegal",
-        rs: "Serbia",
-        sc: "Seychelles",
-        sl: "Sierra Leone",
-        sk: "Slovakia",
-        si: "Slovenia",
-        so: "Somalia",
-        za: "South Africa",
-        gs: "South Georgia and the South Sandwich Islands",
-        es: "Spain",
-        sd: "Sudan",
-        sj: "Svalbard",
-        sz: "Swaziland",
-        se: "Sweden",
-        ch: "Switzerland",
-        sy: "Syria",
-        tz: "Tanzania",
-        tg: "Togo",
-        tn: "Tunisia",
-        tr: "Turkey",
-        ug: "Uganda",
-        ua: "Ukraine",
-        ae: "United Arab Emirates",
-        eh: "Western Sahara",
-        ye: "Yemen",
-        zm: "Zambia",
-        zw: "Zimbabwe",
-      };
-
-      const startingCurrencyLookup = {
-        au: "aud",
-        nz: "aud",
-        gb: "gbp",
-        ca: "usd",
-        usd: "usd",
-      };
-
-      let startingCurrency;
-
-      if (userCountryId) {
-        if (countriesObj[userCountryId]) {
-          startingCurrency = "eur";
-        } else if (startingCurrencyLookup[userCountryId]) {
-          startingCurrency = startingCurrencyLookup[userCountryId];
-        } else {
-          startingCurrency = "usd";
-        }
-      } else {
-        startingCurrency = "usd";
-      }
-    </script>
-    -->
-
-    
-    <!-- Empty OG/Twitter meta tags - add proper values when needed
-    <meta property="og:description" content="">
-    <meta property="og:title" content="">
-    <meta name="twitter:description" content="">
-    <meta name="twitter:title" content="">
-    -->
-
-    
-
-    
-    <!-- HubSpot breadcrumb/CTA button CSS - legacy code, not used
-    <style>
-a.cta_button{-moz-box-sizing:content-box !important;-webkit-box-sizing:content-box !important;box-sizing:content-box !important;vertical-align:middle}.hs-breadcrumb-menu{list-style-type:none;margin:0px 0px 0px 0px;padding:0px 0px 0px 0px}.hs-breadcrumb-menu-item{float:left;padding:10px 0px 10px 10px}.hs-breadcrumb-menu-divider:before{content:'›';padding-left:10px}.hs-featured-image-link{border:0}.hs-featured-image{float:right;margin:0 0 20px 20px;max-width:50%}@media (max-width: 568px){.hs-featured-image{float:none;margin:0;width:100%;max-width:100%}}.hs-screen-reader-text{clip:rect(1px, 1px, 1px, 1px);height:1px;overflow:hidden;position:absolute !important;width:1px}
-</style>
-    -->
-
-<!-- <link rel="stylesheet" href="https://www.roller.software/hubfs/hub_generated/template_assets/1/37604089735/1741740594287/template_main.css">
-<link rel="stylesheet" href="https://www.roller.software/hubfs/hub_generated/module_assets/1/37604089733/1741949070863/module_menu-section.min.css"> -->
-    <!-- jQuery removed for performance - was blocking render and outdated (1.7.2 from 2011) -->
-
-    
-    <!-- Incorrect canonical URL - should be dynamic per page
-    <link rel="canonical" href="https://www.roller.software/404">
-    -->
 
     {enableThirdPartyScripts && (
       <>
-<!-- Ensure dataLayer/gtag are available immediately as stubs -->
-<script is:inline>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}</script>
+        <!-- USERCENTRICS TEST: legacy consent + consent-gated snippets — re-enable after testing -->
+        <!--
+        <script is:inline defer src="/scripts/regional-consent.js"></script>
+        <script is:inline defer src="/scripts/consent-controller.js"></script>
+        <script is:inline async defer id="hs-script-loader" src="https://js.hs-scripts.com/3375779.js"></script>
 
-<!-- Regional consent defaults (deferred — no longer render-blocking) -->
-<script is:inline defer src="/scripts/regional-consent.js"></script>
+        <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com">
+        <link rel="preconnect" href="https://cdn.sanity.io">
+        <script
+          type="text/plain"
+          data-src="https://dev.visualwebsiteoptimizer.com/j.php?a=1171237"
+          data-attrs='{"async":true,"id":"vwoCode"}'>
+        </script>
+        <script is:inline
+          type="text/plain"
+          data-src="https://tracking.g2crowd.com/attribution_tracking/conversions/2535.js?p=https://www.roller.software/featur&amp;e="
+          data-attrs='{"async":true}'>
+        </script>
+        -->
 
-<!-- Consent controller: hydrates inert scripts after consent/click/timeout -->
-<script is:inline defer src="/scripts/consent-controller.js"></script>
-
-<!-- HubSpot Tracking (Portal 3375779) — shows consent banner -->
-<script is:inline async defer id="hs-script-loader" src="https://js.hs-scripts.com/3375779.js"></script>
-
-<meta name="google-site-verification" content="8gRa8N41J52kOXwPTGI_PXAQk-OkWhwvxDfxFOCSsiM">
-
-<!-- Speed hints are safe -->
-<link rel="preconnect" href="https://www.googletagmanager.com">
-
-<!-- Start VWO Async SmartCode --> 
-<link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com">
-
- <!-- =========================
-  VWO (INERT - Hydrated after consent)
-========================= -->
-<script
-  type="text/plain"
-  data-src="https://dev.visualwebsiteoptimizer.com/j.php?a=1171237"
-  data-attrs='{"async":true,"id":"vwoCode"}'>
-</script>
-
-<!-- End VWO Async SmartCode --> 
-<meta name="twitter:card" content="summary">
-<meta http-equiv="content-language" content="en">
-
-
-<!-- =========================
-  G2 Tracking (INERT - Hydrated after consent)
-========================= -->
-<script is:inline
-  type="text/plain"
-  data-src="https://tracking.g2crowd.com/attribution_tracking/conversions/2535.js?p=https://www.roller.software/featur&amp;e="
-  data-attrs='{"async":true}'>
-</script>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width"
-    />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
-    <meta
-      name="generator"
-      content={Astro.generator}
-    />
+        <meta name="google-site-verification" content="8gRa8N41J52kOXwPTGI_PXAQk-OkWhwvxDfxFOCSsiM">
+        <meta http-equiv="content-language" content="en">
 
       </>
     )}
-
-    <!-- Google fonts loaded at top of head with preload + media swap for non-blocking -->
-
-
 
     <!-- Custom head content from CMS -->
     {headDocument && <Fragment set:html={headDocument} />}
