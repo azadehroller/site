@@ -15,7 +15,7 @@ export default defineType({
     isTemplate: false,
     sections: [
 
-      // ── 1: Hero — 2/3 (heading + CTA) | 1/3 (image) ──────────────────────
+      // ── Hero — page heading, supporting text, CTA button, and image ────────
       {
         _type: 'columnsBlock',
         _key: 'section-hero',
@@ -115,7 +115,7 @@ export default defineType({
         ],
       },
 
-      // ── 2c: Logo set (blue-99 background) ────────────────────────────────
+      // ── Logo strip ────────────────────────────────────────────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-logos',
@@ -143,7 +143,7 @@ export default defineType({
           },
         ],
       },
-      // ── 2a: Business growth heading (blue-99 background) ─────────────────​​​​‌﻿‍﻿​‍​‍‌‍﻿﻿‌﻿​‍‌‍‍‌‌‍‌﻿‌‍‍‌‌‍﻿‍​‍​‍​﻿‍‍​‍​‍‌﻿​﻿‌‍​‌‌‍﻿‍‌‍‍‌‌﻿‌​‌﻿‍‌​‍﻿‍‌‍‍‌‌‍﻿﻿​‍​‍​‍﻿​​‍​‍‌‍‍​‌﻿​‍‌‍‌‌‌‍‌‍​‍​‍​﻿‍‍​‍​‍‌‍‍​‌﻿‌​‌﻿‌​‌﻿​​​﻿‍‍​‍﻿﻿​‍﻿﻿‌‍﻿​‌‍﻿﻿‌‍​﻿‌‍​‌‌‍﻿​‌‍‍​‌‍﻿﻿‌﻿​﻿‌﻿‌​​﻿‍‍​﻿​﻿​﻿​﻿​﻿​﻿​﻿​﻿​‍﻿﻿‌‍‍‌‌‍﻿‍‌﻿‌​‌‍‌‌‌‍﻿‍‌﻿‌​​‍﻿﻿‌‍‌‌‌‍‌​‌‍‍‌‌﻿‌​​‍﻿﻿‌‍﻿‌‌‍﻿﻿‌‍‌​‌‍‌‌​﻿﻿‌‌﻿​​‌﻿​‍‌‍‌‌‌﻿​﻿‌‍‌‌‌‍﻿‍‌﻿‌​‌‍​‌‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍​﻿‍﻿‌‍‍‌‌‍‌​​﻿﻿‌​﻿‌﻿​﻿​‌​﻿​​‌‍​﻿​﻿​‌‌‍​‌​﻿‌﻿​﻿‍​​‍﻿‌​﻿‍​​﻿​‌​﻿‌​‌‍‌‌​‍﻿‌​﻿‌​‌‍​‌​﻿​​​﻿​​​‍﻿‌​﻿‍‌‌‍​﻿​﻿​‍‌‍‌​​‍﻿‌​﻿‍​​﻿‍‌​﻿‍‌​﻿​‌​﻿‌‍​﻿​​​﻿‌﻿​﻿‌‌​﻿‍​​﻿​​‌‍​﻿‌‍‌​​﻿‍﻿‌﻿‌​‌﻿‍‌‌﻿​​‌‍‌‌​﻿﻿‌‌‍‍‌‌‍﻿‍‌‍‌​‌﻿‌‌‌﻿​﻿‌﻿‌​‌﻿​‍‌﻿‍‌​﻿‍﻿‌﻿​​‌‍​‌‌﻿‌​‌‍‍​​﻿﻿‌‌﻿​﻿‌‍‌‌‌‍​﻿‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍‌﻿​﻿​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‌​‌﻿​​‌‍​﻿​﻿​​‌‍﻿​‌‍​‌​﻿‌‌​﻿‌‍‌‍﻿‍‌‍‍﻿‌‍‌‌‌‍﻿﻿‌‍‌﻿​﻿​‍​﻿​﻿‌﻿‍​‌‍﻿‌‌﻿‌‍‌‍‍​‌‍​‌​﻿​​‌‍‌‍​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌‍​﻿‌‍﻿﻿‌‍﻿​‌﻿‌‌‌‍﻿‌‌‍﻿‍​﻿​‌​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‍​‌﻿‍‍‌‍‌‍‌‍﻿‌‌‍‍‌‌﻿​﻿‌‍‌﻿‌﻿​﻿​﻿‌​‌‍​﻿‌﻿​​‌﻿​​‌‍‍‍‌﻿‌‍‌﻿‌​‌﻿​​‌‍﻿﻿‌‍​﻿‌‍﻿‍‌﻿‌‍‌﻿​﻿​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌﻿‌​‌‍‍‌‌﻿‌​‌‍﻿​‌‍‌‌​﻿﻿﻿‌‍​‍‌‍​‌‌﻿​﻿‌‍‌‌‌‌‌‌‌﻿​‍‌‍﻿​​﻿﻿‌‌‍‍​‌﻿‌​‌﻿‌​‌﻿​​​‍‌‌​﻿​﻿‌​​‌​‍‌‌​﻿​‍‌​‌‍​‍‌‌​﻿​‍‌​‌‍‌‍﻿​‌‍﻿﻿‌‍​﻿‌‍​‌‌‍﻿​‌‍‍​‌‍﻿﻿‌﻿​﻿‌﻿‌​​‍‌‌​﻿​﻿‌​​‌​﻿​﻿​﻿​﻿​﻿​﻿​﻿​﻿​‍‌‍‌‍‍‌‌‍‌​​﻿﻿‌​﻿‌﻿​﻿​‌​﻿​​‌‍​﻿​﻿​‌‌‍​‌​﻿‌﻿​﻿‍​​‍﻿‌​﻿‍​​﻿​‌​﻿‌​‌‍‌‌​‍﻿‌​﻿‌​‌‍​‌​﻿​​​﻿​​​‍﻿‌​﻿‍‌‌‍​﻿​﻿​‍‌‍‌​​‍﻿‌​﻿‍​​﻿‍‌​﻿‍‌​﻿​‌​﻿‌‍​﻿​​​﻿‌﻿​﻿‌‌​﻿‍​​﻿​​‌‍​﻿‌‍‌​​‍‌‍‌﻿‌​‌﻿‍‌‌﻿​​‌‍‌‌​﻿﻿‌‌‍‍‌‌‍﻿‍‌‍‌​‌﻿‌‌‌﻿​﻿‌﻿‌​‌﻿​‍‌﻿‍‌​‍‌‍‌﻿​​‌‍​‌‌﻿‌​‌‍‍​​﻿﻿‌‌﻿​﻿‌‍‌‌‌‍​﻿‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍‌﻿​﻿​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‌​‌﻿​​‌‍​﻿​﻿​​‌‍﻿​‌‍​‌​﻿‌‌​﻿‌‍‌‍﻿‍‌‍‍﻿‌‍‌‌‌‍﻿﻿‌‍‌﻿​﻿​‍​﻿​﻿‌﻿‍​‌‍﻿‌‌﻿‌‍‌‍‍​‌‍​‌​﻿​​‌‍‌‍​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌‍​﻿‌‍﻿﻿‌‍﻿​‌﻿‌‌‌‍﻿‌‌‍﻿‍​﻿​‌​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‍​‌﻿‍‍‌‍‌‍‌‍﻿‌‌‍‍‌‌﻿​﻿‌‍‌﻿‌﻿​﻿​﻿‌​‌‍​﻿‌﻿​​‌﻿​​‌‍‍‍‌﻿‌‍‌﻿‌​‌﻿​​‌‍﻿﻿‌‍​﻿‌‍﻿‍‌﻿‌‍‌﻿​﻿​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌﻿‌​‌‍‍‌‌﻿‌​‌‍﻿​‌‍‌‌​‍​‍‌﻿﻿‌</h3> </div> <div class="text-base portable-text" data-astro-cid-dieygfh3="" data-astro-source-file="/Users/azadeh.faramarzi/Documents/Frontend/site/astro-app/src/components/blocks/HeadingComposition.astro" data-astro-source-loc="204:51"> <p data-astro-source-file="/Users/azadeh.faramarzi/Documents/Frontend/site/node_modules/astro-portabletext/components/Block.astro" data-astro-source-loc="32:20">ROLLER is the global leader in trampoline park software - we've helped elevate the experience at over 700 trampoline parks around the world.​​​​‌﻿‍﻿​‍​‍‌‍﻿﻿‌﻿​‍‌‍‍‌‌‍‌﻿‌‍‍‌‌‍﻿‍​‍​‍​﻿‍‍​‍​‍‌﻿​﻿‌‍​‌‌‍﻿‍‌‍‍‌‌﻿‌​‌﻿‍‌​‍﻿‍‌‍‍‌‌‍﻿﻿​‍​‍​‍﻿​​‍​‍‌‍‍​‌﻿​‍‌‍‌‌‌‍‌‍​‍​‍​﻿‍‍​‍​‍‌‍‍​‌﻿‌​‌﻿‌​‌﻿​​​﻿‍‍​‍﻿﻿​‍﻿﻿‌‍﻿​‌‍﻿﻿‌‍​﻿‌‍​‌‌‍﻿​‌‍‍​‌‍﻿﻿‌﻿​﻿‌﻿‌​​﻿‍‍​﻿​﻿​﻿​﻿​﻿​﻿​﻿​﻿​‍﻿﻿‌‍‍‌‌‍﻿‍‌﻿‌​‌‍‌‌‌‍﻿‍‌﻿‌​​‍﻿﻿‌‍‌‌‌‍‌​‌‍‍‌‌﻿‌​​‍﻿﻿‌‍﻿‌‌‍﻿﻿‌‍‌​‌‍‌‌​﻿﻿‌‌﻿​​‌﻿​‍‌‍‌‌‌﻿​﻿‌‍‌‌‌‍﻿‍‌﻿‌​‌‍​‌‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍​﻿‍﻿‌‍‍‌‌‍‌​​﻿﻿‌​﻿‌﻿​﻿​‌​﻿​​‌‍​﻿​﻿​‌‌‍​‌​﻿‌﻿​﻿‍​​‍﻿‌​﻿‍​​﻿​‌​﻿‌​‌‍‌‌​‍﻿‌​﻿‌​‌‍​‌​﻿​​​﻿​​​‍﻿‌​﻿‍‌‌‍​﻿​﻿​‍‌‍‌​​‍﻿‌​﻿‍​​﻿‍‌​﻿‍‌​﻿​‌​﻿‌‍​﻿​​​﻿‌﻿​﻿‌‌​﻿‍​​﻿​​‌‍​﻿‌‍‌​​﻿‍﻿‌﻿‌​‌﻿‍‌‌﻿​​‌‍‌‌​﻿﻿‌‌‍‍‌‌‍﻿‍‌‍‌​‌﻿‌‌‌﻿​﻿‌﻿‌​‌﻿​‍‌﻿‍‌​﻿‍﻿‌﻿​​‌‍​‌‌﻿‌​‌‍‍​​﻿﻿‌‌﻿​﻿‌‍‌‌‌‍​﻿‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍‌﻿​﻿​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‌​‌﻿​​‌‍​﻿​﻿​​‌‍﻿​‌‍​‌​﻿‌‌​﻿‌‍‌‍﻿‍‌‍‍﻿‌‍‌‌‌‍﻿﻿‌‍‌﻿​﻿​‍​﻿​﻿‌﻿‍​‌‍﻿‌‌﻿‌‍‌‍‍​‌‍​‌​﻿​​‌‍‌‍​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌‍​﻿‌‍﻿﻿‌‍﻿​‌﻿‌‌‌‍﻿‌‌‍﻿‍​﻿​‌​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‍​‌﻿‍‍‌‍‌‍‌‍﻿‌‌‍‍‌‌﻿​﻿‌‍‌﻿‌﻿​﻿​﻿‌​‌‍​﻿‌﻿​​‌﻿​​‌‍‍‍‌﻿‌‍‌﻿‌​‌﻿​​‌‍﻿﻿‌‍​﻿‌‍﻿‍‌﻿‌‍‌﻿​﻿​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌﻿‌​‌‍‌‌‌﻿‍​‌﻿‌​​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍​﻿‍​‌‍﻿﻿‌‍‍‌‌﻿​‌​﻿‌​​﻿‌‌‌‍﻿‍‌﻿‍‍‌﻿‌​​﻿​﻿‌﻿‌‌‌‍​‍‌‍‍‌‌﻿‍​‌﻿​​‌‍​‌‌‍﻿‌​﻿​‍​﻿‌​‌﻿​‌‌‍﻿​​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌‍​﻿‌‍‍​‌‍‍‌‌‍﻿​‌‍‌​‌﻿​‍‌‍‌‌‌‍﻿‍​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌‍﻿‌​﻿‌​‌‍‌​‌﻿‌‌‌﻿‌‍‌﻿‍​​﻿‍‌‌‍‌​‌‍​‌‌‍‍﻿‌﻿‌‍​﻿‌‌‌‍​﻿‌﻿‍‍‌﻿‍​‌﻿​﻿‌‍﻿‍​﻿​​‌‍​‍‌﻿‌‌​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌﻿‌​‌‍‌‌‌﻿‍​‌﻿‌​​﻿﻿﻿‌‍​‍‌‍​‌‌﻿​﻿‌‍‌‌‌‌‌‌‌﻿​‍‌‍﻿​​﻿﻿‌‌‍‍​‌﻿‌​‌﻿‌​‌﻿​​​‍‌‌​﻿​﻿‌​​‌​‍‌‌​﻿​‍‌​‌‍​‍‌‌​﻿​‍‌​‌‍‌‍﻿​‌‍﻿﻿‌‍​﻿‌‍​‌‌‍﻿​‌‍‍​‌‍﻿﻿‌﻿​﻿‌﻿‌​​‍‌‌​﻿​﻿‌​​‌​﻿​﻿​﻿​﻿​﻿​﻿​﻿​﻿​‍‌‍‌‍‍‌‌‍‌​​﻿﻿‌​﻿‌﻿​﻿​‌​﻿​​‌‍​﻿​﻿​‌‌‍​‌​﻿‌﻿​﻿‍​​‍﻿‌​﻿‍​​﻿​‌​﻿‌​‌‍‌‌​‍﻿‌​﻿‌​‌‍​‌​﻿​​​﻿​​​‍﻿‌​﻿‍‌‌‍​﻿​﻿​‍‌‍‌​​‍﻿‌​﻿‍​​﻿‍‌​﻿‍‌​﻿​‌​﻿‌‍​﻿​​​﻿‌﻿​﻿‌‌​﻿‍​​﻿​​‌‍​﻿‌‍‌​​‍‌‍‌﻿‌​‌﻿‍‌‌﻿​​‌‍‌‌​﻿﻿‌‌‍‍‌‌‍﻿‍‌‍‌​‌﻿‌‌‌﻿​﻿‌﻿‌​‌﻿​‍‌﻿‍‌​‍‌‍‌﻿​​‌‍​‌‌﻿‌​‌‍‍​​﻿﻿‌‌﻿​﻿‌‍‌‌‌‍​﻿‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍‌﻿​﻿​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‌​‌﻿​​‌‍​﻿​﻿​​‌‍﻿​‌‍​‌​﻿‌‌​﻿‌‍‌‍﻿‍‌‍‍﻿‌‍‌‌‌‍﻿﻿‌‍‌﻿​﻿​‍​﻿​﻿‌﻿‍​‌‍﻿‌‌﻿‌‍‌‍‍​‌‍​‌​﻿​​‌‍‌‍​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌‍​﻿‌‍﻿﻿‌‍﻿​‌﻿‌‌‌‍﻿‌‌‍﻿‍​﻿​‌​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌﻿‍​‌﻿‍‍‌‍‌‍‌‍﻿‌‌‍‍‌‌﻿​﻿‌‍‌﻿‌﻿​﻿​﻿‌​‌‍​﻿‌﻿​​‌﻿​​‌‍‍‍‌﻿‌‍‌﻿‌​‌﻿​​‌‍﻿﻿‌‍​﻿‌‍﻿‍‌﻿‌‍‌﻿​﻿​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌﻿‌​‌‍‌‌‌﻿‍​‌﻿‌​​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍​﻿‍​‌‍﻿﻿‌‍‍‌‌﻿​‌​﻿‌​​﻿‌‌‌‍﻿‍‌﻿‍‍‌﻿‌​​﻿​﻿‌﻿‌‌‌‍​‍‌‍‍‌‌﻿‍​‌﻿​​‌‍​‌‌‍﻿‌​﻿​‍​﻿‌​‌﻿​‌‌‍﻿​​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌‍​﻿‌‍‍​‌‍‍‌‌‍﻿​‌‍‌​‌﻿​‍‌‍‌‌‌‍﻿‍​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍‌‍﻿‌​﻿‌​‌‍‌​‌﻿‌‌‌﻿‌‍‌﻿‍​​﻿‍‌‌‍‌​‌‍​‌‌‍‍﻿‌﻿‌‍​﻿‌‌‌‍​﻿‌﻿‍‍‌﻿‍​‌﻿​﻿‌‍﻿‍​﻿​​‌‍​‍‌﻿‌‌​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌﻿‌​‌‍‌‌‌﻿‍​‌﻿‌​​‍​‍‌﻿﻿‌</p> </div> </section>
+      // ── Business growth section heading with supporting text ──────────────
       {
         _type: 'columnsBlock',
         _key: 'section-business-growth',
@@ -194,7 +194,7 @@ export default defineType({
           },
         ],
       },
-      // ── 2b: Testimonials — 2 equal columns (blue-99) ─────────────────────
+      // ── Customer testimonials — two quotes side by side ──────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-quotes',
@@ -248,7 +248,7 @@ export default defineType({
           },
         ],
       },
-      // ── Widget User Reviews (global reference) ─────────────────────────
+      // ── User reviews widget (global reference) ───────────────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-reviews',
@@ -276,64 +276,13 @@ export default defineType({
           },
         ],
       },
-      // ── 3: Section heading (standalone) ──────────────────────────────────
-      {
-        _type: 'columnsBlock',
-        _key: 'section-heading-1',
-        layout: '1',
-        backgroundColor: 'none',
-        backgroundGradient: 'none',
-        paddingTop: '80px',
-        paddingBottom: '0px',
-        paddingLeft: '0px',
-        paddingRight: '0px',
-        paddingTopMobile: '48px',
-        paddingBottomMobile: '0px',
-        paddingLeftMobile: '0px',
-        paddingRightMobile: '0px',
-        column1PaddingBottomMobile: '32px',
-        column2PaddingBottomMobile: '32px',
-        column1: [
-          {
-            _type: 'headingComposition',
-            _key: 'heading-1-block',
-            eyebrow: 'Lorem ipsum',
-            eyebrowType: 'div',
-            eyebrowStyle: 'none',
-            title: 'Section heading',
-            text: [
-              {
-                _type: 'block',
-                _key: 'heading-1-text',
-                style: 'normal',
-                markDefs: [],
-                children: [
-                  {
-                    _type: 'span',
-                    _key: 'heading-1-span',
-                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                    marks: [],
-                  },
-                ],
-              },
-            ],
-            theme: 'dark',
-            textAlignment: 'LEFT',
-            headingType: 'h2',
-            displayType: 'h2',
-            textType: 'lg',
-            addBorderLine: false,
-            experimentActive: false,
-          },
-        ],
-      },
 
-      // ── 6: Heading + Results List ─────────────────────────────────────────
+      // ── Results list with section heading ────────────────────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-heading-2',
         layout: '1',
-        backgroundColor: 'none',
+        backgroundColor: 'var(--blue-95)',
         backgroundGradient: 'none',
         paddingTop: '80px',
         paddingBottom: '80px',
@@ -423,12 +372,12 @@ export default defineType({
           },
         ],
       },
-      // ── 7: Features Stacked Content ───────────────────────────────────────
+      // ── Secondary hero — heading, CTA, and image in equal columns ───────
       {
         _type: 'columnsBlock',
-        _key: 'section-features-stacked',
-        layout: '1',
-        backgroundColor: 'none',
+        _key: 'section-hero-b',
+        layout: '2',
+        backgroundColor: 'var(--blue-99)',
         backgroundGradient: 'none',
         paddingTop: '80px',
         paddingBottom: '80px',
@@ -442,17 +391,92 @@ export default defineType({
         column2PaddingBottomMobile: '32px',
         column1: [
           {
-            _type: 'featuresStackedContent',
-            _key: 'features-stacked-block',
+            _type: 'headingComposition',
+            _key: 'hero-b-heading',
+            eyebrow: '[INDUSTRY] SOFTWARE',
+            eyebrowType: 'h1',
+            eyebrowStyle: 'red',
+            title: 'Your headline here',
+            text: [
+              {
+                _type: 'block',
+                _key: 'hero-b-text',
+                style: 'normal',
+                markDefs: [],
+                children: [
+                  {
+                    _type: 'span',
+                    _key: 'hero-b-span',
+                    text: 'Your supporting text here.',
+                    marks: [],
+                  },
+                ],
+              },
+            ],
+            theme: 'dark',
+            textAlignment: 'LEFT',
+            headingType: 'h2',
+            displayType: 'h1',
+            textType: 'lg',
+            addBorderLine: false,
+            experimentActive: false,
+          },
+          {
+            _type: 'buttonStack',
+            _key: 'hero-b-cta',
+            buttonList: [
+              {
+                _key: 'hero-b-btn-primary',
+                buttonSettings: {
+                  modalTrigger: false,
+                  modalTriggerVideo: false,
+                  btnLabel: 'Get started',
+                  position: 'left',
+                  buttonLink: {
+                    href: 'https://sa-rolls.netlify.app/get-started',
+                    openInNewTab: false,
+                    noFollow: false,
+                  },
+                },
+                btnIcon: {
+                  iconFieldSvg: '',
+                  iconPosition: 'left',
+                },
+                buttonStyles: {
+                  bgKind: 'primary',
+                },
+              },
+            ],
+            styles: {
+              layout: {
+                spacing: {
+                  marginTop: '0px',
+                  marginBottom: '0px',
+                  marginLeft: '0px',
+                  marginRight: '0px',
+                },
+                alignment: 'LEFT',
+              },
+              animation: {
+                type: 'none',
+              },
+            },
+          },
+        ],
+        column2: [
+          {
+            _type: 'advancedImage',
+            _key: 'hero-b-image',
+            alt: 'Hero image',
           },
         ],
       },
-      // ── 8: Heading + Comparison Table ────────────────────────────────────
+      // ── Comparison table with section heading ────────────────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-heading-3',
         layout: '1',
-        backgroundColor: 'none',
+        backgroundColor: 'var(--blue-95)',
         backgroundGradient: 'none',
         paddingTop: '80px',
         paddingBottom: '80px',
@@ -530,12 +554,63 @@ export default defineType({
           },
         ],
       },
-      // ── 9: Features Selector (global reference) ──────────────────────────
+      // ── Features stacked content — alternating image and text rows ─────────
+      {
+        _type: 'columnsBlock',
+        _key: 'section-features-stacked',
+        layout: '1',
+        backgroundColor: 'none',
+        backgroundGradient: 'none',
+        paddingTop: '80px',
+        paddingBottom: '80px',
+        paddingLeft: '0px',
+        paddingRight: '0px',
+        paddingTopMobile: '48px',
+        paddingBottomMobile: '48px',
+        paddingLeftMobile: '0px',
+        paddingRightMobile: '0px',
+        column1PaddingBottomMobile: '32px',
+        column2PaddingBottomMobile: '32px',
+        column1: [
+          {
+            _type: 'featuresStackedContent',
+            _key: 'features-stacked-block',
+            theme: 'dark',
+            textAlignment: 'LEFT',
+            eyebrowType: 'div',
+            eyebrowStyle: 'red',
+            headingType: 'h3',
+            displayType: 'h2',
+            textType: 'lg',
+            items: [
+              {
+                _type: 'featureItem',
+                _key: 'feature-item-memberships',
+                eyebrow: 'MEMBERSHIPS',
+                title: 'Automated recurring revenue',
+                text: "Make upsells easier and convert guests into regulars with intuitive membership sign-ups. Once you've made your sale online or at the POS, enjoy hands-off recurring revenue with automatic repeat billing.",
+                imageAlt: 'Membership',
+                imagePosition: 'left',
+                imageRatio: 'aspect-square',
+                showStats: false,
+                showQuote: false,
+                showCta: true,
+                ctaText: 'Explore memberships',
+                ctaLink: 'https://www.roller.software/features/membership-management-software/',
+                ctaOpenInNewTab: false,
+                ctaIconPosition: 'right',
+                ctaKind: 'ghost',
+              },
+            ],
+          },
+        ],
+      },
+      // ── Features selector (global reference) ─────────────────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-features-selector',
         layout: '1',
-        backgroundColor: 'none',
+        backgroundColor: 'var(--blue-99)',
         backgroundGradient: 'none',
         paddingTop: '80px',
         paddingBottom: '80px',
@@ -558,7 +633,7 @@ export default defineType({
           },
         ],
       },
-      // ── 10: FAQs ──────────────────────────────────────────────────────────
+      // ── Frequently asked questions ────────────────────────────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-faqs',
@@ -629,12 +704,12 @@ export default defineType({
           },
         ],
       },
-      // ── 11: Bottom CTA — 3/4 (heading) | 1/4 (button) ───────────────────
+      // ── Bottom CTA — heading and call-to-action button ───────────────────
       {
         _type: 'columnsBlock',
         _key: 'section-cta',
         layout: '4/1',
-        backgroundColor: 'var(--blue-95)',
+        backgroundColor: 'var(--blue-90)',
         backgroundGradient: 'none',
         paddingTop: '80px',
         paddingBottom: '80px',
