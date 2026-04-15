@@ -366,13 +366,12 @@ const organizationJsonLd = {
       legalLinks={footerData?.legalLinks}
       socialLinks={footerData?.socialLinks}
       socialText={footerData?.socialText}
-      showFloatingButton={footerData?.showFloatingButton}
+      showFloatingButton={false}
       floatingButtonUrl={footerData?.floatingButtonUrl}
       floatingButtonPrimaryText={footerData?.floatingButtonPrimaryText}
       floatingButtonSecondaryText={footerData?.floatingButtonSecondaryText}
     />
-    {/* Chatbot temporarily disabled */}
-    {/* {chatbotConfig?.enabled && <ChatWidget config={chatbotConfig} />} */}
+    {chatbotConfig?.enabled && <ChatWidget config={chatbotConfig} />}
     {/* View Transitions at end of body so script doesn't block head / above-the-fold parse */}
     {viewTransitionsEnabled && <ViewTransitions />}
     {/* Visual Editing: only when enabled; hydrates on idle so it never blocks LCP */}

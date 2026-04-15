@@ -65,7 +65,9 @@ Rules:
 - Never combine a "not found" disclaimer with an actual answer. Either answer confidently or say you couldn't find it — never both.
 - Be concise, clear, and helpful.
 - Prefer step-by-step instructions when applicable.
-- Do not mention documentation sources, embeddings, vector databases, or internal systems.`;
+- Do not mention documentation sources, embeddings, vector databases, or internal systems.
+- Each documentation snippet includes a "URL:" line with the real page address. When referencing a page, you may link to it using Markdown syntax: [Page Title](URL). Only use URLs that appear in the provided documentation — never invent or guess URLs.
+- Do NOT add inline source citations like "[Source: ...]", "[1]", "([2])", or a trailing "Sources:" section. The application handles source links separately.`;
 
 /**
  * Generate a grounded answer using Ollama's generate API.
@@ -110,5 +112,35 @@ ${userPrompt}`;
   }
 
   const data: OllamaGenerateResponse = await response.json();
-  return data.response.trim();
+  return stripInlineCitations(data.response.trim());
+}
+
+/**
+ * Strips model-generated inline citation markers that the app handles separately.
+ * Handles patterns like:
+ *   [Source: Not provided]
+ *   [Source: Not directly mentioned but implied…]
+ *   ([1])  ([2])  [1]  [2]
+ *   A trailing "Sources:\n→ …" block
+ */
+function stripInlineCitations(text: string): string {
+  return text
+    // Remove [Source: …] markers
+    .replace(/\[Source:[^\]]*\]/gi, '')
+    // Remove parenthesised numeric references like ([1]) or ([2], [3])
+    .replace(/\(\[[\d,\s]+\]\)/g, '')
+    // Remove bare numeric references like [1] [2]
+    .replace(/\[\d+\]/g, '')
+    // Convert Markdown links pointing to CDN/internal URLs → plain text only
+    // (cdn.rollerdigital.com, cdn.sanity.io, or any URL containing /invalid-link)
+    .replace(
+      /\[([^\]]+)\]\(https?:\/\/(?:cdn\.rollerdigital\.com|cdn\.sanity\.io)[^)]*\)/gi,
+      '$1',
+    )
+    .replace(/\[([^\]]+)\]\([^)]*invalid-link[^)]*\)/gi, '$1')
+    // Remove a trailing "Sources:" block the model sometimes appends
+    .replace(/\n{1,2}Sources?:\s*[\s\S]*$/i, '')
+    // Collapse multiple blank lines left behind by the removals
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
