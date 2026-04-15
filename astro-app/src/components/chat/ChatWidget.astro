@@ -65,6 +65,11 @@ const welcomeMessage =
     role="dialog"
     aria-labelledby="chat-title"
   >
+    <!-- Resize handles (left edge, top edge, top-left corner) -->
+    <div class="chat-resize-handle chat-resize-left" data-resize="left"></div>
+    <div class="chat-resize-handle chat-resize-top" data-resize="top"></div>
+    <div class="chat-resize-handle chat-resize-corner" data-resize="corner"></div>
+
     <!-- Header -->
     <div class="chat-header">
       <div class="chat-header-icon">
@@ -142,6 +147,11 @@ const welcomeMessage =
       </div>
       <p id="chat-error" class="chat-error chat-error-hidden"></p>
     </form>
+    <!-- Persistent CTA buttons -->
+    <div class="chat-cta-wrapper">
+      <a class="chat-cta-btn chat-cta-get-started" href="/get-started">Get Started</a>
+      <a class="chat-cta-btn chat-cta-book-demo" href="/">Book a Demo</a>
+    </div>
   </div>
 </div>
 
@@ -397,14 +407,27 @@ const welcomeMessage =
     color: #0541a0 !important;
   }
 
-  :global(.chat-cta-wrapper) {
+  /* Inline links rendered from Markdown [text](url) in bot responses */
+  :global(.chat-inline-link) {
+    color: #074dc5 !important;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 500;
+  }
+
+  :global(.chat-inline-link:hover) {
+    color: #0541a0 !important;
+    text-decoration-thickness: 2px;
+  }
+
+  .chat-cta-wrapper {
     display: flex;
     gap: 0.5rem;
-    margin-top: 1rem;
+    padding: 0.5rem 0.75rem 0.75rem;
     flex-wrap: wrap;
   }
 
-  :global(.chat-cta-btn) {
+  .chat-cta-btn {
     display: inline-block;
     padding: 0.5rem 1.125rem;
     border-radius: 9999px;
@@ -418,17 +441,17 @@ const welcomeMessage =
     line-height: 1;
   }
 
-  :global(.chat-cta-btn:hover) {
+  .chat-cta-btn:hover {
     opacity: 0.85;
     color: #ffffff !important;
     text-decoration: none;
   }
 
-  :global(.chat-cta-get-started) {
+  .chat-cta-get-started {
     background-color: var(--secondary-50, #ff290c);
   }
 
-  :global(.chat-cta-book-demo) {
+  .chat-cta-book-demo {
     background-color: var(--primary-50, #033180);
   }
 
@@ -547,6 +570,7 @@ const welcomeMessage =
     font-weight: 500;
     margin: 0 0 0.5rem 0;
     animation: blink 1s infinite ease-in-out;
+    will-change: opacity; /* composited layer — avoids layout reflow on each frame */
   }
 
   @keyframes blink {
@@ -593,6 +617,48 @@ const welcomeMessage =
     }
   }
 
+  /* ── Resize handles ─────────────────────────────────────────────────── */
+  .chat-resize-handle {
+    position: absolute;
+    z-index: 20;
+    transition: background 0.15s;
+  }
+
+  /* Left edge — drag horizontally to widen/narrow */
+  .chat-resize-left {
+    top: 1rem;        /* clear the corner zone */
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    cursor: ew-resize;
+    border-radius: 1rem 0 0 1rem;
+  }
+
+  /* Top edge — drag vertically to raise/lower */
+  .chat-resize-top {
+    top: 0;
+    left: 1rem;       /* clear the corner zone */
+    right: 0;
+    height: 6px;
+    cursor: ns-resize;
+    border-radius: 0 1rem 0 0;
+  }
+
+  /* Top-left corner — drag diagonally */
+  .chat-resize-corner {
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    border-radius: 1rem 0 0 0;
+  }
+
+  .chat-resize-handle:hover {
+    background: rgba(3, 49, 128, 0.12);
+  }
+  /* ── End resize handles ─────────────────────────────────────────────── */
+
   /* Mobile responsive */
   @media (max-width: 640px) {
     .chat-panel {
@@ -602,486 +668,8 @@ const welcomeMessage =
   }
 </style>
 
-<script is:inline>
-  (() => {
-    'use strict';
-
-    // DOM elements
-    const elements = {
-      widget: document.getElementById('chat-widget'),
-      toggle: document.getElementById('chat-toggle'),
-      panel: document.getElementById('chat-panel'),
-      form: document.getElementById('chat-form'),
-      input: document.getElementById('chat-input'),
-      messages: document.getElementById('chat-messages'),
-      error: document.getElementById('chat-error'),
-      iconOpen: document.getElementById('chat-icon-open'),
-      iconClose: document.getElementById('chat-icon-close'),
-    };
-
-    // State
-    let conversationId = null;
-    let isLoading = false;
-
-    // Toggle chat panel
-    const toggleChat = () => {
-      const isHidden = elements.panel.classList.contains('chat-panel-hidden');
-
-      elements.panel.classList.toggle('chat-panel-hidden');
-      elements.iconOpen.classList.toggle('chat-icon-hidden');
-      elements.iconClose.classList.toggle('chat-icon-hidden');
-
-      elements.toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-
-      if (isHidden) {
-        elements.input.focus();
-      }
-    };
-
-    elements.toggle.addEventListener('click', toggleChat);
-
-    // ── Auto-resize textarea ─────────────────────────────────────────────────
-    // minInputHeight is captured lazily on the first autoResize() call, not at
-    // script init. At init the panel has display:none so scrollHeight === 0,
-    // which would cause the textarea to collapse to 0px on every resize.
-    let minInputHeight = 0;
-
-    const autoResize = () => {
-      if (!minInputHeight) {
-        // First call: panel is now visible — capture the true 1-row height.
-        // Clear any inline style first so we read the CSS/rows-defined height.
-        elements.input.style.height = '';
-        minInputHeight = elements.input.scrollHeight;
-      }
-      elements.input.style.height    = minInputHeight + 'px'; // reset to 1-row floor
-      const next = elements.input.scrollHeight;
-      const max  = parseInt(getComputedStyle(elements.input).maxHeight, 10);
-      elements.input.style.height    = Math.min(next, max) + 'px';
-      elements.input.style.overflowY = next > max ? 'auto' : 'hidden';
-    };
-
-    // Resize on every keystroke
-    elements.input.addEventListener('input', autoResize);
-
-    // Submit on Enter; allow Shift+Enter for a real newline
-    elements.input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        elements.form.requestSubmit();
-      }
-    });
-    // ── End auto-resize ───────────────────────────────────────────────────────
-
-    // Handle form submission
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-
-      if (isLoading) return;
-
-      const question = elements.input.value.trim();
-      if (!question) return;
-
-      // Clear input, reset its height, and hide any error
-      elements.input.value = '';
-      autoResize();
-      hideError();
-
-      // Add user message to chat
-      addMessage(question, 'user');
-
-      // Show loading indicator
-      const loadingEl = showLoading();
-      isLoading = true;
-
-      try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            question,
-            conversationId,
-          }),
-        });
-
-        const data = await response.json();
-
-        // Remove loading indicator
-        loadingEl.remove();
-
-        if (!response.ok) {
-          isLoading = false;
-          showError(data.error || 'An error occurred. Please try again.');
-          return;
-        }
-
-        // Update conversation ID
-        if (data.conversationId) {
-          conversationId = data.conversationId;
-        }
-
-        // Type the bot response word by word; isLoading is cleared when typing finishes
-        typeBotMessage(data.answer, data.sources);
-      } catch (error) {
-        loadingEl.remove();
-        isLoading = false;
-        showError('Failed to connect. Please check your connection and try again.');
-      }
-    };
-
-    elements.form.addEventListener('submit', handleSubmit);
-
-    const formatMessageContent = (content, messageType) => {
-      const lines = content.split('\n');
-      let html = '';
-      let inOrderedList = false;
-      let inUnorderedList = false;
-
-      // Add extra class for user messages
-      const paragraphClass = messageType === 'user' ? 'chat-paragraph chat-paragraph-user' : 'chat-paragraph';
-      const headerClass = messageType === 'user' ? 'chat-section-header chat-section-header-user' : 'chat-section-header';
-
-      // First pass: detect consecutive numbered items
-      const numberedGroups = [];
-      let currentGroup = [];
-
-      lines.forEach((line, i) => {
-        const trimmedLine = line.trim();
-        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.+)$/);
-
-        if (numberedMatch) {
-          currentGroup.push(i);
-        } else if (currentGroup.length > 0) {
-          if (currentGroup.length > 1) {
-            numberedGroups.push(currentGroup);
-          }
-          currentGroup = [];
-        }
-      });
-
-      if (currentGroup.length > 1) {
-        numberedGroups.push(currentGroup);
-      }
-
-      // Check if line index is part of a multi-item numbered list
-      const isInNumberedGroup = (idx) => numberedGroups.some(group => group.includes(idx));
-
-      // Second pass: format content
-      lines.forEach((line, i) => {
-        const trimmedLine = line.trim();
-
-        // Check for numbered list (1. , 2. , etc.)
-        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.+)$/);
-        // Check for bullet points (-, *, •)
-        const bulletMatch = trimmedLine.match(/^[-*•]\s+(.+)$/);
-        // Check for section headers (lines ending with colon, typically short)
-        const isHeader = trimmedLine.endsWith(':') && trimmedLine.length < 100 && !numberedMatch && !bulletMatch;
-
-        if (numberedMatch && isInNumberedGroup(i)) {
-          if (!inOrderedList) {
-            if (inUnorderedList) {
-              html += '</ul>';
-              inUnorderedList = false;
-            }
-            html += '<ol class="chat-ordered-list">';
-            inOrderedList = true;
-          }
-          html += `<li>${numberedMatch[2]}</li>`;
-        } else if (bulletMatch) {
-          if (!inUnorderedList) {
-            if (inOrderedList) {
-              html += '</ol>';
-              inOrderedList = false;
-            }
-            html += '<ul class="chat-unordered-list">';
-            inUnorderedList = true;
-          }
-          html += `<li>${bulletMatch[1]}</li>`;
-        } else {
-          if (inOrderedList) {
-            html += '</ol>';
-            inOrderedList = false;
-          }
-          if (inUnorderedList) {
-            html += '</ul>';
-            inUnorderedList = false;
-          }
-          if (trimmedLine) {
-            if (isHeader) {
-              html += `<h3 class="${headerClass}">${trimmedLine}</h3>`;
-            } else {
-              html += `<p class="${paragraphClass}">${trimmedLine}</p>`;
-            }
-          }
-        }
-      });
-
-      if (inOrderedList) html += '</ol>';
-      if (inUnorderedList) html += '</ul>';
-
-      return html;
-    };
-
-    const createCtaButtons = () => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'chat-cta-wrapper';
-
-      const getStarted = document.createElement('a');
-      getStarted.className = 'chat-cta-btn chat-cta-get-started';
-      getStarted.textContent = 'Get Started';
-      getStarted.href = '/get-started';
-
-      const bookDemo = document.createElement('a');
-      bookDemo.className = 'chat-cta-btn chat-cta-book-demo';
-      bookDemo.textContent = 'Book a Demo';
-      bookDemo.href = '/';
-
-      wrapper.appendChild(getStarted);
-      wrapper.appendChild(bookDemo);
-      return wrapper;
-    };
-
-    const createSourceLink = (source) => {
-      const linkWrapper = document.createElement('div');
-      linkWrapper.style.marginBottom = '0.25rem';
-
-      const element = source.url ? document.createElement('a') : document.createElement('span');
-      element.className = 'chat-source-link';
-      element.textContent = `→ ${source.title}`;
-
-      if (source.url) {
-        element.href = source.url;
-        element.target = '_blank';
-        element.rel = 'noopener noreferrer';
-      }
-
-      linkWrapper.appendChild(element);
-      return linkWrapper;
-    };
-
-    const addMessage = (content, type, sources = []) => {
-      const messageEl = document.createElement('div');
-      messageEl.className = `chat-message chat-message-${type}`;
-
-      const bubbleEl = document.createElement('div');
-      bubbleEl.className = `chat-bubble chat-bubble-${type}`;
-
-      const textEl = document.createElement('div');
-      textEl.className = 'chat-text';
-      textEl.innerHTML = formatMessageContent(content, type);
-      bubbleEl.appendChild(textEl);
-
-      // Add sources for bot messages
-      if (type === 'bot' && sources.length > 0) {
-        const sourcesEl = document.createElement('div');
-        sourcesEl.className = 'chat-sources';
-
-        const separator = document.createElement('hr');
-        separator.className = 'chat-sources-separator';
-        sourcesEl.appendChild(separator);
-
-        const sourcesTitle = document.createElement('p');
-        sourcesTitle.className = 'chat-sources-title';
-        sourcesTitle.textContent = 'Sources:';
-        sourcesEl.appendChild(sourcesTitle);
-
-        sources.forEach(source => {
-          sourcesEl.appendChild(createSourceLink(source));
-        });
-
-        bubbleEl.appendChild(sourcesEl);
-      }
-
-      messageEl.appendChild(bubbleEl);
-      elements.messages.appendChild(messageEl);
-
-      // Scroll to bottom
-      elements.messages.scrollTop = elements.messages.scrollHeight;
-    };
-
-    // ── Typewriter effect for bot responses ───────────────────────────────────
-    // Reveals the answer character-by-character so users read from the top.
-    // Sources are appended only after typing completes.
-    // isLoading stays true during typing so a second question can't be sent mid-type.
-    const typeBotMessage = (content, sources = []) => {
-      const messageEl = document.createElement('div');
-      messageEl.className = 'chat-message chat-message-bot';
-
-      const bubbleEl = document.createElement('div');
-      bubbleEl.className = 'chat-bubble chat-bubble-bot';
-
-      const textEl = document.createElement('div');
-      textEl.className = 'chat-text';
-      bubbleEl.appendChild(textEl);
-      messageEl.appendChild(bubbleEl);
-      elements.messages.appendChild(messageEl);
-
-      // Scroll so the TOP of the new bubble is visible — user reads from the start
-      messageEl.scrollIntoView({ behavior: 'instant', block: 'start' });
-
-      let displayed = 0;
-      const CHARS_PER_TICK = 4;  // characters revealed per tick
-      const TICK_MS        = 16; // ~60 fps — feels like natural typing
-
-      const tick = () => {
-        if (displayed >= content.length) {
-          // ── Typing complete ──────────────────────────────────────────────
-          // Swap plain text for fully formatted HTML (lists, headers, etc.)
-          textEl.innerHTML = formatMessageContent(content, 'bot');
-
-          // Append sources after the formatted text
-          if (sources.length > 0) {
-            const sourcesEl = document.createElement('div');
-            sourcesEl.className = 'chat-sources';
-
-            const separator = document.createElement('hr');
-            separator.className = 'chat-sources-separator';
-            sourcesEl.appendChild(separator);
-
-            const sourcesTitle = document.createElement('p');
-            sourcesTitle.className = 'chat-sources-title';
-            sourcesTitle.textContent = 'Sources:';
-            sourcesEl.appendChild(sourcesTitle);
-
-            sources.forEach(source => sourcesEl.appendChild(createSourceLink(source)));
-            bubbleEl.appendChild(sourcesEl);
-          }
-
-          // Append CTA buttons at the end of every bot response
-          bubbleEl.appendChild(createCtaButtons());
-
-          // Scroll to reveal sources + buttons
-          elements.messages.scrollTop = elements.messages.scrollHeight;
-
-          // Unlock input now that the full response is shown
-          isLoading = false;
-          return;
-        }
-
-        // Reveal next batch of characters as plain text (formatting applied at the end)
-        displayed = Math.min(displayed + CHARS_PER_TICK, content.length);
-        textEl.textContent = content.slice(0, displayed);
-
-        // Keep the newest typed content in view
-        elements.messages.scrollTop = elements.messages.scrollHeight;
-
-        setTimeout(tick, TICK_MS);
-      };
-
-      tick();
-    };
-    // ── End typewriter ────────────────────────────────────────────────────────
-
-    const showLoading = () => {
-      const loadingEl = document.createElement('div');
-      loadingEl.className = 'chat-message chat-message-bot';
-      loadingEl.innerHTML = `
-        <div class="chat-bubble chat-bubble-bot">
-          <p class="chat-text thinking-text">Thinking...</p>
-          <div class="typing-indicator">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
-      `;
-      elements.messages.appendChild(loadingEl);
-      elements.messages.scrollTop = elements.messages.scrollHeight;
-      return loadingEl;
-    };
-
-    const showError = (message) => {
-      elements.error.textContent = message;
-      elements.error.classList.remove('chat-error-hidden');
-    };
-
-    const hideError = () => {
-      elements.error.classList.add('chat-error-hidden');
-    };
-
-    // Close chat on escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !elements.panel.classList.contains('chat-panel-hidden')) {
-        elements.toggle.click();
-      }
-    });
-
-    // ── Speech-to-text ──────────────────────────────────────────────────────
-    // Supported on Chrome and Edge. Hidden automatically on Safari / Firefox.
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const micBtn = document.getElementById('chat-mic');
-
-    if (SpeechRecognition && micBtn) {
-      // Reveal the button only in supporting browsers
-      micBtn.classList.remove('chat-mic-hidden');
-
-      let recognition = null;
-      let isListening = false;
-
-      // Stop recording and immediately update the listening flag so onresult
-      // fired during teardown doesn't overwrite the input after submission.
-      const stopListening = () => {
-        if (!isListening) return;
-        isListening = false;
-        micBtn.classList.remove('chat-mic-listening');
-        recognition.stop();
-      };
-
-      const startListening = () => {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-        // continuous = true  → keeps recording through pauses; never auto-stops
-        // interimResults = true → fires onresult as you speak so text appears immediately
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.maxAlternatives = 1;
-
-        recognition.onstart = () => {
-          isListening = true;
-          micBtn.classList.add('chat-mic-listening');
-        };
-
-        recognition.onresult = (e) => {
-          // Guard: don't update the input after stopListening() has been called
-          if (!isListening) return;
-
-          // Accumulate all results (interim + final) into one transcript string
-          let transcript = '';
-          for (let i = 0; i < e.results.length; i++) {
-            transcript += e.results[i][0].transcript;
-          }
-          elements.input.value = transcript;
-          // Grow the textarea to show the full transcript as it comes in
-          autoResize();
-        };
-
-        recognition.onend = () => {
-          // Only reset visual state; isListening flag is already managed by stopListening()
-          isListening = false;
-          micBtn.classList.remove('chat-mic-listening');
-        };
-
-        recognition.onerror = (e) => {
-          // 'no-speech' is routine with continuous mode — ignore it
-          if (e.error === 'no-speech') return;
-          isListening = false;
-          micBtn.classList.remove('chat-mic-listening');
-        };
-
-        recognition.start();
-      };
-
-      // Toggle mic on button click
-      micBtn.addEventListener('click', () => {
-        if (isLoading) return;
-        isListening ? stopListening() : startListening();
-      });
-
-      // Stop recording when the message is sent (button click or Enter key)
-      // Use capture phase so we stop before the submit handler reads the input
-      elements.form.addEventListener('submit', stopListening, { capture: true });
-    }
-    // ── End speech-to-text ──────────────────────────────────────────────────
-  })();
+<script>
+  import { initChatWidget } from './chat-widget';
+  // Re-runs on every page load, including after View Transitions DOM swaps.
+  document.addEventListener('astro:page-load', initChatWidget);
 </script>

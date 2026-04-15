@@ -126,16 +126,27 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
     } else if (item._type === 'image') {
       const img = item as ImageBlock;
       const imageUrl = img.asset?.url;
-      return imageUrl ? (
+      return (
         <div class="content-block-wrapper" {...editAttrs}>
-          <img 
-            src={imageUrl} 
-            alt={cleanStega(img.alt)} 
-            class="w-full h-auto rounded-lg"
-            loading="lazy"
-          />
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={cleanStega(img.alt)}
+              class="w-full h-auto rounded-lg"
+              loading="lazy"
+            />
+          ) : (
+            <div class="image-block-placeholder" data-sanity-edit-target>
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <span>Select an image</span>
+            </div>
+          )}
         </div>
-      ) : null;
+      );
     } else if (item._type === 'advancedImage') {
       const advImg = item as AdvancedImageType;
       return (
@@ -573,9 +584,31 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   /* Wrapper for content blocks - provides visual editing target */
   .content-block-wrapper {
     display: contents;
+  }
+
+  /* Placeholder shown when an image block has no image selected */
+  .image-block-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 200px;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 2px dashed #d1d5db;
+    border-radius: 1rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .image-block-placeholder svg {
+    opacity: 0.5;
   }
 </style>
