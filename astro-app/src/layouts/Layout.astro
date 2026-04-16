@@ -221,11 +221,9 @@ const organizationJsonLd = {
     )}
 
     <!-- SEO Meta Tags -->
-    {noIndex ? (
-      <meta name="robots" content="noindex, nofollow" />
-    ) : (
-      <meta name="robots" content="index, follow" />
-    )}
+    <!-- Staging site: always block indexing. The X-Robots-Tag header in netlify.toml
+         provides a second layer, and robots.txt disallows all crawling. -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
     
     <title>{pageTitle}</title>
     {metaDescription && <meta name="description" content={metaDescription} />}
