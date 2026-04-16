@@ -177,6 +177,7 @@ const organizationJsonLd = {
     )}
     <script
       is:inline
+      async
       id="usercentrics-cmp"
       src="https://web.cmp.usercentrics.eu/ui/loader.js"
       data-settings-id="2IPQ2tsbqQMCiu"
@@ -205,6 +206,14 @@ const organizationJsonLd = {
         })
       </script>
     )}
+
+    <!-- Preconnect to critical origins for faster resource loading -->
+    <!-- Sanity CDN serves all CMS images — preconnect saves ~100-200ms on first image load -->
+    <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+    <!-- Usercentrics CMP script domain -->
+    <link rel="preconnect" href="https://web.cmp.usercentrics.eu" crossorigin />
+    <link rel="dns-prefetch" href="https://web.cmp.usercentrics.eu" />
 
     <!-- Preload LCP image for faster rendering (reduces resource load delay) -->
     {lcpImage && (
@@ -243,8 +252,7 @@ const organizationJsonLd = {
 
     {enableThirdPartyScripts && (
       <>
-        <!-- USERCENTRICS TEST: inert marketing tags (were hydrated via consent-controller) — re-enable after testing -->
-        <!--
+        <!-- Consent-gated marketing tags: type="text/plain" prevents execution until Usercentrics grants consent -->
         <script type="text/plain"
           data-src="https://app.posthog.com/static/array.js"
           data-attrs='{"async":true}'>
@@ -285,26 +293,25 @@ const organizationJsonLd = {
           data-attrs='{"async":true}'>
         </script>
 
-
         <script type="text/plain"
           data-src="https://snap.licdn.com/li.lms-analytics/insight.min.js"
           data-attrs='{"async":true}'>
         </script>
-        -->
 
       </>
     )}
 
     {enableThirdPartyScripts && (
       <>
-        <!-- USERCENTRICS TEST: legacy consent + consent-gated snippets — re-enable after testing -->
+        <!-- Legacy consent scripts — disabled, Usercentrics handles consent now -->
         <!--
         <script is:inline defer src="/scripts/regional-consent.js"></script>
         <script is:inline defer src="/scripts/consent-controller.js"></script>
+        -->
+
         <script is:inline async defer id="hs-script-loader" src="https://js.hs-scripts.com/3375779.js"></script>
 
         <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com">
-        <link rel="preconnect" href="https://cdn.sanity.io">
         <script
           type="text/plain"
           data-src="https://dev.visualwebsiteoptimizer.com/j.php?a=1171237"
@@ -315,7 +322,6 @@ const organizationJsonLd = {
           data-src="https://tracking.g2crowd.com/attribution_tracking/conversions/2535.js?p=https://www.roller.software/featur&amp;e="
           data-attrs='{"async":true}'>
         </script>
-        -->
 
         <meta name="google-site-verification" content="8gRa8N41J52kOXwPTGI_PXAQk-OkWhwvxDfxFOCSsiM">
         <meta http-equiv="content-language" content="en">
