@@ -39,7 +39,7 @@
     Netlify-CDN-Cache-Control = "public, max-age=300, stale-while-revalidate=3600"
 
 [build]
-  command = "rm -rf node_modules package-lock.json && npm install && npm run build --workspace=astro-app"
+  command = "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps && npm run build --workspace=astro-app"
   publish = "astro-app/dist"
 
 [functions]
