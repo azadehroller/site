@@ -1617,6 +1617,7 @@ export async function getIndustriesLandingPage(request?: Request) {
       announcementBar
     }`,
     request,
+    queryType: 'page',
   });
 }
 
@@ -2486,6 +2487,7 @@ export async function getIndustry(slug: string, request?: Request) {
     }`,
     params: { slug },
     request,
+    queryType: 'page',
   });
 }
 

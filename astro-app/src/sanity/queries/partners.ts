@@ -199,6 +199,7 @@ export async function getPartner(slug: string, request?: Request) {
     }`,
     params: { slug },
     request,
+    queryType: 'page',
   });
 }
 
@@ -399,6 +400,7 @@ export async function getPartnersLandingPage(request?: Request) {
       announcementBar
     }`,
     request,
+    queryType: 'page',
   });
 }
 

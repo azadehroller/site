@@ -52,6 +52,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   // Don't cache preview/draft content or API routes
   if (isPreview || url.pathname.startsWith('/api/')) {
     response.headers.set('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    // Explicitly tell Netlify CDN not to cache preview/API responses
+    response.headers.set('Netlify-CDN-Cache-Control', 'private, no-cache, no-store, must-revalidate');
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → NO CACHE (${isPreview ? 'preview mode' : 'API route'})`);
     }
@@ -73,6 +75,13 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       'Cache-Control',
       'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400'
     );
+    // Netlify CDN-specific header: tells Netlify Edge to cache independently of browser Cache-Control
+    // Without this, Netlify may not cache SSR responses at the CDN layer, causing every request
+    // to hit the origin serverless function (cold start + Sanity API call = slow TTFB)
+    response.headers.set(
+      'Netlify-CDN-Cache-Control',
+      'public, max-age=3600, stale-while-revalidate=86400, durable'
+    );
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → BLOG INDEX (5min browser, 1hr CDN)`);
     }
@@ -85,16 +94,26 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       'Cache-Control',
       'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400'
     );
+    response.headers.set(
+      'Netlify-CDN-Cache-Control',
+      'public, max-age=3600, stale-while-revalidate=86400, durable'
+    );
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → BLOG POST (5min browser, 1hr CDN)`);
     }
     return response;
   }
-  
+
   // Other pages (landing pages, industries, etc.)
   response.headers.set(
     'Cache-Control',
     'public, max-age=60, s-maxage=300, stale-while-revalidate=3600'
+  );
+  // Netlify CDN caches for 5 min with 1hr stale-while-revalidate
+  // 'durable' flag tells Netlify to persist cache across deploys (safe because webhook purges on content change)
+  response.headers.set(
+    'Netlify-CDN-Cache-Control',
+    'public, max-age=300, stale-while-revalidate=3600, durable'
   );
   if (DEBUG_CACHE) {
     console.log(`[Cache] ${url.pathname} → PAGE (1min browser, 5min CDN)`);

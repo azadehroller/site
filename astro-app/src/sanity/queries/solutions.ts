@@ -905,5 +905,6 @@ export async function getSolution(slug: string, request?: Request) {
     }`,
     params: { slug },
     request,
+    queryType: 'page',
   });
 }

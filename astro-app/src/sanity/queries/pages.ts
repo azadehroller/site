@@ -853,6 +853,7 @@ export async function getPage(slug: string, request?: Request) {
     }`,
     params: { slug },
     request,
+    queryType: 'page',
   });
 }
 
@@ -1842,5 +1843,6 @@ export async function getLandingPage(slug: string, request?: Request) {
     }`,
     params: { slug },
     request,
+    queryType: 'page',
   });
 }

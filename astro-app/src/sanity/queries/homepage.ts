@@ -1606,6 +1606,7 @@ export async function getHomepage(request?: Request, experimentParams?: { experi
       variant: experimentParams?.variant ?? '',
     },
     request,
+    queryType: 'page', // Use 10-min cache TTL (homepage changes less than blog posts)
   });
 }
 

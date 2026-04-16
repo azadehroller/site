@@ -58,10 +58,15 @@ export default defineConfig({
       },
     }),
     react(), // Required for visual editing
-    astrobook({
-      directory: 'src/stories', // Directory containing story files
-      subpath: '/storybook', // URL path for storybook UI
-      css: ['./src/styles/global.css', './src/styles/storybook.css'], // Include global styles
-    }),
+    // Astrobook: only include in dev/preview — adds ~11 MB to production build (storybook pages,
+    // story JS bundles, Google Fonts CSS import). Excluding it from production builds reduces
+    // deploy size from ~17 MB to ~6 MB and removes the Google Fonts @import from the CSS bundle.
+    ...(process.env.NODE_ENV === 'production' ? [] : [
+      astrobook({
+        directory: 'src/stories',
+        subpath: '/storybook',
+        css: ['./src/styles/global.css', './src/styles/storybook.css'],
+      }),
+    ]),
   ],
 });

@@ -199,6 +199,7 @@ export async function getCompetitor(slug: string, request?: Request) {
     }`,
     params: { slug },
     request,
+    queryType: 'page',
   });
 }
 
@@ -399,6 +400,7 @@ export async function getCompetitorsLandingPage(request?: Request) {
       announcementBar
     }`,
     request,
+    queryType: 'page',
   });
 }
 

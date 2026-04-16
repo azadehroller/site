@@ -785,6 +785,7 @@ export async function getFeaturesLandingPage(request?: Request) {
       announcementBar
     }`,
     request,
+    queryType: 'page',
   });
 }
 
@@ -1518,6 +1519,7 @@ export async function getFeature(slug: string, request?: Request) {
     }`,
     params: { slug },
     request,
+    queryType: 'page',
   });
 }
 
