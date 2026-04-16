@@ -1,42 +1,32 @@
+# ─── Security & meta headers (all routes) ───
 [[headers]]
   for = "/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
-    # Performance headers
     X-Content-Type-Options = "nosniff"
     # Note: Netlify automatically handles Brotli/gzip compression
 
-# Cache static assets aggressively
+# ─── Static assets: hashed filenames → cache forever ───
 [[headers]]
   for = "/_astro/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
 
 [[headers]]
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Cache blog posts for longer (1 hour CDN, 5 min browser)
-[[headers]]
-  for = "/blog/*"
-  [headers.values]
-    Cache-Control = "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
-    Netlify-CDN-Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
-
-# Never cache API routes
+# ─── API routes: never cache ───
 [[headers]]
   for = "/api/*"
   [headers.values]
     Cache-Control = "private, no-cache, no-store, must-revalidate"
 
-# Cache other pages (5 min CDN, 1 min browser)
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Cache-Control = "public, max-age=60, s-maxage=300, stale-while-revalidate=3600"
-    Netlify-CDN-Cache-Control = "public, max-age=300, stale-while-revalidate=3600"
+# NOTE: Cache-Control for SSR pages (/blog/*, other pages) is set by
+# Astro middleware (src/middleware.ts) which also sets Netlify-CDN-Cache-Control.
+# Defining them here too would create conflicting/duplicate headers.
+# The middleware is the single source of truth for page caching.
 
 [build]
   command = "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps && npm run build --workspace=astro-app"
