@@ -214,6 +214,16 @@ const organizationJsonLd = {
     <!-- Usercentrics CMP script domain -->
     <link rel="preconnect" href="https://web.cmp.usercentrics.eu" crossorigin />
     <link rel="dns-prefetch" href="https://web.cmp.usercentrics.eu" />
+    {enableThirdPartyScripts && (
+      <>
+        <!-- Preconnects for deferred trackers so the post-load fetch is faster (no full TLS round-trip when the script finally runs). -->
+        <link rel="preconnect" href="https://js.hs-scripts.com" crossorigin />
+        <link rel="preconnect" href="https://track.hubspot.com" crossorigin />
+        <link rel="preconnect" href="https://www.clarity.ms" crossorigin />
+        <link rel="preconnect" href="https://app.posthog.com" crossorigin />
+        <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
+      </>
+    )}
 
     <!-- Preload LCP image for faster rendering (reduces resource load delay) -->
     {lcpImage && (
@@ -250,6 +260,70 @@ const organizationJsonLd = {
 
     {enableThirdPartyScripts && (
       <>
+        <!--
+          Defer heavy consent-gated trackers (Facebook Pixel, Clarity, PostHog) until after window.load.
+          Consent gating is unchanged — Usercentrics still controls whether they execute at all.
+          The MutationObserver auto-disconnects once all targets are seen (or after 60s) to avoid
+          a long-lived subtree observer on document.documentElement.
+        -->
+        <script is:inline>
+          (function () {
+            var DEFERRED = ['fbevents.js', 'clarity.ms', 'app.posthog.com'];
+            var seen = Object.create(null);
+
+            function matchTarget(src) {
+              for (var i = 0; i < DEFERRED.length; i++) {
+                if (src.indexOf(DEFERRED[i]) !== -1) return DEFERRED[i];
+              }
+              return null;
+            }
+
+            function deferScript(script) {
+              if (!script || script.nodeName !== 'SCRIPT') return false;
+              if (script.getAttribute('data-deferred-injected') === '1') return false;
+              var src = script.src || '';
+              var key = matchTarget(src);
+              if (!key) return false;
+              var async = script.async;
+              if (script.parentNode) script.parentNode.removeChild(script);
+              function inject() {
+                var s = document.createElement('script');
+                s.async = async;
+                s.src = src;
+                s.setAttribute('data-deferred-injected', '1');
+                document.head.appendChild(s);
+              }
+              if (document.readyState === 'complete') setTimeout(inject, 0);
+              else window.addEventListener('load', inject, { once: true });
+              seen[key] = true;
+              return true;
+            }
+
+            function allSeen() {
+              for (var i = 0; i < DEFERRED.length; i++) {
+                if (!seen[DEFERRED[i]]) return false;
+              }
+              return true;
+            }
+
+            try {
+              document.querySelectorAll('script[src]').forEach(deferScript);
+              if (allSeen()) return;
+
+              var obs = new MutationObserver(function (records) {
+                for (var i = 0; i < records.length; i++) {
+                  var added = records[i].addedNodes;
+                  for (var j = 0; j < added.length; j++) {
+                    deferScript(added[j]);
+                  }
+                }
+                if (allSeen()) obs.disconnect();
+              });
+              obs.observe(document.documentElement, { childList: true, subtree: true });
+              setTimeout(function () { try { obs.disconnect(); } catch (e) {} }, 60000);
+            } catch (e) {}
+          })();
+        </script>
         <!-- Consent-gated marketing tags: type="text/plain" prevents execution until Usercentrics grants consent -->
         <script type="text/plain"
           data-src="https://app.posthog.com/static/array.js"
@@ -307,7 +381,24 @@ const organizationJsonLd = {
         <script is:inline defer src="/scripts/consent-controller.js"></script>
         -->
 
-        <script is:inline async defer id="hs-script-loader" src="https://js.hs-scripts.com/3375779.js"></script>
+        <!-- HubSpot tracking: inject after window.load so it does not compete with LCP (forms still use js.hsforms.net/embed/v2.js separately). -->
+        <script is:inline>
+          (function () {
+            if (window.__hsScriptsLoaderScheduled) return
+            window.__hsScriptsLoaderScheduled = true
+            function injectHubSpotTracker() {
+              if (document.getElementById('hs-script-loader')) return
+              var s = document.createElement('script')
+              s.id = 'hs-script-loader'
+              s.async = true
+              s.defer = true
+              s.src = 'https://js.hs-scripts.com/3375779.js'
+              document.head.appendChild(s)
+            }
+            if (document.readyState === 'complete') injectHubSpotTracker()
+            else window.addEventListener('load', injectHubSpotTracker, { once: true })
+          })()
+        </script>
 
         <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com">
         <script

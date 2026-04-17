@@ -28,6 +28,23 @@ declare global {
   }
 }
 
+/** Wait until the full page load event so HubSpot does not compete with LCP. */
+function afterWindowLoad(): Promise<void> {
+  return new Promise((resolve) => {
+    if (document.readyState === 'complete') {
+      resolve();
+    } else {
+      window.addEventListener('load', () => resolve(), { once: true });
+    }
+  });
+}
+
+function flushHubSpotReadyCallbacks(): void {
+  const callbacks = window.__hubspotReadyCallbacks || [];
+  window.__hubspotReadyCallbacks = [];
+  callbacks.forEach((cb) => cb());
+}
+
 /**
  * Load the HubSpot forms script if not already loaded
  * Returns a promise that resolves when the script is ready
@@ -61,34 +78,44 @@ export function loadHubSpotScript(): Promise<void> {
       return;
     }
 
-    // Load the script
     window.__hubspotScriptLoading = true;
-    window.__hubspotReadyCallbacks = [resolve];
+    window.__hubspotReadyCallbacks = window.__hubspotReadyCallbacks || [];
+    window.__hubspotReadyCallbacks.push(resolve);
 
-    const script = document.createElement('script');
-    script.src = '//js.hsforms.net/forms/embed/v2.js';
-    script.charset = 'utf-8';
-    script.async = true;
-    
-    script.onload = () => {
-      window.__hubspotScriptLoaded = true;
-      window.__hubspotScriptLoading = false;
-      
-      // Wait for hbspt object to be available
-      waitForHubSpot(() => {
-        // Execute all pending callbacks
-        const callbacks = window.__hubspotReadyCallbacks || [];
-        callbacks.forEach(cb => cb());
-        window.__hubspotReadyCallbacks = [];
-      });
-    };
+    void afterWindowLoad().then(() => {
+      if (window.hbspt?.forms) {
+        window.__hubspotScriptLoading = false;
+        flushHubSpotReadyCallbacks();
+        return;
+      }
 
-    script.onerror = () => {
-      window.__hubspotScriptLoading = false;
-      console.error('[HubSpot] Failed to load forms script');
-    };
+      const domScript = document.querySelector('script[src*="js.hsforms.net"]');
+      if (domScript || window.__hubspotScriptLoaded) {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(flushHubSpotReadyCallbacks);
+        return;
+      }
 
-    document.head.appendChild(script);
+      const script = document.createElement('script');
+      script.src = '//js.hsforms.net/forms/embed/v2.js';
+      script.charset = 'utf-8';
+      script.async = true;
+
+      script.onload = () => {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+
+        waitForHubSpot(flushHubSpotReadyCallbacks);
+      };
+
+      script.onerror = () => {
+        window.__hubspotScriptLoading = false;
+        console.error('[HubSpot] Failed to load forms script');
+      };
+
+      document.head.appendChild(script);
+    });
   });
 }
 
@@ -228,6 +255,11 @@ export const hubspotLoaderInlineScript = `
     check();
   }
   
+  function runAfterWindowLoad(fn) {
+    if (document.readyState === 'complete') fn();
+    else window.addEventListener('load', fn, { once: true });
+  }
+
   window.__loadHubSpotScript = function(callback) {
     if (window.hbspt && window.hbspt.forms) {
       callback && callback();
@@ -252,22 +284,42 @@ export const hubspotLoaderInlineScript = `
     
     window.__hubspotScriptLoading = true;
     callback && window.__hubspotReadyCallbacks.push(callback);
-    
-    var script = document.createElement('script');
-    script.src = '//js.hsforms.net/forms/embed/v2.js';
-    script.charset = 'utf-8';
-    script.async = true;
-    
-    script.onload = function() {
-      window.__hubspotScriptLoaded = true;
-      window.__hubspotScriptLoading = false;
-      waitForHubSpot(function() {
+
+    runAfterWindowLoad(function() {
+      if (window.hbspt && window.hbspt.forms) {
+        window.__hubspotScriptLoading = false;
         window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
         window.__hubspotReadyCallbacks = [];
-      });
-    };
-    
-    document.head.appendChild(script);
+        return;
+      }
+
+      var existing = document.querySelector('script[src*="js.hsforms.net"]');
+      if (existing || window.__hubspotScriptLoaded) {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(function() {
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+        return;
+      }
+
+      var script = document.createElement('script');
+      script.src = '//js.hsforms.net/forms/embed/v2.js';
+      script.charset = 'utf-8';
+      script.async = true;
+      
+      script.onload = function() {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(function() {
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+      };
+      
+      document.head.appendChild(script);
+    });
   };
   
   window.__initHubSpotForm = function(options) {

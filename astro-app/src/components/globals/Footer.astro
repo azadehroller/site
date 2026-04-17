@@ -369,6 +369,11 @@ const hasContent = newsletterTitle || columns.length > 0;
       check();
     }
 
+    function runAfterWindowLoad(fn) {
+      if (document.readyState === 'complete') fn();
+      else window.addEventListener('load', fn, { once: true });
+    }
+
     function loadScript(callback) {
       if (window.hbspt && window.hbspt.forms) {
         callback && callback();
@@ -394,20 +399,40 @@ const hasContent = newsletterTitle || columns.length > 0;
       window.__hubspotScriptLoading = true;
       callback && window.__hubspotReadyCallbacks.push(callback);
 
-      var script = document.createElement('script');
-      script.src = '//js.hsforms.net/forms/embed/v2.js';
-      script.async = true;
-
-      script.onload = function() {
-        window.__hubspotScriptLoaded = true;
-        window.__hubspotScriptLoading = false;
-        waitForHubSpot(function() {
+      runAfterWindowLoad(function() {
+        if (window.hbspt && window.hbspt.forms) {
+          window.__hubspotScriptLoading = false;
           window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
           window.__hubspotReadyCallbacks = [];
-        });
-      };
+          return;
+        }
 
-      document.head.appendChild(script);
+        var existing = document.querySelector('script[src*="js.hsforms.net"]');
+        if (existing || window.__hubspotScriptLoaded) {
+          window.__hubspotScriptLoaded = true;
+          window.__hubspotScriptLoading = false;
+          waitForHubSpot(function() {
+            window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+            window.__hubspotReadyCallbacks = [];
+          });
+          return;
+        }
+
+        var script = document.createElement('script');
+        script.src = '//js.hsforms.net/forms/embed/v2.js';
+        script.async = true;
+
+        script.onload = function() {
+          window.__hubspotScriptLoaded = true;
+          window.__hubspotScriptLoading = false;
+          waitForHubSpot(function() {
+            window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+            window.__hubspotReadyCallbacks = [];
+          });
+        };
+
+        document.head.appendChild(script);
+      });
     }
 
     function initFooterForm() {

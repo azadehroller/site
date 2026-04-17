@@ -10,6 +10,11 @@
   window.__hubspotFormsInitialized = window.__hubspotFormsInitialized || {};
   window.__hubspotReadyCallbacks = window.__hubspotReadyCallbacks || [];
 
+  function runAfterWindowLoad(fn) {
+    if (document.readyState === 'complete') fn();
+    else window.addEventListener('load', fn, { once: true });
+  }
+
   function waitForHubSpot(callback, maxAttempts) {
     maxAttempts = maxAttempts || 50;
     var attempts = 0;
@@ -50,21 +55,41 @@
     window.__hubspotScriptLoading = true;
     callback && window.__hubspotReadyCallbacks.push(callback);
 
-    var script = document.createElement('script');
-    script.src = '//js.hsforms.net/forms/embed/v2.js';
-    script.charset = 'utf-8';
-    script.async = true;
-
-    script.onload = function() {
-      window.__hubspotScriptLoaded = true;
-      window.__hubspotScriptLoading = false;
-      waitForHubSpot(function() {
+    runAfterWindowLoad(function() {
+      if (window.hbspt && window.hbspt.forms) {
+        window.__hubspotScriptLoading = false;
         window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
         window.__hubspotReadyCallbacks = [];
-      });
-    };
+        return;
+      }
 
-    document.head.appendChild(script);
+      var existing = document.querySelector('script[src*="js.hsforms.net"]');
+      if (existing || window.__hubspotScriptLoaded) {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(function() {
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+        return;
+      }
+
+      var script = document.createElement('script');
+      script.src = '//js.hsforms.net/forms/embed/v2.js';
+      script.charset = 'utf-8';
+      script.async = true;
+
+      script.onload = function() {
+        window.__hubspotScriptLoaded = true;
+        window.__hubspotScriptLoading = false;
+        waitForHubSpot(function() {
+          window.__hubspotReadyCallbacks.forEach(function(cb) { cb(); });
+          window.__hubspotReadyCallbacks = [];
+        });
+      };
+
+      document.head.appendChild(script);
+    });
   }
 
   function getUrlParameters(url, names) {

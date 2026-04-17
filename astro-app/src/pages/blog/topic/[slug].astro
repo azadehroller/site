@@ -344,6 +344,11 @@ const baseUrl = `/blog/topic/${slug}`;
       check();
     }
     
+    function runAfterWindowLoad(fn: () => void) {
+      if (document.readyState === 'complete') fn();
+      else window.addEventListener('load', fn, { once: true });
+    }
+
     function loadScript(callback?: () => void) {
       if (window.hbspt?.forms) {
         callback?.();
@@ -369,22 +374,42 @@ const baseUrl = `/blog/topic/${slug}`;
       
       window.__hubspotScriptLoading = true;
       callback && window.__hubspotReadyCallbacks?.push(callback);
-      
-      const script = document.createElement('script');
-      script.src = '//js.hsforms.net/forms/embed/v2.js';
-      script.charset = 'utf-8';
-      script.async = true;
-      
-      script.onload = () => {
-        window.__hubspotScriptLoaded = true;
-        window.__hubspotScriptLoading = false;
-        waitForHubSpot(() => {
+
+      runAfterWindowLoad(() => {
+        if (window.hbspt?.forms) {
+          window.__hubspotScriptLoading = false;
           window.__hubspotReadyCallbacks?.forEach(cb => cb());
           window.__hubspotReadyCallbacks = [];
-        });
-      };
-      
-      document.head.appendChild(script);
+          return;
+        }
+
+        const existing = document.querySelector('script[src*="js.hsforms.net"]');
+        if (existing || window.__hubspotScriptLoaded) {
+          window.__hubspotScriptLoaded = true;
+          window.__hubspotScriptLoading = false;
+          waitForHubSpot(() => {
+            window.__hubspotReadyCallbacks?.forEach(cb => cb());
+            window.__hubspotReadyCallbacks = [];
+          });
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = '//js.hsforms.net/forms/embed/v2.js';
+        script.charset = 'utf-8';
+        script.async = true;
+        
+        script.onload = () => {
+          window.__hubspotScriptLoaded = true;
+          window.__hubspotScriptLoading = false;
+          waitForHubSpot(() => {
+            window.__hubspotReadyCallbacks?.forEach(cb => cb());
+            window.__hubspotReadyCallbacks = [];
+          });
+        };
+        
+        document.head.appendChild(script);
+      });
     }
 
     // Initialize HubSpot forms
