@@ -69,6 +69,13 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     return response;
   }
   
+  // Cookies that legitimately change page content (A/B test buckets).
+  // Listing them in Netlify-Vary tells the Netlify CDN to (a) shard cache by these
+  // cookie values and (b) IGNORE every other cookie when computing the cache key.
+  // Without this, any cookie on the request (HubSpot __hstc, Facebook _fbp, GTM
+  // _gcl_au, etc.) causes the durable cache to bypass entirely → 800ms+ TTFB.
+  const NETLIFY_VARY = 'query,cookie=ab-test|ab-headingComposition';
+
   // Blog index - cache like blog posts (was falling through to generic 5min rule)
   if (url.pathname === '/blog' || url.pathname === '/blog/') {
     response.headers.set(
@@ -82,6 +89,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       'Netlify-CDN-Cache-Control',
       'public, max-age=3600, stale-while-revalidate=86400, durable'
     );
+    response.headers.set('Netlify-Vary', NETLIFY_VARY);
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → BLOG INDEX (5min browser, 1hr CDN)`);
     }
@@ -98,6 +106,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       'Netlify-CDN-Cache-Control',
       'public, max-age=3600, stale-while-revalidate=86400, durable'
     );
+    response.headers.set('Netlify-Vary', NETLIFY_VARY);
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → BLOG POST (5min browser, 1hr CDN)`);
     }
@@ -115,9 +124,10 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     'Netlify-CDN-Cache-Control',
     'public, max-age=300, stale-while-revalidate=3600, durable'
   );
+  response.headers.set('Netlify-Vary', NETLIFY_VARY);
   if (DEBUG_CACHE) {
     console.log(`[Cache] ${url.pathname} → PAGE (1min browser, 5min CDN)`);
   }
-  
+
   return response;
 };
