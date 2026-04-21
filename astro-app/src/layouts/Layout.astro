@@ -7,6 +7,7 @@ import Header from '@components/globals/Header.astro';
 import AnnouncementBar from '@components/globals/AnnouncementBar.astro';
 import ChatWidget from '@components/chat/ChatWidget.astro';
 import { getLayoutData, type AnnouncementBarSettings, type LayoutSanityResult } from '@utils/sanity';
+import { isProductionHost, PRODUCTION_BASE } from '@utils/host';
 
 // Visual Editing: Only load for authenticated Sanity editors (via preview cookie)
 // This keeps React/Sanity out of main bundle for normal users (performance optimization)
@@ -62,16 +63,24 @@ const metaDescription = seo?.seoDescription || seo?.fallbackDescription;
 const ogImage = seo?.seoImage?.asset?.url || seo?.fallbackImage?.url;
 const ogImageAlt = seo?.seoImage?.alt || seo?.fallbackImage?.alt || pageTitle;
 const noIndex = seo?.noIndex;
-const canonicalUrl = seo?.canonicalUrl || Astro.url.href;
+
+// Only fire third-party trackers on the production hostname; staging Netlify deploys
+// are PROD builds but must not phone home to HubSpot, Facebook, Clarity, etc.
+// Use PUBLIC_ENABLE_THIRD_PARTY_SCRIPTS=true in .env to enable locally for testing.
+const isProdHost = isProductionHost(Astro.url.hostname);
+
+// On non-production hosts (staging, deploy previews) rebase canonicals to production
+// so an accidental noindex removal would never canonicalise staging URLs.
+const canonicalUrl = seo?.canonicalUrl || (isProdHost
+  ? Astro.url.href
+  : `${PRODUCTION_BASE}${Astro.url.pathname}${Astro.url.search}`);
 
 // Show announcement bar if enabled and has text
 const showAnnouncementBar = announcementBar?.enabled && announcementBar?.text;
 
 // View Transitions add client-side navigation JS. Set PUBLIC_VIEW_TRANSITIONS_ENABLED=false to disable for better perf.
 const viewTransitionsEnabled = import.meta.env.PUBLIC_VIEW_TRANSITIONS_ENABLED !== 'false';
-// Localhost/dev: disable external trackers (gtag/GTM, Facebook, etc.) that may be blocked by course policy.
-// Set PUBLIC_ENABLE_THIRD_PARTY_SCRIPTS=true in .env to enable locally for testing
-const enableThirdPartyScripts = import.meta.env.PROD || import.meta.env.PUBLIC_ENABLE_THIRD_PARTY_SCRIPTS === 'true';
+const enableThirdPartyScripts = (import.meta.env.PROD && isProdHost) || import.meta.env.PUBLIC_ENABLE_THIRD_PARTY_SCRIPTS === 'true';
 
 // Usercentrics draft testing (dev): see comments next to the CMP script in <head>
 const usercentricsClearStorage =
