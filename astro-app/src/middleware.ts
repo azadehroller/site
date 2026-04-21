@@ -4,6 +4,56 @@ import { resolveAbTest, resolveComponentAbTest, resolveGeo } from './utils/exper
 // Enable logging in development to see caching behavior
 const DEBUG_CACHE = import.meta.env.DEV;
 
+// Custom request header that the CDN keys cache entries on (via response Vary).
+// See computeAbVariant + AB_VARIANT_BUCKETS below.
+const AB_VARIANT_HEADER = 'x-ab-variant';
+const AB_VARIANT_BUCKETS = 10; // coarse-grain bucketValue floats so cache shards stay small
+
+/**
+ * Discretize the AB context into a short, deterministic string so two visitors
+ * in the same variant produce the same value (and therefore the same CDN cache
+ * key). Format: `g<0|1>-h<0..9>` (20 possible combinations max — bounded cache
+ * fan-out per URL).
+ *
+ * Why not vary on the raw cookie values? Because `ab-headingComposition`
+ * stores `Math.random()` as a float — every visitor has a unique value, which
+ * would produce per-visitor cache entries (~useless). Discretising fixes that.
+ *
+ * Returns null when no AB context is available (e.g. asset routes).
+ */
+function computeAbVariant(locals: App.Locals): string | null {
+  const ab = locals.abTest;
+  const hc = locals.abTestHeadingComposition;
+  if (!ab && !hc) return null;
+
+  const parts: string[] = [];
+  if (ab?.userGroup) {
+    parts.push(`g${ab.userGroup === 'control' ? '0' : '1'}`);
+  }
+  if (hc) {
+    const bucket = Math.min(
+      Math.floor(hc.bucketValue * AB_VARIANT_BUCKETS),
+      AB_VARIANT_BUCKETS - 1
+    );
+    parts.push(`h${bucket}`);
+  }
+  return parts.length > 0 ? parts.join('-') : null;
+}
+
+/**
+ * Append a value to a multi-valued header (e.g. Vary), avoiding duplicates.
+ */
+function appendHeader(headers: Headers, name: string, value: string): void {
+  const existing = headers.get(name);
+  if (!existing) {
+    headers.set(name, value);
+    return;
+  }
+  const tokens = existing.split(',').map((t) => t.trim().toLowerCase());
+  if (tokens.includes(value.toLowerCase())) return;
+  headers.set(name, `${existing}, ${value}`);
+}
+
 /**
  * Middleware for adding caching headers to responses
  * and assigning A/B test cookies to new visitors.
@@ -25,6 +75,20 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     context.locals.abTestHeadingComposition = hcTest;
 
     context.locals.geo = resolveGeo(context.request);
+
+    // Inject a deterministic AB-variant header on the REQUEST before passing
+    // control downstream. On Vercel, this middleware compiles to an Edge
+    // Function (`edgeMiddleware: true`) that runs before the CDN cache lookup,
+    // so a header set here participates in cache-key computation via the
+    // `Vary: x-ab-variant` response header set further down.
+    //
+    // On Netlify this header is simply visible to the SSR function — Netlify
+    // uses its own `Netlify-Vary` directive for cache sharding, so this is a
+    // no-op there (and harmless).
+    const variant = computeAbVariant(context.locals);
+    if (variant) {
+      context.request.headers.set(AB_VARIANT_HEADER, variant);
+    }
   }
 
   const response = await next();
@@ -76,6 +140,19 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   // _gcl_au, etc.) causes the durable cache to bypass entirely → 800ms+ TTFB.
   const NETLIFY_VARY = 'query,cookie=ab-test|ab-headingComposition';
 
+  // CDN-Cache-Control is the IETF standard header Vercel (and other modern CDNs)
+  // respect for edge caching, independent of the browser-facing Cache-Control.
+  // We mirror the Netlify-CDN-Cache-Control values so both platforms cache the
+  // same way. The Netlify-only `durable` flag is omitted because it has no
+  // standard equivalent — Vercel's cache is naturally durable across deploys.
+  //
+  // AB-variant cache sharding on Vercel is handled via the `x-ab-variant`
+  // request header (set above) + `Vary: x-ab-variant` in the response (set per
+  // SSR branch below). The header value is discretized so cache fan-out per
+  // URL stays bounded (≤ 20 entries) — see computeAbVariant.
+  const CDN_CACHE_BLOG = 'public, max-age=3600, stale-while-revalidate=86400';
+  const CDN_CACHE_PAGE = 'public, max-age=300, stale-while-revalidate=3600';
+
   // Blog index - cache like blog posts (was falling through to generic 5min rule)
   if (url.pathname === '/blog' || url.pathname === '/blog/') {
     response.headers.set(
@@ -90,6 +167,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       'public, max-age=3600, stale-while-revalidate=86400, durable'
     );
     response.headers.set('Netlify-Vary', NETLIFY_VARY);
+    response.headers.set('CDN-Cache-Control', CDN_CACHE_BLOG);
+    appendHeader(response.headers, 'Vary', AB_VARIANT_HEADER);
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → BLOG INDEX (5min browser, 1hr CDN)`);
     }
@@ -107,6 +186,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       'public, max-age=3600, stale-while-revalidate=86400, durable'
     );
     response.headers.set('Netlify-Vary', NETLIFY_VARY);
+    response.headers.set('CDN-Cache-Control', CDN_CACHE_BLOG);
+    appendHeader(response.headers, 'Vary', AB_VARIANT_HEADER);
     if (DEBUG_CACHE) {
       console.log(`[Cache] ${url.pathname} → BLOG POST (5min browser, 1hr CDN)`);
     }
@@ -125,6 +206,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     'public, max-age=300, stale-while-revalidate=3600, durable'
   );
   response.headers.set('Netlify-Vary', NETLIFY_VARY);
+  response.headers.set('CDN-Cache-Control', CDN_CACHE_PAGE);
+  appendHeader(response.headers, 'Vary', AB_VARIANT_HEADER);
   if (DEBUG_CACHE) {
     console.log(`[Cache] ${url.pathname} → PAGE (1min browser, 5min CDN)`);
   }

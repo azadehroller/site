@@ -15,25 +15,59 @@ const {
   PUBLIC_SANITY_DATASET,
 } = loadEnv(import.meta.env.MODE, __dirname, "");
 import sanity from '@sanity/astro'
-import { defineConfig } from "astro/config";
+import { defineConfig, passthroughImageService } from "astro/config";
 import react from "@astrojs/react";
 import netlify from "@astrojs/netlify";
+import vercel from "@astrojs/vercel/serverless";
 
 // Different environments use different variables
 const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID || PUBLIC_SANITY_PROJECT_ID;
 const dataset = PUBLIC_SANITY_STUDIO_DATASET || PUBLIC_SANITY_DATASET;
 
-
-// Change this depending on your hosting provider (Vercel, Netlify etc)
+// Adapter selection — supports running on both Vercel (primary) and Netlify (fallback).
+// Detection order:
+//   1. DEPLOY_TARGET env var (manual override: "vercel" | "netlify")
+//   2. process.env.VERCEL  → set automatically on Vercel builds
+//   3. process.env.NETLIFY → set automatically on Netlify builds
+//   4. Default → Vercel (primary host)
 // https://docs.astro.build/en/guides/server-side-rendering/#adding-an-adapter
+function selectAdapter() {
+  const target =
+    (process.env.DEPLOY_TARGET || '').toLowerCase() ||
+    (process.env.VERCEL ? 'vercel' : '') ||
+    (process.env.NETLIFY ? 'netlify' : '') ||
+    'vercel';
+
+  if (target === 'netlify') {
+    return netlify({
+      edgeMiddleware: true, // Use Edge Functions for faster cold starts (~50ms vs ~2s)
+    });
+  }
+
+  return vercel({
+    // Run middleware as a Vercel Edge Function for faster cold starts.
+    edgeMiddleware: true,
+    // Image optimisation is opt-in; leaving disabled for now to avoid surprise
+    // billing during the comparison phase. Flip to `true` after we benchmark.
+    imageService: false,
+    // Surface Web Vitals in the Vercel dashboard at no extra runtime cost.
+    webAnalytics: { enabled: false },
+  });
+}
 
 // https://astro.build/config
 export default defineConfig({
   // Server output is required for SSR and visual editing
   output: 'server',
-  adapter: netlify({
-    edgeMiddleware: true, // Use Edge Functions for faster cold starts (~50ms vs ~2s)
-  }),
+  adapter: selectAdapter(),
+  // Passthrough image service: don't bundle `sharp`. Avoids the Vercel adapter's
+  // esbuild step choking on Sharp's `node:` prefix imports, and matches our
+  // decision to skip platform image optimisation during the comparison phase.
+  // All <Image> tags will pass src/width/height through verbatim — the source
+  // (Sanity CDN) already serves optimised images via URL params.
+  image: {
+    service: passthroughImageService(),
+  },
   checker: {
     typescript: false,
   },
