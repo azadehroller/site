@@ -10,10 +10,24 @@ import {fieldLevelExperiments} from '@sanity/personalization-plugin'
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 
-// Automatically detect environment and set preview URL accordingly
-// - When Studio runs on localhost, ALWAYS use local Astro dev server
-// - When Studio runs in production (deployed), use production URL
-const productionPreviewUrl = 'https://sa-rolls.netlify.app'
+// Automatically detect environment and set preview URL accordingly.
+// - When Studio runs on localhost → use local Astro dev server.
+// - When Studio runs deployed     → use the configured production frontend.
+//
+// During the Netlify→Vercel migration we run two parallel frontends, so the
+// canonical deployed preview URL is selectable. Priority order:
+//   1. SANITY_STUDIO_PREVIEW_URL env var (per-deploy override)
+//   2. Vercel (new primary)
+// Netlify is still reachable from Studio because it's in `allowOrigins`, so an
+// editor can paste its URL into Presentation's origin switcher when comparing.
+const DEPLOYED_PREVIEW_URLS = {
+  vercel: 'https://site-studio-sanity-astro.vercel.app',
+  netlify: 'https://sa-rolls.netlify.app',
+} as const
+
+const productionPreviewUrl =
+  process.env.SANITY_STUDIO_PREVIEW_URL ||
+  DEPLOYED_PREVIEW_URLS.vercel
 const developmentPreviewUrl = 'http://localhost:4321'
 
 // Check if we're running locally (works both server-side and client-side)
@@ -43,7 +57,16 @@ export default defineConfig({
           disable: '/api/draft-mode/disable',
         }
       },
-      allowOrigins: ['http://localhost:*', 'https://sa-rolls.netlify.app', 'https://*.sanity.studio'],
+      // Origins Presentation is allowed to iframe. Covers both production
+      // deploys + Vercel preview URLs (*.vercel.app) so branch deploys are
+      // previewable without a config change.
+      allowOrigins: [
+        'http://localhost:*',
+        DEPLOYED_PREVIEW_URLS.vercel,
+        DEPLOYED_PREVIEW_URLS.netlify,
+        'https://*.vercel.app',
+        'https://*.sanity.studio',
+      ],
     }),
 
     fieldLevelExperiments({
