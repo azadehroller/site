@@ -25,3 +25,4 @@ pnpm-debug.log*
 # Typescript
 *.tsbuildinfo
 .npm-cache
+.env*.local
