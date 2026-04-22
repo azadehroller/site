@@ -45,8 +45,20 @@ function selectAdapter() {
   }
 
   return vercel({
-    // Run middleware as a Vercel Edge Function for faster cold starts.
-    edgeMiddleware: true,
+    // edgeMiddleware: false → run middleware inside the Node serverless render
+    // function, NOT as a Vercel Edge Function (V8 isolate).
+    //
+    // Why: with edgeMiddleware: true, Astro bundles the middleware (and its
+    // transitive deps, including Astro internals) into a single edge worker.
+    // Some of those internals invoke `WebAssembly.compile()` at module init,
+    // which the Vercel Edge runtime forbids ("Wasm code generation disallowed
+    // by embedder") — the middleware then crashes silently, AB cookies never
+    // get set, geo never resolves, and `Vary: x-ab-variant` is never emitted,
+    // breaking CDN cache sharding entirely. Running middleware in Node sidesteps
+    // the WASM restriction. Cost: middleware adds a few ms to the SSR function
+    // cold path instead of running at the edge — acceptable for now; revisit
+    // once the WASM-importing dep is identified and removed.
+    edgeMiddleware: false,
     // Image optimisation is opt-in; leaving disabled for now to avoid surprise
     // billing during the comparison phase. Flip to `true` after we benchmark.
     imageService: false,

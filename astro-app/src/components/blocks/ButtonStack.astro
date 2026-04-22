@@ -58,10 +58,17 @@ interface Props {
   styles?: Styles;
 }
 
+// IMPORTANT: destructuring defaults only kick in for `undefined`, NOT `null`.
+// Sanity returns `null` for unfilled fields (common in drafts and older docs),
+// so we must coerce after destructuring or `rawStyles.layout` would throw
+// `TypeError: Cannot read properties of null (reading 'layout')` mid-render →
+// streamed page body ends with "Internal server error".
 const {
-  buttonList = [],
-  styles: rawStyles = {},
+  buttonList: rawButtonList,
+  styles: rawStylesProp,
 } = Astro.props;
+const buttonList = rawButtonList ?? [];
+const rawStyles = rawStylesProp ?? {};
 
 // Clean stega encoding
 const styles = {

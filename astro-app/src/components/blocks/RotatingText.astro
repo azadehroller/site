@@ -18,13 +18,17 @@ interface Props {
   id?: string;
 }
 
+// IMPORTANT: destructuring defaults only kick in for `undefined`, NOT `null`.
+// Sanity returns `null` for unfilled fields (especially in drafts), so coerce
+// after destructuring or `content.eyebrow` / `styles.theme` would throw.
 const {
-  content,
-  styles = {},
+  content: rawContent,
+  styles: rawStyles,
   id = `rotating-text-${Math.random().toString(36).slice(2, 11)}`
 } = Astro.props;
+const content = rawContent ?? ({} as NonNullable<typeof rawContent>);
+const styles = rawStyles ?? {};
 
-// Content
 const eyebrow = content.eyebrow;
 const title = content.title;
 const text = content.text;
