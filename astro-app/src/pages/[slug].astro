@@ -20,7 +20,10 @@ const { data: regularPage } = landingPage ? { data: null } : await getPage(slug 
 const page = landingPage || regularPage;
 
 if (!page) {
-  return Astro.redirect('/404');
+  // Return a real 404 status instead of redirecting to /404. A redirect would
+  // be re-caught by THIS same route (it's the catch-all), causing an infinite
+  // loop → Vercel 508 INFINITE_LOOP.
+  return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
 // Document info for visual editing

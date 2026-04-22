@@ -14,7 +14,7 @@ const [{ data: page }, layoutSanity] = await Promise.all([
 ]);
 
 if (!page) {
-  return Astro.redirect('/404');
+  return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
 // Document info for visual editing
