@@ -71,13 +71,6 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
 
 // Check if any industry has Lottie animation
 const hasLottieAnimations = industries.some(industry => industry.animationFile?.asset?.url);
-
-// Debug: Log industries data to see what's coming from Sanity
-console.log('[IndustrySelector] Industries data:', JSON.stringify(industries.map(i => ({
-  title: i.title,
-  hasIcon: !!i.icon,
-  animationFile: i.animationFile
-})), null, 2));
 ---
 
 <div

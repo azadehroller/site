@@ -1,15 +1,16 @@
 /**
  * Visual Editing Utilities for Sanity Presentation Mode
- * 
+ *
  * These utilities help generate proper data-sanity attributes for nested content
  * to enable click-to-edit functionality in Sanity's Presentation tool.
- * 
+ *
  * Key concepts:
  * - Stega encoding: Invisible Unicode characters embedded in string content that
  *   carry path information for visual editing. Should be PRESERVED in visible text.
- * - data-sanity attributes: HTML attributes that explicitly mark elements as 
+ * - data-sanity attributes: HTML attributes that explicitly mark elements as
  *   editable and specify the path to their content in the Sanity document.
  */
+import { createDataAttribute } from '@sanity/visual-editing';
 
 export interface SanityEditInfo {
   id: string;           // Document _id (base ID without drafts. prefix)
@@ -126,15 +127,42 @@ export function createBlockEditInfo(
 }
 
 /**
- * Helper to generate data attribute object for visual editing
+ * Helper to generate data attribute object for visual editing.
  * Use with Astro's spread syntax: {...createDataSanityAttrs(editInfo)}
+ *
+ * Emits THREE attributes:
+ *   1. `data-sanity` — modern format produced by `createDataAttribute()`. This is
+ *      what `@sanity/visual-editing`'s overlay scanner prefers; it encodes the
+ *      Studio base URL so the overlay's "Open in Studio" action can build the
+ *      `intent/edit/mode=presentation;id=...;type=...;path=...` URL and focus
+ *      the exact field. Without `base=`, Studio opens the document but lands at
+ *      the top instead of the clicked field.
+ *   2. `data-sanity-edit-target` — empty marker, picked up by the scanner to
+ *      register the element as a click-to-edit target (works alongside `data-sanity`).
+ *   3. `data-sanity-edit-info` — legacy JSON format, kept for backward compat
+ *      with any callers/tests that still read it directly. Sanity's scanner
+ *      still supports it but new integrations should rely on `data-sanity`.
+ *
+ * Studio base URL is read from `PUBLIC_SANITY_STUDIO_URL` (already used by
+ * `astro.config.mjs` → @sanity/astro `stega.studioUrl`).
  */
 export function createDataSanityAttrs(editInfo: SanityEditInfo | null | undefined): Record<string, string> {
   if (!editInfo) return {};
-  
+
+  const { id, type, path } = editInfo;
+  const studioBaseUrl = (import.meta.env.PUBLIC_SANITY_STUDIO_URL as string | undefined) || '';
+
+  const attr = createDataAttribute({
+    id,
+    type,
+    path,
+    baseUrl: studioBaseUrl || undefined,
+  });
+
   return {
+    'data-sanity': attr.toString(),
     'data-sanity-edit-target': '',
-    'data-sanity-edit-info': JSON.stringify(editInfo)
+    'data-sanity-edit-info': JSON.stringify(editInfo),
   };
 }
 
