@@ -17,7 +17,10 @@ export default defineCliConfig({
   },
   studioHost: process.env.SANITY_STUDIO_STUDIO_HOST || '',
   deployment: {
-    appId: 'ibwfcr9lpav9nc8f3h4n2nj3',
+    // App ID of the Sanity-hosted Studio for this project. Pinned so deploys
+    // always target the same *.sanity.studio hostname. Look this up in
+    // sanity.io/manage → project → Studios → <studio> → App ID.
+    appId: 'm973yfb641yyoetwfs2p6txp',
     autoUpdates: true,
   },
   vite: (config: any) => {
