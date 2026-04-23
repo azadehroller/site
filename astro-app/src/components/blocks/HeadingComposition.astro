@@ -8,6 +8,7 @@ import { PortableText } from "astro-portabletext";
 import type { PortableTextBlock } from "@portabletext/types";
 import { cleanStega } from '@utils/stega';
 import { pickVariantIndex, variantMatchesGeo } from '@utils/experiments';
+import { createDataSanityAttrs, type SanityEditInfo } from '@utils/visualEditing';
 import RawHtml from "@components/ui/RawHtml.astro";
 
 interface HeadingVariant {
@@ -38,6 +39,8 @@ interface Props {
   addBorderLine?: boolean;
   // Unique identifier for animations/targeting
   id?: string;
+  // Visual editing: path to this block in the Sanity document
+  editInfo?: SanityEditInfo | null;
 }
 
 const {
@@ -55,6 +58,7 @@ const {
   textType: rawTextType = 'lg',
   addBorderLine = false,
   id,
+  editInfo,
 } = Astro.props;
 
 // Clean stega from style values (must be clean for CSS class names)
@@ -67,6 +71,11 @@ const displayType = cleanStega(rawDisplayType) || 'h2';
 const textType = cleanStega(rawTextType) || 'lg';
 
 const variants = rawVariants ?? [];
+
+// Per-field data-sanity attributes for Presentation Tool click-to-edit
+const eyebrowEditAttrs = editInfo ? createDataSanityAttrs({ ...editInfo, path: `${editInfo.path}.eyebrow` }) : {};
+const titleEditAttrs   = editInfo ? createDataSanityAttrs({ ...editInfo, path: `${editInfo.path}.title` })   : {};
+const textEditAttrs    = editInfo ? createDataSanityAttrs({ ...editInfo, path: `${editInfo.path}.text` })    : {};
 
 // Resolve A/B variant: only when experimentActive is ON
 // 1. Filter variants to those matching the visitor's region
@@ -174,12 +183,13 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
   id={id ? cleanStega(id) : undefined}
 >
   {eyebrow && (
-    <EyebrowTag 
+    <EyebrowTag
       class:list={[
         eyebrowClasses,
         'uppercase font-extrabold small',
         theme === 'enterprise' && 'relative',
       ]}
+      {...eyebrowEditAttrs}
     >
       {theme === 'enterprise' && (
         <div class="fancy absolute inset-0 pointer-events-none"></div>
@@ -189,8 +199,8 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
   )}
 
   {title && (
-    <div>
-      <HeadingTag 
+    <div {...titleEditAttrs}>
+      <HeadingTag
         class:list={[
           displayType && `${displayType}-heading`,
           'my-0',
@@ -203,8 +213,8 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
   )}
 
   {text && text.length > 0 && (
-    <div class={`text-${textType} portable-text`}>
-      <PortableText 
+    <div class={`text-${textType} portable-text`} {...textEditAttrs}>
+      <PortableText
         value={text} 
         components={{
           type: {

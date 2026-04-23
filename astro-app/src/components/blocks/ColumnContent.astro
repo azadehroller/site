@@ -361,6 +361,7 @@ function getItemEditInfo(itemKey: string | undefined): SanityEditInfo | null {
             textType={cleanStega(headingData.textType) as 'xs' | 'sm' | 'base' | 'lg' | '2xl' | undefined}
             addBorderLine={headingData.addBorderLine}
             id={cleanStega(headingData._key)}
+            editInfo={itemEditInfo}
           />
         </div>
       );
