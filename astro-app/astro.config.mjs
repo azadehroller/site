@@ -13,6 +13,7 @@ const {
   PUBLIC_SANITY_STUDIO_DATASET,
   PUBLIC_SANITY_PROJECT_ID,
   PUBLIC_SANITY_DATASET,
+  PUBLIC_SANITY_STUDIO_URL,
 } = loadEnv(import.meta.env.MODE, __dirname, "");
 import sanity from '@sanity/astro'
 import { defineConfig, passthroughImageService } from "astro/config";
@@ -99,8 +100,7 @@ export default defineConfig({
       apiVersion: "2024-12-08", // Set to date of setup to use the latest API version
       // No studioBasePath - using standalone studio
       stega: {
-        // Default to localhost for development, use env var for production
-        studioUrl: process.env.PUBLIC_SANITY_STUDIO_URL || 'http://localhost:3333',
+        studioUrl: PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || 'http://localhost:3333',
       },
     }),
     react(), // Required for visual editing

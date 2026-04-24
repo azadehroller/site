@@ -159,7 +159,11 @@ export async function loadQuery<T>({
     perspective,
     // Only enable stega when actually in preview mode. Otherwise, it pollutes strings
     // (e.g. alt text) with invisible Unicode used for click-to-edit.
-    stega: visualEditingEnabled && isPreview,
+    // Pass studioUrl explicitly so stega-encoded links point to the correct Studio host,
+    // not the build-time default (which may be localhost:3333 on Vercel).
+    stega: visualEditingEnabled && isPreview
+      ? { enabled: true, studioUrl: import.meta.env.PUBLIC_SANITY_STUDIO_URL || '' }
+      : false,
     // Use token only when you actually need to read drafts
     ...(isPreview && token ? { token } : {}),
     // Use CDN for published content (faster, cached globally)
