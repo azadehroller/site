@@ -27,14 +27,14 @@ interface Props {
 const {
   stats: rawStats = [],
   theme: rawTheme = 'light',
-  numberColor: rawNumberColor = '#0960F6',
+  numberColor: rawNumberColor = 'var(--blue-50)',
   dividerColor: rawDividerColor = 'navy-80',
   id,
 } = Astro.props;
 
 // Clean stega from style values
 const theme = cleanStega(rawTheme) || 'light';
-const numberColor = cleanStega(rawNumberColor) || '#0960F6';
+const numberColor = cleanStega(rawNumberColor) || 'var(--blue-50)';
 const dividerColor = cleanStega(rawDividerColor) || 'navy-80';
 
 // Preserve stega in visible text for visual editing
@@ -73,11 +73,11 @@ const textColorClass = getTextColorClass();
       
       return (
         <div 
-          class="stat-item flex flex-col items-start py-4"
+          class="stat-item flex flex-col items-start padding-block-4"
           style={`--stat-number-color: ${numberColor};`}
           data-sanity-edit-target
         >
-          <div class="stat-number font-extrabold text-3xl md:text-5xl leading-8 md:leading-[3.75rem]">
+          <div class="stat-number font-extrabold">
             {statNumber}
           </div>
           <div class={`stat-text text-xl ${textColorClass}`}>
@@ -122,13 +122,14 @@ const textColorClass = getTextColorClass();
 
   /* Responsive text sizing for stat number */
   .stat-number {
-    font-weight: 800;
+    font-weight: var(--font-weight-800);
+    font-size: var(--font-size-30);
   }
 
   @media (min-width: 768px) {
     .stat-number {
-      font-size: 3rem;
-      line-height: 3.75rem;
+      font-size: var(--font-size-48);
+      line-height: var(--line-height-20);
     }
   }
 </style>

@@ -30,16 +30,16 @@ const { quickLinks = [], columns = [] } = Astro.props;
 
 {quickLinks.length > 0 && (
   <>
-    <div class="footer-quick-links">
+    <div class="footer-quick-links flex flex-wrap">
       {quickLinks.map((link) => (
         <a
           href={link.url}
-          class="footer-quick-link"
+          class="footer-quick-link flex items-center"
           target={link.isExternal ? '_blank' : undefined}
           rel={link.isExternal ? 'noopener noreferrer' : undefined}
         >
           {link.icon && (
-            <span class="footer-quick-link__icon" set:html={link.icon}></span>
+            <span class="footer-quick-link__icon flex-center" set:html={link.icon}></span>
           )}
           {link.label}
         </a>
@@ -50,16 +50,16 @@ const { quickLinks = [], columns = [] } = Astro.props;
 )}
 
 {columns.length > 0 && (
-  <nav class="footer-nav" aria-label="Footer Navigation">
+  <nav class="footer-nav grid grid-cols-5" aria-label="Footer Navigation">
     {columns.map((column) => (
-      <div class="footer-nav-column">
-        <h3 class="footer-nav-column__title">{column.title}</h3>
+      <div class="footer-nav-column stack">
+        <h3 class="footer-nav-column__title inline-block">{column.title}</h3>
         {column.links && column.links.length > 0 && (
-          <div class="footer-nav-column__links">
+          <div class="footer-nav-column__links stack">
             {column.links.map((link) => (
               <a
                 href={link.url}
-                class="footer-nav-link"
+                class="footer-nav-link block"
                 target={link.isExternal ? '_blank' : undefined}
                 rel={link.isExternal ? 'noopener noreferrer' : undefined}
               >
@@ -76,27 +76,23 @@ const { quickLinks = [], columns = [] } = Astro.props;
 <style>
   .footer-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--white-alpha-30);
     width: 100%;
   }
 
   .footer-quick-links {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    padding: 16px 0;
+    gap: var(--spacing-6);
+    padding: var(--spacing-4) 0;
     list-style: none;
     margin: 0;
   }
 
   .footer-quick-link {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: #ffffff;
+    gap: var(--spacing-1);
+    color: var(--neutral-white);
     text-decoration: none;
-    font-size: 14px;
-    line-height: 18px;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-21);
     transition: opacity 0.2s ease;
   }
 
@@ -108,33 +104,25 @@ const { quickLinks = [], columns = [] } = Astro.props;
   .footer-quick-link__icon {
     width: 16px;
     height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .footer-nav {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 32px;
-    font-size: 14px;
+    gap: var(--spacing-8);
+    font-size: var(--font-size-14);
   }
 
   .footer-nav-column {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-4);
   }
 
   .footer-nav-column__title {
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 18px;
-    color: #ffffff;
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-800);
+    line-height: var(--line-height-21);
+    color: var(--neutral-white);
     margin: 0;
-    display: inline-block;
     cursor: auto;
-    margin-bottom: var(--size-3, 12px);
+    margin-block-end: var(--size-3, 12px);
   }
 
   .footer-nav-column__title:hover {
@@ -142,23 +130,20 @@ const { quickLinks = [], columns = [] } = Astro.props;
   }
 
   .footer-nav-column__links {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-bottom: var(--size-3, 12px);
+    gap: var(--spacing-1);
+    margin-block-end: var(--size-3, 12px);
   }
 
   .footer-nav-column__links a {
-    display: block;
-    line-height: 1.5;
+    line-height: var(--line-height-24);
     padding: 0.125rem 0;
   }
 
   .footer-nav-link {
-    color: #f2f2f2;
+    color: var(--neutral-10);
     text-decoration: none;
-    font-size: 14px;
-    line-height: 18px;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-21);
     transition: opacity 0.2s ease;
   }
 
@@ -180,7 +165,7 @@ const { quickLinks = [], columns = [] } = Astro.props;
 
     .footer-quick-links {
       flex-direction: column;
-      gap: 12px;
+      gap: var(--spacing-3);
     }
   }
 
@@ -190,7 +175,7 @@ const { quickLinks = [], columns = [] } = Astro.props;
     }
   }
 
-  @media only screen and (min-width: 720px) {
+  @media (min-width: 768px) {
     .footer-quick-links {
       display: flex;
       gap: var(--size-6, 24px);
@@ -198,7 +183,7 @@ const { quickLinks = [], columns = [] } = Astro.props;
 
     .footer-nav {
       grid-template-columns: repeat(5, 1fr);
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
 
     .footer-nav-column__links a {

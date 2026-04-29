@@ -20,20 +20,20 @@ const { eyebrow, title, blurb, stats, horizontalLayout = false } = Astro.props;
 // This is a global/referenced document - clicking will open the global WidgetStats document
 ---
 
-<section class="widget-stats mx-auto bg-neutral-white box-shadow-onlight rounded-[32px]" data-sanity-edit-target>
+<section class="widget-stats margin-inline-auto bg-neutral-white box-shadow-onlight" data-sanity-edit-target>
   <div class:list={[
-    "grid grid-cols-1 sm:grid-cols-1 overflow-hidden rounded-2xl",
-    horizontalLayout ? "lg:grid-cols-2" : ""
+    "widget-stats-inner grid grid-cols-1 overflow-hidden",
+    horizontalLayout ? "widget-stats-horizontal" : ""
   ]}>
-    <div class="flex items-center p-4 md:p-6 bg-[#F5F8FF]">
+    <div class="widget-stats__header flex items-center padding-4">
       <header class="flex flex-col gap-4">
         {eyebrow && (
-          <div class="text-secondary-50 font-extrabold uppercase" data-sanity-edit-target>
+          <div class="text-eyebrow text-secondary-50" data-sanity-edit-target>
             {eyebrow}
           </div>
         )}
-        <div class="text-sm font-semibold leading-6 text-primary-50">
-          <h2 class="block mb-0" data-sanity-edit-target>
+        <div class="text-sm font-semibold text-primary-50">
+          <h2 class="block margin-block-end-0" data-sanity-edit-target>
             {title}
           </h2>
         </div>
@@ -44,15 +44,15 @@ const { eyebrow, title, blurb, stats, horizontalLayout = false } = Astro.props;
         )}
       </header>
     </div>
-    <div class="p-4 md:p-6">
-      <div class="grid gap-3 grid-cols-3 md:gap-y-4 md:gap-x-5 text-primary-50">
+    <div class="widget-stats__body padding-4">
+      <div class="widget-stats__grid grid gap-3 grid-cols-3 text-primary-50">
         {stats?.map((stat) => (
           <div class="flex flex-col" data-sanity-edit-target>
             {stat.icon && (
               <div class="text-sm font-semibold" set:html={stat.icon} />
             )}
-            <div class="text-3xl md:text-5xl font-bold" data-sanity-edit-target>{stat.value}</div>
-            <div class="md:text-base" data-sanity-edit-target>{stat.label}</div>
+            <div class="stat-value font-bold" data-sanity-edit-target>{stat.value}</div>
+            <div class="stat-label" data-sanity-edit-target>{stat.label}</div>
           </div>
         ))}
       </div>
@@ -62,8 +62,33 @@ const { eyebrow, title, blurb, stats, horizontalLayout = false } = Astro.props;
 
 <style>
   .widget-stats {
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+    --shadow-color: var(--black-alpha-10);
     box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+  }
+
+  .widget-stats-inner {
+    border-radius: 1rem;
+  }
+
+  .widget-stats__header {
+    background-color: var(--blue-99);
+  }
+
+  .stat-value {
+    font-size: var(--font-size-30);
+  }
+
+  @media (min-width: 768px) {
+    .widget-stats__header,
+    .widget-stats__body { padding: var(--spacing-6); }
+    .widget-stats__grid { row-gap: var(--spacing-4); column-gap: var(--spacing-5); }
+    .stat-value { font-size: var(--font-size-48); }
+    .stat-label { font-size: var(--font-size-16); }
+  }
+
+  @media (min-width: 1024px) {
+    .widget-stats-horizontal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>
 

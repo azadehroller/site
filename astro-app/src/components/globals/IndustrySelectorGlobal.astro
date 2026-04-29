@@ -54,14 +54,13 @@ const hasHeading = heading?.eyebrow || heading?.title || (heading?.text && headi
 // Theme classes
 const themeClass = theme === 'light' ? 'light' : 'dark';
 const textColorClass = theme === 'light' ? 'text-neutral-white' : 'text-primary-50';
-const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutral-white';
 
 // CTA link data (unused in current implementation)
 ---
 
 <div 
   id={componentId}
-  class="industry-selector-global mx-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col lg:p-6 rounded-[32px] py-6 px-6 mb-0 md:mb-4"
+  class="industry-selector-global margin-inline-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col padding-block-6 padding-inline-6 margin-block-end-0"
   data-sanity-edit-target
 >
   {/* Header Section using HeadingComposition */}
@@ -84,7 +83,7 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
   )}
 
   {/* Desktop flex-wrap view */}
-  <div class={`hidden md:flex flex-wrap gap-3 ms-auto me-auto ${themeClass}`}>
+  <div class={`industry-global-desktop flex-wrap gap-3 margin-inline-start-auto margin-inline-end-auto ${themeClass}`}>
     {industries.map((industry) => {
       const industryTitle = industry.title;
       const industryIcon = industry.icon;
@@ -104,13 +103,13 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
       return (
         <a 
           href={href}
-          class={`js-industryItemsLink flex items-center justify-center gap-2 mo-card-features ${textColorClass} font-semibold ease-in transition duration-200 ${hoverBgClass} hover:shadow-3xl rounded-2xl`}
+          class={`js-industryItemsLink flex items-center justify-center gap-2 mo-card-features ${textColorClass} font-semibold ease-in transition duration-200`}
           target={openInNewTab ? '_blank' : undefined}
           rel={rel}
           data-sanity-edit-target
         >
           {industryIcon && (
-            <span class="industry-icon" set:html={industryIcon} data-sanity-edit-target />
+            <span class="industry-icon flex-center" set:html={industryIcon} data-sanity-edit-target />
           )}
           {industryTitle && (
             <span data-sanity-edit-target>{industryTitle}</span>
@@ -121,10 +120,10 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
   </div>
 
   {/* Mobile dropdown view */}
-  <div class="grid gap-3 md:hidden dropdown-wrapper" data-sanity-ignore>
+  <div class="industry-global-mobile gap-3 dropdown-wrapper relative z-9999" data-sanity-ignore>
     <select 
       id={`${componentId}-dropdown`}
-      class="industry-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+      class="industry-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center padding-block-2 padding-inline-4 w-full appearance-none cursor-pointer"
       data-sanity-ignore
     >
       <option value="" selected>Select your industry</option>
@@ -138,7 +137,7 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
     </select>
     <button 
       type="button"
-      class="industry-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 bg-secondary-50 hover:bg-secondary-70 rounded-3xl py-2 px-4 text-neutral-white"
+      class="industry-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline text-base font-semibold tracking-tight transition ease-in-out duration-300 bg-secondary-50 padding-block-2 padding-inline-4 text-neutral-white"
       data-dropdown-id={`${componentId}-dropdown`}
     >
       Discover
@@ -150,7 +149,7 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
 <style>
   /* Container shadows */
   .box-shadow-onlight {
-    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+    box-shadow: 0px 4px 8px 0px var(--primary-alpha-08), 0px 12px 24px 0px var(--primary-alpha-12);
   }
 
   .box-shadow-onlight-navy-40 {
@@ -159,9 +158,7 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
 
   /* Dropdown wrapper with custom arrow */
   .dropdown-wrapper {
-    position: relative;
     isolation: isolate;
-    z-index: 9999;
   }
 
   .dropdown-wrapper::after {
@@ -180,20 +177,31 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
 
   /* Industry item cards */
   .mo-card-features {
-    padding: 0.75rem 1.25rem;
+    padding: var(--spacing-3) 1.25rem;
     min-height: 56px;
+    border-radius: 1rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  /* Shadow on hover */
-  .hover\:shadow-3xl:hover {
-    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+  /* Hover states — light theme (dark text on white bg, hover goes darker) */
+  .light .js-industryItemsLink:hover {
+    background-color: var(--primary-60);
+    box-shadow: 0px 4px 8px 0px var(--primary-alpha-08), 0px 12px 24px 0px var(--primary-alpha-12);
   }
 
-  /* Icon container */
-  .industry-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* Hover states — dark theme (white text on dark bg, hover to white card) */
+  .dark .js-industryItemsLink:hover {
+    background-color: var(--neutral-white);
+    box-shadow: 0px 4px 8px 0px var(--primary-alpha-08), 0px 12px 24px 0px var(--primary-alpha-12);
+  }
+
+  /* Discover button */
+  .industry-discover-btn {
+    border-radius: 1.5rem;
+  }
+
+  .industry-discover-btn:hover {
+    background-color: var(--secondary-70);
   }
 
   .industry-icon :global(svg) {
@@ -203,13 +211,23 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
 
   /* Background colors */
   .bg-widget-industries {
-    background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
+    background-image: linear-gradient(100deg, var(--neutral-white) 0%, var(--blue-99) 61.98%);
   }
+
+  /* Container */
+  .industry-selector-global {
+    border-radius: 2rem;
+  }
+
+  /* Desktop / mobile visibility */
+  .industry-global-desktop { display: none; }
+  .industry-global-mobile { display: grid; }
 
   /* Dropdown styles */
   .industry-dropdown {
     border: none;
     outline: none;
+    border-radius: 61.25rem;
     position: relative;
     z-index: 1;
     pointer-events: auto !important;
@@ -220,6 +238,15 @@ const hoverBgClass = theme === 'light' ? 'hover:bg-primary-60' : 'hover:bg-neutr
 
   .industry-dropdown:focus {
     box-shadow: 0 0 0 2px var(--primary-40, #074DC5);
+  }
+
+  @media (min-width: 768px) {
+    .industry-selector-global { margin-block-end: var(--spacing-4); }
+    .industry-global-desktop { display: flex; }
+    .industry-global-mobile { display: none; }
+  }
+  @media (min-width: 1024px) {
+    .industry-selector-global { padding: var(--spacing-6); }
   }
 
 </style>

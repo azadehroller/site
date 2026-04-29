@@ -102,10 +102,10 @@ const HeadingTag = cleanHeadingType as keyof HTMLElementTagNameMap;
 const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
 ---
 
-<section class:list={["widget-user-reviews inline-flex flex-col w-full gap-y-4 md:gap-y-1", alignmentClass, `md:${alignmentClass}`]} data-sanity-edit-target>
+<section class:list={["widget-user-reviews inline-flex flex-col w-full gap-row-4", alignmentClass]} data-sanity-edit-target>
   {eyebrow && (
     <EyebrowTag
-      class:list={[eyebrowColor, "uppercase font-extrabold text-sm"]}
+      class:list={[eyebrowColor, "text-eyebrow"]}
       data-sanity-edit-target
     >
       {eyebrow}
@@ -123,7 +123,7 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
   
   {text && (
     <div
-      class:list={[titleColor, textSizeClass, "[&>ul]:list-disc [&>ul]:list-inside [&>ul]:mt-4 [&>ul>li]:ml-2"]}
+      class:list={[titleColor, textSizeClass, "widget-reviews-content"]}
       data-sanity-edit-target
     >
       {text}
@@ -131,7 +131,7 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
   )}
   
   {badges && badges.length > 0 && (
-    <ul class="flex flex-wrap justify-start items-end px-0 gap-x-5 gap-y-3 md:gap-5 list-none" data-sanity-edit-target>
+    <ul class="user-reviews-badges flex flex-wrap justify-start items-end padding-inline-0 gap-col-5 gap-row-3 list-none" data-sanity-edit-target>
       {badges.map((badge) => {
         let imageUrl = '';
         if (badge.image?.asset) {
@@ -160,7 +160,7 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
                 <img
                   src={imageUrl}
                   alt={badgeAlt}
-                  class="badge-img h-[100px] md:h-[120px] lg:h-[144px] max-w-[96px] object-contain"
+                  class="badge-img object-contain"
                   loading="lazy"
                 />
               </a>
@@ -168,7 +168,7 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
               <img
                 src={imageUrl}
                 alt={badgeAlt}
-                class="badge-img h-[100px] md:h-[120px] lg:h-[144px] max-w-[96px] object-contain"
+                class="badge-img object-contain"
                 loading="lazy"
               />
             )}
@@ -182,50 +182,76 @@ const EyebrowTag = cleanEyebrowType as keyof HTMLElementTagNameMap;
 <style>
   /* Heading display sizes */
   .h1-heading {
-    font-size: 3rem;
-    line-height: 1.1;
-    font-weight: 700;
+    font-size: var(--font-size-48);
+    line-height: var(--line-height-18);
+    font-weight: var(--font-weight-700);
   }
 
   .h2-heading {
-    font-size: 2.25rem;
-    line-height: 1.2;
-    font-weight: 700;
+    font-size: var(--font-size-36);
+    line-height: var(--line-height-19);
+    font-weight: var(--font-weight-700);
   }
 
   .h3-heading {
-    font-size: 1.875rem;
-    line-height: 1.3;
-    font-weight: 600;
+    font-size: var(--font-size-30);
+    line-height: var(--line-height-21);
+    font-weight: var(--font-weight-600);
   }
 
   .h4-heading {
-    font-size: 1.5rem;
-    line-height: 1.4;
-    font-weight: 600;
+    font-size: var(--font-size-24);
+    line-height: var(--line-height-22);
+    font-weight: var(--font-weight-600);
   }
 
   .h5-heading {
-    font-size: 1.25rem;
-    line-height: 1.5;
-    font-weight: 600;
+    font-size: var(--font-size-20);
+    line-height: var(--line-height-24);
+    font-weight: var(--font-weight-600);
   }
 
   .h6-heading {
-    font-size: 1rem;
-    line-height: 1.5;
-    font-weight: 600;
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+    font-weight: var(--font-weight-600);
   }
 
   .s8-heading {
-    font-size: 0.875rem;
-    line-height: 1.5;
-    font-weight: 600;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-24);
+    font-weight: var(--font-weight-600);
+  }
+
+  /* Rich text content */
+  .widget-reviews-content > ul {
+    list-style: disc;
+    list-style-position: inside;
+    margin-top: var(--spacing-4);
+  }
+  .widget-reviews-content > ul > li {
+    margin-left: var(--spacing-2);
+  }
+
+  /* Badge sizing */
+  .badge-img {
+    height: 100px;
+    max-width: 96px;
   }
 
   /* Badge hover effect */
   .user-review-badge .badge-img:hover {
     mix-blend-mode: luminosity;
+  }
+
+  @media (min-width: 768px) {
+    .widget-user-reviews { row-gap: var(--spacing-1); }
+    .user-reviews-badges { gap: var(--spacing-5); }
+    .badge-img { height: 120px; }
+  }
+
+  @media (min-width: 1024px) {
+    .badge-img { height: 144px; }
   }
 </style>
 

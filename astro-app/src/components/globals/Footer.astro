@@ -75,25 +75,25 @@ const isProdHost = isProductionHost(Astro.url.hostname);
 
 <style>
   .site-footer {
-    background-color: #033180;
-    color: #ffffff;
-    font-family: 'Proxima Nova', 'proxima-nova', 'Helvetica Neue', Arial, sans-serif;
-    padding: 32px 0;
+    background-color: var(--blue-30);
+    color: var(--neutral-white);
+    font-family: var(--font-family-brand);
+    padding-block: var(--spacing-8);
+    padding-inline: 0;
   }
 
   .footer-container {
     max-width: 1312px;
-    margin: 0 auto;
-    padding: 0 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    margin-inline: auto;
+    padding-block: 0;
+    padding-inline: var(--spacing-8);
+    gap: var(--spacing-6);
   }
 
   .footer-empty {
     text-align: center;
-    padding: 40px;
-    color: rgba(255, 255, 255, 0.7);
+    padding: var(--spacing-10);
+    color: var(--white-alpha-70);
   }
 
   .footer-empty p {
@@ -102,16 +102,13 @@ const isProdHost = isProductionHost(Astro.url.hostname);
 
   .footer-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--white-alpha-30);
     width: 100%;
   }
 
   /* Newsletter */
   .footer-newsletter {
-    display: flex;
-    gap: 32px;
-    align-items: center;
-    flex-wrap: wrap;
+    gap: var(--spacing-8);
   }
 
   .footer-newsletter__content {
@@ -120,36 +117,36 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   }
 
   .footer-newsletter__title {
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 30px;
-    margin: 0 0 8px 0;
+    font-size: var(--font-size-24);
+    font-weight: var(--font-weight-800);
+    line-height: var(--line-height-20);
+    margin-block-start: 0;
+    margin-block-end: var(--spacing-2);
+    margin-inline: 0;
   }
 
   .footer-newsletter__title span {
-    font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-weight: var(--font-weight-700);
+    font-family: var(--font-family-body);
   }
 
   .footer-newsletter__desc {
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    letter-spacing: -0.32px;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-400);
+    line-height: var(--line-height-24);
+    letter-spacing: var(--letter-spacing-tight);
     margin: 0;
-    color: #ffffff;
+    color: var(--neutral-white);
   }
 
   /* HubSpot Form */
   .footer-form-container {
-    display: flex;
-    gap: 16px;
-    align-items: center;
+    gap: var(--spacing-4);
   }
 
   .footer-form-container form {
     display: flex;
-    gap: 16px;
+    gap: var(--spacing-4);
     align-items: center;
     margin: 0;
   }
@@ -160,7 +157,7 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   }
 
   .footer form input[type='email'] {
-    color: #a0a0a0;
+    color: var(--neutral-45);
   }
 
   .footer-form-container .hs-form-field {
@@ -176,31 +173,33 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   }
 
   .footer-form-container input[type="email"] {
-    background: #ffffff;
-    border: 1px solid #033180;
+    background: var(--neutral-white);
+    border: 1px solid var(--blue-30);
     border-radius: 980px;
-    padding: 8px 24px;
+    padding-block: var(--spacing-2);
+    padding-inline: var(--spacing-6);
     width: 375px;
-    font-size: 16px;
-    line-height: 24px;
-    color: #4d4d4d;
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+    color: var(--neutral-60);
     box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.05);
   }
 
   .footer-form-container input[type="submit"] {
-    background: #ff490c;
-    color: #ffffff;
+    background: var(--red-55);
+    color: var(--neutral-white);
     border: none;
     border-radius: 980px;
-    padding: 8px 24px;
-    font-size: 16px;
-    line-height: 24px;
+    padding-block: var(--spacing-2);
+    padding-inline: var(--spacing-6);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
     cursor: pointer;
     transition: background-color 0.2s ease;
   }
 
   .footer-form-container input[type="submit"]:hover {
-    background: #cc3a0a;
+    background: var(--red-60);
   }
 
   /* Global footer link/list overrides */
@@ -213,7 +212,7 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   }
 
   .site-footer li {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 
   .site-footer form {
@@ -221,9 +220,9 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   }
 
   .site-footer form input[type='email'] {
-    border: 1px solid #4c4eec;
+    border: 1px solid var(--purple-40);
     border-radius: 980px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     color: var(--neutral-60, #4d4d4d);
     padding: 0.45rem 1.5rem;
   }
@@ -231,16 +230,19 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   .site-footer form input[type='submit'] {
     background: var(--secondary-50, #ff490c);
     color: var(--neutral-white, #ffffff);
-    font-weight: bold;
+    font-weight: var(--font-weight-700);
     cursor: pointer;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    padding: 0.5rem 1.5rem;
+    padding-block: var(--spacing-2);
+    padding-inline: var(--spacing-6);
     border-radius: 1.5rem;
-    margin: 0 0 1.5rem;
+    margin-block-start: 0;
+    margin-block-end: var(--spacing-6);
+    margin-inline: 0;
     width: 100%;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .site-footer form input[type='submit']:hover {
@@ -265,11 +267,12 @@ const isProdHost = isProductionHost(Astro.url.hostname);
 
   @media (max-width: 480px) {
     .footer-container {
-      padding: 0 16px;
+      padding-block: 0;
+      padding-inline: var(--spacing-4);
     }
   }
 
-  @media only screen and (min-width: 720px) {
+  @media (min-width: 768px) {
     .site-footer form {
       display: flex;
     }
@@ -295,7 +298,7 @@ const isProdHost = isProductionHost(Astro.url.hostname);
 </style>
 
 <footer id="js-footer" class="site-footer" data-sanity-edit-target>
-  <div class="footer-container">
+  <div class="footer-container stack">
     {!hasContent ? (
       <div class="footer-empty">
         <p>Footer content not configured. Please add content in Sanity Studio under Globals → Footer.</p>
@@ -303,7 +306,7 @@ const isProdHost = isProductionHost(Astro.url.hostname);
     ) : (
       <>
         {newsletterTitle && (
-          <div class="footer-newsletter">
+          <div class="footer-newsletter flex flex-wrap items-center">
             <div class="footer-newsletter__content">
               <h2 class="footer-newsletter__title">
                 {newsletterTitle.includes('Sign up') ? (
@@ -319,10 +322,10 @@ const isProdHost = isProductionHost(Astro.url.hostname);
               )}
             </div>
             {isProdHost ? (
-              <div class="footer-form-container" id="footer-newsletter-form"></div>
+              <div class="footer-form-container flex items-center" id="footer-newsletter-form"></div>
             ) : (
-              <div class="footer-form-container" data-staging-placeholder>
-                <p style="margin:0;font-size:0.875rem;opacity:0.8;">Newsletter form disabled on non-production hosts.</p>
+              <div class="footer-form-container flex items-center" data-staging-placeholder>
+                <p class="text-sm" style="margin:0;opacity:0.8;">Newsletter form disabled on non-production hosts.</p>
               </div>
             )}
           </div>

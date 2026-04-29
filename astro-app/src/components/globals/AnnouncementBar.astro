@@ -61,13 +61,13 @@ const bgClass = themeClasses[theme] || themeClasses.default;
       rel={relAttr}
       class="block"
     >
-      <div class="flex flex-col md:flex-row items-start gap-1 px-4 py-3 md:items-center md:justify-between md:gap-3">
-        <div class="font-extrabold text-lg md:flex-1">{text}</div>
+      <div class="announcement-bar-inner flex flex-col items-start gap-1 padding-block-3">
+        <div class="announcement-text text-lg font-extrabold">{text}</div>
         {ctaText && (
-          <div class="font-semibold underline whitespace-nowrap">{ctaText}</div>
+          <div class="text-base font-semibold underline whitespace-nowrap">{ctaText}</div>
         )}
         {countdownDate && (
-          <div id="js-countdown-timer" class="font-semibold underline text-md whitespace-nowrap" data-target-date={countdownDate}></div>
+          <div id="js-countdown-timer" class="text-base font-semibold underline whitespace-nowrap" data-target-date={countdownDate}></div>
         )}
       </div>
     </a>
@@ -143,6 +143,24 @@ const bgClass = themeClasses[theme] || themeClasses.default;
     }
   })();
 </script>
+
+<style>
+  /* Inline padding aligns with .dnd-column / .inner-header (32px) at >=768px.
+     Below 768px the wrapping .container already provides 32px via its mobile
+     padding rule, so no extra padding is needed here. */
+  @media (min-width: 768px) {
+    .announcement-bar-inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-3);
+      padding-inline: var(--spacing-8);
+    }
+    .announcement-text {
+      flex: 1;
+    }
+  }
+</style>
 
 <style is:global>
   .banner-text a {

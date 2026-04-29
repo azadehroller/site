@@ -149,7 +149,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   }
 
   .header.dark {
-    background: var(--primary-50, #033180);
+    background: var(--blue-30);
   }
 
   .header.dark .header__logo {
@@ -163,11 +163,11 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   /* Dark theme - mobile */
   .header.dark .main-nav__item button,
   .header.dark .main-nav__item:last-child a {
-    color: var(--primary-50, #033180);
+    color: var(--blue-30);
   }
 
   /* Dark theme - desktop */
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .header.dark .main-nav__item button,
     .header.dark .main-nav__item a,
     .header.dark .main-nav__item:last-child a {
@@ -199,7 +199,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   }
 
   .header.industry_report {
-    background: #011840;
+    background: var(--blue-10);
   }
 
   .header.industry_report .header__logo {
@@ -213,11 +213,11 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   /* Industry report theme - mobile */
   .header.industry_report .main-nav__item button,
   .header.industry_report .main-nav__item:last-child a {
-    color: #011840;
+    color: var(--blue-10);
   }
 
   /* Industry report theme - desktop */
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .header.industry_report .main-nav__item button,
     .header.industry_report .main-nav__item a,
     .header.industry_report .main-nav__item:last-child a {
@@ -250,7 +250,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     position: fixed;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--black-alpha-10);
   }
 
   .header.is-fixed .header__logo {
@@ -263,18 +263,29 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
   .header.is-fixed .main-nav__item a,
   .header.is-fixed .main-nav__item button {
-    color: var(--primary-50, #033180);
+    color: var(--blue-30);
   }
 
   .header.is-fixed .main-nav__item-icon {
-    fill: var(--primary-50, #033180);
+    fill: var(--blue-30);
   }
 
   .header.is-fixed .header__block-toggle-item {
-    background-color: var(--primary-50, #033180) !important;
+    background-color: var(--blue-30) !important;
   }
 
-  /* Logo - using Tailwind classes: w-[160px] mr-2 sm:w-[192px] shrink-0 */
+  /* Logo sizing */
+  .header__logo,
+  .header__logo--secondary {
+    width: 160px;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 640px) {
+    .header__logo,
+    .header__logo--secondary { width: 192px; }
+  }
+
   .header__logo * ,
   .header__logo--secondary * {
     display: block;
@@ -308,43 +319,27 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     overflow: visible;
     top: 0;
     width: auto;
-    background: var(--primary-50, #033180);
+    background: var(--blue-30);
     color: white;
-    padding: 8px 16px;
+    padding: var(--spacing-2) 16px;
     z-index: 9999;
   }
 
   /* Inner header */
   .inner-header {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 1.5rem;
-    padding-top: 1.5rem;
+    padding-block-end: var(--spacing-6);
+    padding-block-start: var(--spacing-6);
     width: 100%;
   }
 
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .inner-header {
-      padding-bottom: 0.5rem;
-      padding-top: 0.5rem;
+      padding-block-end: var(--spacing-2);
+      padding-block-start: var(--spacing-2);
     }
   }
 
-  /* Header main */
-  .header__main {
-    align-items: center;
-    display: flex;
-  }
-
-  .header__nav {
-    align-items: center;
-    flex-shrink: 0;
-    flex-grow: 0;
-    display: flex;
-  }
-
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .header__nav {
       flex-grow: 1;
       justify-content: flex-end;
@@ -354,7 +349,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   /* Mobile menu toggle */
   .header__block-toggle {
     align-items: flex-start;
-    color: var(--primary-50, #033180);
+    color: var(--blue-30);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -377,7 +372,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
   /* Default toggle item background when not using Tailwind class */
   .header__block-toggle-item:not(.bg-neutral-white) {
-    background-color: var(--primary-50, #033180);
+    background-color: var(--blue-30);
   }
 
   /* Toggle reverse animation - X state */
@@ -415,7 +410,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     transform: translateY(-8px) rotate(-45deg);
   }
 
-  @media screen and (min-width: 1024px) {
+  @media (min-width: 1024px) {
     .header__block-toggle {
       display: none;
     }
@@ -437,8 +432,8 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
       margin: 0;
       left: 0;
       overflow-y: auto;
-      padding-top: 1.875rem;
-      padding-bottom: 1.875rem;
+      padding-block-start: 1.875rem;
+      padding-block-end: 1.875rem;
       position: fixed;
       right: 0;
       top: calc(var(--announcement-bar-height, 0px) + 72px);
@@ -451,7 +446,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
           top: calc(var(--announcement-bar-height, 0px) + var(--header-height, 0px));
     }
 }
-  @media screen and (min-width: 1024px) {
+  @media (min-width: 1024px) {
     .header__block {
       background-color: transparent;
       display: flex;
@@ -475,7 +470,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     }
 
     .header__block.is-active .mega-link .main-nav__item-label {
-      color: var(--primary-50, #033180);
+      color: var(--blue-30);
     }
   }
 
@@ -489,7 +484,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     width: 100%;
   }
 
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .main-nav-list {
       background-color: transparent;
       flex-direction: row;
@@ -503,30 +498,30 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   .main-nav__item {
     cursor: pointer;
     flex-grow: 0;
-    margin-left: 0.45em;
-    margin-right: 0.45em;
-    line-height: 1;
+    margin-inline-start: 0.45em;
+    margin-inline-end: 0.45em;
+    line-height: var(--line-height-16);
     position: relative;
     padding: 0.5em 0 0.5em 1em;
   }
 
   .main-nav__item,
   .main-nav__item button {
-    font-size: 1.33rem;
+    font-size: var(--font-size-21);
   }
 
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .main-nav__item {
-      font-size: 0.89rem;
+      font-size: var(--font-size-14);
       padding: 0.2em 0;
-      margin-left: 1em;
-      margin-right: 1em;
+      margin-inline-start: 1em;
+      margin-inline-end: 1em;
     }
 
     .main-nav__item button {
-      font-size: 0.875rem;
-      padding-top: 0.25em;
-      padding-bottom: 0.25em;
+      font-size: var(--font-size-14);
+      padding-block-start: 0.25em;
+      padding-block-end: 0.25em;
     }
   }
 
@@ -540,7 +535,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     border: none;
     cursor: pointer;
     color: inherit;
-    font-weight: 600;
+    font-weight: var(--font-weight-600);
     fill: var(--header-nav-color, currentColor);
   }
 
@@ -549,9 +544,9 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   }
 
   .main-nav__item a {
-    color: var(--primary-50, #033180);
+    color: var(--blue-30);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: var(--font-weight-600);
   }
 
   .main-nav__item a:hover,
@@ -564,20 +559,19 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   }
 
   .main-nav__item-label {
-    font-size: 1.33rem;
-    font-weight: 600;
+    font-size: var(--font-size-21);
+    font-weight: var(--font-weight-600);
     margin: 0;
   }
 
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .main-nav__item-label {
-      font-size: 1rem;
+      font-size: var(--font-size-16);
     }
   }
 
   .main-nav__item-icon {
-    display: inline-block;
-    margin-left: 0.2em;
+    margin-inline-start: 0.2em;
     width: 1em;
     transition: transform 0.2s ease;
     fill: currentColor;
@@ -589,7 +583,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   }
 
   /* Icon rotation - desktop: also on hover */
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .main-nav__item:hover .main-nav__item-icon {
       transform: translateY(1px) rotate(180deg);
     }
@@ -604,7 +598,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   }
 
   /* Desktop: dropdown opens on hover OR is-active */
-  @media screen and (min-width: 992px) {
+  @media (min-width: 992px) {
     .main-nav__item:hover :global(.menu-drop-panel),
     .main-nav__item.is-active :global(.menu-drop-panel) {
       height: auto;
@@ -615,14 +609,11 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
   /* Header CTA buttons */
   .header__cta {
-    display: none;
-    gap: 0.5rem;
-    margin-left: auto;
+    gap: var(--spacing-2);
   }
 
-  @media screen and (min-width: 768px) {
+  @media (min-width: 768px) {
     .header__cta {
-      display: flex;
       flex-shrink: 0;
     }
   }
@@ -631,10 +622,10 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 1.5rem;
+    padding: var(--spacing-2) 1.5rem;
     border-radius: 980px;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-600);
     text-decoration: none;
     transition: all 0.2s ease;
   }
@@ -650,18 +641,18 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
   .header__cta-btn--secondary {
     background-color: transparent;
-    color: var(--primary-50, #033180);
-    border: 1px solid var(--primary-50, #033180);
+    color: var(--blue-30);
+    border: 1px solid var(--blue-30);
   }
 
   .header__cta-btn--secondary:hover {
-    background-color: var(--primary-50, #033180);
+    background-color: var(--blue-30);
     color: var(--neutral-white, #ffffff);
   }
 
   .header__cta-btn--text {
     background-color: transparent;
-    color: var(--primary-50, #033180);
+    color: var(--blue-30);
   }
 
   .header__cta-btn--text:hover {
@@ -676,14 +667,14 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
   .header.dark .header__cta-btn--secondary:hover {
     background-color: var(--neutral-white, #ffffff);
-    color: var(--primary-50, #033180);
+    color: var(--blue-30);
   }
 
   .header.dark .header__cta-btn--text {
     color: var(--neutral-white, #ffffff);
   }
   .header  .header__block-toggle-item{
-    background-color:  var(--primary-50, #033180);
+    background-color:  var(--blue-30);
   }
   .header.dark  .header__block-toggle-item{
     background-color: var(--neutral-white, #ffffff);
@@ -697,14 +688,72 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* Header__main ordering */
+  .header__main {
+    order: 3;
+  }
+
+  @media (min-width: 1024px) {
+    .header__main { order: 2; }
+  }
+
+  /* Screen-reader-only span in burger button */
+  .header__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Nav item: flex on mobile with fixed height, inline-block at md */
+  .main-nav__item {
+    display: flex;
+    align-items: center;
+    height: 72px;
+  }
+
+  @media (min-width: 768px) {
+    .main-nav__item {
+      display: inline-block;
+      height: auto;
+    }
+  }
+
+  /* CTA buttons wrapper: hidden on mobile, flex at md, ordered at lg */
+  .header__cta-wrapper {
+    display: none;
+    order: 2;
+  }
+
+  @media (min-width: 768px) {
+    .header__cta-wrapper { display: flex; }
+  }
+
+  @media (min-width: 1024px) {
+    .header__cta-wrapper { order: 3; }
+  }
+
+  /* Inline padding matches .dnd-column (page content sections) so the
+     header logo aligns vertically with the content edges below. */
+  .inner-header { padding-inline: var(--spacing-8); }
+
+  @media (min-width: 768px) {
+    .header__main { margin-inline-start: var(--spacing-3); }
+  }
 </style>
 
 <header id="header" class:list={["header", themeClass]}>
   <a href="#main-content" class="header__skip">Skip to content</a>
 
-  <div class="inner-header container md:px-5 lg:px-5 py-4">
+  <div class="inner-header container padding-block-4 flex-between">
     <!-- Logo (Dark Background) -->
-    <div class="header__logo w-[160px] mr-2 sm:w-[192px] shrink-0">
+    <div class="header__logo margin-inline-end-2">
       <a href={logoLink}>
         <img 
           src={logoDark?.asset?.url || defaultLogoDark} 
@@ -717,7 +766,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
     </div>
     
     <!-- Logo (Light Background) -->
-    <div class="header__logo--secondary w-[160px] mr-2 sm:w-[192px] shrink-0">
+    <div class="header__logo--secondary margin-inline-end-2">
       <a href={logoLink}>
         <img 
           src={logo?.asset?.url || defaultLogo} 
@@ -729,7 +778,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
       </a>
     </div>
 
-    <div class="header__main flex ml-0 order-3 lg:order-2 md:ml-3">
+    <div class="header__main flex items-center margin-inline-start-0">
       <!-- Mobile menu trigger -->
       <button 
         id="header__block-toggle" 
@@ -737,7 +786,7 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
         aria-expanded="false" 
         aria-controls="burger-submenu"
       >
-        <span class="b-0 h-[1px] overflow-hidden p-0 absolute whitespace-nowrap w-[1px]">Menu</span>
+        <span class="header__sr-only">Menu</span>
         <span class="header__block-toggle-item header__block-toggle-item--s bg-neutral-white"></span>
         <span class="header__block-toggle-item header__block-toggle-item--l bg-neutral-white"></span>
         <span class="header__block-toggle-item header__block-toggle-item--m bg-neutral-white"></span>
@@ -745,21 +794,21 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
       <!-- Navigation block -->
       <div id="burger-submenu" class="header__block no-scrollbar">
-        <nav class="header__nav" aria-label="Main menu">
+        <nav class="header__nav flex items-center shrink-0 grow-0" aria-label="Main menu">
           <ul role="list" class="main-nav-list" id="main-nav-list">
             {navItems.map((item) => {
               const megaMenu = item.hasMegaMenu ? getMegaMenu(item.label) : undefined;
               const itemClasses = megaMenu
-                ? 'main-nav__item no-underline flex md:inline-block items-center h-[72px] md:h-auto mega-link menu-drop'
-                : 'main-nav__item no-underline flex md:inline-block items-center h-[72px] md:h-auto';
+                ? 'main-nav__item no-underline mega-link menu-drop'
+                : 'main-nav__item no-underline';
               
               return (
                 <li class={itemClasses}>
                   {megaMenu ? (
                     <>
-                      <button class="drop-trigger no-underline">
-                        <p class="main-nav__item-label font-semibold mt-0 mb-0 ml-0 mr-2">{item.label}</p>
-                        <svg class="main-nav__item-icon fill-white" viewBox="0 0 19 18" fill="currentColor">
+                      <button class="drop-trigger no-underline flex items-center">
+                        <p class="main-nav__item-label font-semibold margin-block-start-0 margin-block-end-0 margin-inline-start-0 margin-inline-end-2">{item.label}</p>
+                        <svg class="main-nav__item-icon fill-white inline-block" viewBox="0 0 19 18" fill="currentColor">
                           <path d="M9.1878 13.2325L4.1811 8.22575C3.93963 7.98428 3.93963 7.59279 4.1811 7.35135L4.76505 6.7674C5.00611 6.52634 5.39679 6.52588 5.63842 6.76637L9.62501 10.7343L13.6116 6.76637C13.8532 6.52588 14.2439 6.52634 14.4849 6.7674L15.0689 7.35135C15.3104 7.59282 15.3104 7.9843 15.0689 8.22575L10.0622 13.2325C9.82075 13.4739 9.42927 13.4739 9.1878 13.2325Z"/>
                         </svg>
                       </button>
@@ -780,23 +829,23 @@ const defaultLogoDark = 'https://www.roller.software/hubfs/ROLLER%20Logo%20-%20W
 
     <!-- Header CTA buttons -->
     {buttons.length > 0 && (
-      <div class="ml-auto hidden md:flex order-2 lg:order-3">
+      <div class="header__cta-wrapper margin-inline-start-auto">
         <ul
           id="js-button-stack"
-          class="flex flex-row list-none gap-3 m-0"
+          class="flex flex-row list-none gap-3 margin-0"
         >
             {buttons.map((button) => {
               const cleanLabel = stripInvisible(button.label || '');
               const labelLower = cleanLabel.toLowerCase();
               return (
-                <li class="ml-0">
+                <li class="margin-inline-start-0">
                   <a
                     href={button.href}
                     class={[
-                      "button-all relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold text-md transition ease-in-out duration-300 w-full sm:w-auto whitespace-nowrap rounded-3xl py-2 px-4",
+                      "header__cta-btn",
                       button.variant === "primary" || !button.variant
-                        ? "bg-secondary-50 hover:bg-secondary-70 text-neutral-white"
-                        : "bg-neutral-white hover:bg-neutral-20 text-primary-50 border-[1px]"
+                        ? "header__cta-btn--primary"
+                        : "header__cta-btn--secondary"
                     ].join(" ")}
                     id={labelLower === "login" ? "button_stack_login" : labelLower === "get started" ? "button_stack_get_started" : undefined}
                     target={button.openInNewTab ? "_blank" : undefined}

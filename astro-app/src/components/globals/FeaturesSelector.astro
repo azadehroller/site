@@ -60,7 +60,7 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
 
 <div 
   id={componentId}
-  class="features-selector mx-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col lg:p-6 rounded-[32px] py-6 px-6 mb-0 md:mb-4"
+  class="features-selector margin-inline-auto gap-5 bg-widget-industries box-shadow-onlight flex flex-col padding-block-6 padding-inline-6 margin-block-end-0"
   data-sanity-edit-target
 >
   {/* Header Section using HeadingComposition */}
@@ -83,7 +83,7 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
   )}
 
   {/* Desktop grid view */}
-  <div class="hidden md:flex flex-wrap gap-3 ms-auto me-auto dark">
+  <div class="features-global-desktop flex-wrap gap-3 margin-inline-start-auto margin-inline-end-auto dark">
     {features.map((feature) => {
       const featureTitle = feature.title;
       const featureIcon = feature.icon;
@@ -100,13 +100,13 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
       return (
         <a 
           href={href}
-          class="feature-item-link flex items-center justify-center gap-2 mo-card-features text-primary-50 font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-3xl rounded-2xl"
+          class="feature-item-link flex items-center justify-center gap-2 mo-card-features text-primary-50 font-semibold ease-in transition duration-200"
           target={openInNewTab ? '_blank' : undefined}
           rel={rel}
           data-sanity-edit-target
         >
           {featureIcon && (
-            <span class="feature-icon" set:html={featureIcon} data-sanity-edit-target />
+            <span class="feature-icon flex-center" set:html={featureIcon} data-sanity-edit-target />
           )}
           <span data-sanity-edit-target>{featureTitle}</span>
         </a>
@@ -115,10 +115,10 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
   </div>
 
   {/* Mobile dropdown view - data-sanity-ignore prevents Visual Editing from intercepting clicks */}
-  <div class="grid gap-3 md:hidden dropdown-wrapper" data-sanity-ignore>
+  <div class="features-global-mobile gap-3 dropdown-wrapper relative z-9999" data-sanity-ignore>
     <select 
       id={`${componentId}-dropdown`}
-      class="feature-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+      class="feature-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center padding-block-2 padding-inline-4 w-full appearance-none cursor-pointer"
       data-sanity-ignore
     >
       <option value="" selected>Select a feature</option>
@@ -132,7 +132,7 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     </select>
     <button 
       type="button"
-      class="feature-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 bg-secondary-50 hover:bg-secondary-70 rounded-3xl py-2 px-4 text-neutral-white"
+      class="feature-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline text-base font-semibold tracking-tight transition ease-in-out duration-300 bg-secondary-50 padding-block-2 padding-inline-4 text-neutral-white"
       data-dropdown-id={`${componentId}-dropdown`}
     >
       Discover
@@ -146,12 +146,12 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
         href={ctaHref}
         target={ctaOpenInNewTab ? '_blank' : undefined}
         rel={ctaRel}
-        class="relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold bg-transparent text-primary-50 font-serif group"
+        class="features-cta-link relative inline-flex items-center cursor-pointer select-none appearance-none no-underline text-base font-semibold tracking-tight bg-transparent text-primary-50 font-serif"
       >
-        <span class="flex justify-center items-center mr-0 ml-2 order-1">
-          <svg class="transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
-            <rect width="40" height="40" fill="#ff290c" rx="20"></rect>
-            <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"></path>
+        <span class="flex justify-center items-center margin-inline-end-0 margin-inline-start-2 order-1">
+          <svg class="features-cta-arrow transition-transform ease-out duration-300" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+            <rect width="40" height="40" fill="var(--secondary-50)" rx="20"></rect>
+            <path fill="var(--neutral-white)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"></path>
           </svg>
         </span>
         <span>{ctaLabel}</span>
@@ -163,7 +163,7 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
 <style>
   /* Container shadows */
   .box-shadow-onlight {
-    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+    box-shadow: 0px 4px 8px 0px var(--primary-alpha-08), 0px 12px 24px 0px var(--primary-alpha-12);
   }
 
   .box-shadow-onlight-navy-40 {
@@ -172,9 +172,7 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
 
   /* Dropdown wrapper with custom arrow */
   .dropdown-wrapper {
-    position: relative;
     isolation: isolate;
-    z-index: 9999;
   }
 
   .dropdown-wrapper::after {
@@ -200,27 +198,46 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
     display: none !important;
   }
 
+  /* Container */
+  .features-selector {
+    border-radius: 2rem;
+  }
+
+  /* Desktop / mobile visibility */
+  .features-global-desktop { display: none; }
+  .features-global-mobile { display: grid; }
+
   /* Feature item cards */
   .mo-card-features {
-    padding: 0.75rem 1.25rem;
+    padding-block: var(--spacing-3);
+    padding-inline: var(--spacing-5);
     min-height: 56px;
+    border-radius: 1rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .feature-item-link:hover {
+    background-color: var(--neutral-white);
+    box-shadow: 0px 4px 8px 0px var(--primary-alpha-08), 0px 12px 24px 0px var(--primary-alpha-12);
+  }
+
+  /* Discover button */
+  .feature-discover-btn {
+    border-radius: 1.5rem;
+  }
+
+  .feature-discover-btn:hover {
+    background-color: var(--secondary-70);
+  }
+
+  /* CTA link arrow hover */
+  .features-cta-link:hover .features-cta-arrow {
+    transform: translateX(0.25rem);
   }
 
   /* Background colors */
   .bg-widget-industries {
-    background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
-  }
-
-  /* Shadow on hover */
-  .hover\:shadow-3xl:hover {
-    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
-  }
-
-  /* Icon container */
-  .feature-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-image: linear-gradient(100deg, var(--neutral-white) 0%, var(--blue-99) 61.98%);
   }
 
   .feature-icon :global(svg) {
@@ -232,6 +249,7 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
   .feature-dropdown {
     border: none;
     outline: none;
+    border-radius: 61.25rem;
     position: relative;
     z-index: 1;
     pointer-events: auto !important;
@@ -242,6 +260,16 @@ const ctaRel = ctaRelParts.length > 0 ? ctaRelParts.join(' ') : undefined;
 
   .feature-dropdown:focus {
     box-shadow: 0 0 0 2px var(--primary-40, #074DC5);
+  }
+
+  @media (min-width: 768px) {
+    .features-selector { margin-block-end: var(--spacing-4); }
+    .features-global-desktop { display: flex; }
+    .features-global-mobile { display: none; }
+  }
+
+  @media (min-width: 1024px) {
+    .features-selector { padding: var(--spacing-6); }
   }
 
 </style>
