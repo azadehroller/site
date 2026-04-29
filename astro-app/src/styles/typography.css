@@ -1,0 +1,176 @@
+/*
+ * typography.css
+ * Single source of truth for all typography tokens in the design system.
+ * Import this file instead of defining typography values elsewhere.
+ *
+ * Naming convention (matches spacings.css):
+ *   The number suffix on every token = the value in pixels
+ *   (computed at the 16px root font-size).
+ *
+ *   --font-size-24   ->  24px  (1.5rem)
+ *   --line-height-24 ->  1.5   (unitless ratio that renders 24px at 16px text)
+ *   --font-weight-600 -> 600
+ *
+ * Every token below maps to a value already used in the codebase
+ * (in a <style> block, in a Tailwind utility, or in global.css).
+ */
+
+:where(html) {
+  /* ─── FONT FAMILIES ───────────────────────────────────────────────────── */
+  /* These stay named because there is no numeric equivalent.              */
+  --font-family-brand:
+    'proxima-nova', 'Helvetica Neue', 'Arial', sans-serif;
+  --font-family-body:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-family-body-alt: 'Metropolis', sans-serif;
+  --font-family-serif:    'PT Serif', Georgia, serif;
+  --font-family-mono:     monospace;
+
+
+  /* ─── FONT SIZES ──────────────────────────────────────────────────────── */
+  /* Suffix = pixel value at 16px root. */
+  --font-size-12: 0.75rem;     /* 12px — text-xs                            */
+  --font-size-13: 0.8125rem;   /* 13px — AdvancedImage, ChatWidget          */
+  --font-size-14: 0.875rem;    /* 14px — text-sm                            */
+  --font-size-15: 0.9375rem;   /* 15px — ChatWidget, BlogTableBlock         */
+  --font-size-16: 1rem;        /* 16px — text-base, body default            */
+  --font-size-18: 1.125rem;    /* 18px — text-lg                            */
+  --font-size-20: 1.25rem;     /* 20px — text-xl                            */
+  --font-size-21: 1.33rem;     /* ~21px — main nav                          */
+  --font-size-24: 1.5rem;      /* 24px — text-2xl, HubSpot h3               */
+  --font-size-29: 1.8rem;      /* ~29px — global.css h3, BlogPost h3        */
+  --font-size-30: 1.875rem;    /* 30px — text-3xl                           */
+  --font-size-32: 2rem;        /* 32px — h2, blog headings                  */
+  --font-size-36: 2.25rem;     /* 36px — text-4xl                           */
+  --font-size-40: 2.5rem;      /* 40px — h1 mobile, StatsSet                */
+  --font-size-42: 2.625rem;    /* 42px — BlogEditorPicks, BlogPostSubscribe */
+  --font-size-48: 3rem;        /* 48px — text-5xl                           */
+  --font-size-64: 4rem;        /* 64px — StatsSet desktop, --size-7         */
+
+  /* Fluid sizes — suffix = max pixel value the clamp resolves to. */
+  --font-size-fluid-48: clamp(2em,  3.5vw, 3rem);   /* 32 → 48 — h2 desktop */
+  --font-size-fluid-64: clamp(2rem, 4vw,   4rem);   /* 32 → 64 — h1 desktop */
+  --font-size-fluid-96: clamp(4rem, 6vw,   6rem);   /* 64 → 96 — display    */
+
+
+  /* ─── FONT WEIGHTS ────────────────────────────────────────────────────── */
+  /* Suffix = the CSS numeric weight (already a standard convention). */
+  --font-weight-400: 400;   /* font-normal — body, quoteAuthorTitle         */
+  --font-weight-500: 500;   /* font-medium — secondary copy                 */
+  --font-weight-600: 600;   /* font-semibold — buttons, labels, links       */
+  --font-weight-700: 700;   /* font-bold — h2/h3                            */
+  --font-weight-800: 800;   /* font-extrabold — hero, eyebrow, h1           */
+
+
+  /* ─── LINE HEIGHTS ────────────────────────────────────────────────────── */
+  /* Suffix = pixel value rendered at 16px text. Values are unitless ratios
+     (design-system best practice — they scale with the inheriting font).  */
+  --line-height-16: 1;      /* 16px — leading-none, stat numbers            */
+  --line-height-18: 1.12;   /* ~18px — hero h1 tight (= --font-lineheight-0)*/
+  --line-height-19: 1.2;    /* ~19px — BlogTextBlock h1/h2, BlogPost        */
+  --line-height-20: 1.25;   /* 20px — default heading (= --font-lineheight-1) */
+  --line-height-21: 1.3;    /* ~21px — WidgetUserReviewCard mid             */
+  --line-height-22: 1.4;    /* ~22px — p, body, button                      */
+  --line-height-24: 1.5;    /* 24px — most common; also leading-6           */
+  --line-height-26: 1.6;    /* ~26px — body{} relaxed                       */
+  --line-height-28: 1.75;   /* 28px — leading-7                             */
+  --line-height-30: 1.875;  /* 30px — Footer hero                           */
+  --line-height-32: 2;      /* 32px — leading-8                             */
+  --line-height-36: 2.25;   /* 36px — leading-9                             */
+  --line-height-40: 2.5;    /* 40px — leading-10                            */
+  --line-height-44: 2.75;   /* 44px — leading-11 (MegaMenuDropdown)         */
+  --line-height-60: 3.75;   /* 60px — StatsSet leading-[3.75rem]            */
+  --line-height-72: 4.5;    /* 72px — StatsSet desktop                      */
+
+
+  /* ─── LETTER SPACING ──────────────────────────────────────────────────── */
+  /* Kept descriptive: source values are em-based and don't map to a fixed
+     pixel value (an em is proportional to font-size).                     */
+  --letter-spacing-tight: -0.025em; /* tracking-tight (Tailwind)            */
+  --letter-spacing-snug:  -0.01em;  /* --letter-spacing in global.css       */
+  --letter-spacing-wide:   0.1em;   /* HeadingComposition eyebrow           */
+  --letter-spacing-wider:  0.2em;   /* 404.astro eyebrow                    */
+  --letter-spacing-1px:    1px;     /* BlogPost eyebrow (only fixed-px use) */
+
+
+  /* ─── PROJECT ALIASES ─────────────────────────────────────────────────── */
+  /* Older naming kept for backwards compatibility with existing components. */
+  --fontFamily:        var(--font-family-brand);
+  --base-font-size:    var(--font-size-16);
+  --letter-spacing:    var(--letter-spacing-snug);
+  --body-text-family:  var(--font-family-body);
+  --fontWeightBold:    var(--font-weight-800);
+
+  /* Line height aliases */
+  --font-lineheight-0: var(--line-height-18);
+  --font-lineheight-1: var(--line-height-20);
+  --font-lineheight-2: var(--line-height-22);
+  --font-lineheight-3: var(--line-height-24);
+  --font-lineheight-4: var(--line-height-28);
+  --font-lineheight-5: var(--line-height-32);
+
+  /* Fluid font size aliases */
+  --font-size-fluid-2: var(--font-size-fluid-48);
+  --font-size-fluid-3: var(--font-size-fluid-64);
+  --font-size-fluid-4: var(--font-size-fluid-96);
+}
+
+
+/* ===========================================================================
+ * BASE TYPOGRAPHY — element defaults
+ * Element-level rules that apply typography tokens to the document. Kept in
+ * this file so all typography concerns (tokens + base styles) live together.
+ * =========================================================================== */
+
+p {
+  font-size: var(--font-size-16);
+  letter-spacing: var(--letter-spacing);
+  line-height: var(--line-height-22);
+  margin: 0 0 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--heading-color);
+  font-weight: var(--fontWeightBold);
+  letter-spacing: var(--letter-spacing);
+  line-height: var(--font-lineheight-1);
+}
+
+h1 { font-size: var(--size-5); }
+h2 { font-size: var(--font-size-32); }
+h3 { font-size: var(--font-size-29); }
+h4 { font-size: var(--size-4); }
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: var(--font-size-fluid-3);
+    line-height: var(--font-lineheight-0);
+  }
+  h2 {
+    font-size: var(--font-size-fluid-2);
+    line-height: var(--font-lineheight-1);
+  }
+  h3 {
+    font-size: var(--size-5);
+    line-height: var(--font-lineheight-1);
+  }
+  h4 {
+    font-size: var(--size-4);
+    line-height: var(--font-lineheight-1);
+  }
+}
+
+ul, ol {
+  margin: 0 0 1.34rem;
+}
+
+li {
+  line-height: var(--line-height-22);
+}
+
+blockquote {
+  border-left: 2px solid;
+  margin: 0 0 1.4rem;
+  padding-left: 0.7rem;
+}

@@ -1,0 +1,203 @@
+/*
+ * colors.css
+ * Single source of truth for all color tokens in the design system.
+ * Import this file instead of defining colors elsewhere.
+ *
+ * Scale convention: 10 = lightest, 99 = near-white tint. 50 = default/mid.
+ * Shadow tokens are included here since they encode color information.
+ */
+
+:where(html) {
+  /* ─── PRIMARY (Navy Blue) ─────────────────────────────────────────────── */
+  --primary-10:  #cedffd;
+  --primary-20:  #9dbffb;
+  --primary-30:  #6ba0fa;
+  --primary-40:  #074dc5;
+  --primary-50:  #033180;   /* default brand blue */
+  --primary-60:  #032663;
+  --primary-70:  #011332;
+
+  /* ─── SECONDARY (Red / Orange) ───────────────────────────────────────── */
+  --secondary-10: #fff3f2;
+  --secondary-20: #ffd2cc;
+  --secondary-30: #ff7866;
+  --secondary-40: #ff4b33;
+  --secondary-50: #ff290c;  /* default brand red */
+  --secondary-60: #991200;
+  --secondary-70: #660c00;
+
+  /* ─── BLUE (Extended scale — includes dark navy & bright accent) ──────── */
+  /* Note: --blue-20/30/40 intentionally overlap with --primary-60/50/40    */
+  --blue-05:  #001338;  /* darkest navy — used in gradients */
+  --blue-07:  #001f4a;
+  --blue-10:  #011840;
+  --blue-12:  #081b45;
+  --blue-20:  #032663;  /* = --primary-60 */
+  --blue-30:  #033180;  /* = --primary-50 */
+  --blue-35:  #143d82;
+  --blue-38:  #0541a0;
+  --blue-40:  #074dc5;  /* = --primary-40 */
+  --blue-45:  #0270e0;
+  --blue-50:  #0960f6;  /* bright accent blue */
+  --blue-52:  #3a80f8;
+  --blue-90:  #cedffd;  /* = --primary-10 */
+  --blue-95:  #ebf2fe;
+  --blue-99:  #f5f8ff;
+
+  --midnight:  #1a1a2e;  /* very dark blue-black */
+
+  /* ─── PURPLE / IRIS ──────────────────────────────────────────────────── */
+  --iris:     #603ff5;  /* primary purple — alias of --iris-50 */
+  --iris-50:  #603ff5;
+
+  --purple-deep: #3c0091;  /* very dark saturated purple — GX score */
+  --purple-40: #4c4eec;
+  --purple-50: #3f40f2;
+  --purple-60: #4d2fc4;
+  --purple-70: #7c3aed;
+  --purple-80: #a554ff;
+  --purple-90: #c239fb;
+
+  /* ─── CYAN / TEAL (gradient & animation accents) ─────────────────────── */
+  --cyan-40: #00b8ff;
+  --cyan-50: #00b5fa;
+  --cyan-60: #038dc5;
+  --cyan-80: #38f6ff;
+  --green-60: #18f273;
+  --green-70: #3ef78b;
+
+  /* ─── RED (aliases & animation-only variants) ────────────────────────── */
+  --red-50:   #ff290c;  /* = --secondary-50 */
+  --red-52:   #ff280c;  /* one-off variant — near-identical to --secondary-50 */
+  --red-55:   #ff490c;  /* gradient variant */
+  --red-57:   #ff634f;  /* lighter salmon-red */
+  --red-60:   #cc3a0a;
+  --red-65:   #cc2d00;
+  --red-70:   #b31803;
+  --red-80:   #dc2626;  /* standard Tailwind danger red */
+  --red-90:   #e94560;  /* error/alert accent */
+
+  /* ─── NEUTRAL (Grays) ────────────────────────────────────────────────── */
+  --neutral-white:  #ffffff;
+  --neutral-black:  #000000;
+  --neutral-07:     #eeeeee;
+  --neutral-08:     #f0f0f0;
+  --neutral-10:     #f2f2f2;
+  --neutral-20:     #e5e5e4;
+  --neutral-30:     #cccccc;
+  --neutral-40:     #b3b3b3;
+  --neutral-43:     #999999;
+  --neutral-45:     #a0a0a0;
+  --neutral-50:     #808080;
+  --neutral-55:     #757382;  /* slightly purple-gray */
+  --neutral-58:     #666666;
+  --neutral-60:     #4d4d4d;
+  --neutral-65:     #494a52;  /* dark charcoal */
+  --neutral-70:     #262626;
+  --neutral-75:     #2a2a2a;
+
+  /* Grays sourced from Tailwind / external components */
+  --gray-100: #f9fafb;
+  --gray-200: #f3f4f6;
+  --gray-300: #e5e7eb;
+  --gray-400: #d1d5db;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #2d3748;
+  --gray-900: #1a202c;
+
+  /* ─── BLUE-GREY (blog / content components) ─────────────────────────── */
+  --blue-grey-10: #e2e8f0;
+  --blue-grey-20: #cbd7ee;
+  --blue-grey-30: #b0c1d4;
+  --blue-grey-40: #99acc2;
+
+  /* ─── ERROR ──────────────────────────────────────────────────────────── */
+  --error-08: #fee2e2;
+  --error-10: #fee5e5;
+  --error-20: #ffbfbf;
+  --error-30: #ff8080;
+  --error-40: #f24949;
+  --error-50: #e50b0b;
+  --error-60: #b20404;
+  --error-70: #590202;
+
+  /* ─── BACKGROUND TINTS ───────────────────────────────────────────────── */
+  /* Light washes used for section backgrounds and cards */
+  --bg-blue-95:    #f0f6ff;
+  --bg-blue-97:    #f1f3f9;
+  --bg-blue-98:    #f9fbff;
+  --bg-blue-99:    #f5f8ff;  /* = --blue-99 */
+  --bg-white-blue: #e7effe;  /* slightly tinted white */
+
+  --bg-purple-96:  #f5f3ff;
+  --bg-purple-97:  #f4ebff;
+  --bg-purple-98:  #fbf8ff;
+
+  --bg-neutral-97: #f7fafc;
+  --bg-neutral-98: #f8fafc;
+  --bg-neutral-99: #f9fafb;  /* = --gray-100 */
+
+  --bg-slate-97:   #f1f5f9;
+
+  /* ─── ALPHA / RGBA PALETTE ───────────────────────────────────────────── */
+  /* Semantic transparent colors derived from brand hues */
+  --primary-alpha-04:  rgba(3, 49, 128, 0.04);
+  --primary-alpha-08:  rgba(3, 49, 128, 0.08);
+  --primary-alpha-12:  rgba(3, 49, 128, 0.12);
+  --primary-alpha-20:  rgba(3, 49, 128, 0.20);
+
+  --blue-alpha-10:     rgba(2, 34, 89, 0.10);
+  --blue-alpha-05:     rgba(2, 34, 89, 0.05);
+  --blue-alpha-25:     rgba(2, 34, 89, 0.25);
+
+  --blue-bright-alpha-40:  rgba(9, 96, 246, 0.40);
+  --blue-bright-alpha-95:  rgba(9, 96, 246, 0.95);
+
+  --white-alpha-10:    rgba(255, 255, 255, 0.10);
+  --white-alpha-20:    rgba(255, 255, 255, 0.20);
+  --white-alpha-30:    rgba(255, 255, 255, 0.30);
+  --white-alpha-70:    rgba(255, 255, 255, 0.70);
+  --white-alpha-80:    rgba(255, 255, 255, 0.80);
+
+  --black-alpha-10:    rgba(0, 0, 0, 0.10);
+  --black-alpha-15:    rgba(0, 0, 0, 0.15);
+
+  /* ─── SHADOWS ─────────────────────────────────────────────────────────── */
+  --shadow-xsmall:  0px 1px 2px rgba(2, 34, 89, 0.05);
+  --shadow-small:   0px 1px 3px rgba(2, 34, 89, 0.1),
+                    0px 1px 2px -1px rgba(2, 34, 89, 0.1);
+  --shadow-medium:  0px 4px 6px -1px rgba(2, 34, 89, 0.1),
+                    0px 2px 4px -2px rgba(2, 34, 89, 0.1);
+  --shadow-large:   0px 10px 15px -3px rgba(2, 34, 89, 0.1),
+                    0px 4px 6px -4px rgba(2, 34, 89, 0.1);
+  --shadow-xlarge:  0px 20px 25px -5px rgba(2, 34, 89, 0.1),
+                    0px 8px 10px -6px rgba(2, 34, 89, 0.1);
+  --shadow-xxlarge: 0px 25px 50px -12px rgba(2, 34, 89, 0.25);
+
+  /* Named semantic shadows */
+  --shadow-on-dark-bg:          0px 4px 8px 0px rgba(3, 49, 128, 0.08),
+                                0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+
+  --shadown-onlight:            0px 24px 40px rgba(18, 77, 178, 0.1),
+                                0px 8px 16px rgba(18, 77, 178, 0.05);
+  --shadown-onlight-navy-40:    0px 8px 16px 0px rgba(18, 77, 178, 0.05),
+                                0px 24px 40px 0px rgba(18, 77, 178, 0.1);
+  --shadown-onlight-navy-40-hover: 0px 8px 24px 0px rgba(18, 77, 178, 0.05),
+                                0px 24px 60px 0px rgba(18, 77, 178, 0.1);
+
+  --shadown-ondark:             0px 24px 40px rgba(1, 24, 64, 0.5),
+                                0px 8px 16px rgba(1, 24, 64, 0.25);
+  --shadown-ondark-blue-10:     0px 8px 16px 0px rgba(1, 19, 50, 0.25),
+                                0px 24px 40px 0px rgba(1, 19, 50, 0.5);
+  --shadown-ondark-blue-10-hover: 0px 8px 24px 0px rgba(1, 19, 50, 0.5),
+                                0px 24px 40px 0px rgba(1, 19, 50, 0.75);
+  --shadown-ondark-blue-40:     0px 8px 16px 0px rgba(7, 77, 197, 0.05),
+                                0px 24px 40px 0px rgba(7, 77, 197, 0.1);
+  --shadown-ondark-blue-40-hover: 0px 8px 24px 0px rgba(1, 19, 50, 0.5),
+                                0px 24px 40px 0px rgba(1, 19, 50, 0.75);
+
+  --shadown-gxscore:            0px 24px 40px rgba(201, 128, 255, 0.1),
+                                0px 8px 16px rgba(201, 128, 255, 0.05);
+}

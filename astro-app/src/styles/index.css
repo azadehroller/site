@@ -1,0 +1,44 @@
+/*
+ * index.css
+ * ---------------------------------------------------------------------------
+ * Single CSS entry point for the Astro app.
+ *
+ * Layout.astro imports ONLY this file. Every other partial in src/styles/
+ * (including global.css) is imported from here — never imported individually
+ * from a component or layout, and never importing from each other.
+ *
+ * Order matters:
+ *
+ *   1. reset.css            — base resets and element defaults
+ *   2. Token files          — design tokens (variables only, zero specificity)
+ *   3. layout.css           — layout tokens + layout utility classes
+ *   4. *-utils.css          — utility classes (wrapped in @layer utilities)
+ *   5. integrations.css     — third-party overrides (HubSpot, Sanity, etc.)
+ *   6. global.css           — anything truly global that doesn't fit a
+ *                             dedicated file (treated as just another partial)
+ * ---------------------------------------------------------------------------
+ */
+
+/* 1. Reset + base element rules */
+@import "./reset.css";
+
+/* 2. Design tokens */
+@import "./breakpoints.css";
+@import "./colors.css";
+@import "./spacings.css";
+@import "./typography.css";
+
+/* 3. Layout (tokens + utility classes) */
+@import "./layout.css";
+
+/* 4. Utility classes */
+@import "./spacing-utils.css";
+@import "./typography-utils.css";
+@import "./color-utils.css";
+@import "./utilities.css";
+
+/* 5. Third-party integration overrides */
+@import "./integrations.css";
+
+/* 6. Global overrides that don't belong anywhere else */
+@import "./global.css";

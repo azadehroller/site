@@ -1,7 +1,7 @@
 ---
 // https://docs.astro.build/en/guides/view-transitions/
 import { ViewTransitions } from 'astro:transitions';
-import '@styles/global.css';
+import '@styles/index.css';
 import Footer from '@components/globals/Footer.astro';
 import Header from '@components/globals/Header.astro';
 import AnnouncementBar from '@components/globals/AnnouncementBar.astro';
@@ -433,7 +433,7 @@ const organizationJsonLd = {
     <!-- Named slot for additional head content -->
     <slot name="head" />
   </head>
-  <body class="m-0 bg-white font-sans">
+  <body class="margin-0 bg-white font-sans">
     {showAnnouncementBar && (
       <AnnouncementBar
         display={true}
@@ -455,7 +455,7 @@ const organizationJsonLd = {
         buttons={headerData?.buttons}
         headerTheme={headerTheme}
       />
-      <main id="main-content" class="sm:mt-0">
+      <main id="main-content">
         <slot />
       </main>
     </div>
@@ -482,4 +482,10 @@ const organizationJsonLd = {
     {VisualEditingIdle && <VisualEditingIdle zIndex={1000} />}
   </body>
 </html>
+
+<style>
+  @media (min-width: 640px) {
+    #main-content { margin-block-start: 0; }
+  }
+</style>
 

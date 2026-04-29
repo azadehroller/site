@@ -1,0 +1,55 @@
+/*
+ * spacings.css
+ * Single source of truth for all spacing tokens in the design system.
+ * Import this file instead of defining spacing values elsewhere.
+ *
+ * Convention: --spacing-N where N × 4px = the value.
+ *   e.g. --spacing-4 = 4 × 4px = 16px
+ *
+ * Numbered tokens stop at --spacing-20 (80px). Add a new token only when
+ * a new value appears in the codebase — not before.
+ */
+
+:where(html) {
+  /* ─── CORE SCALE ─────────────────────────────────────────────────────── */
+  --spacing-1:   4px;   /*  1 × base — icon gap, badge padding          */
+  --spacing-2:   8px;   /*  2 × base — compact padding, tight gap       */
+  --spacing-3:  12px;   /*  3 × base — label margin, small gap          */
+  --spacing-4:  16px;   /*  4 × base — base unit, most common           */
+  --spacing-5:  20px;   /*  5 × base — in-between step                  */
+  --spacing-6:  24px;   /*  6 × base — card gap, comfortable layout     */
+  --spacing-7:  28px;   /*  7 × base — in-between step                  */
+  --spacing-8:  32px;   /*  8 × base — card padding, spacious gap       */
+  --spacing-10: 40px;   /* 10 × base — section sub-gap                  */
+  --spacing-12: 48px;   /* 12 × base — section padding mobile           */
+  --spacing-14: 56px;   /* 14 × base — large component gap              */
+  --spacing-16: 64px;   /* 16 × base — large section padding            */
+  --spacing-20: 80px;   /* 20 × base — section padding desktop          */
+
+
+  /* ─── LEGACY --size-* SCALE ─────────────────────────────────────────────
+     Kept for backwards compatibility with components that already reference
+     these tokens. The numeric suffix is an opaque index (NOT pixels — unlike
+     --spacing-N above). Prefer --spacing-N for new code; consolidate when a
+     value matches.                                                         */
+  --size-1:  0.25rem;   /*   4px */
+  --size-2:  0.5rem;    /*   8px */
+  --size-3:  1rem;      /*  16px */
+  --size-4:  1.5rem;    /*  24px */
+  --size-5:  2.5rem;    /*  40px */
+  --size-6:  3rem;      /*  48px */
+  --size-7:  4rem;      /*  64px */
+  --size-8:  5rem;      /*  80px */
+  --size-9:  6rem;      /*  96px */
+  --size-10: 7.5rem;    /* 120px */
+  --size-11: 10rem;     /* 160px */
+  --size-15: 15rem;     /* 240px */
+
+
+  /* ─── CONTENT OFFSETS ──────────────────────────────────────────────────
+     Vertical offset used to push content below the fixed Header at each
+     breakpoint. Driven by Header height — keep in sync with Header.astro.  */
+  --content-offset-desktop: 80px;
+  --content-offset-sm:      90px;
+  --content-offset-mobile:  72px;
+}

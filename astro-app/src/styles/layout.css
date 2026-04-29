@@ -1,0 +1,217 @@
+/*
+ * layout.css
+ * Layout utility classes — Tailwind-compatible naming.
+ *
+ * Two layers:
+ *   1. PRIMITIVES — one CSS property per class (composable, low-level).
+ *   2. COMPOSITES — common multi-property patterns observed in the audit.
+ *
+ * Every class below maps to a value that is currently used in the codebase
+ * (in a <style> block, in markup, or in global.css). When a new pattern
+ * appears, add a class then — not before.
+ *
+ * Note: gap utilities (.gap-N, .gap-col-N, .gap-row-N) are NOT defined
+ *       here — they live in spacing-utils.css because they're driven by
+ *       --spacing-N tokens. Use them alongside the .flex / .grid classes.
+ *
+ * Wrapped in @layer utilities so the whole file sits inside Tailwind v4's
+ * utilities cascade layer. Anything outside a layer (e.g. component CSS,
+ * Astro scoped <style> blocks) automatically wins — no !important needed.
+ */
+
+/* ─── LAYOUT TOKENS ─────────────────────────────────────────────────────
+   Declared in :where(html) so they are zero-specificity and can be
+   overridden by any consumer. Kept outside @layer because variable
+   declarations don't participate in cascade layer ordering.              */
+:where(html) {
+  /* Max-width for content containers at each breakpoint. */
+  --container-sm:        544px;
+  --container-md:        768px;
+  --container-lg:        1012px;
+  --container-xl:        1312px;
+  --container-xlg:       1250px;
+  --blogpost-container:  800px;
+  --small-container:     640px;
+
+  /* Default horizontal gap between columns in legacy .row-fluid grids. */
+  --column-gap: 2.13%;
+}
+
+
+@layer utilities {
+
+  /* ─── Container ──────────────────────────────────────────────────────
+     Centred content wrapper capped at the largest container width. */
+  .container {
+    max-width: var(--container-xl);
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  @media (max-width: 767px) {
+    .container {
+      padding: 0 2rem;
+    }
+  }
+
+
+  /* ──────────────────────────────────────────────────────────────────────
+     1. PRIMITIVES
+     ────────────────────────────────────────────────────────────────────── */
+
+  /* ─── Display ───────────────────────────────────────────────────────── */
+  .flex         { display: flex; }
+  .inline-flex  { display: inline-flex; }
+  .grid         { display: grid; }
+  .block        { display: block; }
+  .inline-block { display: inline-block; }
+  .inline       { display: inline; }
+  .hidden       { display: none; }
+  .contents     { display: contents; }
+
+  /* ─── Flex direction ────────────────────────────────────────────────── */
+  .flex-row         { flex-direction: row; }
+  .flex-row-reverse { flex-direction: row-reverse; }
+  .flex-col         { flex-direction: column; }
+  .flex-col-reverse { flex-direction: column-reverse; }
+
+  /* ─── Flex wrap ─────────────────────────────────────────────────────── */
+  .flex-wrap   { flex-wrap: wrap; }
+  .flex-nowrap { flex-wrap: nowrap; }
+
+  /* ─── Flex sizing ───────────────────────────────────────────────────── */
+  .flex-1    { flex: 1 1 0%; }
+  .flex-auto { flex: 1 1 auto; }
+  .grow      { flex-grow: 1; }
+  .grow-0    { flex-grow: 0; }
+  .shrink-0  { flex-shrink: 0; }
+
+  /* ─── Justify content ───────────────────────────────────────────────── */
+  .justify-start   { justify-content: flex-start; }
+  .justify-end     { justify-content: flex-end; }
+  .justify-center  { justify-content: center; }
+  .justify-between { justify-content: space-between; }
+  .justify-around  { justify-content: space-around; }
+
+  /* ─── Align items ───────────────────────────────────────────────────── */
+  .items-start    { align-items: flex-start; }
+  .items-end      { align-items: flex-end; }
+  .items-center   { align-items: center; }
+  .items-baseline { align-items: baseline; }
+
+  /* ─── Align self ────────────────────────────────────────────────────── */
+  .self-end { align-self: flex-end; }
+
+  /* ─── Grid template columns ─────────────────────────────────────────── */
+  /* Covers every repeat(N, 1fr) used in the codebase. */
+  .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+  /* ─── Order ─────────────────────────────────────────────────────────── */
+  .order-1 { order: 1; }
+  .order-2 { order: 2; }
+  .order-3 { order: 3; }
+
+  /* ─── Position ──────────────────────────────────────────────────────── */
+  .static   { position: static; }
+  .relative { position: relative; }
+  .absolute { position: absolute; }
+  .fixed    { position: fixed; }
+  .sticky   { position: sticky; }
+
+  /* ─── Inset / anchors ───────────────────────────────────────────────── */
+  .inset-0  { inset: 0; }
+  .top-0    { top: 0; }
+  .right-0  { right: 0; }
+  .bottom-0 { bottom: 0; }
+  .left-0   { left: 0; }
+
+  /* ─── Z-index ───────────────────────────────────────────────────────── */
+  /* Honest mapping of every distinct value that exists in the codebase.
+     Reads ad-hoc because the existing usage is ad-hoc. We can promote to
+     a semantic scale (z-modal, z-toast, etc.) in a follow-up pass. */
+  .-z-1     { z-index: -1; }
+  .z-0      { z-index: 0; }
+  .z-1      { z-index: 1; }
+  .z-2      { z-index: 2; }
+  .z-9      { z-index: 9; }
+  .z-10     { z-index: 10; }
+  .z-20     { z-index: 20; }
+  .z-100    { z-index: 100; }
+  .z-1000   { z-index: 1000; }
+  .z-9998   { z-index: 9998; }
+  .z-9999   { z-index: 9999; }
+  .z-10001  { z-index: 10001; }
+
+
+  /* ──────────────────────────────────────────────────────────────────────
+     2. COMPOSITES
+     Multi-property patterns that appear repeatedly in the audit.
+     ────────────────────────────────────────────────────────────────────── */
+
+  /* Center children both axes. Replaces ~25+ flex-center blocks. */
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Header / row pattern: items on opposite ends, vertically centered.
+     Replaces ~10 blocks. */
+  .flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Vertical stack. Pair with a .gap-N from spacing-utils.css.
+     Replaces ~28 blocks of `display: flex; flex-direction: column;`. */
+  .stack {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Wrapping horizontal cluster — chips, tags, inline action rows.
+     Pair with a .gap-N from spacing-utils.css. */
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* Cover the parent. Requires the parent to be positioned. */
+  .absolute-fill {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Pin to the absolute centre of the parent. */
+  .absolute-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* One-line grids. Pair with a .gap-N from spacing-utils.css when needed. */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+}

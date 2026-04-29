@@ -3,7 +3,6 @@
 import { loadEnv } from "vite";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import tailwindcss from '@tailwindcss/vite';
 import astrobook from 'astrobook';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -85,7 +84,7 @@ export default defineConfig({
     typescript: false,
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [],
     // Production build: minify JS/CSS (default true; set explicitly so it's guaranteed)
     build: {
       minify: 'esbuild', // fast; use true for default (esbuild)
@@ -111,7 +110,7 @@ export default defineConfig({
       astrobook({
         directory: 'src/stories',
         subpath: '/storybook',
-        css: ['./src/styles/global.css', './src/styles/storybook.css'],
+        css: ['./src/styles/index.css', './src/styles/storybook.css'],
       }),
     ]),
   ],

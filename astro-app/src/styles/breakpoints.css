@@ -1,0 +1,64 @@
+/* breakpoints.css
+ * ---------------------------------------------------------------------------
+ * Project breakpoint reference and container query size tokens.
+ *
+ * No dependencies. Plain CSS only.
+ *
+ * ─── VIEWPORT BREAKPOINTS — hardcoded literals in @media queries ─────────
+ *
+ * CSS does not (yet) support custom variables inside `@media` query
+ * conditions, so we hardcode pixel values rather than introduce a PostCSS
+ * dependency. The canonical scale is documented below — DO NOT invent new
+ * breakpoints. If you need responsive behavior, use one of these values:
+ *
+ *   480px   — large mobile
+ *   640px   — small tablet / phablet
+ *   768px   — tablet portrait
+ *   992px   — desktop (primary)
+ *   1024px  — desktop wide (TODO: consolidate with 992px)
+ *   1200px  — wide desktop
+ *   1440px  — large desktop / laptop
+ *   1920px  — extra-large desktop
+ *
+ * Mobile-first: prefer `min-width` queries.
+ * The one allowed escape hatch is `max-width: 360px` for tiny phones (iPhone
+ * SE etc.) — used sparingly because "below the base" cannot be expressed
+ * mobile-first. Do NOT add other max-width tokens.
+ *
+ * Example:
+ *
+ *   .card {
+ *     // mobile styles
+ *   }
+ *   @media (min-width: 768px) {
+ *     .card {
+ *       // tablet+ overrides
+ *     }
+ *   }
+ *
+ * Environment queries:
+ *
+ *   @media (prefers-reduced-motion: reduce) { ... }
+ *   @media (hover: hover) { ... }
+ *
+ * ─── CONTAINER QUERIES — variable form supported by native CSS ────────────
+ *
+ * Unlike viewport @media, the `@container` at-rule DOES accept CSS variables
+ * in its size conditions. Use the `--cq-*` tokens below for component-level
+ * responsive layout (e.g. a card switching from stacked to row based on its
+ * own width, not the viewport's):
+ *
+ *   .card-wrapper { container: card / inline-size; }
+ *   @container card (min-width: var(--cq-md)) { ... }
+ *
+ * Container queries are the preferred tool for component-internal layout.
+ * Use viewport @media for page-level layout (header sticky, sidebar reveal,
+ * container widths).
+ * ---------------------------------------------------------------------------
+ */
+
+:where(html) {
+  --cq-sm: 320px;   /* narrow card / sidebar widget       */
+  --cq-md: 480px;   /* default two-column threshold       */
+  --cq-lg: 640px;   /* three-column / wide threshold      */
+}

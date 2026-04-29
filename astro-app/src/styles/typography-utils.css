@@ -1,0 +1,213 @@
+/*
+ * typography-utils.css
+ * Utility classes for typography — built on tokens from typography.css.
+ *
+ * Two layers:
+ *
+ *   1. PRIMITIVES — one property each. Combine when you need granular
+ *      control. Each .text-{size} ALSO sets a sensible line-height so you
+ *      never need a separate .leading-* class. (No standalone leading-*
+ *      utilities exist on purpose.)
+ *
+ *   2. COMPOSITE TEXT STYLES — one class = a complete typography spec
+ *      (size + line-height + weight + tracking, plus mobile/desktop
+ *      responsive sizes where the codebase needs them). Apply ONE of
+ *      these and you're done.
+ *
+ * Responsive breakpoint: 768px (matches the existing h1/h2 fluid CSS).
+ *
+ * Wrapped in @layer utilities so the whole file sits inside Tailwind v4's
+ * utilities cascade layer. Anything outside a layer (e.g. component CSS,
+ * Astro scoped <style> blocks) automatically wins — no !important needed.
+ */
+
+@layer utilities {
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * LAYER 1 — PRIMITIVES
+   * ═══════════════════════════════════════════════════════════════════════ */
+
+  /* ─── FONT FAMILY ───────────────────────────────────────────────────── */
+  .font-brand { font-family: var(--font-family-brand); }
+  .font-body  { font-family: var(--font-family-body); }
+  .font-serif { font-family: var(--font-family-serif); }
+  .font-mono  { font-family: var(--font-family-mono); }
+
+  /* ─── FONT WEIGHT ───────────────────────────────────────────────────── */
+  .font-normal     { font-weight: var(--font-weight-400); }
+  .font-medium     { font-weight: var(--font-weight-500); }
+  .font-semibold   { font-weight: var(--font-weight-600); }
+  .font-bold       { font-weight: var(--font-weight-700); }
+  .font-extrabold  { font-weight: var(--font-weight-800); }
+
+  /* ─── LETTER SPACING ────────────────────────────────────────────────── */
+  .tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+  .tracking-snug  { letter-spacing: var(--letter-spacing-snug); }
+  .tracking-wide  { letter-spacing: var(--letter-spacing-wide); }
+  .tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+
+  /* ─── FONT SIZE (line-height is baked in) ───────────────────────────── */
+  /* Body-style sizes — relaxed line-height suitable for paragraph copy. */
+  .text-xs   { font-size: var(--font-size-12); line-height: var(--line-height-22); }  /* 12 / 1.4  */
+  .text-sm   { font-size: var(--font-size-14); line-height: var(--line-height-22); }  /* 14 / 1.4  */
+  .text-base { font-size: var(--font-size-16); line-height: var(--line-height-22); }  /* 16 / 1.4  */
+  .text-lg   { font-size: var(--font-size-18); line-height: var(--line-height-26); }  /* 18 / 1.6  */
+  .text-xl   { font-size: var(--font-size-20); line-height: var(--line-height-22); }  /* 20 / 1.4  */
+
+  /* Heading-style sizes — tighter line-height for display/headline use. */
+  .text-2xl  { font-size: var(--font-size-24); line-height: var(--line-height-19); }  /* 24 / 1.2  */
+  .text-3xl  { font-size: var(--font-size-30); line-height: var(--line-height-19); }  /* 30 / 1.2  */
+  .text-4xl  { font-size: var(--font-size-36); line-height: var(--line-height-18); }  /* 36 / 1.12 */
+  .text-5xl  { font-size: var(--font-size-48); line-height: var(--line-height-18); }  /* 48 / 1.12 */
+  .text-6xl  { font-size: var(--font-size-64); line-height: var(--line-height-16); }  /* 64 / 1    */
+
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * LAYER 2 — COMPOSITE TEXT STYLES
+   * Each class = full typography spec for a role found in the codebase.
+   * Responsive: mobile values first, desktop overrides at min-width: 768px.
+   * ═══════════════════════════════════════════════════════════════════════ */
+
+  /* ─── DISPLAY / HEADINGS ────────────────────────────────────────────── */
+  .text-display {
+    font-size: var(--font-size-48);
+    line-height: var(--line-height-18);
+    font-weight: var(--font-weight-800);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-h1 {
+    font-size: var(--font-size-40);
+    line-height: var(--line-height-18);
+    font-weight: var(--font-weight-800);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-h2 {
+    font-size: var(--font-size-32);
+    line-height: var(--line-height-19);
+    font-weight: var(--font-weight-700);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-h3 {
+    font-size: var(--font-size-24);
+    line-height: var(--line-height-20);
+    font-weight: var(--font-weight-600);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-h4 {
+    font-size: var(--font-size-24);
+    line-height: var(--line-height-20);
+    font-weight: var(--font-weight-600);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-h5 {
+    font-size: var(--font-size-18);
+    line-height: var(--line-height-28);
+    font-weight: var(--font-weight-600);
+  }
+
+  .text-h6 {
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-26);
+    font-weight: var(--font-weight-600);
+  }
+
+  /* ─── BODY ──────────────────────────────────────────────────────────── */
+  .text-body-lg {
+    font-size: var(--font-size-18);
+    line-height: var(--line-height-26);
+    font-weight: var(--font-weight-400);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-body {
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-22);
+    font-weight: var(--font-weight-400);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-body-sm {
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-24);
+    font-weight: var(--font-weight-400);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  /* ─── UI / FUNCTIONAL ROLES ─────────────────────────────────────────── */
+  .text-eyebrow {
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-20);
+    font-weight: var(--font-weight-800);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: uppercase;
+  }
+
+  .text-caption {
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-22);
+    font-weight: var(--font-weight-400);
+    font-style: italic;
+  }
+
+  .text-button {
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+    font-weight: var(--font-weight-600);
+    letter-spacing: var(--letter-spacing-snug);
+  }
+
+  .text-nav {
+    font-size: var(--font-size-21);
+    line-height: var(--line-height-20);
+    font-weight: var(--font-weight-600);
+  }
+
+  .text-stat {
+    font-size: var(--font-size-40);
+    line-height: var(--line-height-16);
+    font-weight: var(--font-weight-800);
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * RESPONSIVE OVERRIDES (≥ 768px)
+   * Composite classes that scale up on desktop. Numbers come from the audit.
+   * ═══════════════════════════════════════════════════════════════════════ */
+  @media (min-width: 768px) {
+    .text-display {
+      font-size: var(--font-size-fluid-96);     /* clamp 64 → 96 */
+      line-height: var(--line-height-18);
+    }
+
+    .text-h1 {
+      font-size: var(--font-size-fluid-64);     /* clamp 32 → 64 */
+      line-height: var(--line-height-18);
+    }
+
+    .text-h2 {
+      font-size: var(--font-size-fluid-48);     /* clamp 32 → 48 */
+      line-height: var(--line-height-20);
+    }
+
+    .text-h3 {
+      font-size: var(--font-size-40);
+      line-height: var(--line-height-20);
+    }
+
+    .text-h4 {
+      font-size: var(--font-size-24);
+      line-height: var(--line-height-20);
+    }
+
+    .text-stat {
+      font-size: var(--font-size-64);
+      line-height: var(--line-height-16);
+    }
+  }
+
+}

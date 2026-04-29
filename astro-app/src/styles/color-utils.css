@@ -1,0 +1,105 @@
+/*
+ * color-utils.css
+ * Utility classes for color, fill, background-color, background-image
+ * (gradients & decorative URLs), and box-shadow. Built on tokens from
+ * colors.css.
+ *
+ * Wrapped in @layer utilities so component scoped <style> blocks (which
+ * are unlayered) always win without needing !important.
+ */
+
+@layer utilities {
+
+  /* ─── TEXT COLOR ─────────────────────────────────────────────────────── */
+  .text-neutral-white { color: var(--neutral-white); }
+  .text-primary-50    { color: var(--primary-50); }
+  .text-secondary-50  { color: var(--secondary-50); }
+  .text-gx-80         { color: var(--gx-80); }
+  .text-gx-90         { color: var(--gx-90); }
+  .text-secondary     { color: var(--neutral-50); }
+
+  /* ─── FILL ───────────────────────────────────────────────────────────── */
+  .fill-neutral-white { fill: var(--neutral-white); }
+  .fill-primary-50    { fill: var(--primary-50); }
+
+  /* ─── BACKGROUND COLOR ───────────────────────────────────────────────── */
+  .bg-transparent       { background-color: transparent; }
+  .bg-neutral-white     { background-color: var(--neutral-white); }
+  .bg-accent-primary-30 { background-color: rgb(206 223 253 / 30%); }
+  .bg-green-10          { background-color: rgb(230 255 240); }
+  .bg-gx-80             { background-color: rgb(60 0 145); }
+  .bg-gx-90             { background-color: rgb(165 84 255); }
+  .bg-iris-50           { background-color: rgb(96 63 245); }
+  .bg-neutral-60        { background-color: rgb(77 77 77); }
+  .bg-primary-10        { background-color: rgb(206 223 253); }
+  .bg-primary-40        { background-color: rgb(7 77 197); }
+  .bg-primary-50        { background-color: rgb(3 49 128); }
+  .bg-primary-60        { background-color: rgb(3 38 99); }
+  .bg-primary-70        { background-color: rgb(1 19 50); }
+  .bg-secondary-50      { background-color: var(--secondary-50); }
+
+  /* ─── BACKGROUND SIZE ────────────────────────────────────────────────── */
+  .bg-cover { background-size: cover; }
+
+  /* ─── BACKGROUND IMAGE — GRADIENTS ───────────────────────────────────── */
+  .bg-announcement {
+    background-image: linear-gradient(90deg, var(--blue-50) 0%, var(--secondary-50) 100%);
+  }
+
+  .bg-hero {
+    background-image: linear-gradient(180deg, var(--primary-50) 29.5%, #022765 100%);
+  }
+
+  .bg-industry-report {
+    background-image: linear-gradient(to right, var(--blue-50) 0%, var(--cyan-40) 40%, var(--green-70) 100%);
+  }
+
+  .bg-new-design,
+  .bg-new-design-mobile {
+    background-image: linear-gradient(270deg, var(--purple-90) 0%, var(--purple-50) 10%, var(--purple-50) 90%, var(--purple-90) 100%);
+  }
+
+  .bg-product-launch,
+  .bg-product-launch-mobile {
+    background-image: linear-gradient(90deg, var(--blue-05) 0.01%, var(--blue-50) 84.99%, var(--cyan-80) 99.99%);
+  }
+
+  .bg-pill-gradient {
+    background-image: linear-gradient(276deg, var(--secondary-50) 0%, var(--primary-40) 100%);
+  }
+
+  .bg-widget-group {
+    background-image: linear-gradient(0deg, rgb(229 239 255 / .35), rgb(229 239 255 / .35));
+  }
+
+  .bg-widget-industries {
+    background-image: linear-gradient(100deg, var(--neutral-white) 0%, var(--blue-99) 61.98%);
+  }
+
+  /* ─── BACKGROUND IMAGE — DECORATIVE URLS ─────────────────────────────── */
+  .bg-events-default {
+    background-image: url(https://3375779.fs1.hubspotusercontent-na1.net/hub/3375779/event-default-bg.png);
+  }
+
+  .bg-user-review {
+    background-image: url(https://3375779.fs1.hubspotusercontent-na1.net/hubfs/3375779/user-review-widget.png);
+  }
+
+  .bg-webinar-default {
+    background-image: url(https://3375779.fs1.hubspotusercontent-na1.net/hub/3375779/webinar-default-bg.png);
+  }
+
+  /* ─── BOX SHADOW ─────────────────────────────────────────────────────── */
+  .box-shadow-onlight {
+    box-shadow: var(--shadown-onlight);
+  }
+
+  .box-shadow-ondark {
+    box-shadow: var(--shadown-ondark);
+  }
+
+  .box-shadow-onlight-navy-40 {
+    box-shadow: 0 4px 6px -1px rgba(1, 24, 64, 0.1), 0 2px 4px -2px rgba(1, 24, 64, 0.1);
+  }
+
+}
