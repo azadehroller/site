@@ -26,12 +26,12 @@ const welcomeMessage =
   'Hi! I can help you find information in the ROLLER documentation. What would you like to know?';
 ---
 
-<div id="chat-widget" class="chat-widget" data-chatbot>
+<div id="chat-widget" class="chat-widget fixed z-9999" data-chatbot>
   <!-- Toggle Button -->
   <button
     id="chat-toggle"
     type="button"
-    class="chat-toggle"
+    class="chat-toggle flex-center"
     aria-label="Open chat assistant"
     aria-expanded="false"
     aria-controls="chat-panel"
@@ -61,18 +61,18 @@ const welcomeMessage =
   <!-- Chat Panel -->
   <div
     id="chat-panel"
-    class="chat-panel chat-panel-hidden"
+    class="chat-panel chat-panel-hidden absolute stack"
     role="dialog"
     aria-labelledby="chat-title"
   >
     <!-- Resize handles (left edge, top edge, top-left corner) -->
-    <div class="chat-resize-handle chat-resize-left" data-resize="left"></div>
-    <div class="chat-resize-handle chat-resize-top" data-resize="top"></div>
-    <div class="chat-resize-handle chat-resize-corner" data-resize="corner"></div>
+    <div class="chat-resize-handle chat-resize-left absolute z-20" data-resize="left"></div>
+    <div class="chat-resize-handle chat-resize-top absolute z-20" data-resize="top"></div>
+    <div class="chat-resize-handle chat-resize-corner absolute z-20" data-resize="corner"></div>
 
     <!-- Header -->
-    <div class="chat-header">
-      <div class="chat-header-icon">
+    <div class="chat-header flex items-center">
+      <div class="chat-header-icon flex-center">
         <svg class="chat-header-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             stroke-linecap="round"
@@ -86,7 +86,7 @@ const welcomeMessage =
     </div>
 
     <!-- Messages Container -->
-    <div id="chat-messages" class="chat-messages" aria-live="polite" aria-atomic="false">
+    <div id="chat-messages" class="chat-messages stack" aria-live="polite" aria-atomic="false">
       <!-- Welcome message -->
       <div class="chat-message chat-message-bot">
         <div class="chat-bubble chat-bubble-bot">
@@ -97,7 +97,7 @@ const welcomeMessage =
 
     <!-- Input Area -->
     <form id="chat-form" class="chat-form">
-      <div class="chat-input-wrapper">
+      <div class="chat-input-wrapper flex items-end">
         <textarea
           id="chat-input"
           placeholder="Ask a question..."
@@ -133,7 +133,7 @@ const welcomeMessage =
         <button
           id="chat-submit"
           type="submit"
-          class="chat-submit"
+          class="chat-submit flex-center"
           aria-label="Send message"
         >
           <svg class="chat-submit-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -148,7 +148,7 @@ const welcomeMessage =
       <p id="chat-error" class="chat-error chat-error-hidden"></p>
     </form>
     <!-- Persistent CTA buttons -->
-    <div class="chat-cta-wrapper">
+    <div class="chat-cta-wrapper flex flex-wrap">
       <a class="chat-cta-btn chat-cta-get-started" href="/get-started">Get Started</a>
       <a class="chat-cta-btn chat-cta-book-demo" href="/">Book a Demo</a>
     </div>
@@ -157,10 +157,8 @@ const welcomeMessage =
 
 <style>
   .chat-widget {
-    position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;
-    z-index: 9999;
   }
 
   .chat-toggle {
@@ -171,9 +169,6 @@ const welcomeMessage =
     color: var(--neutral-white);
     border: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     box-shadow: var(--shadow-xlarge);
     transition: background-color 0.2s, transform 0.2s;
   }
@@ -198,7 +193,6 @@ const welcomeMessage =
   }
 
   .chat-panel {
-    position: absolute;
     bottom: 5rem;
     right: 0;
     width: 28rem;
@@ -209,8 +203,6 @@ const welcomeMessage =
     border-radius: 1rem;
     box-shadow: var(--shadow-xxlarge);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
   }
 
   .chat-panel-hidden {
@@ -220,10 +212,8 @@ const welcomeMessage =
   .chat-header {
     background-color: var(--primary-50);
     color: var(--neutral-white);
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    padding: var(--spacing-3) 1rem;
+    gap: var(--spacing-3);
   }
 
   .chat-header-icon {
@@ -231,9 +221,6 @@ const welcomeMessage =
     height: 2rem;
     border-radius: 50%;
     background-color: var(--primary-40);
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .chat-header-svg {
@@ -242,18 +229,16 @@ const welcomeMessage =
   }
 
   .chat-title {
-    font-size: 1.125rem;
-    font-weight: 600;
+    font-size: var(--font-size-18);
+    font-weight: var(--font-weight-600);
     margin: 0;
   }
 
   .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    padding: var(--spacing-4);
+    gap: var(--spacing-4);
   }
 
   .chat-message {
@@ -270,7 +255,7 @@ const welcomeMessage =
 
   .chat-bubble {
     max-width: 85%;
-    padding: 0.75rem 1rem;
+    padding: var(--spacing-3) 1rem;
     border-radius: 1rem;
   }
 
@@ -286,34 +271,34 @@ const welcomeMessage =
   }
 
   .chat-text {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
     margin: 0;
-    color: #033180;
-    font-weight: 700;
+    color: var(--primary-50);
+    font-weight: var(--font-weight-700);
   }
 
   .chat-bubble-user .chat-text {
-    color: #033180;
-    font-size: 0.9375rem;
-    font-weight: 700;
+    color: var(--primary-50);
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-700);
   }
 
   :global(.chat-paragraph) {
     margin: 0 0 0.75rem 0;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: #033180;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-24);
+    color: var(--primary-50);
   }
 
   :global(.chat-paragraph:last-child) {
-    margin-bottom: 0;
+    margin-block-end: 0;
   }
 
   :global(.chat-paragraph-user) {
-    color: #033180;
-    font-size: 1rem;
-    font-weight: 700;
+    color: var(--primary-50);
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-700);
     padding: .5rem;
     background: var(--primary-10);
     border-radius: 10px 10px 0 10px;
@@ -321,30 +306,30 @@ const welcomeMessage =
   }
 
   :global(.chat-section-header) {
-    margin: 1rem 0 0.5rem 0;
-    font-size: 0.9375rem;
-    line-height: 1.4;
-    color: #033180;
-    font-weight: 700;
+    margin: var(--spacing-4) 0 0.5rem 0;
+    font-size: var(--font-size-15);
+    line-height: var(--line-height-22);
+    color: var(--primary-50);
+    font-weight: var(--font-weight-700);
   }
 
   :global(.chat-section-header:first-child) {
-    margin-top: 0;
+    margin-block-start: 0;
   }
 
   :global(.chat-section-header-user) {
-    color: #033180;
-    font-size: 1rem;
-    font-weight: 700;
+    color: var(--primary-50);
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-700);
   }
 
   :global(.chat-ordered-list),
   :global(.chat-unordered-list) {
-    margin: 0.5rem 0;
-    padding-left: 1.5rem;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: #033180;
+    margin: var(--spacing-2) 0;
+    padding-inline-start: var(--spacing-6);
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-26);
+    color: var(--primary-50);
   }
 
   :global(.chat-ordered-list) {
@@ -359,91 +344,89 @@ const welcomeMessage =
 
   :global(.chat-ordered-list li),
   :global(.chat-unordered-list li) {
-    margin-bottom: 0.35rem;
-    padding-left: 0.25rem;
+    margin-block-end: 0.35rem;
+    padding-inline-start: var(--spacing-1);
     display: list-item;
   }
 
   :global(.chat-ordered-list li:last-child),
   :global(.chat-unordered-list li:last-child) {
-    margin-bottom: 0;
+    margin-block-end: 0;
   }
 
   .chat-bubble-user :global(.chat-ordered-list),
   .chat-bubble-user :global(.chat-unordered-list) {
-    color: #033180;
-    font-size: 0.9375rem;
-    font-weight: 700;
+    color: var(--primary-50);
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-700);
   }
 
   .chat-sources {
-    margin-top: 0.75rem;
+    margin-block-start: var(--spacing-3);
   }
 
   :global(.chat-sources-separator) {
     border: none;
-    border-top: .5px solid #084dc5;
-    margin: 1rem 0;
+    border-top: .5px solid var(--primary-40);
+    margin: var(--spacing-4) 0;
   }
 
   :global(.chat-sources-title) {
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     color: var(--neutral-60);
-    font-weight: 700;
+    font-weight: var(--font-weight-700);
     margin: 0 0 0.5rem 0;
   }
 
   :global(.chat-source-link) {
     display: inline-block;
-    color: #074dc5 !important;
+    color: var(--primary-40) !important;
     text-decoration: none;
-    font-size: 0.75rem;
-    line-height: 1.6;
-    font-weight: 500;
+    font-size: var(--font-size-12);
+    line-height: var(--line-height-26);
+    font-weight: var(--font-weight-500);
   }
 
   :global(.chat-source-link:hover) {
     text-decoration: underline;
-    color: #0541a0 !important;
+    color: var(--blue-38) !important;
   }
 
   /* Inline links rendered from Markdown [text](url) in bot responses */
   :global(.chat-inline-link) {
-    color: #074dc5 !important;
+    color: var(--primary-40) !important;
     text-decoration: underline;
     text-underline-offset: 2px;
-    font-weight: 500;
+    font-weight: var(--font-weight-500);
   }
 
   :global(.chat-inline-link:hover) {
-    color: #0541a0 !important;
+    color: var(--blue-38) !important;
     text-decoration-thickness: 2px;
   }
 
   .chat-cta-wrapper {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem 0.75rem;
-    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) 0.75rem 0.75rem;
   }
 
   .chat-cta-btn {
     display: inline-block;
-    padding: 0.5rem 1.125rem;
+    padding: var(--spacing-2) 1.125rem;
     border-radius: 9999px;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: #ffffff !important;
+    font-size: var(--font-size-13);
+    font-weight: var(--font-weight-600);
+    color: var(--neutral-white) !important;
     text-decoration: none;
     border: none;
     cursor: pointer;
     transition: opacity 0.2s;
-    line-height: 1;
+    line-height: var(--line-height-16);
   }
 
   .chat-cta-btn:hover {
     opacity: 0.85;
-    color: #ffffff !important;
+    color: var(--neutral-white) !important;
     text-decoration: none;
   }
 
@@ -457,23 +440,21 @@ const welcomeMessage =
 
   .chat-form {
     border-top: 1px solid var(--neutral-20);
-    padding: 0.75rem;
+    padding: var(--spacing-3);
   }
 
   .chat-input-wrapper {
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-end; /* keeps mic + send buttons pinned to the bottom as textarea grows */
+    gap: var(--spacing-2);
   }
 
   .chat-input {
     flex: 1;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-2) 1rem;
     border: 1px solid var(--neutral-30);
     border-radius: 1rem;
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     font-family: inherit;
-    line-height: 1.5;
+    line-height: var(--line-height-24);
     outline: none;
     resize: none;         /* hide the drag handle */
     overflow-y: hidden;   /* no scrollbar until max-height is reached */
@@ -494,9 +475,6 @@ const welcomeMessage =
     color: var(--neutral-white);
     border: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: background-color 0.2s;
   }
 
@@ -544,8 +522,8 @@ const welcomeMessage =
 
   /* Pulsing red ring while listening — shown on Chrome/Edge only */
   .chat-mic-listening {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: var(--error-08);
+    color: var(--red-80);
     animation: mic-pulse 1.2s infinite ease-in-out;
   }
 
@@ -556,8 +534,8 @@ const welcomeMessage =
 
   .chat-error {
     color: var(--error-50);
-    font-size: 0.75rem;
-    margin: 0.5rem 0.5rem 0;
+    font-size: var(--font-size-12);
+    margin: var(--spacing-2) 0.5rem 0;
   }
 
   .chat-error-hidden {
@@ -565,9 +543,9 @@ const welcomeMessage =
   }
 
   :global(.thinking-text) {
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     color: var(--primary-50);
-    font-weight: 500;
+    font-weight: var(--font-weight-500);
     margin: 0 0 0.5rem 0;
     animation: blink 1s infinite ease-in-out;
     will-change: opacity; /* composited layer — avoids layout reflow on each frame */
@@ -584,8 +562,8 @@ const welcomeMessage =
 
   .typing-indicator {
     display: flex;
-    gap: 4px;
-    padding: 0.5rem 0;
+    gap: var(--spacing-1);
+    padding: var(--spacing-2) 0;
   }
 
   .typing-indicator span {
@@ -619,8 +597,6 @@ const welcomeMessage =
 
   /* ── Resize handles ─────────────────────────────────────────────────── */
   .chat-resize-handle {
-    position: absolute;
-    z-index: 20;
     transition: background 0.15s;
   }
 
@@ -655,7 +631,7 @@ const welcomeMessage =
   }
 
   .chat-resize-handle:hover {
-    background: rgba(3, 49, 128, 0.12);
+    background: var(--primary-alpha-12);
   }
   /* ── End resize handles ─────────────────────────────────────────────── */
 

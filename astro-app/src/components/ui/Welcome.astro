@@ -1,33 +1,33 @@
 ---
 ---
 
-<div class="flex flex-col items-center p-2">
-  <div class="hidden sm:flex sm:items-center sm:my-12 sm:mb-8 sm:relative">
+<div class="flex flex-col items-center padding-2">
+  <div class="hidden sm:flex sm:items-center sm:relative">
     <div class="absolute flex h-[115px] w-[375px] -rotate-[19deg] bg-pink-200 blur-[82px] -z-10"></div>
     <img
       class="flex"
       src="/astro.svg"
       alt="Astro Logo"
     />
-    <span class="flex mx-4 font-sans text-4xl font-extrabold leading-9">+</span>
+    <span class="flex margin-inline-4 font-sans text-4xl font-extrabold">+</span>
     <img
       class="flex"
       src="/sanity.svg"
       alt="Sanity Logo"
     />
   </div>
-  <div class="w-full flex-col sm:flex sm:max-w-xs sm:p-0">
-    <h2 class="text-2xl leading-6">Next steps</h2>
-    <ul class="mt-0 list-none p-0">
-      <li class="mb-5">
-        <h3 class="mt-4 text-lg leading-6 sm:mt-5">Publish a post in your Studio</h3>
-        <p class="font-serif leading-6">
+  <div class="w-full flex-col sm:flex sm:max-w-xs">
+    <h2 class="text-2xl">Next steps</h2>
+    <ul class="margin-block-start-0 list-none padding-0">
+      <li class="margin-block-end-5">
+        <h3 class="margin-block-start-4 text-lg welcome-heading">Publish a post in your Studio</h3>
+        <p class="font-serif text-base">
           Visit the <a class="text-blue-600 no-underline" href="http://localhost:3333/">Sanity Studio</a> and publish a new document of type post.
         </p>
       </li>
-      <li class="mb-5">
-        <h3 class="mt-4 text-lg leading-6 sm:mt-5">Dive into the documentation</h3>
-        <p class="font-serif leading-6">
+      <li class="margin-block-end-5">
+        <h3 class="margin-block-start-4 text-lg welcome-heading">Dive into the documentation</h3>
+        <p class="font-serif text-base">
           Check out{" "}
           <a
             class="text-blue-600 no-underline"
@@ -40,9 +40,9 @@
           to learn more about Sanity.
         </p>
       </li>
-      <li class="mb-5">
-        <h3 class="mt-4 text-lg leading-6 sm:mt-5">Join the Sanity Community</h3>
-        <p class="font-serif leading-6">
+      <li class="margin-block-end-5">
+        <h3 class="margin-block-start-4 text-lg welcome-heading">Join the Sanity Community</h3>
+        <p class="font-serif text-base">
           Leverage{" "}
           <a
             class="text-blue-600 no-underline"
@@ -58,4 +58,10 @@
     </ul>
   </div>
 </div>
+
+<style>
+@media (min-width: 640px) {
+  .welcome-heading { margin-block-start: var(--spacing-5); }
+}
+</style>
 

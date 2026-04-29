@@ -29,7 +29,7 @@ const isFloated = style.includes('float:') || style.includes('float ');
 
 {url && isFloated ? (
   <!-- Floated inline image: wrap in span to preserve float behavior -->
-  <span class="inline-image-wrapper" style={style}>
+  <span class="inline-image-wrapper inline-block" style={style}>
     <img 
       src={url} 
       alt={alt} 
@@ -53,10 +53,6 @@ const isFloated = style.includes('float:') || style.includes('float ');
 ) : null}
 
 <style>
-  .inline-image-wrapper {
-    display: inline-block;
-  }
-  
   .inline-image {
     max-width: 100%;
     height: auto;

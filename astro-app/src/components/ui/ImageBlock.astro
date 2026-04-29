@@ -46,7 +46,7 @@ const imageStyle = isFloated ? undefined : imgStyle;
 
 {url && isFloated ? (
   <!-- Floated images: apply style directly to a span wrapper to preserve float behavior -->
-  <span class={`image-block-inline ${alignmentClass}`} style={containerStyle}>
+  <span class={`image-block-inline inline-block ${alignmentClass}`} style={containerStyle}>
     <img 
       src={url} 
       alt={alt} 
@@ -54,14 +54,15 @@ const imageStyle = isFloated ? undefined : imgStyle;
       width={width ? width.replace('px', '').replace('%', '') : undefined}
       height={height ? height.replace('px', '').replace('%', '') : undefined}
     />
-    {caption && <span class="image-caption">{caption}</span>}
+    {caption && <span class="image-caption block">{caption}</span>}
   </span>
 ) : url && (
   <figure class={`image-block ${alignmentClass}`}>
-    <img 
-      src={url} 
-      alt={alt} 
-      loading="lazy" 
+    <img
+      class="block"
+      src={url}
+      alt={alt}
+      loading="lazy"
       style={imageStyle || undefined}
       width={width ? width.replace('px', '').replace('%', '') : undefined}
       height={height ? height.replace('px', '').replace('%', '') : undefined}
@@ -73,7 +74,7 @@ const imageStyle = isFloated ? undefined : imgStyle;
 <style>
   /* Block-level images (centered, no float) */
   .image-block {
-    margin: 1.5rem 0;
+    margin: var(--spacing-6) 0;
   }
   
   .image-block img {
@@ -83,9 +84,9 @@ const imageStyle = isFloated ? undefined : imgStyle;
   }
   
   .image-block figcaption {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #666;
+    margin-block-start: var(--spacing-2);
+    font-size: var(--font-size-14);
+    color: var(--neutral-58);
     text-align: center;
   }
 
@@ -96,14 +97,9 @@ const imageStyle = isFloated ? undefined : imgStyle;
   
   .image-block--center img {
     margin: 0 auto;
-    display: block;
   }
 
   /* Inline floated images - uses original HubSpot styles */
-  .image-block-inline {
-    display: inline-block;
-  }
-  
   .image-block-inline img {
     max-width: 100%;
     height: auto;
@@ -111,10 +107,9 @@ const imageStyle = isFloated ? undefined : imgStyle;
   }
   
   .image-block-inline .image-caption {
-    display: block;
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #666;
+    margin-block-start: var(--spacing-2);
+    font-size: var(--font-size-14);
+    color: var(--neutral-58);
     text-align: center;
   }
 

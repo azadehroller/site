@@ -60,35 +60,35 @@ const getPageUrl = (page: number) => {
 ---
 
 <nav class="blog-pagination" aria-label="Pagination">
-  <div class="blog-pagination__nav">
+  <div class="blog-pagination__nav flex items-center">
     {/* Previous button */}
     {currentPage > 1 ? (
       <a
         href={getPageUrl(currentPage - 1)}
-        class="blog-pagination__prev-link"
+        class="blog-pagination__prev-link inline-flex items-center"
         aria-label="Previous page"
       >
         <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#143D82"/>
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="var(--blue-35)"/>
         </svg>
         <span>Previous</span>
       </a>
     ) : (
-      <span class="blog-pagination__prev-link blog-pagination__prev-link--disabled">
+      <span class="blog-pagination__prev-link blog-pagination__prev-link--disabled inline-flex items-center">
         <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#B0C1D4"/>
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="var(--blue-grey-30)"/>
         </svg>
         <span>Previous</span>
       </span>
     )}
 
     {/* Page numbers */}
-    <div class="blog-pagination__items">
+    <div class="blog-pagination__items flex items-center">
       {pageNumbers.map((page) => (
         typeof page === 'number' ? (
           page === currentPage ? (
             <span
-              class="blog-pagination__link blog-pagination__link--active"
+              class="blog-pagination__link blog-pagination__link--active inline-flex"
               aria-current="page"
             >
               {page}
@@ -96,7 +96,7 @@ const getPageUrl = (page: number) => {
           ) : (
             <a
               href={getPageUrl(page)}
-              class="blog-pagination__link blog-pagination__number-link"
+              class="blog-pagination__link blog-pagination__number-link inline-flex"
             >
               {page}
             </a>
@@ -111,19 +111,19 @@ const getPageUrl = (page: number) => {
     {currentPage < totalPages ? (
       <a
         href={getPageUrl(currentPage + 1)}
-        class="blog-pagination__next-link"
+        class="blog-pagination__next-link inline-flex items-center"
         aria-label="Next page"
       >
         <span>Next</span>
         <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#143D82"/>
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="var(--blue-35)"/>
         </svg>
       </a>
     ) : (
-      <span class="blog-pagination__next-link blog-pagination__next-link--disabled">
+      <span class="blog-pagination__next-link blog-pagination__next-link--disabled inline-flex items-center">
         <span>Next</span>
         <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#B0C1D4"/>
+          <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="var(--blue-grey-30)"/>
         </svg>
       </span>
     )}
@@ -132,9 +132,8 @@ const getPageUrl = (page: number) => {
 
 <style>
   .blog-pagination {
-    display: block;
-    margin-bottom: 3.3rem;
-    padding: 16px 0 0;
+    margin-block-end: 3.3rem;
+    padding: var(--spacing-4) 0 0;
     text-align: center;
   }
 
@@ -147,10 +146,7 @@ const getPageUrl = (page: number) => {
   }
 
   .blog-pagination__nav {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    gap: 0.5rem;
+    gap: var(--spacing-2);
   }
 
   @media (min-width: 992px) {
@@ -166,12 +162,11 @@ const getPageUrl = (page: number) => {
   }
 
   .blog-pagination__link {
-    color: #033180;
-    display: inline-flex;
-    font-size: 16px;
-    line-height: 1;
+    color: var(--blue-30);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-16);
     text-decoration: none;
-    font-weight: 700;
+    font-weight: var(--font-weight-700);
     transition: all 0.2s ease;
   }
 
@@ -182,46 +177,44 @@ const getPageUrl = (page: number) => {
 
   .blog-pagination__number-link {
     padding: 6px 9px;
-    font-weight: 500;
+    font-weight: var(--font-weight-500);
   }
 
   .blog-pagination__number-link:not(.blog-pagination__link--active):focus,
   .blog-pagination__number-link:not(.blog-pagination__link--active):hover {
-    font-weight: 500;
+    font-weight: var(--font-weight-500);
     text-decoration: underline;
   }
 
   .blog-pagination__link--active {
-    font-weight: 700;
+    font-weight: var(--font-weight-700);
     pointer-events: none;
   }
 
   .blog-pagination__ellipsis {
     pointer-events: none;
-    color: #033180;
-    font-size: 0.95rem;
+    color: var(--blue-30);
+    font-size: var(--font-size-15);
     padding: 6px;
   }
 
   .blog-pagination__prev-link,
   .blog-pagination__next-link {
-    align-items: center;
-    display: inline-flex;
-    gap: 0.25rem;
+    gap: var(--spacing-1);
     text-decoration: none;
-    color: #033180;
-    font-size: 16px;
-    font-weight: 700;
+    color: var(--blue-30);
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-700);
     transition: all 0.2s ease;
   }
 
   .blog-pagination__prev-link {
-    margin-right: 0.25rem;
+    margin-inline-end: var(--spacing-1);
     text-align: right;
   }
 
   .blog-pagination__next-link {
-    margin-left: 0.25rem;
+    margin-inline-start: var(--spacing-1);
     text-align: left;
   }
 
@@ -238,16 +231,14 @@ const getPageUrl = (page: number) => {
     .blog-pagination__prev-link--disabled,
     .blog-pagination__next-link--disabled {
       display: inline-flex;
-      color: #B0C1D4;
+      color: var(--blue-grey-30);
       cursor: default;
       pointer-events: none;
     }
   }
 
   .blog-pagination__items {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    gap: var(--spacing-2);
   }
 </style>
 
