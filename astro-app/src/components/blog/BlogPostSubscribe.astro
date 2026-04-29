@@ -7,8 +7,8 @@ const isProdHost = isProductionHost(Astro.url.hostname);
 ---
 
 <div class="blog-post__section" style="overflow: hidden;">
-  <div class="blog-post__subscribe">
-    <div class="blog-post__subscribe-inner">
+  <div class="blog-post__subscribe relative">
+    <div class="blog-post__subscribe-inner flex flex-col-reverse items-center">
       <div class="blog-post__subscribe-content text-light">
         <h2>Enhance your guest experience</h2>
         <p>
@@ -22,7 +22,7 @@ const isProdHost = isProductionHost(Astro.url.hostname);
               data-region="na1">
             </div>
           ) : (
-            <p style="margin:0;font-size:0.875rem;opacity:0.8;">
+            <p class="text-sm" style="margin:0;opacity:0.8;">
               Newsletter form disabled on non-production hosts.
             </p>
           )}
@@ -44,27 +44,23 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   .blog-post__section {
     margin: 0 auto;
     padding: 0;
-    margin-bottom: 60px;
+    margin-block-end: 60px;
   }
 
   .blog-post__subscribe {
-    background-color: #033180;
+    background-color: var(--blue-30);
     border-radius: 20px;
-    color: #fff;
+    color: var(--neutral-white);
     margin: 60px 0;
     padding: 60px 28px;
-    position: relative;
   }
 
   .blog-post__subscribe * {
-    color: #fff;
+    color: var(--neutral-white);
   }
 
   .blog-post__subscribe .blog-post__subscribe-inner {
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
-    gap: 2rem;
+    gap: var(--spacing-8);
   }
 
   @media (min-width: 768px) {
@@ -82,20 +78,20 @@ const isProdHost = isProductionHost(Astro.url.hostname);
   }
 
   .blog-post__subscribe h2 {
-    font-size: 32px;
-    margin-bottom: 15px;
+    font-size: var(--font-size-32);
+    margin-block-end: 15px;
   }
 
   @media (min-width: 992px) {
     .blog-post__subscribe h2 {
-      font-size: 42px;
+      font-size: var(--font-size-42);
     }
   }
 
   .blog-post__subscribe p {
-    font-size: 1rem;
-    line-height: 28px;
-    margin-bottom: 30px;
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-28);
+    margin-block-end: 30px;
     opacity: 0.9;
   }
 
@@ -104,7 +100,7 @@ const isProdHost = isProductionHost(Astro.url.hostname);
     width: 100%;
   }
 
-  @media (min-width: 990px) {
+  @media (min-width: 992px) {
     .blog-post__subscribe {
       margin: 100px 0 0;
       min-height: 320px;

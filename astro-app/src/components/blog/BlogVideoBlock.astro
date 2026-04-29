@@ -46,7 +46,7 @@ const paddingBottom = getPaddingBottom(aspectRatio);
 
 {videoId && (
   <div class="blog-video-block" style={`max-width: ${maxWidth}; margin: 2rem auto;`}>
-    <div class="video-wrapper" style={`padding-bottom: ${paddingBottom};`}>
+    <div class="video-wrapper relative" style={`padding-bottom: ${paddingBottom};`}>
       {videoType === 'wistia' && (
         <Fragment>
           <script is:inline src={`https://fast.wistia.com/embed/medias/${videoId}.jsonp`} async></script>
@@ -87,12 +87,10 @@ const paddingBottom = getPaddingBottom(aspectRatio);
 
 <style>
   .blog-video-block {
-    display: block;
-    margin: 2rem auto;
+    margin: var(--spacing-8) auto;
   }
 
   .video-wrapper {
-    position: relative;
     width: 100%;
     height: 0;
     overflow: hidden;

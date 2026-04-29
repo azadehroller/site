@@ -32,41 +32,41 @@ const caption = blockData?.caption;
 
 <style>
   .blog-table-block {
-    margin: 2rem 0;
+    margin: var(--spacing-8) 0;
     overflow-x: auto;
   }
   
   .table-caption {
-    font-size: 0.875rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-14);
+    color: var(--neutral-58);
+    margin-block-end: var(--spacing-2);
     font-style: italic;
   }
   
   .table-wrapper :global(table) {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-15);
   }
   
   .table-wrapper :global(th),
   .table-wrapper :global(td) {
-    padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
+    padding: var(--spacing-3) 1rem;
+    border: 1px solid var(--blue-grey-10);
     text-align: left;
   }
   
   .table-wrapper :global(th) {
-    background-color: #f7fafc;
-    font-weight: 600;
+    background-color: var(--bg-neutral-97);
+    font-weight: var(--font-weight-600);
   }
   
   .table-wrapper :global(tr:nth-child(even)) {
-    background-color: #f9fafb;
+    background-color: var(--gray-100);
   }
   
   .table-wrapper :global(tr:hover) {
-    background-color: #f1f5f9;
+    background-color: var(--bg-slate-97);
   }
 </style>
 

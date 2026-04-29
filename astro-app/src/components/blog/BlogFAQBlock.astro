@@ -52,7 +52,7 @@ const expandFirst = blockData?.expandFirst || false;
         const isFirst = index === 0 && expandFirst;
 
         return (
-          <details class="m-faq__item" open={isFirst}>
+          <details class="m-faq__item relative" open={isFirst}>
             <summary class="a-faq__heading">
               {question}
             </summary>
@@ -68,11 +68,11 @@ const expandFirst = blockData?.expandFirst || false;
 
 <style>
   .blog-faq-section {
-    margin: 2rem 0;
+    margin: var(--spacing-8) 0;
   }
 
   .a-faq__title {
-    margin-bottom: 33px;
+    margin-block-end: 33px;
   }
 
   .m-faq__items {
@@ -81,16 +81,15 @@ const expandFirst = blockData?.expandFirst || false;
   }
 
   .m-faq__item {
-    padding: 16px 0 16px 0;
-    background: #ffffff;
-    border-bottom: 1px solid #023180;
+    padding: var(--spacing-4) 0 var(--spacing-4) 0;
+    background: var(--neutral-white);
+    border-bottom: 1px solid var(--blue-30);
     text-align: left;
-    position: relative;
     cursor: pointer;
   }
 
   .m-faq__item:not(:last-child) {
-    margin-bottom: 16px;
+    margin-block-end: var(--spacing-4);
   }
 
   /* Minus icon (open state) - hidden by default */
@@ -126,7 +125,7 @@ const expandFirst = blockData?.expandFirst || false;
 
   /* When open: show minus, hide plus, add bottom padding */
   .m-faq__item[open] {
-    padding-bottom: 16px;
+    padding-block-end: var(--spacing-4);
   }
 
   .m-faq__item[open]::before {
@@ -138,9 +137,9 @@ const expandFirst = blockData?.expandFirst || false;
   }
 
   .a-faq__heading {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-size: var(--font-size-18);
+    font-weight: var(--font-weight-700);
+    margin-block-end: var(--spacing-2);
     cursor: pointer;
     list-style: none;
     user-select: none;
@@ -156,18 +155,18 @@ const expandFirst = blockData?.expandFirst || false;
   }
 
   .a-faq__body {
-    margin-bottom: 0;
+    margin-block-end: 0;
   }
 
   /* Desktop styles */
-  @media (min-width: 1025px) {
+  @media (min-width: 1024px) {
     .a-faq__title {
-      margin-bottom: 40px;
+      margin-block-end: var(--spacing-10);
       text-align: center;
     }
 
     .m-faq__item {
-      padding-right: 0;
+      padding-inline-end: 0;
     }
   }
 </style>

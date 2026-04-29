@@ -8,9 +8,9 @@ interface Props {
 const { topics } = Astro.props;
 ---
 
-<div class="blog-filter-options">
+<div class="blog-filter-options relative flex flex-wrap items-baseline">
   <nav id="js-scroll-nav" aria-label="Filter articles by topic">
-    <ul role="list">
+    <ul role="list" class="flex items-center">
       <li class="active">
         <button type="button" class="filter-btn" data-filter="all" data-topic-slug="">All articles</button>
       </li>
@@ -45,22 +45,22 @@ const { topics } = Astro.props;
   </nav>
 
   {topics && topics.length > 0 && (
-    <div class="blog-dropdown dropdown" data-dropdown>
-      <button type="button" class="btn--dropdown" data-dropdown-button aria-label="Browse categories">
+    <div class="blog-dropdown dropdown relative" data-dropdown>
+      <button type="button" class="btn--dropdown flex items-center" data-dropdown-button aria-label="Browse categories">
         Browse categories
         <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12">
           <path d="M6 9L1 4h10L6 9z" fill="currentColor"/>
         </svg>
       </button>
       <div class="dropdown-menu">
-        <div class="dropdown-links">
+        <div class="dropdown-links grid grid-cols-1">
           {topics
             .filter(topic => (topic as any).postCount > 0)
             .sort((a, b) => ((b as any).postCount || 0) - ((a as any).postCount || 0))
             .map((topic) => (
               <a
                 href={`/blog/topic/${topic.slug?.current}`}
-                class="dropdown-link"
+                class="dropdown-link block"
               >
                 {topic.name} ({((topic as any).postCount || 0)})
               </a>
@@ -73,13 +73,9 @@ const { topics } = Astro.props;
 
 <style>
   .blog-filter-options {
-    position: relative;
-    align-items: baseline;
-    display: flex;
-    flex-wrap: wrap;
     padding: 0 0 16px;
     white-space: nowrap;
-    gap: 8px;
+    gap: var(--spacing-2);
   }
 
   .blog-filter-options nav {
@@ -89,7 +85,7 @@ const { topics } = Astro.props;
   @media (min-width: 992px) {
     .blog-filter-options nav {
       display: flex;
-      padding: 8px 0 0;
+      padding: var(--spacing-2) 0 0;
     }
 
     .blog-filter-options nav ul {
@@ -99,11 +95,9 @@ const { topics } = Astro.props;
   }
 
   .blog-filter-options nav ul {
-    align-items: center;
-    display: flex;
     list-style-type: none;
     margin: 0;
-    padding: 8px 0;
+    padding: var(--spacing-2) 0;
   }
 
   .blog-filter-options nav li {
@@ -113,12 +107,12 @@ const { topics } = Astro.props;
   .blog-filter-options nav li .filter-btn {
     border: none;
     border-radius: 100px;
-    box-shadow: 0 0 0 1px #cbd7ee;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 8px 12px;
+    box-shadow: 0 0 0 1px var(--blue-grey-20);
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-700);
+    padding: var(--spacing-2) 12px;
     transition: background 0.2s ease, color 0.2s ease;
-    color: #033180;
+    color: var(--primary-50);
     background: transparent;
     cursor: pointer;
     font-family: inherit;
@@ -126,25 +120,24 @@ const { topics } = Astro.props;
 
   .blog-filter-options nav li.active .filter-btn,
   .blog-filter-options nav li:hover .filter-btn {
-    background: #033180;
-    color: #fff;
+    background: var(--primary-50);
+    color: var(--neutral-white);
   }
 
   .blog-dropdown {
-    position: relative;
-    margin-left: 8px;
+    margin-inline-start: var(--spacing-2);
   }
 
   @media (min-width: 992px) {
     .blog-dropdown {
-      margin-left: 16px;
+      margin-inline-start: var(--spacing-4);
     }
   }
 
   @media (max-width: 991px) {
     .blog-dropdown {
-      margin-left: 0;
-      margin-top: 8px;
+      margin-inline-start: 0;
+      margin-block-start: var(--spacing-2);
       width: 100%;
     }
 
@@ -162,18 +155,16 @@ const { topics } = Astro.props;
 
   .blog-dropdown .btn--dropdown {
     border: 0;
-    display: flex;
-    align-items: center;
     gap: 6px;
     padding: 5.5px 12px;
-    font-size: 14px;
-    font-weight: 700;
-    box-shadow: 0 0 0 1px #cbd7ee;
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-700);
+    box-shadow: 0 0 0 1px var(--blue-grey-20);
     border-radius: 100px;
     background: transparent;
     transition: background 0.2s ease, transform 0.2s ease;
     cursor: pointer;
-    color: #033180;
+    color: var(--primary-50);
     font-family: inherit;
   }
 
@@ -184,8 +175,8 @@ const { topics } = Astro.props;
 
   .blog-dropdown .btn--dropdown:hover,
   .blog-dropdown.active .btn--dropdown {
-    color: #fff;
-    background: #033180;
+    color: var(--neutral-white);
+    background: var(--primary-50);
   }
 
   .blog-dropdown.active .btn--dropdown svg {
@@ -198,8 +189,8 @@ const { topics } = Astro.props;
     right: 0;
     left: auto;
     top: calc(100% + 0.9rem);
-    background-color: #fff;
-    padding: 28px 28px 28px 20px;
+    background-color: var(--neutral-white);
+    padding: var(--spacing-7) 28px 28px 20px;
     border-radius: 4px;
     border: 1px solid rgba(2, 49, 128, 0.1);
     display: none;
@@ -218,12 +209,10 @@ const { topics } = Astro.props;
   }
 
   .dropdown-links {
-    display: grid;
-    grid-template-columns: 1fr;
     gap: 0;
   }
 
-  @media (min-width: 591px) {
+  @media (min-width: 640px) {
     .dropdown-links {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -237,17 +226,16 @@ const { topics } = Astro.props;
 
   .dropdown-links a,
   .dropdown-links .dropdown-link {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     padding: 10px 8px;
-    color: #001F4A;
+    color: var(--blue-07);
     transition: background-color 150ms ease-in-out;
     text-decoration: none;
-    display: block;
   }
 
   .dropdown-links a:hover,
   .dropdown-links .dropdown-link:hover {
-    background: #f1f3f9;
+    background: var(--bg-blue-97);
     border-radius: 4px;
   }
 </style>

@@ -46,7 +46,7 @@ const logoAlt = companyLogo?.alt || personName || 'Company logo';
 <div class="blockquote-wrapper">
   {stats && (
     <div class="blockquote__data">
-      <div class="blockquote__stat">
+      <div class="blockquote__stat flex items-end">
         <span class="blockquote__stat--text">{stats}</span>
       </div>
     </div>
@@ -56,9 +56,9 @@ const logoAlt = companyLogo?.alt || personName || 'Company logo';
     {quote}
   </blockquote>
 
-  <div class="blockquote__profile">
+  <div class="blockquote__profile flex items-center">
     {logoUrl && (
-      <div class="blockquote__profile--logo">
+      <div class="blockquote__profile--logo flex-center">
         <img src={logoUrl} alt={logoAlt} loading="lazy" />
       </div>
     )}
@@ -78,52 +78,45 @@ const logoAlt = companyLogo?.alt || personName || 'Company logo';
 
 <style>
   .blockquote-wrapper {
-    border-left: 4px solid #00b5fa;
-    margin: 2rem 0;
+    border-left: 4px solid var(--cyan-50);
+    margin: var(--spacing-8) 0;
     padding: 10px 0 10px 15px;
   }
 
   .blockquote-wrapper blockquote {
     border-left: 0;
-    font-weight: 800;
-    font-size: var(--h4, 24px);
-    padding: 16px 0;
+    font-weight: var(--font-weight-800);
+    font-size: var(--h4, var(--font-size-24));
+    padding: var(--spacing-4) 0;
     margin: 0;
     font-style: normal;
-    color: #033180;
+    color: var(--blue-30);
   }
 
   .blockquote__stat {
-    display: flex;
-    align-items: flex-end;
-    margin-bottom: 8px;
+    margin-block-end: var(--spacing-2);
   }
 
   .blockquote__stat .blockquote__stat--text {
-    font-size: 40px;
-    font-weight: 800;
-    color: #033180;
+    font-size: var(--font-size-40);
+    font-weight: var(--font-weight-800);
+    color: var(--blue-30);
   }
 
   .blockquote__data {
-    font-size: 14px;
-    color: #033180;
+    font-size: var(--font-size-14);
+    color: var(--blue-30);
   }
 
   .blockquote__profile {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 16px;
+    gap: var(--spacing-2);
+    margin-block-start: var(--spacing-4);
   }
 
   .blockquote__profile .blockquote__profile--logo {
-    background: #fff;
+    background: var(--neutral-white);
     width: 56px;
     height: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .blockquote__profile .blockquote__profile--logo img {
@@ -134,25 +127,25 @@ const logoAlt = companyLogo?.alt || personName || 'Company logo';
   }
 
   .blockquote__profile .blockquote__profile--content {
-    font-size: 14px;
-    color: #033180;
+    font-size: var(--font-size-14);
+    color: var(--blue-30);
   }
 
   .blockquote__profile .blockquote__profile--content__title {
-    font-weight: 800;
+    font-weight: var(--font-weight-800);
   }
 
   @media (min-width: 768px) {
     .blockquote__profile {
-      gap: 16px;
+      gap: var(--spacing-4);
     }
 
     .blockquote__data {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
 
     .blockquote__profile .blockquote__profile--content {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
   }
 </style>

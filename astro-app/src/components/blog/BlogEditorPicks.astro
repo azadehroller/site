@@ -10,13 +10,13 @@ interface Props {
 const { picks, estimateReadingTime } = Astro.props;
 ---
 
-<div class="blog-index__section-header">
+<div class="blog-index__section-header flex-between">
   <h2 class="h2">Editor Picks</h2>
-  <span>
-    <a href="/blog/topic/editor-picks">
+  <span class="flex justify-end">
+    <a href="/blog/topic/editor-picks" class="flex items-center">
       View all
       <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="#143D82"/>
+        <path d="M7 .333 5.825 1.508l4.65 4.659H.333v1.666h10.142l-4.65 4.659L7 13.667 13.667 7 7 .333Z" fill="var(--blue-35)"/>
       </svg>
     </a>
   </span>
@@ -60,7 +60,7 @@ const { picks, estimateReadingTime } = Astro.props;
             <span class="blog-post__readingtime">
               <span class="blog-post__readingtime-icon">
                 <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="var(--blue-30)"/>
                 </svg>
               </span>
               {readingTime} min. read
@@ -78,7 +78,7 @@ const { picks, estimateReadingTime } = Astro.props;
       const readingTime = estimateReadingTime((pick as any).wordCount);
 
       return (
-        <article class="blog-index__post blog-index__summary">
+        <article class="blog-index__post blog-index__summary flex flex-row-reverse">
           <section class="blog-index__post-content">
             {firstTopic && (
               <a class="blog-header__tag" href={`/blog/topic/${firstTopic.slug?.current}`}>
@@ -96,7 +96,7 @@ const { picks, estimateReadingTime } = Astro.props;
               <span class="blog-post__readingtime">
                 <span class="blog-post__readingtime-icon">
                   <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="var(--blue-30)"/>
                   </svg>
                 </span>
                 {readingTime} mins
@@ -112,43 +112,33 @@ const { picks, estimateReadingTime } = Astro.props;
 
 <style>
   .blog-index__section-header {
-    align-items: center;
-    border-bottom: 1px solid #cbd7ee;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
+    border-bottom: 1px solid var(--blue-grey-20);
+    margin-block-end: 30px;
+    padding-block-end: 15px;
   }
 
   .blog-index__section-header h2 {
-    font-size: 32px;
-    color: #033180;
+    font-size: var(--font-size-32);
+    color: var(--blue-30);
     margin: 0;
   }
 
   .blog-index__section-header h4 {
-    color: #033180;
-    font-size: 1.5rem;
-    font-weight: 600;
+    color: var(--blue-30);
+    font-size: var(--font-size-24);
+    font-weight: var(--font-weight-600);
   }
 
-  .blog-index__section-header span {
-    display: flex;
-    justify-content: end;
-  }
 
   .blog-index__section-header span a {
-    align-items: center;
-    color: #033180;
-    display: flex;
-    font-weight: 500;
+    color: var(--blue-30);
     text-decoration: none;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-700);
   }
 
   .blog-index__section-header span a:hover {
-    color: #0270e0;
+    color: var(--blue-45);
   }
 
   .blog-index__section-header span a svg {
@@ -176,7 +166,7 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index.blog-index-picks > .blog-index__post {
-    border-bottom: 1px solid #cbd7ee;
+    border-bottom: 1px solid var(--blue-grey-20);
   }
 
   .blog-index.blog-index-picks > .blog-index__post:hover {
@@ -190,17 +180,17 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index.blog-index-picks .blog-index__main-editor-pick-title {
-    font-size: var(--size-4, 24px);
+    font-size: var(--size-4, var(--font-size-24));
   }
 
   @media (min-width: 768px) {
     .blog-index.blog-index-picks .blog-index__main-editor-pick-title {
-      font-size: 32px;
+      font-size: var(--font-size-32);
     }
   }
 
   .blog-index.blog-index-picks .blog-index__summary-title {
-    font-size: 18px;
+    font-size: var(--font-size-18);
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -210,7 +200,7 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index.blog-index-picks .blog-index__summary-title a {
-    color: #033180;
+    color: var(--blue-30);
     text-decoration: none;
   }
 
@@ -219,7 +209,7 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index.blog-index-picks > .blog-index__post .blog-index__post-content {
-    padding: 24px 0;
+    padding: var(--spacing-6) 0;
   }
 
   .blog-index-picks__sidebar {
@@ -227,28 +217,26 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index-picks__sidebar h3 {
-    padding: 8px 0;
+    padding: var(--spacing-2) 0;
   }
 
   .blog-index-picks .blog-index__summary {
-    display: flex;
-    flex-direction: row-reverse;
     padding: 0;
-    padding-bottom: 14px;
+    padding-block-end: 14px;
   }
 
   .blog-index-picks .blog-index__summary:not(:first-child) {
-    padding: 28px 0 14px;
+    padding: var(--spacing-7) 0 14px;
   }
 
   @media (max-width: 1080px) {
     .blog-index-picks .blog-index__summary:first-child {
-      padding: 28px 0 0;
+      padding: var(--spacing-7) 0 0;
     }
   }
 
   .blog-index-picks .blog-index__summary:not(:last-child) {
-    border-bottom: 1px solid #cbd7ee;
+    border-bottom: 1px solid var(--blue-grey-20);
   }
 
   .blog-index-picks .blog-index__summary .blog-index__post-content {
@@ -281,8 +269,8 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index-picks .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name span {
-    color: #033180;
-    font-size: 16px;
+    color: var(--blue-30);
+    font-size: var(--font-size-16);
   }
 
   @media (max-width: 768px) {
@@ -296,16 +284,16 @@ const { picks, estimateReadingTime } = Astro.props;
     }
 
     .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name {
-      font-size: 14px;
+      font-size: var(--font-size-14);
       padding: 0 8px 0 0;
     }
 
     .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name span {
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
 
     .blog-index-picks .blog-index-picks__sidebar .blog-index__summary .blog-index__post-content-meta .blog-post__meta-name .blog-post__readingtime {
-      font-size: 14px;
+      font-size: var(--font-size-14);
       padding: 0 8px;
     }
   }
@@ -321,14 +309,14 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index-picks h2 {
-    font-size: 32px;
-    padding: 8px 0 0;
+    font-size: var(--font-size-32);
+    padding: var(--spacing-2) 0 0;
   }
 
   @media (min-width: 992px) {
     .blog-index-picks h2 {
-      font-size: 42px;
-      padding: 8px 0 0;
+      font-size: var(--font-size-42);
+      padding: var(--spacing-2) 0 0;
     }
   }
 
@@ -350,8 +338,8 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index-picks .blog-post__meta-name span {
-    color: #757382;
-    font-size: 14px;
+    color: var(--neutral-55);
+    font-size: var(--font-size-14);
   }
 
   .blog-index-picks .blog-post__readingtime {
@@ -359,7 +347,7 @@ const { picks, estimateReadingTime } = Astro.props;
   }
 
   .blog-index-picks .blog-post__separator {
-    background: #eee;
+    background: var(--neutral-07);
     height: 31px;
     width: 1px;
   }

@@ -13,14 +13,14 @@ const { relatedPosts } = Astro.props;
   <div class="blog-related blog-related__wrapper">
     <div class="blog-post__section">
       <h2>Related articles</h2>
-      <div class="blog-index">
+      <div class="blog-index grid grid-cols-1">
         {relatedPosts.map((relatedPost) => {
           const relatedTopic = relatedPost.topics?.filter(t => t != null)?.[0];
           const relatedDate = relatedPost.publishedAt || relatedPost._createdAt;
           return (
             <article class="blog-index__post">
               {relatedPost.featuredImage?.asset?.url && (
-                <a href={`/blog/${relatedPost.slug.current}`} class="blog-index__post-image">
+                <a href={`/blog/${relatedPost.slug.current}`} class="blog-index__post-image block">
                   <img
                     src={relatedPost.featuredImage.asset.url}
                     alt={relatedPost.featuredImage.alt || relatedPost.title || ''}
@@ -37,13 +37,13 @@ const { relatedPosts } = Astro.props;
                 <h3 class="blog-index__post-title">
                   <a href={`/blog/${relatedPost.slug.current}`}>{relatedPost.title}</a>
                 </h3>
-                <div class="blog-index__post-content-meta">
+                <div class="blog-index__post-content-meta flex">
                   <span>{formatDate(relatedDate)}</span>
                   <span> | </span>
-                  <span class="blog-post__readingtime">
-                    <span class="blog-post__readingtime-icon">
+                  <span class="blog-post__readingtime flex items-center">
+                    <span class="blog-post__readingtime-icon flex items-center">
                       <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180" />
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="var(--blue-30)" />
                       </svg>
                     </span>
                     {Math.max(1, Math.ceil(((relatedPost as any).wordCount || 0) / 1000))} min
@@ -67,7 +67,7 @@ const { relatedPosts } = Astro.props;
   .blog-post__section {
     margin: 0 auto;
     padding: 0;
-    margin-bottom: 60px;
+    margin-block-end: 60px;
   }
 
   .blog-related__wrapper .blog-post__section {
@@ -76,23 +76,21 @@ const { relatedPosts } = Astro.props;
   }
 
   .blog-related__wrapper .blog-post__section h2 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #033180;
-    margin-bottom: 30px;
+    font-size: var(--font-size-32);
+    font-weight: var(--font-weight-700);
+    color: var(--blue-30);
+    margin-block-end: 30px;
   }
 
   @media (min-width: 992px) {
     .blog-related__wrapper .blog-post__section h2 {
-      font-size: 26px;
+      font-size: var(--font-size-24);
     }
   }
 
   .blog-related__wrapper .blog-index {
-    display: grid;
-    grid-template-columns: 1fr;
     gap: 30px;
-    padding: 20px 0 40px;
+    padding: var(--spacing-5) 0 40px;
   }
 
   @media (min-width: 768px) {
@@ -111,7 +109,7 @@ const { relatedPosts } = Astro.props;
     width: 100%;
     border-radius: 10px;
     box-shadow: 0 24px 40px 0 rgba(7, 77, 197, 0.1), 0 8px 16px 0 rgba(7, 77, 197, 0.05);
-    background-color: #fff;
+    background-color: var(--neutral-white);
     padding: 0;
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -120,10 +118,6 @@ const { relatedPosts } = Astro.props;
   .blog-related__wrapper .blog-index__post:hover {
     box-shadow: 0 24px 60px 0 rgba(7, 77, 197, 0.2), 0 8px 24px 0 rgba(7, 77, 197, 0.15);
     transform: translateY(-4px);
-  }
-
-  .blog-related__wrapper .blog-index__post-image {
-    display: block;
   }
 
   .blog-related__wrapper .blog-index__post-image img {
@@ -136,16 +130,16 @@ const { relatedPosts } = Astro.props;
   }
 
   .blog-related__wrapper .blog-index__post-content {
-    padding: 20px;
+    padding: var(--spacing-5);
   }
 
   .blog-related__wrapper .blog-index__post-content h3 {
-    margin-top: 8px;
-    font-size: 18px;
+    margin-block-start: var(--spacing-2);
+    font-size: var(--font-size-18);
   }
 
   .blog-related__wrapper .blog-index__post-content h3 a {
-    color: #033180;
+    color: var(--blue-30);
     text-decoration: none;
   }
 
@@ -154,27 +148,19 @@ const { relatedPosts } = Astro.props;
   }
 
   .blog-related__wrapper .blog-index__post-content-meta {
-    font-size: 14px;
-    color: #033180;
-    display: flex;
-    gap: 0.5rem;
+    font-size: var(--font-size-14);
+    color: var(--blue-30);
+    gap: var(--spacing-2);
   }
 
   .blog-related__wrapper .blog-header__tag {
     color: rgb(255, 41, 12);
     text-decoration: none;
-    font-weight: 800;
-    font-size: 14px;
-  }
-
-  .blog-post__readingtime {
-    align-items: center;
-    display: flex;
+    font-weight: var(--font-weight-800);
+    font-size: var(--font-size-14);
   }
 
   .blog-post__readingtime-icon {
     padding: 0 4px 0 0;
-    display: flex;
-    align-items: center;
   }
 </style>
