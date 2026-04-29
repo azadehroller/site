@@ -107,7 +107,7 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
       <BlogTopicFilters topics={topics ?? []} />
 
       {/* Blog Posts Grid */}
-      <section id="js-section-holder" class="blog-index blog-index-latest">
+      <section id="js-section-holder" class="blog-index blog-index-latest grid grid-cols-1">
         {posts && posts.length ? (
           posts.map((post, postIdx) => {
             if (postIdx < 3) {
@@ -232,7 +232,7 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
 
 <style>
   .blog-index__wrapper {
-    background-color: #fff;
+    background-color: var(--neutral-white);
     margin: 0 auto;
     max-width: 1300px;
     padding: 0 20px;
@@ -245,19 +245,17 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
 
   .blog-heading {
     padding: 55px 0 0;
-    margin-top: 30px;
-    border-top: 1px solid #cbd7ee;
+    margin-block-start: 30px;
+    border-top: 1px solid var(--blue-grey-20);
   }
 
   .blog-heading h2 {
-    font-size: 32px;
-    color: #033180;
+    font-size: var(--font-size-32);
+    color: var(--primary-50);
   }
 
   /* Blog Index Grid */
   .blog-index {
-    display: grid;
-    grid-template-columns: 1fr;
     gap: 30px;
     padding: 60px 0 30px;
   }
@@ -275,7 +273,7 @@ const lcpImageUrl = editorPicks[0]?.featuredImage?.asset?.url;
   }
 
   .blog-index-latest {
-    padding: 20px 0 30px;
+    padding: var(--spacing-5) 0 30px;
   }
 
   /* Override Card wrapper styles - articles already have card styling */

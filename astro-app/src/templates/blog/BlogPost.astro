@@ -80,9 +80,9 @@ const seoProps = {
 
       <!-- Header: breadcrumbs, title, metadata, featured image -->
       <div class="blog-post__section">
-        <div class="blog-post__header">
-          <div class="blog-post__header-content">
-            <div class="blog-post__breadcrumbs">
+        <div class="blog-post__header flex flex-col-reverse">
+          <div class="blog-post__header-content stack justify-center">
+            <div class="blog-post__breadcrumbs flex items-center">
               <a class="blog-header__tag" href="/blog">Blog</a>
               <span>/</span>
               {firstTopic ? (
@@ -92,7 +92,7 @@ const seoProps = {
               )}
             </div>
             <h1 class="blog-post__title h2">{cleanTitle}</h1>
-            <div class="blog-post__metadata">
+            <div class="blog-post__metadata flex items-center">
               {author.avatar?.url && (
                 <div class="blog-post__meta-avatar">
                   <img src={author.avatar.url} alt={author.name} />
@@ -101,15 +101,15 @@ const seoProps = {
               <div class="blog-post__meta-name">
                 <a href={`/blog/author/${author.slug?.current || 'roller-software'}`}>{author.name}</a>
               </div>
-              <div class="blog-post__readingtime">
-                <span class="blog-post__readingtime-icon">
+              <div class="blog-post__readingtime flex items-center">
+                <span class="blog-post__readingtime-icon flex items-center">
                   <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="#033180"></path>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 .667h4V2H6V.667Zm1.333 8.666v-4h1.334v4H7.333Zm5.354-4.406.946-.947c-.286-.34-.6-.66-.94-.94l-.946.947A5.975 5.975 0 0 0 8 2.667a6 6 0 1 0 6 6 5.975 5.975 0 0 0-1.313-3.74Zm-9.354 3.74A4.663 4.663 0 0 0 8 13.333a4.663 4.663 0 0 0 4.667-4.666A4.663 4.663 0 0 0 8 4a4.663 4.663 0 0 0-4.667 4.667Z" fill="var(--blue-30)"></path>
                   </svg>
                 </span>
                 {readingTime} minute read
               </div>
-              <div class="blog-post__date">
+              <div class="blog-post__date stack">
                 <div>
                   Last updated:
                   <time datetime={lastUpdated}>
@@ -121,9 +121,9 @@ const seoProps = {
           </div>
         </div>
 
-        <div class="blog-post__header-image">
+        <div class="blog-post__header-image flex items-center">
           {post.featuredImage?.asset?.url && (
-            <figure class="blog-post__header-img">
+            <figure class="blog-post__header-img flex">
               <img
                 src={post.featuredImage.asset.url}
                 class="hs-image-widget"
@@ -177,17 +177,16 @@ const seoProps = {
 <style>
   /* CSS Variables */
   :root {
-    --primary-50: #0270e0;
+    --primary-50: var(--blue-45);
     --iris-50: #6366f1;
-    --neutral-white: #ffffff;
-    --neutral-50: #757382;
-    --white: #ffffff;
-    --gray: #f2f2f2;
-    --cyan: #00b5fa;
-    --dark-gray: #494a52;
+    --neutral-50: var(--neutral-55);
+    --white: var(--neutral-white);
+    --gray: var(--neutral-10);
+    --cyan: var(--cyan-50);
+    --dark-gray: var(--neutral-65);
     --shadow-medium: 0 24px 40px 0 rgba(7, 77, 197, 0.1), 0 8px 16px 0 rgba(7, 77, 197, 0.05);
     --shadow-large: 0 24px 60px 0 rgba(7, 77, 197, 0.2), 0 8px 24px 0 rgba(7, 77, 197, 0.15);
-    --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0 10px 30px var(--black-alpha-15);
     --heading-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --body-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
@@ -206,15 +205,15 @@ const seoProps = {
   .blog-post__section {
     margin: 0 auto;
     padding: 0;
-    margin-bottom: 60px;
+    margin-block-end: 60px;
   }
 
   .blog-post__wrapper > .blog-post__section:first-child {
     display: grid;
     grid-template-columns: 1fr;
     border-bottom: 1px solid rgba(2, 49, 128, 0.1);
-    padding-bottom: 32px;
-    margin-bottom: 32px;
+    padding-block-end: var(--spacing-8);
+    margin-block-end: var(--spacing-8);
   }
 
   @media (min-width: 1312px) {
@@ -224,19 +223,17 @@ const seoProps = {
 
     .blog-post__wrapper > .blog-post__section:first-child {
       grid-template-columns: 1fr 1fr;
-      padding: 48px 0 32px;
+      padding: var(--spacing-12) 0 32px;
       gap: 1.6rem;
     }
   }
 
   .blog-post__header {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 1rem;
-    padding: 40px 0 0;
+    gap: var(--spacing-4);
+    padding: var(--spacing-10) 0 0;
   }
 
-  @media (min-width: 990px) {
+  @media (min-width: 992px) {
     .blog-post__header {
       align-items: center;
       display: grid;
@@ -244,28 +241,20 @@ const seoProps = {
     }
   }
 
-  .blog-post__header-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
   .blog-post__breadcrumbs {
-    align-items: center;
-    color: #ff634f;
-    display: flex;
-    font-size: 0.875rem;
-    font-weight: 700;
-    gap: 8px;
-    letter-spacing: 1px;
-    margin-bottom: 20px;
-    padding: 8px 0;
+    color: var(--red-57);
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-700);
+    gap: var(--spacing-2);
+    letter-spacing: var(--letter-spacing-1px);
+    margin-block-end: var(--spacing-5);
+    padding: var(--spacing-2) 0;
     text-transform: uppercase;
   }
 
   .blog-post__breadcrumbs a,
   .blog-post__breadcrumbs span {
-    color: #ff290c;
+    color: var(--secondary-50);
   }
 
   .blog-post__breadcrumbs span {
@@ -273,10 +262,10 @@ const seoProps = {
   }
 
   .blog-header__tag {
-    color: #ff290c;
+    color: var(--secondary-50);
     text-decoration: none;
-    font-weight: 800;
-    font-size: 14px;
+    font-weight: var(--font-weight-800);
+    font-size: var(--font-size-14);
   }
 
   .blog-header__tag:hover {
@@ -284,22 +273,20 @@ const seoProps = {
   }
 
   .blog-post__title {
-    color: #033180;
-    font-size: 2.5rem;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 1.6rem;
+    color: var(--blue-30);
+    font-size: var(--font-size-40);
+    font-weight: var(--font-weight-700);
+    line-height: var(--line-height-19);
+    margin-block-end: 1.6rem;
   }
 
   @media (min-width: 992px) {
     .blog-post__title {
-      font-size: 3.2rem;
+      font-size: var(--font-size-48);
     }
   }
 
   .blog-post__metadata {
-    display: flex;
-    align-items: center;
     gap: 15px;
   }
 
@@ -308,40 +295,25 @@ const seoProps = {
     display: none;
   }
 
-  .blog-post__readingtime {
-    align-items: center;
-    display: flex;
-  }
-
   .blog-post__date,
   .blog-post__readingtime {
-    color: #033180;
-    font-size: 0.875rem;
+    color: var(--blue-30);
+    font-size: var(--font-size-14);
   }
 
   .blog-post__readingtime-icon {
     padding: 0 4px 0 0;
-    display: flex;
-    align-items: center;
   }
 
   .blog-post__date {
-    display: flex;
-    flex-direction: column;
     gap: 0.3rem;
-  }
-
-  .blog-post__header-image {
-    align-items: center;
-    display: flex;
   }
 
   .blog-post__header-img {
     border-radius: 12px;
     overflow: hidden;
-    display: flex;
-    margin-left: 0;
-    margin-right: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
   }
 
   .blog-post__header-img img {
@@ -353,18 +325,18 @@ const seoProps = {
   }
 
   .blog-post__meta-name a {
-    color: #033180;
+    color: var(--blue-30);
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-400);
     padding: 0;
   }
 
   /* Main article layout */
   .blog-post {
-    color: #033180;
+    color: var(--blue-30);
     display: grid;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     gap: 60px;
     grid-template-columns: 1fr;
     padding: 0 0 32px;
@@ -400,15 +372,15 @@ const seoProps = {
 
   /* Article body content */
   .blog-post__body {
-    color: #033180;
-    line-height: 1.6;
+    color: var(--blue-30);
+    line-height: var(--line-height-26);
     padding: 0;
   }
 
   .blog-post__body :global(*),
   .blog-post__body :global(p),
   .blog-post__body :global(*:not(a)) {
-    color: #033180;
+    color: var(--blue-30);
   }
 
   .blog-post__body :global(a *) {
@@ -416,81 +388,81 @@ const seoProps = {
   }
 
   .blog-post__body :global(p) {
-    margin-bottom: 24px;
-    font-size: 18px;
+    margin-block-end: var(--spacing-6);
+    font-size: var(--font-size-18);
   }
 
   @media (max-width: 768px) {
     .blog-post__body :global(p) {
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
   }
 
   .blog-post__body :global(h2) {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 1.6rem;
-    margin-top: 48px;
-    color: #033180;
+    font-size: var(--font-size-32);
+    font-weight: var(--font-weight-700);
+    line-height: var(--line-height-19);
+    margin-block-end: 1.6rem;
+    margin-block-start: var(--spacing-12);
+    color: var(--blue-30);
   }
 
   @media (min-width: 992px) {
     .blog-post__body :global(h2) {
-      font-size: 2.4rem;
+      font-size: var(--font-size-40);
     }
   }
 
   @media (min-width: 1200px) {
     .blog-post__body :global(h2) {
-      font-size: 2rem;
+      font-size: var(--font-size-32);
     }
   }
 
   .blog-post__body :global(h3) {
-    font-size: 1.8rem;
-    line-height: 1.2;
-    margin-bottom: 1.6rem;
-    margin-top: 32px;
-    color: #033180;
+    font-size: var(--font-size-29);
+    line-height: var(--line-height-19);
+    margin-block-end: 1.6rem;
+    margin-block-start: var(--spacing-8);
+    color: var(--blue-30);
   }
 
   @media (min-width: 992px) {
     .blog-post__body :global(h3) {
-      font-size: 1.1rem;
+      font-size: var(--font-size-18);
     }
   }
 
   @media (min-width: 1200px) {
     .blog-post__body :global(h3) {
-      font-size: 1.5rem;
+      font-size: var(--font-size-24);
     }
   }
 
   .blog-post__body :global(h4),
   .blog-post__body :global(h5) {
-    font-weight: 600;
-    font-size: 1.25rem;
-    color: #033180;
+    font-weight: var(--font-weight-600);
+    font-size: var(--font-size-20);
+    color: var(--blue-30);
   }
 
   .blog-post__body :global(h4),
   .blog-post__body :global(h6) {
-    font-weight: 700;
+    font-weight: var(--font-weight-700);
   }
 
   .blog-post__body :global(h4),
   .blog-post__body :global(h5),
   .blog-post__body :global(h6) {
-    margin-bottom: 24px;
+    margin-block-end: var(--spacing-6);
   }
 
   .blog-post__body :global(h6) {
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
   }
 
   .blog-post__body :global(a) {
-    color: #00b5fa;
+    color: var(--cyan-50);
     transition: all 0.3s ease-in-out;
   }
 
@@ -500,8 +472,8 @@ const seoProps = {
 
   .blog-post__body :global(ul),
   .blog-post__body :global(ol) {
-    font-size: 18px;
-    line-height: 32px;
+    font-size: var(--font-size-18);
+    line-height: var(--line-height-32);
     margin: 0 0 1.5rem 1.5rem;
   }
 
@@ -511,79 +483,79 @@ const seoProps = {
 
   .blog-post__body :global(ol li),
   .blog-post__body :global(ul li) {
-    padding: 8px 0;
-    font-size: 18px;
+    padding: var(--spacing-2) 0;
+    font-size: var(--font-size-18);
   }
 
   @media (max-width: 768px) {
     .blog-post__body :global(ol),
     .blog-post__body :global(ul) {
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
   }
 
   .blog-post__body :global(img) {
     border-radius: 4px;
     height: auto;
-    margin: 20px 0;
+    margin: var(--spacing-5) 0;
     max-width: 100%;
   }
 
   .blog-post__body :global(blockquote) {
-    border-left: 4px solid #033180;
+    border-left: 4px solid var(--blue-30);
     font-style: italic;
-    margin: 20px 0;
-    padding-left: 20px;
-    font-size: 18px;
+    margin: var(--spacing-5) 0;
+    padding-inline-start: var(--spacing-5);
+    font-size: var(--font-size-18);
   }
 
   .blog-post__body :global(strong),
   .blog-post__body :global(b) {
-    font-weight: 600;
+    font-weight: var(--font-weight-600);
   }
 
   /* Tables */
   .blog-post :global(table) {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.95rem;
-    background-color: #fff;
+    font-size: var(--font-size-15);
+    background-color: var(--neutral-white);
     border: 0 !important;
     display: block;
     overflow-x: auto;
-    margin-bottom: 2rem;
+    margin-block-end: var(--spacing-8);
   }
 
   .blog-post :global(table thead) {
-    background-color: #f0f6ff;
-    font-weight: 700;
+    background-color: var(--bg-blue-95);
+    font-weight: var(--font-weight-700);
   }
 
   .blog-post :global(table th),
   .blog-post :global(table td) {
-    border: 1px solid #99acc2;
-    padding: 0.75rem 1rem;
+    border: 1px solid var(--blue-grey-40);
+    padding: var(--spacing-3) 1rem;
     text-align: left;
     vertical-align: top;
   }
 
   .blog-post :global(table th p),
   .blog-post :global(table td p) {
-    margin-bottom: 0;
+    margin-block-end: 0;
   }
 
   .blog-post :global(table tbody tr:nth-child(even)) {
-    background-color: #f9fbff;
+    background-color: var(--bg-blue-98);
   }
 
   @media (max-width: 600px) {
     .blog-post :global(table) {
-      font-size: 0.85rem;
+      font-size: var(--font-size-14);
     }
 
     .blog-post :global(table th),
     .blog-post :global(table td) {
-      padding: 0.5rem;
+      padding: var(--spacing-2);
     }
   }
 
@@ -601,18 +573,18 @@ const seoProps = {
     }
 
     .blog-post :global(table::-webkit-scrollbar-track) {
-      background: #f0f0f0;
+      background: var(--neutral-08);
     }
 
     .blog-post :global(table::-webkit-scrollbar-thumb) {
-      background-color: #99acc2;
+      background-color: var(--blue-grey-40);
       border-radius: 4px;
     }
   }
 
   /* HubSpot Video Widget */
   .blog-post__body :global(.hs-video-widget) {
-    margin: 2rem 0;
+    margin: var(--spacing-8) 0;
   }
 
   .blog-post__body :global(.hs-video-container) {
@@ -625,9 +597,9 @@ const seoProps = {
   }
 
   /* Body content image/figure styles */
-  .blog-post__body :global(.my-8) {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+  .blog-post__body :global(.margin-block-8) {
+    margin-block-start: var(--spacing-8);
+    margin-block-end: var(--spacing-8);
   }
 
   .blog-post__body :global(.w-full) {
@@ -647,13 +619,13 @@ const seoProps = {
   }
 
   .blog-post__body :global(figure) {
-    margin: 2rem 0;
+    margin: var(--spacing-8) 0;
   }
 
   .blog-post__body :global(figcaption) {
-    font-size: 14px;
-    color: #757382;
+    font-size: var(--font-size-14);
+    color: var(--neutral-55);
     text-align: center;
-    margin-top: 0.5rem;
+    margin-block-start: var(--spacing-2);
   }
 </style>

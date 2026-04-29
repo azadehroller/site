@@ -132,8 +132,8 @@ const getDividerBgClass = (divider: DividerType): string => {
         }
       })
     ) : (
-      <section class="px-4 sm:px-6 lg:px-8 py-16 max-w-7xl mx-auto text-center">
-        <h1 class="text-4xl font-bold mb-4">Industries</h1>
+      <section class="industries-hero padding-inline-4 padding-block-16 max-w-7xl margin-inline-auto text-center">
+        <h1 class="text-4xl font-bold margin-block-end-4">Industries</h1>
         <p class="text-lg text-gray-600">
           Add content to your Industries Landing page in Sanity Studio.
         </p>
@@ -145,5 +145,12 @@ const getDividerBgClass = (divider: DividerType): string => {
 <style>
   .industries-landing-page {
     min-height: 50vh;
+  }
+
+  @media (min-width: 640px) {
+    .industries-hero { padding-inline: var(--spacing-6); }
+  }
+  @media (min-width: 1024px) {
+    .industries-hero { padding-inline: var(--spacing-8); }
   }
 </style>

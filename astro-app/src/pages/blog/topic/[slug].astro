@@ -55,7 +55,7 @@ const baseUrl = `/blog/topic/${slug}`;
   {/* Blog Header */}
   <div class="blog-header">
     <div class="blog-header__inner">
-      <a class="blog-header__tag" href="/blog">Blog</a>
+      <a class="blog-header__tag block" href="/blog">Blog</a>
       <h1 class="blog-header__title">{topic.name}</h1>
     </div>
   </div>
@@ -65,7 +65,7 @@ const baseUrl = `/blog/topic/${slug}`;
     <div class="blog-index__section">
       
       {/* Blog Posts Grid */}
-      <section id="js-section-holder" class="blog-index">
+      <section id="js-section-holder" class="blog-index grid grid-cols-1">
         {posts && posts.length > 0 ? (
           posts.map((post) => (
             <article class="blog-index__post">
@@ -79,7 +79,7 @@ const baseUrl = `/blog/topic/${slug}`;
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <nav class="new-theme-pagination blog-pagination">
+        <nav class="new-theme-pagination blog-pagination flex-center">
           <Pagination 
             currentPage={currentPage} 
             totalPages={totalPages} 
@@ -91,7 +91,7 @@ const baseUrl = `/blog/topic/${slug}`;
 
       {/* Newsletter Section */}
       <div class="blog-post__section" style="overflow: hidden;">
-        <div class="blog-post__subscribe">
+        <div class="blog-post__subscribe relative">
           <div class="blog-post__subscribe-inner">
             <div class="blog-post__subscribe-content text-light">
               <h2>Enhance your guest experience</h2>
@@ -126,9 +126,9 @@ const baseUrl = `/blog/topic/${slug}`;
 <style>
   /* Blog Header Styles - matching BlogLanding.astro */
   .blog-header {
-    background: linear-gradient(135deg, #0270e0 0%, #033180 100%);
-    color: #fff;
-    margin-bottom: 40px;
+    background: linear-gradient(135deg, var(--blue-45) 0%, var(--primary-50) 100%);
+    color: var(--neutral-white);
+    margin-block-end: var(--spacing-10);
     padding: 60px 0;
   }
 
@@ -140,13 +140,12 @@ const baseUrl = `/blog/topic/${slug}`;
   }
 
   .blog-header__tag {
-    font-size: 16px;
-    color: #fff;
-    margin-bottom: 1rem;
-    display: block;
+    font-size: var(--font-size-16);
+    color: var(--neutral-white);
+    margin-block-end: var(--spacing-4);
     text-transform: capitalize;
     text-decoration: none;
-    font-weight: 800;
+    font-weight: var(--font-weight-800);
   }
 
   .blog-header__tag:hover {
@@ -155,19 +154,19 @@ const baseUrl = `/blog/topic/${slug}`;
 
   .blog-header__title {
     color: var(--white, #fff);
-    font-size: 2rem;
+    font-size: var(--font-size-32);
     margin: 0;
   }
 
   @media (min-width: 768px) {
     .blog-header__title {
-      font-size: 3rem;
+      font-size: var(--font-size-48);
     }
   }
 
   /* Blog Index Wrapper */
   .blog-index__wrapper {
-    background-color: #fff;
+    background-color: var(--neutral-white);
     margin: 0 auto;
     max-width: 1300px;
     padding: 0 20px;
@@ -180,8 +179,6 @@ const baseUrl = `/blog/topic/${slug}`;
 
   /* Blog Index Grid */
   .blog-index {
-    display: grid;
-    grid-template-columns: 1fr;
     gap: 30px;
     padding: 60px 0 30px;
   }
@@ -201,50 +198,46 @@ const baseUrl = `/blog/topic/${slug}`;
   .blog-no-posts {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 3rem;
-    color: #666;
-    font-size: 1.125rem;
+    padding: var(--spacing-12);
+    color: var(--neutral-58);
+    font-size: var(--font-size-18);
   }
 
   /* Pagination Styles */
   .new-theme-pagination.blog-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 40px 0;
-    padding: 16px 0 0;
+    margin: var(--spacing-10) 0;
+    padding: var(--spacing-4) 0 0;
   }
 
   /* Newsletter Subscribe Section */
   .blog-post__section {
-    margin-bottom: 60px;
+    margin-block-end: 60px;
   }
 
   .blog-post__subscribe {
-    background-color: #033180;
+    background-color: var(--primary-50);
     border-radius: 20px;
     color: var(--white, #fff);
     margin: 60px 0;
-    padding: 60px 28px;
-    position: relative;
+    padding: 60px var(--spacing-7);
   }
 
   .blog-post__subscribe * {
-    color: #fff;
+    color: var(--neutral-white);
   }
 
   .blog-post__subscribe .blog-post__subscribe-inner {
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
-    gap: 2rem;
+    gap: var(--spacing-8);
   }
 
   @media (min-width: 768px) {
     .blog-post__subscribe .blog-post__subscribe-inner {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0 8px;
+      gap: 0 var(--spacing-2);
     }
   }
 
@@ -255,20 +248,20 @@ const baseUrl = `/blog/topic/${slug}`;
   }
 
   .blog-post__subscribe h2 {
-    font-size: 32px;
-    margin-bottom: 15px;
+    font-size: var(--font-size-32);
+    margin-block-end: 15px;
   }
 
   @media (min-width: 992px) {
     .blog-post__subscribe h2 {
-      font-size: 42px;
+      font-size: var(--font-size-42);
     }
   }
 
   .blog-post__subscribe p {
-    font-size: 1rem;
-    line-height: 28px;
-    margin-bottom: 30px;
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-28);
+    margin-block-end: 30px;
     opacity: 0.9;
   }
 
@@ -277,7 +270,7 @@ const baseUrl = `/blog/topic/${slug}`;
     width: 100%;
   }
 
-  @media (min-width: 990px) {
+  @media (min-width: 992px) {
     .blog-post__subscribe {
       margin: 100px 0 60px;
       padding: 60px;

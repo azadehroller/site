@@ -41,7 +41,7 @@ const title = `${author.name} - Blog Author`;
           <span class="blog-header__tag blog-header__tag--active">Author</span>
         </nav>
         
-        <div class="blog-author-profile">
+        <div class="blog-author-profile stack items-center">
           {author.avatar?.url && (
             <img 
               src={author.avatar.url} 
@@ -58,7 +58,7 @@ const title = `${author.name} - Blog Author`;
               <p class="blog-author-bio">{author.bio}</p>
             )}
             
-            <div class="blog-author-links">
+            <div class="blog-author-links flex flex-wrap justify-center">
               {author.website && (
                 <a href={author.website} target="_blank" rel="noopener noreferrer">
                   🌐 Website
@@ -129,18 +129,15 @@ const title = `${author.name} - Blog Author`;
 <style>
   .blog-author-header {
     text-align: center;
-    padding: 3rem 0;
-    margin-bottom: 2rem;
+    padding: var(--spacing-12) 0;
+    margin-block-end: var(--spacing-8);
   }
-  
+
   .blog-author-profile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    margin: 1.5rem 0;
+    gap: var(--spacing-6);
+    margin: var(--spacing-6) 0;
   }
-  
+
   @media (min-width: 768px) {
     .blog-author-profile {
       flex-direction: row;
@@ -148,65 +145,62 @@ const title = `${author.name} - Blog Author`;
       text-align: left;
     }
   }
-  
+
   .blog-author-avatar {
     width: 120px;
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
   }
-  
+
   .blog-author-info {
     max-width: 500px;
   }
-  
+
   .blog-author-name {
-    font-size: 2rem;
-    color: #033180;
-    margin: 0 0 0.5rem;
+    font-size: var(--font-size-32);
+    color: var(--primary-50);
+    margin: 0 0 var(--spacing-2);
   }
-  
+
   .blog-author-bio {
-    font-size: 1rem;
-    color: #666;
-    margin: 0 0 1rem;
-    line-height: 1.6;
+    font-size: var(--font-size-16);
+    color: var(--neutral-58);
+    margin: 0 0 var(--spacing-4);
+    line-height: var(--line-height-26);
   }
-  
+
   .blog-author-links {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: var(--spacing-4);
   }
-  
+
   @media (min-width: 768px) {
     .blog-author-links {
       justify-content: flex-start;
     }
   }
-  
+
   .blog-author-links a {
-    color: #00b5fa;
+    color: var(--cyan-50);
     text-decoration: none;
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
   }
-  
+
   .blog-author-links a:hover {
     text-decoration: underline;
   }
-  
+
   .blog-author-count {
-    font-size: 0.875rem;
-    color: #999;
-    margin-top: 1rem;
+    font-size: var(--font-size-14);
+    color: var(--neutral-43);
+    margin-block-start: var(--spacing-4);
   }
-  
+
   .blog-no-posts {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 3rem;
-    color: #666;
+    padding: var(--spacing-12);
+    color: var(--neutral-58);
   }
 </style>
 
