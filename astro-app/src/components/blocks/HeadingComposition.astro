@@ -150,12 +150,12 @@ const getEyebrowClasses = (): string => {
         case 'gxscore':
           return 'text-gx-90';
         case 'smb':
-          return 'text-secondary-50 border-2 border-secondary-50 rounded-full px-4 py-2';
+          return 'text-secondary-50 border-2 border-secondary-50 rounded-full padding-inline-4 padding-block-2';
         case 'enterprise':
-          return 'fancy-button bg-[#011840] text-navy-80 rounded-full px-4 py-2 relative overflow-hidden';
+          return 'fancy-button eyebrow-enterprise rounded-full padding-inline-4 padding-block-2 relative overflow-hidden';
         case 'industry_report':
         case 'industry_report_onlight':
-          return 'text-[#0960F6]';
+          return 'text-blue-50';
         default:
           return 'text-secondary-50';
       }
@@ -203,7 +203,7 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
       <HeadingTag
         class:list={[
           displayType && `${displayType}-heading`,
-          'my-0',
+          'margin-block-0',
           headingType === 'h1' && 'text-balance',
         ]}
       >
@@ -227,10 +227,21 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
 </section>
 
 <style>
+  /* Eyebrow enterprise theme */
+  .eyebrow-enterprise {
+    background-color: var(--blue-10);
+    color: var(--navy-80, #011832);
+  }
+
+  /* Eyebrow blue-50 text color */
+  .text-blue-50 {
+    color: var(--blue-50);
+  }
+
   /* Border line style - applied when addBorderLine is true */
   :global(.dnd-column:has(.custom-text-wrapper.add-border)) {
-    border-left: 2px solid #ff280c;
-    margin-left: 2rem;
+    border-left: 2px solid var(--red-52);
+    margin-inline-start: var(--spacing-8);
   }
 
   /* Gradient animation properties */
@@ -289,7 +300,7 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
 
   /* Bright blue color */
   .bright-blue {
-    color: #3a80f8;
+    color: var(--blue-52);
   }
 
   /* Fancy button animation for enterprise theme */
@@ -297,7 +308,7 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.2),
+      var(--white-alpha-20),
       transparent
     );
     animation: shine 3s infinite;
@@ -314,14 +325,14 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
 
   /* Custom heading size */
   .s8-heading {
-    font-size: var(--heading-s8, 0.875rem);
-    line-height: 1.5;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-24);
   }
 
   /* Small eyebrow text - custom styling */
   .small {
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
+    font-size: var(--font-size-12);
+    letter-spacing: var(--letter-spacing-wide);
   }
 
   /* Portable Text styles */
@@ -330,7 +341,7 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
   }
 
   .portable-text :global(p:last-child) {
-    margin-bottom: 0;
+    margin-block-end: 0;
   }
 
   .portable-text :global(a) {
@@ -346,15 +357,15 @@ const EyebrowTag = eyebrowType as keyof HTMLElementTagNameMap;
   .portable-text :global(ul),
   .portable-text :global(ol) {
     margin: 0.5em 0;
-    padding-left: 1.5em;
+    padding-inline-start: 1.5em;
   }
 
   .portable-text :global(li) {
-    margin-bottom: 0.25em;
+    margin-block-end: 0.25em;
   }
 
   .portable-text :global(strong) {
-    font-weight: 700;
+    font-weight: var(--font-weight-700);
   }
 
   .portable-text :global(em) {

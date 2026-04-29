@@ -46,23 +46,22 @@ const textLength = styles.rotatingTextLength ?? 50;
 // Unique class name for scoped styles
 const uniqueName = id?.replace(/[^a-zA-Z0-9]/g, '-') || 'default';
 
-// Helper function to get height classes based on heading type
-function getHeightClasses(tag: string): string {
-  switch (tag) {
-    case 'h1':
-      return 'h-[44px] sm:h-[45px] md:h-[44px] lg:h-[52px]';
-    case 'h2':
-      return 'h-[35px] md:h-[40px] lg:h-auto';
-    case 'h3':
-      return 'h-[35px] md:h-[45px] lg:h-[50px]';
-    case 'h4':
-    case 'h5':
-      return 'h-[20px] md:h-[25px] lg:h-[30px]';
-    case 'h6':
-      return 'h-[20px]';
-    default:
-      return 'h-[35px] md:h-[45px] lg:h-[50px]';
-  }
+// Helper function to generate responsive height CSS for the rotation wrapper
+function getHeightCSS(tag: string, cls: string): string {
+  const heights: Record<string, { base: string; sm?: string; md?: string; lg?: string }> = {
+    h1: { base: '44px', sm: '45px', md: '44px', lg: '52px' },
+    h2: { base: '35px', md: '40px', lg: 'auto' },
+    h3: { base: '35px', md: '45px', lg: '50px' },
+    h4: { base: '20px', md: '25px', lg: '30px' },
+    h5: { base: '20px', md: '25px', lg: '30px' },
+    h6: { base: '20px' },
+  };
+  const bp = heights[tag] || heights['h3'];
+  let css = `.${cls} { height: ${bp.base}; }`;
+  if (bp.sm) css += `@media (min-width: 640px) { .${cls} { height: ${bp.sm}; } }`;
+  if (bp.md) css += `@media (min-width: 768px) { .${cls} { height: ${bp.md}; } }`;
+  if (bp.lg) css += `@media (min-width: 1024px) { .${cls} { height: ${bp.lg}; } }`;
+  return css;
 }
 
 // Helper function to get text color based on theme
@@ -118,13 +117,13 @@ const EyebrowTag = eyebrowType || 'div';
   class:list={[
     "flex",
     alignment === 'CENTER' 
-      ? "is-centered flex-col justify-center items-center gap-0 md:gap-2" 
-      : "flex-col  items-start gap-2 md:gap-3"
+      ? "is-centered rotating-text--centered flex-col justify-center items-center gap-0"
+      : "rotating-text--default flex-col items-start gap-2"
   ]}>
     <div>
       <HeadingTag class:list={[
         displayType && `${displayType}-heading`,
-        "my-0 active",
+        "margin-block-0 active",
         headingType === 'h1' && "text-balance"
       ]}>
         {title}
@@ -132,24 +131,19 @@ const EyebrowTag = eyebrowType || 'div';
     </div>
     
     {validRotatingItems.length > 0 && (
-      <div 
-        class:list={[
-          `rotation-wrapper-${uniqueName}`,
-          getHeightClasses(headingType)
-        ]}
-      >
+      <div class={`rotation-wrapper-${uniqueName}`}>
         {validRotatingItems.map((item, index) => (
           <div 
             class:list={[
               `js-rotating-text-item-${uniqueName}`,
-              "mt-0 mb-0",
+              "margin-block-start-0 margin-block-end-0",
               `s${index + 1}`,
               index === 0 && "active"
             ]}
           >
             <HeadingTag class:list={[
               displayType && `${displayType}-heading`,
-              "my-0",
+              "margin-block-0",
               headingType === 'h1' && "text-balance"
             ]}>
               {item.rotatingTextItem}
@@ -172,43 +166,43 @@ const EyebrowTag = eyebrowType || 'div';
     
     /* Custom semantic classes */
     .is-centered { text-align: center; }
-    .small { font-size: 0.875rem; }
+    .small { font-size: var(--font-size-14); }
     
     /* Custom heading display classes */
     .h1-heading {
-        font-size: clamp(2rem, 4vw, 4rem);
-        font-weight: 800;
-        line-height: 1.12;
+        font-size: var(--font-size-fluid-64);
+        font-weight: var(--font-weight-800);
+        line-height: var(--line-height-18);
     }
     .h2-heading {
-        font-size: clamp(1.75rem, 3.5vw, 3rem);
-        font-weight: 800;
-        line-height: 1.25;
+        font-size: var(--font-size-fluid-48);
+        font-weight: var(--font-weight-800);
+        line-height: var(--line-height-20);
     }
     .h3-heading {
-        font-size: clamp(1.5rem, 3vw, 2.5rem);
-        font-weight: 700;
-        line-height: 1.25;
+        font-size: clamp(var(--font-size-24), 3vw, var(--font-size-40));
+        font-weight: var(--font-weight-700);
+        line-height: var(--line-height-20);
     }
     .h4-heading {
-        font-size: 1.5rem;
-        font-weight: 600;
-        line-height: 1.25;
+        font-size: var(--font-size-24);
+        font-weight: var(--font-weight-600);
+        line-height: var(--line-height-20);
     }
     .h5-heading {
-        font-size: 1.25rem;
-        font-weight: 600;
-        line-height: 1.25;
+        font-size: var(--font-size-20);
+        font-weight: var(--font-weight-600);
+        line-height: var(--line-height-20);
     }
     .h6-heading {
-        font-size: 1rem;
-        font-weight: 600;
-        line-height: 1.25;
+        font-size: var(--font-size-16);
+        font-weight: var(--font-weight-600);
+        line-height: var(--line-height-20);
     }
     .s8-heading {
-        font-size: 0.875rem;
-        font-weight: 600;
-        line-height: 1.25;
+        font-size: var(--font-size-14);
+        font-weight: var(--font-weight-600);
+        line-height: var(--line-height-20);
     }
     
     /* ===================================
@@ -221,6 +215,8 @@ const EyebrowTag = eyebrowType || 'div';
         width: 100%;
         overflow: hidden;
     }
+
+    ${getHeightCSS(headingType, `rotation-wrapper-${uniqueName}`)}
 
     @media (min-width: 430px) {
         .rotation-wrapper-${uniqueName} {
@@ -262,6 +258,11 @@ const EyebrowTag = eyebrowType || 'div';
     .js-loaded .js-rotating-text-item-${uniqueName}.exit {
         opacity: 0;
         transform: translateY(-100%);
+    }
+
+    @media (min-width: 768px) {
+      .rotating-text--centered { gap: var(--spacing-2); }
+      .rotating-text--default { gap: var(--spacing-3); }
     }
 
 `}></style>

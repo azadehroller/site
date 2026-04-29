@@ -54,7 +54,7 @@ const theme = cleanStega(rawTheme) || 'light';
 const isDarkTheme = theme === 'dark';
 const faqBorderClass = isDarkTheme ? 'border-neutral-white' : 'border-primary-50';
 const faqTextClass = isDarkTheme ? 'text-neutral-white' : 'text-primary-50';
-const iconFillClass = isDarkTheme ? '#ffffff' : '#033180';
+const iconFillClass = isDarkTheme ? 'var(--neutral-white)' : 'var(--primary-50)';
 
 // Generate unique ID for component
 const componentId = cleanStega(id) || `faq-module_${Date.now()}`;
@@ -64,10 +64,10 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
 ---
 
 <section id={componentId} data-sanity-edit-target>
-  <div class="mx-auto max-w-5xl  lg:px-8  ">
+  <div class="faq-container margin-inline-auto max-w-5xl">
     {/* Embedded HeadingComposition - has its own styling */}
     {hasHeading && (
-      <div class="mb-8 lg:mb-12" data-sanity-edit-target>
+      <div class="faq-header margin-block-end-8" data-sanity-edit-target>
         <HeadingComposition 
           eyebrow={heading.eyebrow}
           title={heading.title}
@@ -85,7 +85,7 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
     )}
 
     {/* FAQ accordion */}
-    <dl class="mt-2">
+    <dl class="margin-block-start-2">
       {(items ?? []).map((item, index) => {
         const itemTitle = item.title;
         const itemContent = item.content;
@@ -94,7 +94,7 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
         const itemId = `faq-${faqNumber}`;
         
         return (
-          <div class={`py-3 border-b ${faqBorderClass}`} data-sanity-edit-target>
+          <div class={`padding-block-3 border-b ${faqBorderClass}`} data-sanity-edit-target>
             <dt id="js-faq-heading">
               <button 
                 type="button" 
@@ -103,8 +103,8 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
                 aria-expanded={isFirstAndExpanded ? "true" : "false"}
                 data-sanity-edit-target
               >
-                <h3 class="text-lg font-semibold leading-7" data-sanity-edit-target>{itemTitle}</h3>
-                <span class="ml-6 flex h-7 items-center">
+                <h3 class="text-lg font-semibold" data-sanity-edit-target>{itemTitle}</h3>
+                <span class="margin-inline-start-6 flex h-7 items-center">
                   {/* Plus icon (closed state) */}
                   <svg 
                     class={`h-6 w-6 ${isFirstAndExpanded ? 'hidden' : ''}`} 
@@ -135,12 +135,12 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
               </button>
             </dt>
             <dd 
-              class={`mt-2 pr-12 ${faqTextClass} [&>ul]:list-disc [&>ul]:list-inside [&>ul]:mt-4 [&>ul>li]:text-lg [&>div]:text-lg ${isFirstAndExpanded ? '' : 'hidden'}`} 
+              class={`faq-answer margin-block-start-2 ${faqTextClass} ${isFirstAndExpanded ? '' : 'hidden'}`}
               id={itemId}
               hidden={!isFirstAndExpanded}
               data-sanity-edit-target
             >
-              <p class={`text-lg leading-7 ${faqTextClass}`}>{itemContent}</p>
+              <p class={`text-lg ${faqTextClass}`}>{itemContent}</p>
             </dd>
           </div>
         );
@@ -180,6 +180,16 @@ const hasHeading = heading && (heading.eyebrow || heading.title || (heading.text
   /* Hover state */
   dt button:hover {
     opacity: 0.8;
+  }
+
+  .faq-answer { padding-inline-end: 3rem; }
+  .faq-answer > ul { list-style: disc; list-style-position: inside; margin-top: var(--spacing-4); }
+  .faq-answer > ul > li { font-size: var(--font-size-18); }
+  .faq-answer > div { font-size: var(--font-size-18); }
+
+  @media (min-width: 1024px) {
+    .faq-container { padding-inline: var(--spacing-8); }
+    .faq-header { margin-block-end: var(--spacing-12); }
   }
 </style>
 

@@ -325,13 +325,15 @@ const hasCol4 = columns.length >= 4;
   }
 
   .dnd-section .dnd-column {
-    padding: 0 2rem;
+    padding-block: 0;
+    padding-inline: var(--spacing-8);
   }
 
   @media (max-width: 767px) {
     .dnd-section .dnd-column {
-      padding: 0 2rem;
-      padding-bottom: var(--col-padding-bottom-mobile, 32px);
+      padding-block: 0;
+      padding-inline: var(--spacing-8);
+      padding-block-end: var(--col-padding-bottom-mobile, 32px);
     }
   }
 
@@ -348,19 +350,19 @@ const hasCol4 = columns.length >= 4;
   /* Mobile-first responsive padding */
   /* Mobile padding applies by default (below 768px) */
   .row-fluid-wrapper.dnd-section {
-    padding-top: var(--padding-top-mobile, 0);
-    padding-bottom: var(--padding-bottom-mobile, 0);
-    padding-left: var(--padding-left-mobile, 0);
-    padding-right: var(--padding-right-mobile, 0);
+    padding-block-start: var(--padding-top-mobile, 0);
+    padding-block-end: var(--padding-bottom-mobile, 0);
+    padding-inline-start: var(--padding-left-mobile, 0);
+    padding-inline-end: var(--padding-right-mobile, 0);
   }
 
   /* Desktop padding applies at 768px and above */
   @media (min-width: 768px) {
     .row-fluid-wrapper.dnd-section {
-      padding-top: var(--padding-top-desktop, 0);
-      padding-bottom: var(--padding-bottom-desktop, 0);
-      padding-left: var(--padding-left-desktop, 0);
-      padding-right: var(--padding-right-desktop, 0);
+      padding-block-start: var(--padding-top-desktop, 0);
+      padding-block-end: var(--padding-bottom-desktop, 0);
+      padding-inline-start: var(--padding-left-desktop, 0);
+      padding-inline-end: var(--padding-right-desktop, 0);
     }
   }
 </style>

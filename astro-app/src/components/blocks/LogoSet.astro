@@ -75,10 +75,10 @@ const getLogoImageUrl = (logo: LogoItem): string | null => {
 
 <div class="logo-set-module" data-country="" style="visibility: hidden;" data-sanity-edit-target>
   {showDivider && (
-    <div class="mt-3 w-full h-[1px] bg-neutral-white"></div>
+    <div class="logo-divider margin-block-start-3 w-full bg-neutral-white"></div>
   )}
   
-  <h2 class={`font-semibold text-lg block ${textColorClass} m-0 text-${textAlignment}`}>
+  <h2 class={`font-semibold text-lg block ${textColorClass} margin-0 text-${textAlignment}`}>
     <span>{title}</span>
   </h2>
   
@@ -177,7 +177,7 @@ const getLogoImageUrl = (logo: LogoItem): string | null => {
 
   .logo-set-module .scroller__inner {
     flex-wrap: nowrap;
-    gap: 2rem;
+    gap: var(--spacing-8);
     align-items: center;
     will-change: transform;
     min-height: 106px;
@@ -222,6 +222,8 @@ const getLogoImageUrl = (logo: LogoItem): string | null => {
     width: max-content;
     animation: scroll 40s linear infinite;
   }
+
+  .logo-divider { height: 1px; }
 </style>
 
 <script is:inline>

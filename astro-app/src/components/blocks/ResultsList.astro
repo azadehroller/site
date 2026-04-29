@@ -63,7 +63,7 @@ const imageUrl = image?.asset?.url;
 // Theme-based classes
 const getIconBgClass = () => {
   switch (theme) {
-    case 'light': return 'bg-[#0960F6]';
+    case 'light': return 'icon-bg-light';
     case 'gxscore': return 'bg-gx-90';
     default: return 'bg-primary-10';
   }
@@ -81,9 +81,9 @@ const iconBgClass = getIconBgClass();
 const textColorClass = getTextColorClass();
 ---
 
-<section id={`results-list-${componentId}`} class="py-3 js-resultsItemsSection" data-sanity-edit-target>
-  <div class={`grid grid-flow-row-dense grid-cols-1 ${hasImage ? 'md:grid-cols-3' : 'md:grid-cols-1'} md:gap-3 gap-5`}>
-    <div class={`grid grid-cols-1 ${hasImage ? 'md:grid-cols-2 col-span-2' : 'md:grid-cols-4 col-auto'} gap-4 gap-y-5 md:gap-y-6`}>
+<section id={`results-list-${componentId}`} class="padding-block-3 js-resultsItemsSection" data-sanity-edit-target>
+  <div class={`results-grid grid grid-flow-row-dense grid-cols-1 gap-5 ${hasImage ? 'results-grid--has-image' : ''}`}>
+    <div class={`results-items-grid grid grid-cols-1 gap-4 gap-row-5 ${hasImage ? 'results-items--has-image' : 'results-items--no-image'}`}>
       {(items ?? []).map((item, index) => {
         const itemTitle = item.title;
         const itemContent = item.content;
@@ -101,13 +101,13 @@ const textColorClass = getTextColorClass();
         return (
           <div class="flex flex-col gap-3 js-resultsItemsLink" data-sanity-edit-target>
             {useAnimations && item.animationFile ? (
-              <div 
-                id={`js-resultsItemContainer-${componentId}-${index}`} 
-                class="js-resultsItemContainer cursor-pointer flex h-[48px] w-[48px] justify-center overflow-hidden relative"
+              <div
+                id={`js-resultsItemContainer-${componentId}-${index}`}
+                class="js-resultsItemContainer results-lottie cursor-pointer flex justify-center overflow-hidden relative"
                 data-lottie={item.animationFile}
               />
             ) : (
-              <div class={`${iconBgClass} rounded-lg w-[64px] h-[64px] flex justify-center items-center`}>
+              <div class={`${iconBgClass} results-icon-wrap rounded-lg flex justify-center items-center`}>
                 <Fragment set:html={item.icon} />
               </div>
             )}
@@ -118,16 +118,16 @@ const textColorClass = getTextColorClass();
                 {linkLabel && (
                   <a 
                     href={href} 
-                    class={`${textColorClass} mt-auto relative inline-flex items-center gap-2 font-semibold cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 bg-transparent text-primary-50 font-serif group`}
+                    class={`${textColorClass} results-cta-link margin-block-start-auto relative inline-flex items-center gap-2 text-base font-semibold cursor-pointer select-none appearance-none no-underline tracking-tight bg-transparent text-primary-50 font-serif`}
                     target={openInNewTab ? "_blank" : undefined}
                     rel={relAttr}
                     data-sanity-edit-target
                   >
                     <span>{linkLabel}</span>
                     <span>
-                      <svg class="transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
-                        <rect width="40" height="40" fill="#ff290c" rx="20"/>
-                        <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+                      <svg class="results-cta-arrow transition-transform ease-out duration-300" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+                        <rect width="40" height="40" fill="var(--secondary-50)" rx="20"/>
+                        <path fill="var(--neutral-white)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
                       </svg>
                     </span>
                   </a>
@@ -139,7 +139,7 @@ const textColorClass = getTextColorClass();
       })}
     </div>
     {hasImage && (
-      <div class="w-full h-full overflow-hidden [&>img]:object-cover [&>img]:w-full [&>img]:h-full rounded-[42px] hidden md:block">
+      <div class="results-image-wrap w-full h-full overflow-hidden rounded-full">
         <img 
           src={imageUrl} 
           alt={cleanStega(imageAlt) || ''} 
@@ -250,15 +250,20 @@ const textColorClass = getTextColorClass();
 )}
 
 <style>
-  /* Animation container styles */
-  .js-resultsItemContainer {
-    cursor: pointer;
-    display: flex;
-    height: 48px;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    width: 48px;
+  .icon-bg-light { background-color: var(--blue-50); }
+  .results-cta-link:hover .results-cta-arrow { transform: translateX(0.25rem); }
+  .results-lottie { width: 48px; height: 48px; }
+  .results-icon-wrap { width: 64px; height: 64px; }
+  .results-image-wrap { display: none; border-radius: 42px; }
+  .results-image-wrap > img { object-fit: cover; width: 100%; height: 100%; }
+
+  @media (min-width: 768px) {
+    .results-grid { gap: var(--spacing-3); }
+    .results-items-grid { row-gap: var(--spacing-6); }
+    .results-grid--has-image { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .results-items--has-image { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-column: span 2 / span 2; }
+    .results-items--no-image { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .results-image-wrap { display: block; }
   }
 </style>
 

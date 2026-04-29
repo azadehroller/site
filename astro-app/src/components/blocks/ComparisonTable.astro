@@ -20,32 +20,31 @@ const { columns, id } = Astro.props;
 const tableId = cleanStega(id) || `comparison-table-${Math.random().toString(36).slice(2, 11)}`;
 ---
 
-<section id={tableId} class="my-4">
-    <div class="md:flex w-full table-auto box-shadow-onlight-blue-40">
+<section id={tableId} class="margin-block-4">
+    <div class="comparison-table-wrapper w-full">
         {columns?.map((column, colIndex) => {
             const isCompetitor = column.isCompetitor;
             const columnTitle = column.title;
             const items = column.items || [];
-            const columnWidth = columns.length === 2 ? 'md:w-1/2' : `md:w-1/${columns.length}`;
-            
+
             return (
-                <div class={`comparison w-full ${columnWidth}`}>
-                    <div class={`py-3 px-2 text-center ${isCompetitor ? 'bg-primary-70' : 'bg-primary-40'}`}>
+                <div class="comparison w-full">
+                    <div class={`padding-block-3 padding-inline-2 text-center ${isCompetitor ? 'bg-primary-70' : 'bg-primary-40'}`}>
                         <h3 class="text-2xl text-neutral-white">{columnTitle}</h3>
                     </div>
-                    <ul class="m-0">
+                    <ul class="margin-0">
                         {items.map((item, itemIndex) => {
-                            const bgClass = itemIndex % 2 === 0 ? 'bg-[#F5F8FF]' : 'bg-neutral-white';
+                            const bgStyle = itemIndex % 2 === 0 ? 'background-color: var(--blue-99)' : undefined;
                             return (
-                                <li class={`${bgClass} flex flex-row gap-2 py-3 px-4 text-base text-primary-50`}>
+                                <li style={bgStyle} class="comparison-row flex flex-row gap-2 padding-block-3 padding-inline-4 text-base text-primary-50">
                                     <span>
                                         {isCompetitor ? (
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                                <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#E50B0B"/>
+                                                <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="var(--error-50)"/>
                                             </svg>
                                         ) : (
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                                <path d="M9.00039 16.2L4.80039 12L3.40039 13.4L9.00039 19L21.0004 6.99998L19.6004 5.59998L9.00039 16.2Z" fill="#18F273"/>
+                                                <path d="M9.00039 16.2L4.80039 12L3.40039 13.4L9.00039 19L21.0004 6.99998L19.6004 5.59998L9.00039 16.2Z" fill="var(--green-60)"/>
                                             </svg>
                                         )}
                                     </span>
@@ -60,4 +59,9 @@ const tableId = cleanStega(id) || `comparison-table-${Math.random().toString(36)
     </div>
 </section>
 
-
+<style>
+  @media (min-width: 768px) {
+    .comparison-table-wrapper { display: flex; }
+    .comparison { flex: 1; }
+  }
+</style>

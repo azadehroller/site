@@ -137,8 +137,8 @@ function getBorderColorClass(): string {
 }
 
 function getArrowBgColor(): string {
-  if (theme === 'gxscore') return '#A554FF';
-  return '#ff290c';
+  if (theme === 'gxscore') return 'var(--purple-80)';
+  return 'var(--secondary-50)';
 }
 
 const textColorClass = getTextColorClass();
@@ -171,13 +171,13 @@ function sanitizeHtml(html: string | undefined): string {
 }
 ---
 
-<section id={quoteId} class="quote-module text-left my-2 md:my-3" data-sanity-edit-target>
-  <div class={`quote-module-grid relative before:absolute before:w-[2px] before:h-[100%] before:${borderColorClass} before:top-0 before:left-0 pl-3`}>
+<section id={quoteId} class="quote-module text-left margin-block-2" data-sanity-edit-target>
+  <div class={`quote-module-grid grid relative ${borderColorClass} padding-inline-start-3`}>
     {/* For extrabold variant, show image at the top */}
     {styleVariant === 'extrabold' && hasImage && (
       <div class={`flex items-center gap-3`}>
         {hasAvatar && (
-          <figure class="quote-avatar-container rounded-full overflow-hidden" {...createFieldEditInfo('avatar')}>
+          <figure class="quote-avatar-container relative shrink-0 rounded-full overflow-hidden" {...createFieldEditInfo('avatar')}>
             <img 
               src={avatarUrl} 
               alt={cleanStega(avatarAlt) || 'Quote avatar'} 
@@ -191,7 +191,7 @@ function sanitizeHtml(html: string | undefined): string {
           </figure>
         )}
         {hasLogo && (
-          <figure class="quote-logo-container rounded-lg overflow-hidden" {...createFieldEditInfo('logo')}>
+          <figure class="quote-logo-container relative shrink-0 rounded-lg overflow-hidden" {...createFieldEditInfo('logo')}>
             <img 
               src={logoUrl} 
               alt={cleanStega(logoAlt) || 'Company logo'} 
@@ -210,7 +210,7 @@ function sanitizeHtml(html: string | undefined): string {
     <div class="flex flex-col gap-3">
       {/* Quote text */}
       <div 
-        class={`quote-text-container font-${styleVariant} ${textColorClass} ${styleVariant === 'extrabold' ? 'text-2xl leading-7' : 'text-base leading-6'}`}
+        class={`quote-text-container font-${styleVariant} ${textColorClass} ${styleVariant === 'extrabold' ? 'text-2xl' : 'text-base'}`}
         set:html={sanitizeHtml(quoteText)}
         {...createFieldEditInfo('quoteText')}
       />
@@ -222,7 +222,7 @@ function sanitizeHtml(html: string | undefined): string {
           {styleVariant === 'regular' && hasImage && (
             <div class="block">
               {hasAvatar && (
-                <figure class="quote-avatar-container rounded-full overflow-hidden" {...createFieldEditInfo('avatar')}>
+                <figure class="quote-avatar-container relative shrink-0 rounded-full overflow-hidden" {...createFieldEditInfo('avatar')}>
                   <img 
                     src={avatarUrl} 
                     alt={cleanStega(avatarAlt) || 'Quote avatar'} 
@@ -236,7 +236,7 @@ function sanitizeHtml(html: string | undefined): string {
                 </figure>
               )}
               {hasLogo && (
-                <figure class="quote-logo-container rounded-lg overflow-hidden" {...createFieldEditInfo('logo')}>
+                <figure class="quote-logo-container relative shrink-0 rounded-lg overflow-hidden" {...createFieldEditInfo('logo')}>
                   <img 
                     src={logoUrl} 
                     alt={cleanStega(logoAlt) || 'Company logo'} 
@@ -267,7 +267,7 @@ function sanitizeHtml(html: string | undefined): string {
       <div class="quote-link-container" {...createFieldEditInfo('customerStoryLink')}>
         <a 
           href={href} 
-          class={`mt-auto flex items-center gap-2 font-semibold ${textColorClass}`}
+          class={`margin-block-start-auto flex items-center gap-2 font-semibold ${textColorClass}`}
           target={openInNewTab ? '_blank' : undefined}
           rel={relValue || undefined}
         >
@@ -275,7 +275,7 @@ function sanitizeHtml(html: string | undefined): string {
           <span>
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
               <rect width="40" height="40" fill={arrowBgColor} rx="20"/>
-              <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+              <path fill="var(--neutral-white)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
             </svg>
           </span>
         </a>
@@ -305,8 +305,6 @@ function sanitizeHtml(html: string | undefined): string {
     aspect-ratio: 1 / 1;
     width: 72px;
     height: 72px;
-    position: relative;
-    flex-shrink: 0;
   }
 
   .quote-avatar-container img {
@@ -318,8 +316,6 @@ function sanitizeHtml(html: string | undefined): string {
     aspect-ratio: 148 / 80;
     width: 148px;
     height: 80px;
-    position: relative;
-    flex-shrink: 0;
   }
 
   .quote-logo-container img {
@@ -337,7 +333,7 @@ function sanitizeHtml(html: string | undefined): string {
   /* Ensure text containers maintain minimum heights */
   .quote-text-container {
     min-height: 1.5rem;
-    line-height: 1.5;
+    line-height: var(--line-height-24);
   }
 
   .quote-author-container {
@@ -346,8 +342,7 @@ function sanitizeHtml(html: string | undefined): string {
 
   /* Stable grid layout */
   .quote-module-grid {
-    display: grid;
-    gap: 0.75rem;
+    gap: var(--spacing-3);
     grid-template-rows: auto 1fr auto;
     min-height: 120px;
   }
@@ -409,15 +404,15 @@ function sanitizeHtml(html: string | undefined): string {
   }
 
   .quote-text-container.font-extrabold {
-    font-weight: 800;
-    font-size: 1.5rem;
-    line-height: 1.75rem;
+    font-weight: var(--font-weight-800);
+    font-size: var(--font-size-24);
+    line-height: var(--line-height-19);
   }
 
   .quote-text-container.font-regular {
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.5rem;
+    font-weight: var(--font-weight-400);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
   }
 
   /* Ensure proper aspect ratios are maintained */
@@ -450,34 +445,38 @@ function sanitizeHtml(html: string | undefined): string {
   }
 
   /* Spacing utilities specific to quote module */
-  .quote-module .my-2 {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+  .quote-module .margin-block-2 {
+    margin-block-start: var(--spacing-2);
+    margin-block-end: var(--spacing-2);
   }
 
-  .quote-module .my-3 {
-    margin-top: 0.75rem;
-    margin-bottom: 0.75rem;
+  .quote-module .margin-block-3 {
+    margin-block-start: var(--spacing-3);
+    margin-block-end: var(--spacing-3);
   }
 
-  .quote-module .pl-3 {
-    padding-left: 0.75rem;
+  .quote-module .padding-inline-start-3 {
+    padding-inline-start: var(--spacing-3);
   }
 
   .quote-module .gap-2 {
-    gap: 0.5rem;
+    gap: var(--spacing-2);
   }
 
   .quote-module .gap-3 {
-    gap: 0.75rem;
+    gap: var(--spacing-3);
   }
 
   /* Responsive margin */
   @media (min-width: 768px) {
-    .quote-module.md\:my-3 {
-      margin-top: 0.75rem;
-      margin-bottom: 0.75rem;
+    .quote-module.md\:margin-block-3 {
+      margin-block-start: var(--spacing-3);
+      margin-block-end: var(--spacing-3);
     }
   }
+
+@media (min-width: 768px) {
+  .quote-module { margin-block: var(--spacing-3); }
+}
 </style>
 

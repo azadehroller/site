@@ -36,19 +36,19 @@ const featuresListId = layout === 'widget' ? 'js-features-list' : 'features-list
 // Helper function to get div classes based on layout
 function getDivClasses(layout: string, contentLayout: string): string {
   if ((layout === 'widget' && contentLayout === 'default') || layout === 'integration') {
-    return 'text-left pt-4 md:pt-6 block lg:flex';
+    return 'features-detail__wrapper--active text-left padding-block-start-4 block features-detail-flex';
   }
-  return 'text-left block lg:flex gap-4';
+  return 'text-left block features-detail-flex gap-4';
 }
 
 // Helper function to get features list classes
 function getFeaturesListClasses(layout: string, contentLayout: string): string {
   if (layout === 'widget' && contentLayout === 'column_item') {
-    return 'overflow-hidden max-h-0 sm:max-h-full sm:flex sm:basis-9/12 py-0 md:pt-7 lg:pt-0';
+    return 'features-detail__list--col-item overflow-hidden max-h-0 padding-block-0';
   } else if (contentLayout === 'default') {
-    return 'overflow-hidden max-h-0 sm:max-h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 py-0 md:pt-0 lg:pt-0';
+    return 'features-detail__list--default overflow-hidden max-h-0 grid grid-cols-1 gap-5 padding-block-0';
   }
-  return 'features-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5';
+  return 'features-list grid grid-cols-1 gap-5';
 }
 
 // Helper function to build link href
@@ -72,18 +72,18 @@ function buildRel(link: any): string {
 
 <section 
   id={componentId} 
-  class={`my-2 ${layout === 'widget' ? 'mo-card bg-neutral-white rounded-[32px] box-shadow-onlight px-4 md:px-6 relative' : ''}`}
+  class={`margin-block-2 ${layout === 'widget' ? 'mo-card--features bg-neutral-white box-shadow-onlight padding-inline-4 relative' : ''}`}
   style={`margin-bottom: ${marginBottom};`}
   {...editAttrs}
 >
   {((layout === 'widget' && contentLayout === 'default') || layout === 'integration') && (
     <div>
       {title && (
-        <div class="flex flex-col gap-4 sm:flex-auto">
-          <div class="text-secondary-50 uppercase font-extrabold">{eyebrow}</div>
-          <h3 class="text-primary-50 mb-0">{title}</h3>
+        <div class="flex flex-col gap-4 features-detail-flex-auto">
+          <div class="text-eyebrow text-secondary-50">{eyebrow}</div>
+          <h3 class="text-primary-50 margin-block-end-0">{title}</h3>
           {text && (
-            <div class="text-primary-50 pb-3 md:pb-0">
+            <div class="features-detail__icon-wrap text-primary-50 padding-block-end-3">
               <PortableText value={text} />
             </div>
           )}
@@ -91,16 +91,16 @@ function buildRel(link: any): string {
       )}
     </div>
   )}
-  
+
   <div class={getDivClasses(layout, contentLayout)}>
     {contentLayout === 'column_item' && layout === 'widget' && (
       <div class="flex basis-3/12">
         {title && (
-          <div class="flex flex-col gap-4 sm:flex-auto">
-            <div class="text-secondary-50 uppercase font-extrabold">{eyebrow}</div>
-            <h3 class="text-primary-50 mb-0">{title}</h3>
+          <div class="flex flex-col gap-4 features-detail-flex-auto">
+            <div class="text-eyebrow text-secondary-50">{eyebrow}</div>
+            <h3 class="text-primary-50 margin-block-end-0">{title}</h3>
             {text && (
-              <div class="text-primary-50 pb-3 md:pb-0">
+              <div class="features-detail__icon-wrap text-primary-50 padding-block-end-3">
                 <PortableText value={text} />
               </div>
             )}
@@ -116,7 +116,7 @@ function buildRel(link: any): string {
         const linkLabel = item.linkLabel || 'Read more';
         
         return (
-          <div class={`relative ${layout === 'widget' || layout === 'default' ? 'before:absolute before:w-[2px] before:h-[100%] before:bg-secondary-50 before:top-0 before:left-0' : ''} ps-3 pe-3 text-primary-50 flex flex-col flex-nowrap basis-1/3`}>
+          <div class={`${layout === 'widget' || layout === 'default' ? 'fd-left-border' : ''} padding-inline-start-3 padding-inline-end-3 text-primary-50 flex flex-col flex-nowrap basis-1/3`}>
             {layout === 'integration' ? (
               <div>
                 {item.image?.asset?.url && (
@@ -147,10 +147,10 @@ function buildRel(link: any): string {
             
             {layout === 'integration' && href ? (
               <a href={href}>
-                <div class="py-4 font-semibold">{item.title}</div>
+                <div class="padding-block-4 font-semibold">{item.title}</div>
               </a>
             ) : (
-              <div class="py-4 font-semibold">{item.title}</div>
+              <div class="padding-block-4 font-semibold">{item.title}</div>
             )}
             
             {item.text && (
@@ -160,7 +160,7 @@ function buildRel(link: any): string {
             {href && (layout === 'widget' || layout === 'default') && (
               <a 
                 href={href} 
-                class="mt-auto pt-5 underline"
+                class="margin-block-start-auto padding-block-start-5 underline"
                 target={item.link?.openInNewTab ? '_blank' : undefined}
                 rel={rel || undefined}
               >
@@ -175,7 +175,7 @@ function buildRel(link: any): string {
     {(layout === 'widget' || layout === 'integration') && (
       <button 
         id="js-expand" 
-        class="btn-expand absolute bottom-[-18px] left-[50%] right-[50%] translate-x-[-50%] px-4 py-2 bg-secondary-50 focus:bg-secondary-50 hover:bg-secondary-70 rounded-3xl text-neutral-white flex sm:hidden rounded-[980px] font-semibold min-w-[174px] m-auto items-center justify-center"
+        class="btn-expand padding-inline-4 padding-block-2 bg-secondary-50 rounded-3xl text-neutral-white font-semibold m-auto items-center justify-center"
       >
         Show more
       </button>
@@ -199,6 +199,55 @@ function buildRel(link: any): string {
     width: 24px;
     height: 24px;
     transform: rotate(180deg);
+  }
+
+  /* btn-expand: mobile only, positioned absolute */
+  .btn-expand {
+    display: flex;
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 174px;
+    border-radius: 980px;
+  }
+  .btn-expand:hover { background-color: var(--secondary-70); }
+  .btn-expand:focus { background-color: var(--secondary-50); }
+
+  /* Left border on feature items */
+  .fd-left-border {
+    position: relative;
+  }
+  .fd-left-border::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background-color: var(--secondary-50);
+    top: 0;
+    left: 0;
+  }
+
+  @media (min-width: 640px) {
+    .btn-expand { display: none; }
+    .features-detail__list--col-item { max-height: none; display: flex; flex-basis: 75%; }
+    .features-detail__list--default { max-height: none; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .features-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .features-detail-flex-auto { flex: 1 1 auto; }
+  }
+  .mo-card--features { border-radius: 2rem; }
+
+  @media (min-width: 768px) {
+    .mo-card--features { padding-inline: var(--spacing-6); }
+    .features-detail__icon-wrap { padding-block-end: 0; }
+    .features-detail__wrapper--active { padding-block-start: var(--spacing-6); }
+    .features-detail__list--col-item { padding-block-start: var(--spacing-7); }
+    .features-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .features-detail__list--col-item { padding-block-start: 0; }
+    .features-detail__list--default { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .features-detail-flex { display: flex; }
   }
 </style>
 

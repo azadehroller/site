@@ -137,16 +137,16 @@ const borderRadiusClass: Record<string, string> = {
   'sm': 'rounded-lg',
   'md': 'rounded-2xl',
   'lg': 'rounded-3xl',
-  'xl': 'rounded-[2rem]',
+  'xl': 'advanced-image-radius-xl',
   'full': 'rounded-full',
 };
 
 // Shadow classes
 const shadowClass: Record<string, string> = {
   'none': '',
-  'sm': 'shadow-sm',
-  'md': 'shadow-md',
-  'lg': 'shadow-lg',
+  'sm': 'advanced-image-shadow-sm',
+  'md': 'advanced-image-shadow-md',
+  'lg': 'advanced-image-shadow-lg',
   'blue-light': 'advanced-image--shadow-blue-light',
   'blue-dark': 'advanced-image--shadow-blue-dark',
 };
@@ -172,7 +172,7 @@ const objectFitClass: Record<string, string> = {
   >
     <figure 
       class:list={[
-        "advanced-image-figure",
+        "advanced-image-figure inline-block",
         cleanResponsiveBehavior === 'fluid' && "advanced-image-figure--fluid",
         cleanResponsiveBehavior === 'fixed' && "advanced-image-figure--fixed",
       ]}
@@ -180,7 +180,7 @@ const objectFitClass: Record<string, string> = {
     >
       <div 
         class:list={[
-          "advanced-image-container",
+          "advanced-image-container relative inline-block",
           borderRadiusClass[cleanBorderRadius],
           shadowClass[cleanShadow],
         ]}
@@ -197,7 +197,7 @@ const objectFitClass: Record<string, string> = {
           srcset={srcset}
           sizes={sizes}
           class:list={[
-            "advanced-image",
+            "advanced-image block",
             cleanResponsiveBehavior === 'fluid' && "advanced-image--fluid",
             cleanResponsiveBehavior === 'fixed' && "advanced-image--fixed",
             objectFitClass[cleanObjectFit],
@@ -212,7 +212,7 @@ const objectFitClass: Record<string, string> = {
             href={cleanButtonLink}
             target={buttonOpenInNewTab ? "_blank" : undefined}
             rel={buttonOpenInNewTab ? "noopener noreferrer" : undefined}
-            class="advanced-image-button"
+            class="advanced-image-button absolute inline-flex items-center justify-center z-10"
           >
             {cleanButtonText}
           </a>
@@ -229,7 +229,7 @@ const objectFitClass: Record<string, string> = {
 ) : (
   <div 
     id={id}
-    class="advanced-image-placeholder"
+    class="advanced-image-placeholder flex-center flex-col"
     data-sanity-edit-target
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -242,13 +242,20 @@ const objectFitClass: Record<string, string> = {
 )}
 
 <style>
+  /* Border radius variants */
+  .advanced-image-radius-xl { border-radius: 2rem; }
+
+  /* Shadow variants */
+  .advanced-image-shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+  .advanced-image-shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
+  .advanced-image-shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+
   /* ===================================
      Advanced Image Component Styles
      =================================== */
   
   /* Wrapper - controls alignment */
   .advanced-image-wrapper {
-    display: block;
     width: 100%;
   }
   
@@ -266,7 +273,6 @@ const objectFitClass: Record<string, string> = {
   
   /* Figure element */
   .advanced-image-figure {
-    display: inline-block;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -282,15 +288,12 @@ const objectFitClass: Record<string, string> = {
   
   /* Container - holds image and button overlay */
   .advanced-image-container {
-    position: relative;
-    display: inline-block;
     width: 100%;
     overflow: hidden;
   }
   
   /* Image styles */
   .advanced-image {
-    display: block;
     transition: transform 0.3s ease, filter 0.3s ease;
   }
   
@@ -306,8 +309,8 @@ const objectFitClass: Record<string, string> = {
   
   /* Hover effect when button is present */
   .advanced-image-wrapper--has-button .advanced-image {
-    mask-image: linear-gradient(to left, transparent 0%, #fff 90%, #fff 100%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to left, transparent 0%, #fff 90%, #fff 100%, transparent 100%);
+    mask-image: linear-gradient(to left, transparent 0%, var(--neutral-white) 90%, var(--neutral-white) 100%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, transparent 0%, var(--neutral-white) 90%, var(--neutral-white) 100%, transparent 100%);
   }
   
   .advanced-image-wrapper--has-button:hover .advanced-image {
@@ -317,20 +320,16 @@ const objectFitClass: Record<string, string> = {
   
   /* Button overlay */
   .advanced-image-button {
-    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 10;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
+    padding-block: var(--spacing-3);
+    padding-inline: var(--spacing-6);
     background-color: rgba(9, 96, 246, 0.95);
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.875rem;
-    line-height: 1.5;
+    color: var(--neutral-white);
+    font-weight: var(--font-weight-600);
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-24);
     text-decoration: none;
     border-radius: 9999px;
     backdrop-filter: blur(4px);
@@ -341,21 +340,21 @@ const objectFitClass: Record<string, string> = {
   }
   
   .advanced-image-button:hover {
-    background-color: #0960F6;
+    background-color: var(--blue-50);
     transform: translate(-50%, -50%) scale(1.05);
     box-shadow: 0 8px 24px rgba(9, 96, 246, 0.4);
   }
   
   .advanced-image-button:focus {
-    outline: 2px solid #fff;
+    outline: 2px solid var(--neutral-white);
     outline-offset: 2px;
   }
   
   /* Caption */
   .advanced-image-caption {
-    margin-top: 0.75rem;
-    font-size: 0.875rem;
-    color: #6b7280;
+    margin-block-start: var(--spacing-3);
+    font-size: var(--font-size-14);
+    color: var(--gray-500);
     text-align: center;
   }
   
@@ -370,20 +369,16 @@ const objectFitClass: Record<string, string> = {
   
   /* Placeholder styling */
   .advanced-image-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
+    gap: var(--spacing-3);
     width: 100%;
     min-height: 200px;
-    padding: 2rem;
-    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-    border: 2px dashed #d1d5db;
+    padding: var(--spacing-8);
+    background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-300) 100%);
+    border: 2px dashed var(--gray-400);
     border-radius: 1rem;
-    color: #6b7280;
-    font-size: 0.875rem;
-    font-weight: 500;
+    color: var(--gray-500);
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-500);
   }
   
   .advanced-image-placeholder svg {
@@ -394,11 +389,11 @@ const objectFitClass: Record<string, string> = {
   @media (max-width: 640px) {
     .advanced-image-button {
       padding: 0.625rem 1.25rem;
-      font-size: 0.8125rem;
+      font-size: var(--font-size-13);
     }
     
     .advanced-image-caption {
-      font-size: 0.8125rem;
+      font-size: var(--font-size-13);
     }
   }
   

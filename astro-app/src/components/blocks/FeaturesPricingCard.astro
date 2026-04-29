@@ -86,18 +86,18 @@ const getContentAlignmentClass = (): string => {
 
 // Button style classes
 const getButtonClasses = (): string => {
-  const baseClasses = 'relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 rounded-3xl py-3 px-6 inline-flex';
-  
+  const baseClasses = 'relative items-center cursor-pointer select-none appearance-none no-underline text-base font-semibold tracking-tight transition ease-in-out duration-300 rounded-3xl padding-block-3 padding-inline-6 inline-flex';
+
   switch (buttonStyle) {
     case 'secondary':
-      return `${baseClasses} bg-primary-50 hover:bg-primary-60 text-neutral-white`;
+      return `${baseClasses} bg-primary-50 text-neutral-white btn-pricing-secondary`;
     case 'tertiary':
-      return `${baseClasses} bg-transparent border-2 border-primary-50 text-primary-50 hover:bg-primary-10`;
+      return `${baseClasses} bg-transparent border-2 border-primary-50 text-primary-50 btn-pricing-tertiary`;
     case 'ghost':
-      return `${baseClasses} bg-transparent text-primary-50 hover:text-primary-60 underline`;
+      return `${baseClasses} bg-transparent text-primary-50 underline btn-pricing-ghost`;
     case 'primary':
     default:
-      return `${baseClasses} bg-secondary-50 hover:bg-secondary-70 text-neutral-white`;
+      return `${baseClasses} bg-secondary-50 text-neutral-white btn-pricing-primary`;
   }
 };
 
@@ -110,7 +110,7 @@ const isCentered = alignment === 'CENTER';
 ---
 
 <div 
-  class="featured-pricing-cards grid grid-cols-1 lg:flex lg:flex-row justify-center gap-4 md:mx-auto my-4"
+  class="featured-pricing-cards grid grid-cols-1 justify-center gap-4 margin-block-4"
   id={componentId}
   data-sanity-edit-target
 >
@@ -133,11 +133,11 @@ const isCentered = alignment === 'CENTER';
     
     return (
       <div 
-        class="mo-card bg-neutral-white rounded-[32px] box-shadow-onlight px-4 md:px-6 relative flex flex-col gap-5 lg:w-[430px] lg:max-w-[430px]"
+        class="mo-card bg-neutral-white box-shadow-onlight padding-inline-4 relative flex flex-col gap-5"
         data-sanity-edit-target
       >
         {/* Header */}
-        <header class={`flex flex-col gap-y-3 flex-wrap ${alignmentClass}`}>
+        <header class={`flex flex-col gap-row-3 flex-wrap ${alignmentClass}`}>
           {cardTitle && (
             <div class="text-lg uppercase font-extrabold text-secondary-50">
               {cardTitle}
@@ -152,7 +152,7 @@ const isCentered = alignment === 'CENTER';
 
         {/* Divider */}
         {showDivider && (
-          <div class="h-[1px] w-full bg-primary-40"></div>
+          <div class="pricing-divider w-full bg-primary-40"></div>
         )}
 
         {/* Features List */}
@@ -161,10 +161,10 @@ const isCentered = alignment === 'CENTER';
             {featuresHeading && (
               <div class="text-primary-50 font-semibold">{featuresHeading}</div>
             )}
-            <ul class={`flex flex-col mb-0 list ${contentAlignmentClass}`}>
+            <ul class={`flex flex-col margin-block-end-0 list ${contentAlignmentClass}`}>
               {features.map((feature) => (
                 <li 
-                  class="relative text-primary-50 flex items-center gap-x-2 py-[8px]"
+                  class="relative text-primary-50 flex items-center gap-col-2 feature-li"
                   data-sanity-edit-target
                 >
                   <span>• {feature.text}</span>
@@ -179,7 +179,7 @@ const isCentered = alignment === 'CENTER';
 
         {/* Button */}
         {buttonLabel && buttonHref && (
-          <div class={isCentered ? 'm-auto' : 'mt-auto'}>
+          <div class={isCentered ? 'm-auto' : 'margin-block-start-auto'}>
             <a 
               class={buttonClasses}
               href={buttonHref}
@@ -198,13 +198,22 @@ const isCentered = alignment === 'CENTER';
 <style>
   /* Card styles */
   .mo-card {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+    padding-block-start: var(--spacing-6);
+    padding-block-end: var(--spacing-6);
+    border-radius: 2rem;
+  }
+
+  .pricing-divider { height: 1px; }
+  .feature-li { padding-block: 8px; }
+
+  @media (min-width: 1024px) {
+    .featured-pricing-cards { display: flex; flex-direction: row; }
+    .mo-card { width: 430px; max-width: 430px; }
   }
 
   /* Box shadow */
   .box-shadow-onlight {
-    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+    box-shadow: 0px 4px 8px 0px var(--primary-alpha-08), 0px 12px 24px 0px var(--primary-alpha-12);
   }
 
   /* Tooltip styles */
@@ -222,15 +231,15 @@ const isCentered = alignment === 'CENTER';
     top: 0;
     border-radius: 8px;
     pointer-events: none;
-    background: #fff;
-    color: #033180;
-    font-weight: 600;
+    background: var(--neutral-white);
+    color: var(--primary-50);
+    font-weight: var(--font-weight-600);
     transition: transform, opacity, .15s ease-in-out;
     transform-origin: 20px calc(100% + 12px);
     transform: translateY(calc(-100% + 10px)) scale(.75);
-    padding: 16px;
-    font-size: 14px;
-    line-height: 18px;
+    padding: var(--spacing-4);
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-21);
     z-index: 10;
   }
 
@@ -247,9 +256,15 @@ const isCentered = alignment === 'CENTER';
     box-shadow: 3px 3px 5px rgba(82,95,127,.04);
   }
 
-  /* Ensure list items can contain tooltip */
-  .list li {
-    position: relative;
-  }
+  /* Button variant hover states */
+  .btn-pricing-primary:hover  { background-color: var(--secondary-70); }
+  .btn-pricing-secondary:hover { background-color: var(--primary-60); }
+  .btn-pricing-tertiary:hover  { background-color: var(--primary-10); }
+  .btn-pricing-ghost:hover     { color: var(--primary-60); }
+
+@media (min-width: 768px) {
+  .featured-pricing-cards { margin-inline: auto; }
+  .mo-card { padding-inline: var(--spacing-6); }
+}
 </style>
 

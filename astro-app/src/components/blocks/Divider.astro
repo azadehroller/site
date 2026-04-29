@@ -46,7 +46,7 @@ const dividerClasses = [
     <img 
       src="/images/divider.svg" 
       alt="Divider" 
-      class="w-full h-[2px] block max-w-full" 
+      class="w-full block max-w-full" style="height:2px"
       width="1314" 
       height="2"
     />
@@ -59,63 +59,59 @@ const dividerClasses = [
     height: 2px;
   }
 
-  .divider-line {
-    display: block;
-  }
-
   /* Background colors */
   :global(.dnd-section:has(.divider.light)),
   :global(.dnd-section.divider-bg-light) {
-    background-color: #fff;
+    background-color: var(--neutral-white);
   }
 
-  /* Dark backgrounds - Blue 10 (#011840) */
+  /* Dark backgrounds - Blue 10 (var(--blue-10)) */
   :global(.dnd-section.divider-bg-blue10) {
-    background-color: #011840;
+    background-color: var(--blue-10);
   }
 
-  /* Dark backgrounds - Blue 30 (#033180) */
+  /* Dark backgrounds - Blue 30 (var(--primary-50)) */
   :global(.dnd-section.divider-bg-blue30) {
-    background-color: #033180;
+    background-color: var(--primary-50);
   }
 
   /* Mobile padding (default) */
   /* Short - smaller padding */
   :global(.dnd-section:has(.divider.short.divider-shown)) {
-    padding-block: 40px;
+    padding-block: var(--spacing-10);
   }
 
   :global(.dnd-section:has(.divider.short.divider-hidden)) {
-    padding-block: 24px;
+    padding-block: var(--spacing-6);
   }
 
   /* Tall - larger padding */
   :global(.dnd-section:has(.divider.tall.divider-shown)) {
-    padding-block: 56px;
+    padding-block: var(--spacing-14);
   }
 
   :global(.dnd-section:has(.divider.tall.divider-hidden)) {
-    padding-block: 40px;
+    padding-block: var(--spacing-10);
   }
 
   /* Desktop padding (768px+) */
   @media (min-width: 768px) {
     /* Short - smaller padding */
     :global(.dnd-section:has(.divider.short.divider-shown)) {
-      padding-block: 56px;
+      padding-block: var(--spacing-14);
     }
 
     :global(.dnd-section:has(.divider.short.divider-hidden)) {
-      padding-block: 40px;
+      padding-block: var(--spacing-10);
     }
 
     /* Tall - larger padding */
     :global(.dnd-section:has(.divider.tall.divider-shown)) {
-      padding-block: 80px;
+      padding-block: var(--spacing-20);
     }
 
     :global(.dnd-section:has(.divider.tall.divider-hidden)) {
-      padding-block: 80px;
+      padding-block: var(--spacing-20);
     }
   }
 </style>

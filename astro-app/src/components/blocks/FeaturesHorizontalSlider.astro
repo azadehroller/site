@@ -52,55 +52,55 @@ const componentId = id ? cleanStega(id) : `features-slider-${Math.random().toStr
 // Theme-based colors
 const getProgressBarBg = (): string => {
   switch (theme) {
-    case 'dark': return '#cccccc';
-    case 'light': return '#F5F8FF';
-    case 'gxscore': return '#f4ebff';
-    default: return '#F5F8FF';
+    case 'dark': return 'var(--neutral-30)';
+    case 'light': return 'var(--blue-99)';
+    case 'gxscore': return 'var(--bg-purple-97)';
+    default: return 'var(--blue-99)';
   }
 };
 
 const getProgressBarActiveFill = (): string => {
   switch (theme) {
-    case 'dark': return '#ff290c';
-    case 'light': return '#ff290c';
-    case 'gxscore': return '#A554FF';
-    default: return '#ff290c';
+    case 'dark': return 'var(--secondary-50)';
+    case 'light': return 'var(--secondary-50)';
+    case 'gxscore': return 'var(--purple-80)';
+    default: return 'var(--secondary-50)';
   }
 };
 
 const getTitleColor = (): string => {
   switch (theme) {
-    case 'dark': return '#ff290c';
-    case 'light': return '#ff290c';
-    case 'gxscore': return '#A554FF';
-    default: return '#ff290c';
+    case 'dark': return 'var(--secondary-50)';
+    case 'light': return 'var(--secondary-50)';
+    case 'gxscore': return 'var(--purple-80)';
+    default: return 'var(--secondary-50)';
   }
 };
 
 const getTextColor = (): string => {
   switch (theme) {
-    case 'dark': return '#033180';
-    case 'light': return '#fff';
-    case 'gxscore': return '#A554FF';
-    default: return '#fff';
+    case 'dark': return 'var(--primary-50)';
+    case 'light': return 'var(--neutral-white)';
+    case 'gxscore': return 'var(--purple-80)';
+    default: return 'var(--neutral-white)';
   }
 };
 
 const getLinkColor = (): string => {
   switch (theme) {
-    case 'dark': return '#033180';
-    case 'light': return '#fff';
+    case 'dark': return 'var(--primary-50)';
+    case 'light': return 'var(--neutral-white)';
     case 'gxscore': return '#3C0091';
-    default: return '#fff';
+    default: return 'var(--neutral-white)';
   }
 };
 
 const getSvgFill = (): string => {
   switch (theme) {
-    case 'dark': return '#ff290c';
-    case 'light': return '#ff290c';
-    case 'gxscore': return '#A554FF';
-    default: return '#ff290c';
+    case 'dark': return 'var(--secondary-50)';
+    case 'light': return 'var(--secondary-50)';
+    case 'gxscore': return 'var(--purple-80)';
+    default: return 'var(--secondary-50)';
   }
 };
 
@@ -143,7 +143,7 @@ const cssVars = {
             data-no-follow={slide.link?.noFollow ? 'true' : 'false'}
           >
             {imageUrl && (
-              <div class="bg-[#FBF8FF] [&>img]:aspect-video [&>img]:w-full [&>img]:object-cover">
+              <div class="slide-img-wrap">
                 <img 
                   src={imageUrl} 
                   alt={alt}
@@ -159,7 +159,7 @@ const cssVars = {
       })}
     </div>
     <!-- Pagination -->
-    <div class="swiper-pagination pag grid grid-cols-1 lg:grid-cols-3 gap-5 md:h-auto"></div>
+    <div class="swiper-pagination pag grid grid-cols-1 gap-5"></div>
   </div>
 </section>
 
@@ -245,6 +245,23 @@ const cssVars = {
 
   .features-horizontal-slider :global(.pag-svg rect) {
     fill: var(--pag-svg-fill);
+  }
+
+  @media (min-width: 768px) {
+    .features-horizontal-slider .pag { height: auto; }
+  }
+  @media (min-width: 1024px) {
+    .features-horizontal-slider .pag { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .slide-img-wrap { background-color: var(--bg-purple-98); }
+  .slide-img-wrap > img { aspect-ratio: 16/9; width: 100%; object-fit: cover; }
+
+  .features-horizontal-slider :global(.pag-link .pag-svg) {
+    transition: transform 0.3s ease-out;
+  }
+  .features-horizontal-slider :global(.pag-link:hover .pag-svg) {
+    transform: translateX(0.25rem);
   }
 </style>
 
@@ -343,12 +360,12 @@ const cssVars = {
                   <div class="pag-text text-base">${slide.content}</div>
                 </div>
               </div>
-              <a class="inline-flex items-center pag-link text-base font-semibold mt-auto w-max group" href="${slide.link}"${target}${rel}>
+              <a class="inline-flex items-center pag-link text-base font-semibold margin-block-start-auto w-max" href="${slide.link}"${target}${rel}>
                 <span>${slide.label}</span>
                 <span>
-                  <svg class="pag-svg mr-0 ml-2 transition-transform ease-out duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+                  <svg class="pag-svg margin-inline-end-0 margin-inline-start-2" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
                     <rect width="40" height="40" rx="20"/>
-                    <path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+                    <path fill="var(--neutral-white)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
                   </svg>
                 </span>
               </a>

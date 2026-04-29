@@ -87,14 +87,14 @@ function getTextColorClass(): string {
 function getArrowFillColor(): string {
   switch (theme) {
     case 'light':
-      return '#ffffff';
+      return 'var(--neutral-white)';
     case 'gxscore':
       return '#3C0091';
     case 'smb':
     case 'enterprise':
     case 'dark':
     default:
-      return '#033180';
+      return 'var(--primary-50)';
   }
 }
 
@@ -105,7 +105,7 @@ const arrowFill = getArrowFillColor();
 
 <dl 
   id={id ? `cards-segmentation-${id}` : undefined}
-  class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-5 py-2"
+  class="cards-seg-grid grid grid-cols-1 gap-5 padding-block-2"
   {...createDataSanityAttrs(sectionEditInfo)}
 >
   {cards.map((card) => {
@@ -119,10 +119,10 @@ const arrowFill = getArrowFillColor();
     const noFollow = card.link?.noFollow;
     
     return (
-      <div class={`flex flex-col gap-3 max-w-full ${cardBgClass} w-full h-full box-shadow-onlight-navy-40 rounded-[32px] overflow-hidden`}>
+      <div class={`flex flex-col gap-3 max-w-full ${cardBgClass} w-full h-full box-shadow-onlight-navy-40 card-seg-item overflow-hidden`}>
         {/* Card Image */}
         {imageUrl && (
-          <div class="w-full [&>img]:w-full [&>img]:object-cover">
+          <div class="card-img-wrap w-full">
             <img 
               src={imageUrl} 
               alt={imageAlt}
@@ -133,7 +133,7 @@ const arrowFill = getArrowFillColor();
         )}
         
         {/* Card Content */}
-        <div class={`flex flex-col gap-2 py-2 px-8 md:px-6 ${textColorClass}`}>
+        <div class={`flex flex-col gap-2 padding-block-2 padding-inline-8 card-seg-content ${textColorClass}`}>
           {cardTitle && (
             <span class="text-2xl font-semibold" set:html={cardTitle} />
           )}
@@ -144,9 +144,9 @@ const arrowFill = getArrowFillColor();
         
         {/* Card Link */}
         {linkHref && (
-          <div class="flex flex-col md:flex-row wrap px-8 md:px-6 gap-3 mt-auto pb-5">
+          <div class="flex flex-col wrap padding-inline-8 card-seg-link-wrap gap-3 margin-block-start-auto padding-block-end-5">
             <a 
-              class={`relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold text-md transition ease-in-out duration-300 w-full sm:w-auto whitespace-nowrap bg-transparent ${textColorClass} py-2 relative inline-flex items-center gap-2 group`}
+              class={`card-seg-link relative inline-flex items-center cursor-pointer select-none appearance-none no-underline text-base font-semibold tracking-tight transition ease-in-out duration-300 w-full whitespace-nowrap bg-transparent ${textColorClass} padding-block-2 relative inline-flex items-center gap-2`}
               href={linkHref}
               target={openInNewTab ? '_blank' : undefined}
               rel={`${noFollow ? 'nofollow' : ''} ${openInNewTab ? 'noopener noreferrer' : ''}`.trim() || undefined}
@@ -158,7 +158,7 @@ const arrowFill = getArrowFillColor();
                   width="16" 
                   height="16" 
                   fill="none" 
-                  class="transition-transform ease-out duration-300 group-hover:translate-x-1"
+                  class="card-seg-arrow"
                 >
                   <path 
                     fill={arrowFill}
@@ -178,6 +178,24 @@ const arrowFill = getArrowFillColor();
   /* Box shadow matching HubSpot module */
   .box-shadow-onlight-navy-40 {
     box-shadow: 0 4px 24px rgba(1, 24, 64, 0.15);
+  }
+
+  .card-img-wrap > img { width: 100%; object-fit: cover; }
+
+  .card-seg-arrow { transition: transform 0.3s ease-out; }
+  .card-seg-link:hover .card-seg-arrow { transform: translateX(0.25rem); }
+
+  @media (min-width: 640px) {
+    .card-seg-link { width: auto; }
+  }
+  @media (min-width: 768px) {
+    .card-seg-content { padding-inline: var(--spacing-6); }
+    .card-seg-link-wrap { flex-direction: row; padding-inline: var(--spacing-6); }
+  }
+  .card-seg-item { border-radius: 2rem; }
+
+  @media (min-width: 1024px) {
+    .cards-seg-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 </style>
 

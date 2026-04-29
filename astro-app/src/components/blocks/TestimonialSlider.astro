@@ -51,14 +51,14 @@ function buildRel(link?: TestimonialLink): string | undefined {
 }
 
 // Arrow icon SVG
-const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><rect width="40" height="40" fill="#FF490C" rx="20"></rect><path fill="#fff" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"></path></svg>`;
+const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><rect width="40" height="40" fill="var(--red-55)" rx="20"></rect><path fill="var(--neutral-white)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"></path></svg>`;
 ---
 
 <section id={componentId} class="testimonial-slider relative" data-sanity-edit-target data-slider-id={sliderId}>
-  <div class="h-[463px] overflow-hidden w-screen relative right-[50%] left-[50%] ml-[-50vw] mr-[-50vw]">
+  <div class="testimonial-viewport">
     <ul 
       id={sliderId}
-      class="testimonial-slider__list flex mt-0 list-none h-[540px] overflow-x-auto snap-x snap-mandatory"
+      class="testimonial-slider__list flex margin-block-start-0 list-none"
     >
       {slides.map((slide, index) => {
         // Use external URL if provided, otherwise fall back to Sanity asset
@@ -71,11 +71,11 @@ const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40
         
         return (
           <li 
-            class="js-testimonial-item snap-start snap-always shrink-0 mr-5 last:mr-0 h-[460px]"
+            class="js-testimonial-item shrink-0 margin-inline-end-5"
             data-filter=""
             data-sanity-edit-target
           >
-            <div class="slide-center relative flex h-[460px] flex-col bg-neutral-white w-[304px] rounded-2xl mo-card-md">
+            <div class="slide-center relative flex flex-col bg-neutral-white rounded-2xl mo-card-md">
               <div class="flex flex-col gap-4 h-full">
                 {/* Logo */}
                 <div>
@@ -86,35 +86,35 @@ const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40
                       loading="lazy"
                       width="80"
                       height="44"
-                      class="object-fill h-[2.75rem] w-[5rem]"
+                      class="testimonial-logo-img"
                     />
                   ) : (
-                    <div class="h-[2.75rem] w-[5rem] bg-neutral-90 rounded"></div>
+                    <div class="testimonial-logo-placeholder bg-neutral-90 rounded"></div>
                   )}
                 </div>
                 
                 {/* Quote content with red left border */}
                 <div 
-                  class="leading-6 mb-xs text-primary-50 relative before:absolute before:w-[2px] before:h-[100%] before:bg-secondary-50 before:top-0 before:left-0 pl-3"
+                  class="testimonial-quote-body text-base mb-xs text-primary-50 padding-inline-start-3"
                   data-sanity-edit-target
                   set:html={slide.content || ''}
                 />
                 
                 {/* Button */}
-                <div class="button-wrapper pb-3 flex items-end grow">
+                <div class="button-wrapper padding-block-end-3 flex items-end grow">
                   {href ? (
                     <a 
-                      class="relative inline-flex items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold text-md transition ease-in-out duration-300 w-full sm:w-auto whitespace-nowrap bg-transparent text-primary-50 py-2 font-serif hover:opacity-80"
+                      class="testimonial-cta relative inline-flex items-center cursor-pointer select-none appearance-none no-underline text-base font-semibold tracking-tight transition ease-in-out duration-300 w-full whitespace-nowrap bg-transparent text-primary-50 padding-block-2 font-serif"
                       href={href}
                       target={targetAttr}
                       rel={relAttr}
                     >
-                      <div class="flex justify-center items-center order-1 mr-0 ml-2" set:html={arrowIcon} />
+                      <div class="flex justify-center items-center order-1 margin-inline-end-0 margin-inline-start-2" set:html={arrowIcon} />
                       <span>{buttonText}</span>
                     </a>
                   ) : (
-                    <span class="relative inline-flex items-center text-primary-50 py-2 font-serif font-semibold">
-                      <div class="flex justify-center items-center order-1 mr-0 ml-2" set:html={arrowIcon} />
+                    <span class="relative inline-flex items-center text-primary-50 padding-block-2 font-serif font-semibold">
+                      <div class="flex justify-center items-center order-1 margin-inline-end-0 margin-inline-start-2" set:html={arrowIcon} />
                       <span>{buttonText}</span>
                     </span>
                   )}
@@ -128,25 +128,25 @@ const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40
   </div>
   
   {/* Navigation buttons */}
-  <div class="slider-nav-wrapper flex justify-center absolute top-[50%] translate-y-[-50%] w-screen right-[50%] left-[50%] ml-[-50vw] mr-[-50vw] pointer-events-none">
+  <div class="slider-nav-wrapper flex justify-center absolute pointer-events-none">
     <button
-      class="js-slider-prev slider-nav-btn slider-nav-btn--prev transition-all opacity-60 hover:opacity-100 bg-neutral-60 hover:bg-neutral-70 w-[3.5rem] h-[3.5rem] rounded-full items-center justify-center absolute top-[50%] translate-y-[-50%] left-[18px] pointer-events-auto"
+      class="js-slider-prev slider-nav-btn slider-nav-btn--prev pointer-events-auto"
       aria-label="Previous slide"
       type="button"
     >
       <span class="sr-only">Previous slide</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-        <path fill="#fff" d="m17.835 3.87-1.78-1.77-9.89 9.9 9.9 9.9 1.77-1.77L9.705 12l8.13-8.13Z"/>
+        <path fill="var(--neutral-white)" d="m17.835 3.87-1.78-1.77-9.89 9.9 9.9 9.9 1.77-1.77L9.705 12l8.13-8.13Z"/>
       </svg>
     </button>
     <button
-      class="js-slider-next slider-nav-btn slider-nav-btn--next transition-all opacity-60 hover:opacity-100 bg-neutral-60 hover:bg-neutral-70 w-[3.5rem] h-[3.5rem] rounded-full items-center justify-center absolute top-[50%] translate-y-[-50%] right-[18px] pointer-events-auto"
+      class="js-slider-next slider-nav-btn slider-nav-btn--next pointer-events-auto"
       aria-label="Next slide"
       type="button"
     >
       <span class="sr-only">Next slide</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-        <path fill="#fff" d="m6.165 20.13 1.77 1.77 9.9-9.9-9.9-9.9-1.77 1.77 8.13 8.13-8.13 8.13Z"/>
+        <path fill="var(--neutral-white)" d="m6.165 20.13 1.77 1.77 9.9-9.9-9.9-9.9-1.77 1.77 8.13 8.13-8.13 8.13Z"/>
       </svg>
     </button>
   </div>
@@ -156,53 +156,119 @@ const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40
   .testimonial-slider {
     --container-size: 1247px;
   }
-  
-  .slide-center {
-    transform: translateX(calc(max(var(--container-size), 100vw) / 2 - calc(var(--container-size) / 2)));
+
+  /* Full-bleed viewport strip */
+  .testimonial-viewport {
+    height: 463px;
+    overflow: hidden;
+    width: 100vw;
+    position: relative;
+    right: 50%;
+    left: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
   }
-  
-  /* Card styling */
-  .mo-card-md {
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  }
-  
-  /* Hide scrollbar but keep functionality */
+
+  /* Scrollable list */
   .testimonial-slider__list {
+    height: 540px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  
-  .testimonial-slider__list::-webkit-scrollbar {
-    display: none;
+  .testimonial-slider__list::-webkit-scrollbar { display: none; }
+
+  /* Individual slide item */
+  .js-testimonial-item {
+    height: 460px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
-  
+  .js-testimonial-item:last-child { margin-inline-end: 0; }
+
+  /* Slide card */
+  .slide-center {
+    transform: translateX(calc(max(var(--container-size), 100vw) / 2 - calc(var(--container-size) / 2)));
+    height: 460px;
+    width: 304px;
+  }
+
+  /* Card styling */
+  .mo-card-md {
+    padding: var(--spacing-6);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  /* Logo */
+  .testimonial-logo-img { height: 2.75rem; width: 5rem; object-fit: fill; }
+  .testimonial-logo-placeholder { height: 2.75rem; width: 5rem; }
+
+  /* CTA link */
+  .testimonial-cta:hover { opacity: 0.8; }
+  @media (min-width: 640px) { .testimonial-cta { width: auto; } }
+
   /* Ensure quote content displays HTML properly */
   .testimonial-slider [data-sanity-edit-target] :global(strong),
   .testimonial-slider [data-sanity-edit-target] :global(b) {
-    font-weight: 700;
+    font-weight: var(--font-weight-700);
   }
-  
-  /* Navigation buttons - hidden on mobile, flex on md+ */
+
+  /* Nav wrapper — full-bleed centered over the viewport strip */
+  .slider-nav-wrapper {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100vw;
+    right: 50%;
+    left: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+
+  /* Navigation buttons */
   .slider-nav-btn {
     display: none;
     cursor: pointer;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 9999px;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--neutral-60);
+    opacity: 0.6;
+    transition: all 0.2s ease;
   }
-  
+  .slider-nav-btn--prev { left: 18px; }
+  .slider-nav-btn--next { right: 18px; }
+
   @media (min-width: 768px) {
-    .slider-nav-btn {
-      display: flex;
-    }
+    .slider-nav-btn { display: flex; }
   }
-  
-  /* Disabled state - reduce opacity but keep visible */
+
+  .slider-nav-btn:hover { background-color: var(--neutral-70); opacity: 1; }
+
   .slider-nav-btn[disabled] {
     opacity: 0.3;
     cursor: not-allowed;
   }
-  
-  .slider-nav-btn:not([disabled]):hover {
-    opacity: 1;
+
+  .slider-nav-btn:not([disabled]):hover { opacity: 1; }
+
+  /* Quote body left border */
+  .testimonial-quote-body {
+    position: relative;
+  }
+  .testimonial-quote-body::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background-color: var(--secondary-50);
+    top: 0;
+    left: 0;
   }
 </style>
 
@@ -213,7 +279,7 @@ const arrowIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40
     
     sliders.forEach((slider) => {
       const SLIDE_WIDTH = 304;
-      const SLIDE_MARGIN = 20; // mr-5 = 1.25rem = 20px
+      const SLIDE_MARGIN = 20; // margin-inline-end-5 = 1.25rem = 20px
       const SLIDE_TOTAL = SLIDE_WIDTH + SLIDE_MARGIN;
       
       const sliderId = slider.getAttribute('data-slider-id');

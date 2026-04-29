@@ -76,10 +76,10 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
 <div
   id={componentId}
   class:list={[
-    "industry-selector mx-auto gap-5 rounded-[32px] py-6 px-6 mb-0 md:mb-4",
+    "industry-selector margin-inline-auto gap-5 padding-block-6 padding-inline-6 margin-block-end-0",
     theme === 'light'
-      ? "bg-widget-industries  box-shadow-ondark-blue-10 flex flex-col lg:grid lg:grid-cols-3"
-      : " box-shadow-onlight bg-primary-50 flex flex-col lg:p-6"
+      ? "industry-selector--light bg-widget-industries box-shadow-ondark-blue-10 flex flex-col"
+      : "industry-selector--dark box-shadow-onlight bg-primary-50 flex flex-col"
   ]}
   data-sanity-edit-target
 >
@@ -108,7 +108,7 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
           alt={heading.title || "Industry Selector"}
           width="368"
           height="368"
-          class="hidden lg:block mt-4"
+          class="industry-graph-img margin-block-start-4"
         />
       )}
     </header>
@@ -116,7 +116,7 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
 
   {/* Desktop grid view */}
   <div class:list={[
-    "hidden md:flex flex-wrap gap-3 ms-auto me-auto",
+    "industry-desktop-grid flex-wrap gap-3 margin-inline-start-auto margin-inline-end-auto",
     theme === 'light' ? "col-span-2" : "dark"
   ]}>
     {industries.map((industry) => {
@@ -137,8 +137,8 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
         <a
           href={href}
           class:list={[
-            "industry-item-link flex items-center justify-center gap-2 mo-card-features font-semibold ease-in transition duration-200 hover:bg-neutral-white hover:shadow-[var(--shadow-on-dark-bg)] hover:bg-white  rounded-2xl",
-            theme === 'light' ? "text-primary-50 hover:text-neutral-white" : "text-neutral-white hover:text-primary-50"
+            "industry-item-link flex items-center justify-center gap-2 mo-card-features font-semibold ease-in transition duration-200",
+            theme === 'light' ? "text-primary-50 industry-link-light" : "text-neutral-white industry-link-dark"
           ]}
           target={openInNewTab ? '_blank' : undefined}
           rel={rel}
@@ -147,12 +147,12 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
           {/* Lottie animation container - takes priority over SVG icon */}
           {lottieUrl ? (
             <div 
-              class="lottie-container" 
+              class="lottie-container flex-center" 
               data-lottie-src={lottieUrl}
               data-sanity-edit-target
             />
           ) : industryIcon && (
-            <span class="industry-icon" set:html={industryIcon} data-sanity-edit-target />
+            <span class="industry-icon flex-center" set:html={industryIcon} data-sanity-edit-target />
           )}
           <span data-sanity-edit-target>{industryTitle}</span>
         </a>
@@ -161,10 +161,10 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
   </div>
 
   {/* Mobile dropdown view - data-sanity-ignore prevents Visual Editing from intercepting clicks */}
-  <div class="grid gap-3 md:hidden dropdown-wrapper" data-sanity-ignore>
+  <div class="industry-mobile-dropdown gap-3 dropdown-wrapper relative z-9999" data-sanity-ignore>
     <select 
       id={`${componentId}-dropdown`}
-      class="industry-dropdown bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center rounded-[61.25rem] py-2 px-4 w-full appearance-none cursor-pointer"
+      class="industry-dropdown relative z-1 bg-neutral-white box-shadow-onlight-navy-40 text-primary-50 font-semibold text-center padding-block-2 padding-inline-4 w-full appearance-none cursor-pointer"
       data-sanity-ignore
     >
       <option value="" selected>Select your industry</option>
@@ -178,7 +178,7 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
     </select>
     <button 
       type="button"
-      class="industry-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline tracking-tight leading-6 font-semibold transition ease-in-out duration-300 bg-secondary-50 hover:bg-secondary-70 rounded-3xl py-2 px-4 text-neutral-white"
+      class="industry-discover-btn relative items-center cursor-pointer select-none appearance-none no-underline text-base font-semibold tracking-tight transition ease-in-out duration-300 bg-secondary-50 padding-block-2 padding-inline-4 text-neutral-white"
       data-dropdown-id={`${componentId}-dropdown`}
     >
       Discover
@@ -188,9 +188,28 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
 </div>
 
 <style>
+  /* Container */
+  .industry-selector {
+    border-radius: 2rem;
+  }
+
+  /* Industry item card hover */
+  .industry-item-link {
+    border-radius: 1rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  }
+
+  .industry-item-link:hover {
+    background-color: var(--neutral-white);
+    box-shadow: var(--shadow-on-dark-bg, 0px 4px 8px 0px var(--primary-alpha-08));
+  }
+
+  .industry-link-light:hover { color: var(--neutral-white); }
+  .industry-link-dark:hover { color: var(--primary-50); }
+
   /* Container shadows */
   .box-shadow-onlight {
-    box-shadow: 0px 4px 8px 0px rgba(3, 49, 128, 0.08), 0px 12px 24px 0px rgba(3, 49, 128, 0.12);
+    box-shadow: 0px 4px 8px 0px var(--primary-alpha-08), 0px 12px 24px 0px var(--primary-alpha-12);
   }
 
   .box-shadow-ondark-blue-10 {
@@ -207,9 +226,7 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
 
   /* Dropdown wrapper with custom arrow */
   .dropdown-wrapper {
-    position: relative;
     isolation: isolate;
-    z-index: 9999;
   }
 
   .dropdown-wrapper::after {
@@ -237,20 +254,13 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
 
   /* Industry item cards */
   .mo-card-features {
-    padding: 0.75rem 1.25rem;
+    padding: var(--spacing-3) 1.25rem;
     min-height: 56px;
   }
 
   /* Background colors */
   .bg-widget-industries {
-    background-image: linear-gradient(100deg, #FFF 0%, #F5F8FF 61.98%);
-  }
-
-  /* Icon container */
-  .industry-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-image: linear-gradient(100deg, var(--neutral-white) 0%, var(--blue-99) 61.98%);
   }
 
   .industry-icon :global(svg) {
@@ -260,9 +270,6 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
 
   /* Lottie animation container */
   .lottie-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 48px;
     height: 48px;
     overflow: hidden;
@@ -277,8 +284,7 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
   .industry-dropdown {
     border: none;
     outline: none;
-    position: relative;
-    z-index: 1;
+    border-radius: 61.25rem;
     pointer-events: auto !important;
     transform: translateZ(0);
     -webkit-appearance: none;
@@ -287,6 +293,22 @@ const hasLottieAnimations = industries.some(industry => industry.animationFile?.
 
   .industry-dropdown:focus {
     box-shadow: 0 0 0 2px var(--primary-40, #074DC5);
+  }
+
+  /* Mobile-only elements */
+  .industry-mobile-dropdown { display: grid; }
+  .industry-graph-img { display: none; }
+  .industry-desktop-grid { display: none; }
+
+  @media (min-width: 768px) {
+    .industry-selector { margin-block-end: var(--spacing-4); }
+    .industry-mobile-dropdown { display: none; }
+    .industry-desktop-grid { display: flex; }
+  }
+  @media (min-width: 1024px) {
+    .industry-selector--dark { padding: var(--spacing-6); }
+    .industry-selector--light { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .industry-graph-img { display: block; }
   }
 
 </style>
