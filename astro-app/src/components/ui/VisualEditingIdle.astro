@@ -1,10 +1,16 @@
 ---
 /**
  * Loads Sanity Visual Editing. Only included when PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true
- * and the user has the sanity-preview cookie. VisualEditing is an Astro component and
- * manages its own client-side script internally — no client:* directive needed or allowed.
+ * and the user has the sanity-preview cookie.
+ *
+ * We mount our own React `SanityVisualEditing` (rather than `@sanity/astro`'s
+ * built-in `<VisualEditing />` wrapper) because the upstream wrapper still
+ * doesn't expose `onPerspectiveChange`. Without that callback the iframe never
+ * learns when the editor changes perspective in Studio, so SSR keeps fetching
+ * the old perspective and click-to-edit silently breaks until the document
+ * pane is force-remounted.
  */
-import { VisualEditing } from '@sanity/astro/visual-editing';
+import SanityVisualEditing from '@components/ui/SanityVisualEditing.tsx';
 
 interface Props {
   zIndex?: number;
@@ -13,4 +19,4 @@ interface Props {
 const { zIndex = 1000 } = Astro.props;
 ---
 
-<VisualEditing enabled zIndex={zIndex} />
+<SanityVisualEditing client:only="react" zIndex={zIndex} />
