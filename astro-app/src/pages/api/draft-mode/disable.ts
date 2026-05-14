@@ -6,8 +6,11 @@ import type { APIRoute } from 'astro'
  * Called when exiting the Presentation Tool or when explicitly disabling preview mode.
  */
 export const GET: APIRoute = async ({ request, redirect, cookies }) => {
-  // Clear the preview cookie
+  // Clear the preview cookies (both the draft-mode flag and the perspective hint)
   cookies.delete('sanity-preview', {
+    path: '/',
+  })
+  cookies.delete('sanity-preview-perspective', {
     path: '/',
   })
 

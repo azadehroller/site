@@ -95,8 +95,15 @@ export function createNestedPath(
 
 /**
  * Creates the full edit info for a content block.
- * The document ID is normalized (drafts. prefix removed) to ensure
- * the Presentation tool can resolve to the correct version.
+ *
+ * We deliberately do NOT strip the `drafts.` prefix from the document ID.
+ * The Presentation tool uses the ID it receives to decide which perspective
+ * (draft vs published) to mount in the structure pane. If we always send the
+ * published ID, Studio opens the published projection, can't resolve array
+ * `_key`s that only exist on the draft, and silently drops the focus path —
+ * forcing the editor to toggle perspectives to trigger a remount. Keeping the
+ * draft ID when we fetched draft content keeps the two sides aligned.
+ * See sanity-io/client#1114.
  */
 export function createBlockEditInfo(
   documentId: string,
@@ -106,24 +113,20 @@ export function createBlockEditInfo(
   itemKey?: string
 ): SanityEditInfo {
   let path = 'sections';
-  
+
   if (sectionKey) {
     path += `[_key=="${sectionKey}"]`;
   }
-  
+
   if (columnName) {
     path += `.${columnName}`;
   }
-  
+
   if (itemKey) {
     path += `[_key=="${itemKey}"]`;
   }
-  
-  // Normalize the document ID to ensure consistent behavior
-  // The Presentation tool will resolve to the correct version (draft or published)
-  const normalizedId = normalizeDocumentId(documentId);
-  
-  return { id: normalizedId, type: documentType, path };
+
+  return { id: documentId, type: documentType, path };
 }
 
 /**
@@ -150,13 +153,24 @@ export function createDataSanityAttrs(editInfo: SanityEditInfo | null | undefine
   if (!editInfo) return {};
 
   const { id, type, path } = editInfo;
-  const studioBaseUrl = (import.meta.env.PUBLIC_SANITY_STUDIO_URL as string | undefined) || '';
+  const studioBaseUrl = import.meta.env.DEV
+    ? 'http://localhost:3333'
+    : ((import.meta.env.PUBLIC_SANITY_STUDIO_URL as string | undefined) || '');
+
+  // Passing projectId+dataset disambiguates the click target so Studio doesn't
+  // have to fall back to defaults when resolving which workspace owns the doc.
+  const projectId = (import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID as string | undefined)
+    || (import.meta.env.PUBLIC_SANITY_PROJECT_ID as string | undefined);
+  const dataset = (import.meta.env.PUBLIC_SANITY_STUDIO_DATASET as string | undefined)
+    || (import.meta.env.PUBLIC_SANITY_DATASET as string | undefined);
 
   const attr = createDataAttribute({
     id,
     type,
     path,
     baseUrl: studioBaseUrl || undefined,
+    projectId,
+    dataset,
   });
 
   return {

@@ -1,6 +1,30 @@
 // /src/lib/loadQuery.ts
 import { sanityClient } from 'sanity:client' // provided by @sanity/astro
 import type { QueryParams } from 'sanity'
+import type { ClientPerspective } from '@sanity/client'
+
+/**
+ * Parse the `sanity-preview-perspective` cookie. Studio writes either:
+ *   - a plain string: "drafts" | "published" | "<releaseId>"
+ *   - or a JSON-encoded array (stacked perspectives for content releases):
+ *     '["summer-drop","drafts","published"]'
+ */
+function parsePerspectiveCookie(value: string | undefined): ClientPerspective | undefined {
+  if (!value) return undefined
+  const trimmed = value.trim()
+  if (!trimmed) return undefined
+  if (trimmed.startsWith('[')) {
+    try {
+      const arr = JSON.parse(trimmed)
+      if (Array.isArray(arr) && arr.every((p) => typeof p === 'string')) {
+        return arr as ClientPerspective
+      }
+    } catch {
+      // fall through to string
+    }
+  }
+  return trimmed as ClientPerspective
+}
 
 /**
  * You MUST set this on the server (no PUBLIC_):
@@ -73,10 +97,17 @@ export async function loadQuery<T>({
   params,
   request,
   queryType
-}: LoadQueryArgs): Promise<{ data: T; perspective: 'published' | 'drafts' }> {
+}: LoadQueryArgs): Promise<{ data: T; perspective: ClientPerspective }> {
   // Detect preview from cookie set by /api/draft-mode/enable
   const cookieHeader = request?.headers.get('cookie') || ''
   const isPreview = /\bsanity-preview=true\b/.test(cookieHeader)
+
+  // Read the perspective the Studio is currently showing (set by the enable
+  // endpoint from studioPreviewPerspective, and updated client-side by the
+  // VisualEditing component's onPerspectiveChange handler). Falls back to
+  // 'drafts' so existing preview sessions don't break before the cookie exists.
+  const perspectiveMatch = cookieHeader.match(/(?:^|;\s*)sanity-preview-perspective=([^;]+)/)
+  const perspectiveCookie = perspectiveMatch ? decodeURIComponent(perspectiveMatch[1]) : undefined
 
   // Debug logging (only in development)
   if (import.meta.env.DEV) {
@@ -84,6 +115,7 @@ export async function loadQuery<T>({
       isPreview,
       visualEditingEnabled,
       hasToken: !!token,
+      perspectiveCookie,
       cookieHeader: cookieHeader.substring(0, 50) + '...'
     })
   }
@@ -94,7 +126,9 @@ export async function loadQuery<T>({
     )
   }
 
-  const perspective = isPreview ? 'drafts' : 'published'
+  const perspective: ClientPerspective = isPreview
+    ? (parsePerspectiveCookie(perspectiveCookie) ?? 'drafts')
+    : 'published'
   const cacheTTL = getCacheTTL(queryType)
   const staleTime = cacheTTL * 2 // Serve stale for 2x TTL
 
@@ -125,10 +159,12 @@ export async function loadQuery<T>({
 
         // Background revalidation (don't await)
         // IMPORTANT: Preserve stega in background revalidation for visual editing
+        // Note: this block only runs for !isPreview (published cache path), so stega is
+        // always off here regardless of perspective.
         sanityClient.fetch<T>(query, params ?? {}, {
           perspective,
-          stega: visualEditingEnabled && perspective === 'drafts', // Enable stega for preview drafts
-          useCdn: perspective === 'published', // Use CDN for published, bypass for drafts
+          stega: false,
+          useCdn: true,
         }).then(result => {
           // Update cache with fresh data
           queryCache.set(cacheKey, {
@@ -162,8 +198,19 @@ export async function loadQuery<T>({
     // Pass studioUrl explicitly so stega-encoded links point to the correct Studio host,
     // not the build-time default (which may be localhost:3333 on Vercel).
     stega: visualEditingEnabled && isPreview
-      ? { enabled: true, studioUrl: import.meta.env.PUBLIC_SANITY_STUDIO_URL || '' }
+      ? {
+          enabled: true,
+          studioUrl: import.meta.env.DEV
+            ? 'http://localhost:3333'
+            : (import.meta.env.PUBLIC_SANITY_STUDIO_URL || ''),
+        }
       : false,
+    // Content Source Maps: lets Studio resolve clicks on stega-encoded text
+    // back to the exact array `_key` path in the source document. Without this,
+    // the overlay scanner has only the hand-rolled `data-sanity` attributes to
+    // go on, which is fragile across perspective switches. Only needed in
+    // preview — published responses don't carry source maps to clients.
+    resultSourceMap: visualEditingEnabled && isPreview ? 'withKeyArraySelector' : false,
     // Use token only when you actually need to read drafts
     ...(isPreview && token ? { token } : {}),
     // Use CDN for published content (faster, cached globally)

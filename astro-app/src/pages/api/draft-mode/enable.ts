@@ -38,10 +38,12 @@ export const GET: APIRoute = async ({ request, redirect, cookies }) => {
   // here instead of breaking module load (→ Vercel 404).
   let isValid: boolean
   let redirectTo: string
+  let studioPreviewPerspective: string | null | undefined
   try {
     const result = await validatePreviewUrl(getClientWithToken(), request.url)
     isValid = result.isValid
     redirectTo = result.redirectTo ?? '/'
+    studioPreviewPerspective = result.studioPreviewPerspective
   } catch (err) {
     if (err instanceof SanityClientConfigError) {
       console.error('[draft-mode/enable] Configuration error:', err.message)
@@ -68,6 +70,21 @@ export const GET: APIRoute = async ({ request, redirect, cookies }) => {
   cookies.set('sanity-preview', 'true', {
     path: '/',
     httpOnly: true,
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction,
+  })
+
+  // Mirror the Studio's current perspective into a cookie so the SSR fetch in
+  // loadQuery uses the same perspective Studio is showing. Without this, the
+  // frontend always fetches `drafts` while Studio may be on `published` (or a
+  // content release), and click-to-edit ends up sending focus messages for
+  // paths that don't exist in the projection Studio mounted — which is why
+  // editors had to toggle published→draft to make the focus stick.
+  // httpOnly is `false` so the onPerspectiveChange handler in the iframe can
+  // overwrite it client-side when the editor switches perspectives in Studio.
+  cookies.set('sanity-preview-perspective', studioPreviewPerspective ?? 'drafts', {
+    path: '/',
+    httpOnly: false,
     sameSite: isProduction ? 'none' : 'lax',
     secure: isProduction,
   })
