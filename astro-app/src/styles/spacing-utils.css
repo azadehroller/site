@@ -11,8 +11,8 @@
  *   block = vertical axis (top/bottom in LTR)
  *   inline = horizontal axis (left/right in LTR)
  *
- * Wrapped in @layer utilities so the whole file sits inside Tailwind v4's
- * utilities cascade layer. Anything outside a layer (e.g. component CSS,
+ * Wrapped in @layer utilities so the whole file sits inside the
+ * `utilities` cascade layer. Anything outside a layer (e.g. component CSS,
  * Astro scoped <style> blocks) automatically wins — no !important needed.
  * Internal specificity (0,1,0) is preserved, which is healthier than
  * stripping it with :where() on every selector.

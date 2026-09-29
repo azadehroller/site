@@ -14,8 +14,8 @@
  *       here — they live in spacing-utils.css because they're driven by
  *       --spacing-N tokens. Use them alongside the .flex / .grid classes.
  *
- * Wrapped in @layer utilities so the whole file sits inside Tailwind v4's
- * utilities cascade layer. Anything outside a layer (e.g. component CSS,
+ * Wrapped in @layer utilities so the whole file sits inside the
+ * `utilities` cascade layer. Anything outside a layer (e.g. component CSS,
  * Astro scoped <style> blocks) automatically wins — no !important needed.
  */
 

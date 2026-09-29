@@ -41,12 +41,10 @@
     "@astrojs/node": "^8.3.4",
     "@portabletext/types": "2.0.13",
     "@sanity/types": "^5.30.0",
-    "@tailwindcss/vite": "^4.1.18",
     "astrobook": "^0.8.10",
     "eslint": "9.20.1",
     "prettier": "3.3.2",
     "rimraf": "5.0.1",
-    "tailwindcss": "^4.1.18",
     "typescript": "5.7.2",
     "vite": "^5.3.2"
   }

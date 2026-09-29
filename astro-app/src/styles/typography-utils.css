@@ -16,8 +16,8 @@
  *
  * Responsive breakpoint: 768px (matches the existing h1/h2 fluid CSS).
  *
- * Wrapped in @layer utilities so the whole file sits inside Tailwind v4's
- * utilities cascade layer. Anything outside a layer (e.g. component CSS,
+ * Wrapped in @layer utilities so the whole file sits inside the
+ * `utilities` cascade layer. Anything outside a layer (e.g. component CSS,
  * Astro scoped <style> blocks) automatically wins — no !important needed.
  */
 
