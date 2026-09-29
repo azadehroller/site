@@ -99,7 +99,14 @@ export default defineConfig({
       apiVersion: "2024-12-08", // Set to date of setup to use the latest API version
       // No studioBasePath - using standalone studio
       stega: {
-        studioUrl: PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || 'http://localhost:3333',
+        // Dev always points to the local studio so visual-editing "Open in
+        // Studio" links don't escape to production. In prod, use the env var
+        // (set on Vercel/Netlify) and fall back to the canonical studio host.
+        // Detect dev via the Astro CLI command (`dev`/`preview`) — more reliable
+        // than NODE_ENV, which isn't always set when astro.config is loaded.
+        studioUrl: (process.argv.includes('dev') || process.argv.includes('preview'))
+          ? 'http://localhost:3333'
+          : (PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || 'https://roller-software.sanity.studio'),
       },
     }),
     react(), // Required for visual editing

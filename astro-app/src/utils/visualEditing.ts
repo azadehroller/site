@@ -173,10 +173,34 @@ export function createDataSanityAttrs(editInfo: SanityEditInfo | null | undefine
     dataset,
   });
 
+  // `createDataAttribute().toString()` returns `undefined` (not a throw) if the
+  // node is invalid — e.g. baseUrl missing in prod when PUBLIC_SANITY_STUDIO_URL
+  // is unset. Guard so we never emit the literal string "undefined".
+  const encoded = attr.toString();
+  if (!encoded) return {};
+
+  // Force the "Open in Studio" intent to keep Studio's CURRENT perspective
+  // instead of pinning it to `published`.
+  //
+  // Why this is needed: `encodeSanityNodeData` strips the `drafts.` prefix, so
+  // the node id always looks published. The overlay's URL builder
+  // (`createEditUrl`) therefore stamps `perspective=published` on the intent.
+  // Studio then opens the document in the published perspective, where a draft
+  // (or a draft-only document) can't resolve the clicked path — so the doc
+  // opens but the field never focuses. The overlay strips the perspective param
+  // entirely when the decoded node's perspective is exactly `drafts` (see
+  // @sanity/visual-editing ElementOverlay), which lets Studio keep whatever
+  // perspective the editor is in (drafts, or a content release).
+  //
+  // `encodeSanityNodeData` drops the `perspective` field, but the decoder
+  // (`decodeSanityString`) reads a `perspective=` segment, so we append it to
+  // the encoded string directly — no library fork required.
+  const dataSanity = `${encoded};perspective=drafts`;
+
   return {
-    'data-sanity': attr.toString(),
+    'data-sanity': dataSanity,
     'data-sanity-edit-target': '',
-    'data-sanity-edit-info': JSON.stringify(editInfo),
+    'data-sanity-edit-info': JSON.stringify({ ...editInfo, perspective: 'drafts' }),
   };
 }
 
