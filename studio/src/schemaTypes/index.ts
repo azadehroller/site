@@ -28,12 +28,14 @@ import blogLandingPage from './documents/blogLandingPage'
 import pricingPage from './documents/pricingPage'
 import featuresLandingPage from './documents/featuresLandingPage'
 import industriesLandingPage from './documents/industriesLandingPage'
+import productLandingPage from './documents/productLandingPage'
 import partnersLandingPage from './documents/partnersLandingPage'
 import competitorsLandingPage from './documents/competitorsLandingPage'
 import notFoundPage from './documents/notFoundPage'
 import testPage from './documents/testPage'
 import feature from './documents/feature'
 import industry from './documents/industry'
+import productPage from './documents/productPage'
 import partner from './documents/partner'
 import competitor from './documents/competitor'
 import solution from './documents/solution'
@@ -70,6 +72,13 @@ import blogTableData from './objects/blogTableData'
 import blogFAQBlock from './objects/blogFAQBlock'
 import blogQuoteBlock from './objects/blogQuoteBlock'
 import announcementBarSettings from './objects/announcementBarSettings'
+import media from './objects/media'
+import richTextBlock from './objects/richTextBlock'
+import quote from './objects/quote'
+import stats from './objects/stats'
+import btn from './objects/btn'
+import twoColumnSection from './objects/twoColumn/twoColumn'
+import standaloneTwoColumnBlock from './objects/standaloneTwoColumnBlock'
 
 // Export an array of all the schema types.  This is used in the Sanity Studio configuration. https://www.sanity.io/docs/schema-types
 
@@ -81,6 +90,7 @@ export const schemaTypes = [
   pricingPage,
   featuresLandingPage,
   industriesLandingPage,
+  productLandingPage,
   partnersLandingPage,
   competitorsLandingPage,
   notFoundPage,
@@ -88,6 +98,7 @@ export const schemaTypes = [
   // Document types - Collections
   feature,
   industry,
+  productPage,
   partner,
   competitor,
   solution,
@@ -178,4 +189,14 @@ export const schemaTypes = [
   blogQuoteBlock,
   // Announcement Bar Settings
   announcementBarSettings,
+  // Two Column Block — shared objects
+  media,
+  richTextBlock,
+  quote,
+  stats,
+  btn,
+  // Two Column Block — the block itself
+  twoColumnSection,
+  // Standalone Two Column Block — independent page section (not Columns, not TwoColumnSection)
+  standaloneTwoColumnBlock,
 ]

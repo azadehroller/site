@@ -81,6 +81,7 @@ export default defineType({
               to: [
                 {type: 'page'},
                 {type: 'feature'},
+                {type: 'productPage'},
                 {type: 'industry'},
                 {type: 'post'},
                 {type: 'solution'},
@@ -93,6 +94,7 @@ export default defineType({
                 {type: 'getStartedPage'},
                 {type: 'industriesLandingPage'},
                 {type: 'featuresLandingPage'},
+                {type: 'productLandingPage'},
                 {type: 'blogLandingPage'},
                 {type: 'pricingPage'},
                 {type: 'partnersLandingPage'},

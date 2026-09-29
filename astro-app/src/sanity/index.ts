@@ -4,6 +4,7 @@ export * from "./types";
 // All Sanity queries, grouped by domain
 export * from "./queries/homepage";
 export * from "./queries/features";
+export * from "./queries/product";
 export * from "./queries/get-started";
 export * from "./queries/industries";
 export * from "./queries/pages";

@@ -20,6 +20,7 @@ import {
   LinkIcon,
   PresentationIcon,
   EditIcon,
+  CubeIcon,
 } from '@sanity/icons'
 
 export const deskStructure: StructureResolver = (S) =>
@@ -83,6 +84,14 @@ export const deskStructure: StructureResolver = (S) =>
                   S.document()
                     .schemaType('industriesLandingPage')
                     .documentId('industriesLandingPage')
+                ),
+              S.listItem()
+                .title('Product')
+                .icon(CubeIcon)
+                .child(
+                  S.document()
+                    .schemaType('productLandingPage')
+                    .documentId('productLandingPage')
                 ),
               S.listItem()
                 .title('Partners')
@@ -165,6 +174,18 @@ export const deskStructure: StructureResolver = (S) =>
           S.documentTypeList('industry')
             .title('Industries')
             .defaultOrdering([{field: 'isTemplate', direction: 'desc'}, {field: 'orderRank', direction: 'asc'}, {field: 'title', direction: 'asc'}])
+        ),
+
+      // ==========================================
+      // PRODUCT — Campaign / launch landing pages
+      // ==========================================
+      S.listItem()
+        .title('Product')
+        .icon(CubeIcon)
+        .child(
+          S.documentTypeList('productPage')
+            .title('Product Pages')
+            .defaultOrdering([{field: 'orderRank', direction: 'asc'}, {field: 'title', direction: 'asc'}])
         ),
 
       // ==========================================

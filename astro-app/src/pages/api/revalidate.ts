@@ -20,7 +20,7 @@ import { clearQueryCache } from '@utils/loadQuery';
  * 2. Create a webhook for EACH platform you want to keep fresh:
  *    - URL: https://<host>/api/revalidate
  *    - Trigger on: Create, Update, Delete
- *    - Filter: _type in ["post", "page", "landingPage", "homepage", "industry", "feature", "header", "footer", "siteSettings"]
+ *    - Filter: _type in ["post", "page", "landingPage", "homepage", "industry", "feature", "productPage", "productLandingPage", "header", "footer", "siteSettings"]
  *    - Secret: (generate a secure random string)
  *
  * Required env vars per platform:
@@ -82,6 +82,17 @@ function getUrlsForDocument(doc: any): string[] {
     case 'feature':
       if (doc.slug?.current) {
         urls.push(`${baseUrl}/features/${doc.slug.current}`);
+      }
+      break;
+
+    case 'productLandingPage':
+      urls.push(`${baseUrl}/product`);
+      break;
+
+    case 'productPage':
+      if (doc.slug?.current) {
+        urls.push(`${baseUrl}/product/${doc.slug.current}`);
+        urls.push(`${baseUrl}/product`);
       }
       break;
       

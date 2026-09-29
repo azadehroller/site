@@ -81,6 +81,14 @@ export const locations = {
       ],
     }),
   }),
+  productLandingPage: defineLocations({
+    select: {title: 'title'},
+    resolve: (doc) => ({
+      locations: [
+        {title: doc?.title || 'Product', href: '/product'},
+      ],
+    }),
+  }),
   rawHtmlPage: defineLocations({
     select: {title: 'title', slug: 'slug.current'},
     resolve: (doc) => {
@@ -102,6 +110,17 @@ export const locations = {
         locations: slug
           ? [{title: doc?.title || 'Feature', href: `/features/${slug}`}]
           : [{title: 'Features', href: '/features'}],
+      }
+    },
+  }),
+  productPage: defineLocations({
+    select: {title: 'title', slug: 'slug.current'},
+    resolve: (doc) => {
+      const slug = presentationSlug(doc)
+      return {
+        locations: slug
+          ? [{title: doc?.title || 'Product Page', href: `/product/${slug}`}]
+          : [{title: 'Product', href: '/product'}],
       }
     },
   }),
@@ -163,12 +182,20 @@ export const resolve: DocumentResolver = {
       filter: `_type == "featuresLandingPage"`,
     },
     {
+      route: '/product',
+      filter: `_type == "productLandingPage"`,
+    },
+    {
       route: '/blog/:slug',
       filter: `_type == "post" && slug.current == $slug`,
     },
     {
       route: '/features/:slug',
       filter: `_type == "feature" && slug.current == $slug`,
+    },
+    {
+      route: '/product/:slug',
+      filter: `_type == "productPage" && slug.current == $slug`,
     },
     {
       route: '/industries/:slug',

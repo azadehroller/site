@@ -1,0 +1,93 @@
+---
+import Columns from "@components/blocks/Columns.astro";
+import TwoColumnSection from "@components/blocks/TwoColumnSection.astro";
+import StandaloneTwoColumnBlock from "@components/StandaloneTwoColumnBlock.astro";
+import ColumnContent from "@components/blocks/ColumnContent.astro";
+import Layout from "@layouts/Layout.astro";
+import { getProductPage, getLayoutData, type ColumnsBlock } from "@utils/sanity";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const [{ data: productPage }, layoutSanity] = await Promise.all([
+  getProductPage(slug as string, Astro.request),
+  getLayoutData(Astro.request),
+]);
+
+if (!productPage) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const documentId = productPage?._id || '';
+const documentType = 'productPage';
+---
+
+<Layout title={productPage?.title || "Product"} announcementBar={productPage?.announcementBar} layoutSanity={layoutSanity}>
+  {productPage?.sections?.map((section) => {
+    if (section._type === "columnsBlock") {
+      const columnsBlock = section as ColumnsBlock;
+      const sectionKey = columnsBlock._key;
+      return (
+        <Columns 
+          layout={columnsBlock.layout}
+          backgroundColor={columnsBlock.backgroundColor}
+          customBackgroundColor={columnsBlock.customBackgroundColor}
+          backgroundImage={columnsBlock.backgroundImage?.asset?.url}
+          backgroundPosition={columnsBlock.backgroundPosition}
+          backgroundSize={columnsBlock.backgroundSize}
+          backgroundGradient={columnsBlock.backgroundGradient}
+          gradientColorStart={columnsBlock.gradientColorStart}
+          gradientColorEnd={columnsBlock.gradientColorEnd}
+          paddingTop={columnsBlock.paddingTop}
+          paddingTopMobile={columnsBlock.paddingTopMobile}
+          paddingBottom={columnsBlock.paddingBottom}
+          paddingBottomMobile={columnsBlock.paddingBottomMobile}
+          paddingLeft={columnsBlock.paddingLeft}
+          paddingLeftMobile={columnsBlock.paddingLeftMobile}
+          paddingRight={columnsBlock.paddingRight}
+          paddingRightMobile={columnsBlock.paddingRightMobile}
+          sectionKey={sectionKey}
+          documentId={documentId}
+          documentType={documentType}
+        >
+          <ColumnContent 
+            slot="col1" 
+            content={columnsBlock.column1}
+            columnName="column1"
+            sectionKey={sectionKey}
+            documentId={documentId}
+            documentType={documentType}
+          />
+          {columnsBlock.column2 && <ColumnContent 
+            slot="col2" 
+            content={columnsBlock.column2}
+            columnName="column2"
+            sectionKey={sectionKey}
+            documentId={documentId}
+            documentType={documentType}
+          />}
+          {columnsBlock.column3 && <ColumnContent 
+            slot="col3" 
+            content={columnsBlock.column3}
+            columnName="column3"
+            sectionKey={sectionKey}
+            documentId={documentId}
+            documentType={documentType}
+          />}
+          {columnsBlock.column4 && <ColumnContent 
+            slot="col4" 
+            content={columnsBlock.column4}
+            columnName="column4"
+            sectionKey={sectionKey}
+            documentId={documentId}
+            documentType={documentType}
+          />}
+        </Columns>
+        );
+    } else if (section._type === "standaloneTwoColumnBlock") {
+      return <StandaloneTwoColumnBlock {...section} documentId={documentId} documentType={documentType} />;
+    } else if (section._type === "twoColumnSection") {
+      return <TwoColumnSection {...section} documentId={documentId} documentType={documentType} />;
+    }
+  })}
+</Layout>
