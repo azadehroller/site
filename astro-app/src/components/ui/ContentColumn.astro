@@ -1,0 +1,113 @@
+---
+import type { PortableTextBlock } from '@portabletext/types';
+import type { SanityEditInfo } from '@utils/visualEditing';
+import RichTextBlock from './RichTextBlock.astro';
+import Stats from './Stats.astro';
+import Quote from './Quote.astro';
+import Btn from './Btn.astro';
+
+interface SanityAsset {
+  _ref?: string;
+  url?: string;
+}
+
+interface Card {
+  richTextBlock?: {
+    eyebrow?: {
+      text?: string;
+      colourStyleLight?: string;
+      colourStyleDark?: string;
+    };
+    title?: {
+      text?: string;
+      headingSize?: string;
+    };
+    body?: PortableTextBlock[];
+  };
+  stats?: {
+    number?: string;
+    label?: string;
+  };
+  quote?: {
+    quoteText?: string;
+    quoterName?: string;
+    quoterPosition?: string;
+    quoterLogo?: { asset?: SanityAsset; alt?: string };
+  };
+  buttons?: Array<{
+    _key?: string;
+    label?: string;
+    link?: {
+      urlType?: string;
+      href?: string;
+      contentReference?: {
+        _id?: string;
+        _type?: string;
+        title?: string;
+        slug?: { current?: string };
+      };
+      openInNewTab?: boolean;
+      noFollow?: boolean;
+    };
+    hasIcon?: boolean;
+    iconType?: string;
+    styleDefault?: string;
+    styleWithIcon?: string;
+  }>;
+}
+
+interface Props extends Card {
+  theme?: string;
+  editInfo?: SanityEditInfo | null;
+}
+
+const { theme, richTextBlock, stats, quote, buttons, editInfo } = Astro.props;
+
+const richTextEditInfo: SanityEditInfo | null = editInfo
+  ? { ...editInfo, path: `${editInfo.path}.richTextBlock` }
+  : null;
+const statsEditInfo: SanityEditInfo | null = editInfo
+  ? { ...editInfo, path: `${editInfo.path}.stats` }
+  : null;
+const quoteEditInfo: SanityEditInfo | null = editInfo
+  ? { ...editInfo, path: `${editInfo.path}.quote` }
+  : null;
+---
+
+<section class="content-col">
+  {richTextBlock && (
+    <RichTextBlock richTextBlock={richTextBlock} theme={theme} editInfo={richTextEditInfo} />
+  )}
+  {stats && (
+    <Stats stats={stats} editInfo={statsEditInfo} />
+  )}
+  {quote && (
+    <Quote quote={quote} editInfo={quoteEditInfo} />
+  )}
+  {buttons && buttons.length > 0 && (
+    <nav class="btn-group" aria-label="Actions">
+      {buttons.map((btn) => {
+        const btnEditInfo: SanityEditInfo | null = editInfo && btn._key
+          ? { ...editInfo, path: `${editInfo.path}.buttons[_key=="${btn._key}"]` }
+          : null;
+        return <Btn key={btn._key} btn={btn} editInfo={btnEditInfo} />;
+      })}
+    </nav>
+  )}
+</section>
+
+<style>
+  .content-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-5);
+    justify-content: center;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+    align-items: center;
+  }
+</style>

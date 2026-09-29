@@ -1,0 +1,98 @@
+---
+import { urlFor } from '@utils/image';
+import { cleanStega } from '@utils/stega';
+import { createDataSanityAttrs, type SanityEditInfo } from '@utils/visualEditing';
+
+interface SanityAsset {
+  _ref?: string;
+  url?: string;
+}
+
+interface Props {
+  quote?: {
+    quoteText?: string;
+    quoterName?: string;
+    quoterPosition?: string;
+    quoterLogo?: {
+      asset?: SanityAsset;
+      alt?: string;
+    };
+  };
+  editInfo?: SanityEditInfo | null;
+}
+
+const { quote, editInfo } = Astro.props;
+const editAttrs = editInfo ? createDataSanityAttrs(editInfo) : {};
+
+const logoAsset = quote?.quoterLogo?.asset;
+const logoUrl = logoAsset?.url || (logoAsset?._ref ? urlFor(quote?.quoterLogo as any).width(120).auto('format').url() : '');
+const logoAlt = cleanStega(quote?.quoterLogo?.alt) || '';
+---
+
+{quote?.quoteText && (
+  <blockquote class="quote" {...editAttrs}>
+    <p class="quote-text">{quote.quoteText}</p>
+    {(quote.quoterName || quote.quoterPosition || logoUrl) && (
+      <footer class="quote-footer">
+        {logoUrl && (
+          <img class="quote-logo" src={logoUrl} alt={logoAlt} loading="lazy" width="120" height="48" />
+        )}
+        <div class="quote-attribution">
+          {quote.quoterName && <cite class="quoter-name">{quote.quoterName}</cite>}
+          {quote.quoterPosition && <span class="quoter-position">{quote.quoterPosition}</span>}
+        </div>
+      </footer>
+    )}
+  </blockquote>
+)}
+
+<style>
+  .quote {
+    margin: 0;
+    padding-inline-start: var(--spacing-4);
+    border-inline-start: 3px solid var(--secondary-50);
+  }
+
+  .quote-text {
+    margin: 0;
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+    font-style: italic;
+    color: inherit;
+  }
+
+  .quote-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-block-start: var(--spacing-3);
+  }
+
+  .quote-logo {
+    display: block;
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    max-width: 120px;
+  }
+
+  .quote-attribution {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .quoter-name {
+    display: block;
+    font-style: normal;
+    font-weight: var(--font-weight-600);
+    font-size: var(--font-size-14);
+    color: inherit;
+  }
+
+  .quoter-position {
+    font-size: var(--font-size-12);
+    opacity: 0.75;
+    color: inherit;
+  }
+</style>

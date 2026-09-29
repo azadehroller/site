@@ -1,5 +1,6 @@
 import type { PortableTextBlock } from "@portabletext/types";
 import type { Slug } from "@sanity/types";
+import type { StandaloneTwoColumnProps } from "../components/standaloneTwoColumn/variants";
 
 // Column content types
 export interface TextBlock {
@@ -872,7 +873,7 @@ export interface Homepage extends SEOFields {
   _id: string;
   _updatedAt?: string;
   title?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
@@ -882,7 +883,7 @@ export interface GetStartedPage extends SEOFields {
   _id: string;
   _updatedAt?: string;
   title?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
@@ -892,7 +893,7 @@ export interface IndustriesLandingPage extends SEOFields {
   _id: string;
   _updatedAt?: string;
   title?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -902,7 +903,7 @@ export interface Page extends SEOFields {
   title?: string;
   slug: Slug;
   headerTheme?: "default" | "dark" | "light" | "industry_report";
-  sections?: (ColumnsBlock | Divider | Post)[];
+  sections?: (ColumnsBlock | Divider | Post | StandaloneTwoColumnBlock)[];
 }
 
 export interface Feature extends SEOFields {
@@ -911,7 +912,17 @@ export interface Feature extends SEOFields {
   title?: string;
   slug: Slug;
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
+  announcementBar?: AnnouncementBarSettings;
+}
+
+export interface ProductPage extends SEOFields {
+  _type: "productPage";
+  _id: string;
+  title?: string;
+  slug: Slug;
+  description?: string;
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -921,7 +932,7 @@ export interface Industry extends SEOFields {
   title?: string;
   slug: Slug;
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -934,7 +945,19 @@ export interface FeaturesLandingPage {
   _type: "featuresLandingPage";
   title?: string;
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
+  headerTheme?: "default" | "dark" | "light" | "industry_report";
+  announcementBar?: AnnouncementBarSettings;
+}
+
+/** Singleton — /product index */
+export interface ProductLandingPage {
+  _id: string;
+  _updatedAt?: string;
+  _type: "productLandingPage";
+  title?: string;
+  description?: string;
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
@@ -945,7 +968,7 @@ export interface Partner extends SEOFields {
   title?: string;
   slug: Slug;
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -954,7 +977,7 @@ export interface PartnersLandingPage extends SEOFields {
   _id: string;
   title?: string;
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
@@ -965,7 +988,7 @@ export interface Competitor extends SEOFields {
   title?: string;
   slug: Slug;
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -974,7 +997,7 @@ export interface CompetitorsLandingPage extends SEOFields {
   _id: string;
   title?: string;
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
@@ -1186,7 +1209,7 @@ export interface LandingPage extends SEOFields {
   title: string;
   slug: { current: string };
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   headerTheme?: "default" | "dark" | "light" | "industry_report";
   announcementBar?: AnnouncementBarSettings;
 }
@@ -1197,7 +1220,7 @@ export interface Solution extends SEOFields {
   title: string;
   slug: { current: string };
   description?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlock)[];
   announcementBar?: AnnouncementBarSettings;
 }
 
@@ -1251,4 +1274,94 @@ export interface FeaturesDetail {
       marginBottom?: string;
     };
   };
+}
+
+// ── Two Column Block ──────────────────────────────────────────────────────────
+
+export interface TwoColMedia {
+  mediaType?: 'image' | 'wistia';
+  image?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+  wistiaId?: string;
+}
+
+export interface TwoColRichTextBlock {
+  eyebrow?: {
+    text?: string;
+    colourStyleLight?: 'red' | 'navy' | 'dark' | 'lightBlue' | 'gradient';
+    colourStyleDark?: 'white' | 'lightBlue' | 'orange' | 'gradient';
+  };
+  title?: {
+    text?: string;
+    headingSize?: 'medium' | 'big';
+  };
+  body?: PortableTextBlock[];
+}
+
+export interface TwoColStats {
+  number?: string;
+  label?: string;
+}
+
+export interface TwoColQuote {
+  quoteText?: string;
+  quoterName?: string;
+  quoterPosition?: string;
+  quoterLogo?: {
+    asset?: { _ref?: string; url?: string };
+    alt?: string;
+  };
+}
+
+export interface TwoColBtn {
+  _key?: string;
+  label?: string;
+  link?: {
+    urlType?: 'EXTERNAL' | 'EMAIL_ADDRESS' | 'CONTENT' | 'FILE';
+    href?: string;
+    contentReference?: {
+      _id?: string;
+      _type?: string;
+      title?: string;
+      slug?: { current?: string };
+    };
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+  hasIcon?: boolean;
+  iconType?: 'inside' | 'outside';
+  styleDefault?: 'dark' | 'navy' | 'red' | 'lightBlue' | 'iris' | 'transparentLight' | 'transparentDark';
+  styleWithIcon?: 'transparentLight' | 'transparentDark';
+}
+
+export interface TwoColCard {
+  _key?: string;
+  media?: TwoColMedia;
+  mediaSide?: 'left' | 'right';
+  mediaOnTopMobile?: boolean;
+  richTextBlock?: TwoColRichTextBlock;
+  stats?: TwoColStats;
+  quote?: TwoColQuote;
+  buttons?: TwoColBtn[];
+}
+
+export interface TwoColumnSection {
+  _type: 'twoColumnSection';
+  _key?: string;
+  theme?: 'light' | 'dark';
+  columnLayout?: 'equal' | 'biggerText';
+  background?: {
+    type?: 'none' | 'colour' | 'image';
+    colourOptionLight?: 'light' | 'lightBlue';
+    colourOptionDark?: 'navy' | 'dark';
+    imageOption?: 'blueBlob' | 'gradientBlob';
+  };
+  cards?: TwoColCard[];
+}
+
+export interface StandaloneTwoColumnBlock
+  extends Omit<StandaloneTwoColumnProps, 'documentId' | 'documentType'> {
+  _type: 'standaloneTwoColumnBlock';
 }

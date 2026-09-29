@@ -1,0 +1,50 @@
+---
+/**
+ * Storybook-only gallery. Renders the real StandaloneTwoColumnBlock once per item.
+ * Used so option lists in options.ts become visible stories automatically.
+ */
+import StandaloneTwoColumnBlock from '../StandaloneTwoColumnBlock.astro';
+import type { StandaloneTwoColumnProps } from './variants';
+
+export interface Props {
+  items: Array<{
+    label: string;
+    props: StandaloneTwoColumnProps;
+  }>;
+}
+
+const { items } = Astro.props;
+---
+
+<div class="s2c-variant-grid">
+  {items.map((item) => (
+    <article class="s2c-variant-item">
+      <p class="s2c-variant-label">{item.label}</p>
+      <StandaloneTwoColumnBlock {...item.props} />
+    </article>
+  ))}
+</div>
+
+<style>
+  .s2c-variant-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .s2c-variant-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .s2c-variant-label {
+    margin: 0;
+    padding-inline: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5b6b86;
+  }
+</style>

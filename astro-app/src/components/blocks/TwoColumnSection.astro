@@ -1,0 +1,319 @@
+---
+/**
+ * TwoColumnSection — CMS-driven two-column block.
+ * Each card has a media column (image or Wistia) and a content column
+ * (eyebrow, heading, body, optional stats/quote/buttons).
+ */
+import { cleanStega } from '@utils/stega';
+import type { PortableTextBlock } from '@portabletext/types';
+import type { SanityEditInfo } from '@utils/visualEditing';
+import MediaColumn from '@components/ui/MediaColumn.astro';
+import ContentColumn from '@components/ui/ContentColumn.astro';
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+interface SanityAsset {
+  _ref?: string;
+  url?: string;
+}
+
+interface Media {
+  mediaType?: string;
+  image?: { asset?: SanityAsset; alt?: string };
+  wistiaId?: string;
+}
+
+interface RichTextBlock {
+  eyebrow?: {
+    text?: string;
+    colourStyleLight?: string;
+    colourStyleDark?: string;
+  };
+  title?: {
+    text?: string;
+    headingSize?: string;
+  };
+  body?: PortableTextBlock[];
+}
+
+interface Stats {
+  number?: string;
+  label?: string;
+}
+
+interface Quote {
+  quoteText?: string;
+  quoterName?: string;
+  quoterPosition?: string;
+  quoterLogo?: { asset?: SanityAsset; alt?: string };
+}
+
+interface Btn {
+  _key?: string;
+  label?: string;
+  link?: {
+    urlType?: string;
+    href?: string;
+    contentReference?: {
+      _id?: string;
+      _type?: string;
+      title?: string;
+      slug?: { current?: string };
+    };
+    openInNewTab?: boolean;
+    noFollow?: boolean;
+  };
+  hasIcon?: boolean;
+  iconType?: string;
+  styleDefault?: string;
+  styleWithIcon?: string;
+}
+
+interface Card {
+  _key?: string;
+  media?: Media;
+  mediaSide?: string;
+  mediaOnTopMobile?: boolean;
+  richTextBlock?: RichTextBlock;
+  stats?: Stats;
+  quote?: Quote;
+  buttons?: Btn[];
+}
+
+interface Background {
+  type?: string;
+  colourOptionLight?: string;
+  colourOptionDark?: string;
+  imageOption?: string;
+}
+
+interface Props {
+  _key?: string;
+  theme?: string;
+  columnLayout?: string;
+  background?: Background;
+  cards?: Card[];
+  documentId?: string;
+  documentType?: string;
+}
+
+// ── Props ────────────────────────────────────────────────────────────────────
+
+const {
+  _key: blockKey,
+  theme: rawTheme,
+  columnLayout: rawColumnLayout,
+  background,
+  cards = [],
+  documentId,
+  documentType,
+} = Astro.props;
+
+const theme = cleanStega(rawTheme) || 'light';
+const columnLayout = cleanStega(rawColumnLayout) || 'equal';
+
+// ── Background class ─────────────────────────────────────────────────────────
+
+function bgClass(bg: Background | undefined, t: string): string {
+  if (!bg || bg.type === 'none' || !bg.type) return '';
+  if (bg.type === 'colour') {
+    const opt = t === 'dark' ? bg.colourOptionDark : bg.colourOptionLight;
+    return opt ? `bg-colour--${cleanStega(opt)}` : '';
+  }
+  if (bg.type === 'image') {
+    return bg.imageOption ? `bg-image--${cleanStega(bg.imageOption)}` : '';
+  }
+  return '';
+}
+
+const wrapperClass = [
+  'two-col-block',
+  `theme--${theme}`,
+  `layout--${columnLayout}`,
+  bgClass(background, theme),
+].filter(Boolean).join(' ');
+---
+
+<div class={wrapperClass}>
+  {cards.map((card) => {
+    // For equal layout, honour mediaSide. For biggerText, media is always right.
+    const side = columnLayout === 'equal'
+      ? (cleanStega(card.mediaSide) || 'left')
+      : 'right';
+    const mediaOnTop = columnLayout === 'equal' ? (card.mediaOnTopMobile ?? false) : false;
+
+    // DOM order drives desktop column position — no CSS swapping needed.
+    // media-left  → media first in DOM  → col 1 on desktop
+    // media-right → content first in DOM → content col 1, media col 2
+    const mediaFirst = side === 'left';
+
+    const cardBasePath = documentId && documentType && blockKey && card._key
+      ? `sections[_key=="${blockKey}"].cards[_key=="${card._key}"]`
+      : null;
+
+    const mediaEditInfo: SanityEditInfo | null = cardBasePath
+      ? { id: documentId!, type: documentType!, path: `${cardBasePath}.media` }
+      : null;
+
+    const cardEditInfo: SanityEditInfo | null = cardBasePath
+      ? { id: documentId!, type: documentType!, path: cardBasePath }
+      : null;
+
+    const mediaCol = (
+      <div class="col-media">
+        <MediaColumn media={card.media} mediaEditInfo={mediaEditInfo} />
+      </div>
+    );
+    const contentCol = (
+      <div class="col-content">
+        <ContentColumn
+          theme={theme}
+          richTextBlock={card.richTextBlock}
+          stats={card.stats}
+          quote={card.quote}
+          buttons={card.buttons}
+          editInfo={cardEditInfo}
+        />
+      </div>
+    );
+
+    return (
+      <div
+        class={['card', mediaOnTop ? 'card--media-top-mobile' : ''].filter(Boolean).join(' ')}
+        data-key={card._key}
+      >
+        {mediaFirst ? mediaCol : contentCol}
+        {mediaFirst ? contentCol : mediaCol}
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  /* ── Wrapper ─────────────────────────────────────────────────────────────── */
+
+  .two-col-block {
+    container-type: inline-size;
+    padding-block: var(--spacing-12);
+    padding-inline: var(--spacing-4);
+
+    @media (min-width: 768px) {
+      padding-inline: var(--spacing-8);
+    }
+  }
+
+  /* ── Background colour options ───────────────────────────────────────────── */
+  /* Theme = background description. Text colour follows the background.        */
+  /* light theme → light backgrounds (light, lightBlue) → dark text (default)  */
+  /* dark theme  → dark backgrounds (navy, dark)        → light text            */
+
+  /* Light theme backgrounds */
+  .theme--light.bg-colour--light {
+    background-color: var(--neutral-white, #fff);
+  }
+
+  .theme--light.bg-colour--lightBlue {
+    background-color: var(--blue-95);
+  }
+
+  /* Dark theme backgrounds + light text */
+  .theme--dark.bg-colour--navy {
+    background-color: var(--primary-30);
+  }
+
+  .theme--dark.bg-colour--dark {
+    background-color: var(--blue-10);
+  }
+
+  /* Text colour: only override when there's an actual dark background */
+  .theme--dark.bg-colour--navy .col-content,
+  .theme--dark.bg-colour--dark .col-content {
+    color: var(--neutral-white);
+  }
+
+  /* Background image options — decorative blobs via pseudo-element */
+  .bg-image--blueBlob {
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(ellipse 80% 60% at 50% 50%, var(--primary-90, #cedffd) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    & > * { position: relative; z-index: 1; }
+  }
+
+  .bg-image--gradientBlob {
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(ellipse 80% 60% at 30% 40%, var(--primary-50, #0960f6) 0%, var(--secondary-50, #ff490c) 100%);
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 0;
+    }
+    & > * { position: relative; z-index: 1; }
+  }
+
+  /* ── Card layout ─────────────────────────────────────────────────────────── */
+
+  .card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-8);
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+
+  .card + .card {
+    margin-block-start: var(--spacing-16);
+  }
+
+  .col-media,
+  .col-content {
+    width: 100%;
+  }
+
+  /* Mobile stacking follows DOM source order by default:
+     mediaSide=left  → col-media is first in DOM  → media on top  ✓
+     mediaSide=right → col-content is first in DOM → text on top   ✓
+     No default order rules needed.
+  */
+
+  /* mediaOnTopMobile toggle: force media on top even when it's second in DOM */
+  .card--media-top-mobile .col-media   { order: 1; }
+  .card--media-top-mobile .col-content { order: 2; }
+
+  /* ── Desktop two-column layout ───────────────────────────────────────────── */
+  /* Desktop uses DOM source order for column placement — no order CSS needed.  */
+  /* media-left  → <col-media> first in DOM  → column 1 (left)                 */
+  /* media-right → <col-content> first in DOM → column 1, media in column 2    */
+
+  @media (min-width: 768px) {
+    .layout--equal .card {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+
+    /* Reset mobile order — desktop position is driven by DOM source order */
+    .layout--equal .col-media,
+    .layout--equal .col-content {
+      order: unset;
+    }
+
+    /* Bigger text — 60% content, 40% media; content is always first in DOM */
+    .layout--biggerText .card {
+      grid-template-columns: 3fr 2fr;
+      align-items: center;
+    }
+
+    .layout--biggerText .col-media,
+    .layout--biggerText .col-content {
+      order: unset;
+    }
+  }
+</style>

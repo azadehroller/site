@@ -1,0 +1,204 @@
+---
+import { cleanStega } from '@utils/stega';
+import { createDataSanityAttrs, type SanityEditInfo } from '@utils/visualEditing';
+
+interface ContentReference {
+  _id?: string;
+  _type?: string;
+  title?: string;
+  slug?: { current?: string };
+}
+
+interface Props {
+  btn?: {
+    _key?: string;
+    label?: string;
+    link?: {
+      urlType?: string;
+      href?: string;
+      contentReference?: ContentReference;
+      openInNewTab?: boolean;
+      noFollow?: boolean;
+    };
+    hasIcon?: boolean;
+    iconType?: string;
+    styleDefault?: string;
+    styleWithIcon?: string;
+  };
+  editInfo?: SanityEditInfo | null;
+}
+
+const { btn, editInfo } = Astro.props;
+const editAttrs = editInfo ? createDataSanityAttrs(editInfo) : {};
+
+function resolveContentRef(ref: ContentReference | undefined): string {
+  if (!ref?._type) return '#';
+  const singletons: Record<string, string> = {
+    homepage: '/',
+    getStartedPage: '/get-started',
+    industriesLandingPage: '/industries',
+    featuresLandingPage: '/features',
+    productLandingPage: '/product',
+    blogLandingPage: '/blog',
+    pricingPage: '/pricing',
+    partnersLandingPage: '/partners',
+    competitorsLandingPage: '/competitors',
+  };
+  if (singletons[ref._type]) return singletons[ref._type];
+  const slug = ref.slug?.current;
+  if (!slug) return '#';
+  const typeMap: Record<string, string> = {
+    page: '',
+    feature: '/features',
+    productPage: '/product',
+    industry: '/industries',
+    post: '/blog',
+    solution: '/solutions',
+    partner: '/partners',
+    competitor: '/competitors',
+    landingPage: '',
+    rawHtmlPage: '',
+  };
+  const base = typeMap[ref._type] ?? '';
+  return base ? `${base}/${slug}` : `/${slug}`;
+}
+
+const urlType = cleanStega(btn?.link?.urlType) || 'EXTERNAL';
+const hasIcon = btn?.hasIcon ?? false;
+const iconType = cleanStega(btn?.iconType);
+const style = hasIcon
+  ? cleanStega(btn?.styleWithIcon) || 'transparentDark'
+  : cleanStega(btn?.styleDefault) || 'navy';
+
+let href = '';
+if (urlType === 'CONTENT') {
+  href = resolveContentRef(btn?.link?.contentReference);
+} else {
+  href = cleanStega(btn?.link?.href) || '#';
+  if (urlType === 'EMAIL_ADDRESS' && href && !href.startsWith('mailto:')) {
+    href = `mailto:${href}`;
+  }
+}
+
+// Sanitize href
+try { new URL(href, 'https://example.com'); } catch { href = '#'; }
+
+const openInNewTab = btn?.link?.openInNewTab ?? false;
+const noFollow = btn?.link?.noFollow ?? false;
+const relParts: string[] = [];
+if (noFollow) relParts.push('nofollow');
+if (openInNewTab) relParts.push('noopener');
+const rel = relParts.length ? relParts.join(' ') : undefined;
+
+// Arrow SVG for inside icon
+const arrowInside = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2 6.59 3.41 11.17 8H2v2h9.17l-4.58 4.59L8 14l6-6-6-6z" fill="currentColor"/></svg>`;
+---
+
+{btn?.label && (
+  <div class={`btn-wrapper ${hasIcon && iconType === 'outside' ? 'btn-wrapper--outside' : ''}`} {...editAttrs}>
+    <a
+      class={`btn btn--${style}`}
+      href={href}
+      target={openInNewTab ? '_blank' : undefined}
+      rel={rel}
+    >
+      {btn.label}
+      {hasIcon && iconType === 'inside' && (
+        <span class="btn-icon-inside" set:html={arrowInside} />
+      )}
+    </a>
+    {hasIcon && iconType === 'outside' && (
+      <span class="btn-icon-outside" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+          <rect width="40" height="40" rx="20" fill="currentColor"/>
+          <path fill="var(--neutral-white, #fff)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+        </svg>
+      </span>
+    )}
+  </div>
+)}
+
+<style>
+  .btn-wrapper {
+    display: inline-flex;
+    align-items: center;
+
+    &.btn-wrapper--outside {
+      gap: var(--spacing-3);
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    text-decoration: none;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-600);
+    line-height: var(--line-height-24);
+    letter-spacing: var(--letter-spacing-snug);
+    border-radius: 1.5rem;
+    padding-block: var(--spacing-2);
+    padding-inline: var(--spacing-5);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &.btn--dark {
+      background-color: var(--blue-10);
+      color: var(--neutral-white);
+      &:hover { background-color: var(--primary-10); color: var(--blue-10); }
+    }
+
+    &.btn--navy {
+      background-color: var(--primary-30);
+      color: var(--neutral-white);
+      &:hover { background-color: var(--primary-40); }
+    }
+
+    &.btn--red {
+      background-color: var(--secondary-50);
+      color: var(--neutral-white);
+      &:hover { background-color: var(--secondary-60); }
+    }
+
+    &.btn--lightBlue {
+      background-color: var(--primary-20);
+      color: var(--blue-10);
+      &:hover { background-color: var(--primary-30); color: var(--neutral-white); }
+    }
+
+    &.btn--iris {
+      background-color: var(--iris, #603ff5);
+      color: var(--neutral-white);
+      &:hover { opacity: 0.9; }
+    }
+
+    &.btn--transparentLight {
+      background-color: transparent;
+      color: var(--neutral-white);
+      border: 1px solid var(--neutral-white);
+      &:hover { background-color: var(--neutral-white); color: var(--blue-10); }
+    }
+
+    &.btn--transparentDark {
+      background-color: transparent;
+      color: var(--blue-10);
+      border: 1px solid var(--blue-10);
+      &:hover { background-color: var(--blue-10); color: var(--neutral-white); }
+    }
+  }
+
+  .btn-icon-inside {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .btn-icon-outside {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: var(--secondary-50);
+  }
+</style>

@@ -1,0 +1,876 @@
+---
+/**
+ * Standalone Two Column Block
+ * Equal two-column section (content + media) matching the Phase 3 Figma variations.
+ * Not part of Columns, and not the existing TwoColumnSection.
+ */
+import { PortableText } from 'astro-portabletext';
+import { urlFor } from '@utils/image';
+import { cleanStega } from '@utils/stega';
+import { createDataSanityAttrs, type SanityEditInfo } from '@utils/visualEditing';
+import MediaVideo from '@components/ui/MediaVideo.astro';
+import type {
+  StandaloneTwoColumnButton,
+  StandaloneTwoColumnContentReference,
+  StandaloneTwoColumnLoopItem,
+  StandaloneTwoColumnProps,
+} from './standaloneTwoColumn/variants';
+import {
+  isStandaloneTwoColumnArrowButton,
+  isStandaloneTwoColumnDarkTheme,
+  isStandaloneTwoColumnLoop,
+  resolveStandaloneTwoColumnBackground,
+  resolveStandaloneTwoColumnBodySize,
+  resolveStandaloneTwoColumnButtonStyle,
+  resolveStandaloneTwoColumnEyebrowColor,
+  resolveStandaloneTwoColumnHeadingSize,
+  resolveStandaloneTwoColumnImageLoading,
+  resolveStandaloneTwoColumnLayout,
+  resolveStandaloneTwoColumnMediaSide,
+  resolveStandaloneTwoColumnMediaType,
+  resolveStandaloneTwoColumnRowMode,
+  resolveStandaloneTwoColumnStatPlacement,
+  resolveStandaloneTwoColumnTextColor,
+  resolveStandaloneTwoColumnTheme,
+} from './standaloneTwoColumn/variants';
+
+export type Props = StandaloneTwoColumnProps;
+
+const {
+  _key: blockKey,
+  theme: rawTheme,
+  background: rawBackground,
+  textColor: rawTextColor,
+  layout: rawLayout,
+  rowMode: rawRowMode,
+  columnLoop = [],
+  mediaSide: rawMediaSide,
+  mediaOnTopMobile: rawMediaOnTopMobile,
+  mediaType: rawMediaType,
+  image,
+  imageLoading: rawImageLoading,
+  wistiaId,
+  posterImage,
+  stat,
+  eyebrow,
+  heading,
+  body,
+  bodySize: rawBodySize,
+  quote,
+  buttons = [],
+  documentId,
+  documentType,
+} = Astro.props;
+
+const theme = resolveStandaloneTwoColumnTheme(cleanStega(rawTheme), cleanStega(rawBackground));
+const background = resolveStandaloneTwoColumnBackground(cleanStega(rawBackground), theme);
+const textColor = resolveStandaloneTwoColumnTextColor(cleanStega(rawTextColor), theme);
+const layout = resolveStandaloneTwoColumnLayout(cleanStega(rawLayout));
+const rowMode = resolveStandaloneTwoColumnRowMode(cleanStega(rawRowMode));
+const isColumnLoop = isStandaloneTwoColumnLoop(layout, rowMode);
+const mediaSide = resolveStandaloneTwoColumnMediaSide(cleanStega(rawMediaSide));
+const mediaType = resolveStandaloneTwoColumnMediaType(cleanStega(rawMediaType));
+const headingSize = resolveStandaloneTwoColumnHeadingSize(cleanStega(heading?.size));
+const bodySize = resolveStandaloneTwoColumnBodySize(cleanStega(rawBodySize));
+const eyebrowColor = resolveStandaloneTwoColumnEyebrowColor(cleanStega(eyebrow?.color), theme);
+const imageLoading = resolveStandaloneTwoColumnImageLoading(cleanStega(rawImageLoading));
+const statPlacement = resolveStandaloneTwoColumnStatPlacement(cleanStega(stat?.placement));
+
+// Default mobile stack: media on top when media is on the left.
+const mediaOnTopMobile = rawMediaOnTopMobile ?? mediaSide === 'left';
+
+const isDark = isStandaloneTwoColumnDarkTheme(theme);
+
+const blockPath =
+  documentId && documentType && blockKey ? `sections[_key=="${blockKey}"]` : null;
+
+function fieldInfo(field: string): SanityEditInfo | null {
+  if (!documentId || !documentType || !blockPath) return null;
+  return { id: documentId, type: documentType, path: `${blockPath}.${field}` };
+}
+
+function resolveContentRef(ref: StandaloneTwoColumnContentReference | undefined): string {
+  if (!ref?._type) return '#';
+  const singletons: Record<string, string> = {
+    homepage: '/',
+    getStartedPage: '/get-started',
+    industriesLandingPage: '/industries',
+    featuresLandingPage: '/features',
+    productLandingPage: '/product',
+    blogLandingPage: '/blog',
+    pricingPage: '/pricing',
+    partnersLandingPage: '/partners',
+    competitorsLandingPage: '/competitors',
+  };
+  if (singletons[ref._type]) return singletons[ref._type];
+  const slug = ref.slug?.current;
+  if (!slug) return '#';
+  const typeMap: Record<string, string> = {
+    page: '',
+    feature: '/features',
+    productPage: '/product',
+    industry: '/industries',
+    post: '/blog',
+    solution: '/solutions',
+    partner: '/partners',
+    competitor: '/competitors',
+    landingPage: '',
+    rawHtmlPage: '',
+  };
+  const base = typeMap[ref._type] ?? '';
+  return base ? `${base}/${slug}` : `/${slug}`;
+}
+
+function buttonHref(btn: StandaloneTwoColumnButton): string {
+  const urlType = cleanStega(btn.link?.urlType) || 'EXTERNAL';
+  if (urlType === 'CONTENT') return resolveContentRef(btn.link?.contentReference);
+  let href = cleanStega(btn.link?.href) || '#';
+  if (urlType === 'EMAIL_ADDRESS' && href && !href.startsWith('mailto:')) {
+    href = `mailto:${href}`;
+  }
+  try {
+    new URL(href, 'https://example.com');
+  } catch {
+    href = '#';
+  }
+  return href;
+}
+
+const imageAsset = image?.asset;
+const imageSrc =
+  imageAsset?.url ||
+  (imageAsset?._ref ? urlFor(image as Parameters<typeof urlFor>[0]).width(1200).auto('format').url() : '');
+const imageAlt = cleanStega(image?.alt) || '';
+
+const logoAsset = quote?.quoterLogo?.asset;
+const logoSrc =
+  logoAsset?.url ||
+  (logoAsset?._ref
+    ? urlFor(quote?.quoterLogo as Parameters<typeof urlFor>[0]).width(120).auto('format').url()
+    : '');
+const logoAlt = cleanStega(quote?.quoterLogo?.alt) || '';
+const rawLogoAlt = quote?.quoterLogo?.alt;
+
+const hasStat = Boolean(stat?.number || stat?.label);
+const showContentStat = hasStat && statPlacement === 'content';
+const showMediaStat = hasStat && statPlacement === 'mediaOverlay';
+const visibleButtons = (buttons || []).filter((btn) => btn?.label);
+const hasQuote = Boolean(quote?.quoteText);
+const hasMedia = (mediaType === 'image' && imageSrc) || (mediaType === 'wistia' && wistiaId);
+const loopItems = (columnLoop || []).filter((item) => item?.heading || item?.body || item?.image?.asset);
+
+function loopImageSrc(item: StandaloneTwoColumnLoopItem): string {
+  const asset = item.image?.asset;
+  if (asset?.url) return asset.url;
+  if (asset?._ref) {
+    return urlFor(item.image as Parameters<typeof urlFor>[0]).width(416).auto('format').url();
+  }
+  return '';
+}
+
+// Modifier classes on the section — no prefix needed with Astro scoped CSS.
+const sectionClass = [
+  `bg-${background}`,
+  isDark ? 'dark' : 'light',
+  `text-${textColor}`,
+  isColumnLoop ? 'loop' : layout,
+  !isColumnLoop && `media-${mediaSide}`,
+  !isColumnLoop && (mediaOnTopMobile ? 'media-top' : 'content-top'),
+].filter(Boolean).join(' ');
+---
+
+<section
+  class={sectionClass}
+  {...createDataSanityAttrs(documentId && documentType && blockKey
+    ? { id: documentId, type: documentType, path: blockPath! }
+    : null)}
+>
+  {isColumnLoop ? (
+    <div class="loop-items">
+      {loopItems.map((item) => {
+        const src = loopImageSrc(item);
+        const alt = cleanStega(item.image?.alt) || '';
+        const rowEdit = fieldInfo('columnLoop') && item._key
+          ? { id: documentId!, type: documentType!, path: `${blockPath}.columnLoop[_key=="${item._key}"]` }
+          : null;
+
+        return (
+          <article class="row" {...createDataSanityAttrs(rowEdit)}>
+            <div class="row-copy">
+              {item.heading && <h3 class="row-heading">{item.heading}</h3>}
+              {item.body && <p class="row-body">{item.body}</p>}
+            </div>
+            {src && (
+              <figure class="row-media">
+                <img class="row-img" src={src} alt={alt} loading="lazy" />
+              </figure>
+            )}
+          </article>
+        );
+      })}
+    </div>
+  ) : (
+  <div class="layout">
+    <div class="content">
+      {(eyebrow?.text || heading?.text || (body && body.length > 0)) && (
+        <div class="copy">
+          {eyebrow?.text && (
+            <strong class={`eyebrow eyebrow--${eyebrowColor}`} {...createDataSanityAttrs(fieldInfo('eyebrow'))}>
+              {eyebrow.text}
+            </strong>
+          )}
+
+          {heading?.text && (
+            <h2 class={`heading heading--${headingSize}`} {...createDataSanityAttrs(fieldInfo('heading'))}>
+              {heading.text}
+            </h2>
+          )}
+
+          {body && body.length > 0 && (
+            <div class={`body body--${bodySize}`} {...createDataSanityAttrs(fieldInfo('body'))}>
+              <PortableText value={body} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {showContentStat && (
+        <dl class="stat" {...createDataSanityAttrs(fieldInfo('stat'))}>
+          <div class="stat-item">
+            <dd class="stat-number">
+              {stat?.number}
+              <span class="stat-arrow" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 3.3 4.5 8h2.3v4.7h2.4V8h2.3L8 3.3Z" fill="currentColor"/>
+                </svg>
+              </span>
+            </dd>
+            {stat?.label && <dt class="stat-label">{stat.label}</dt>}
+          </div>
+        </dl>
+      )}
+
+      {hasQuote && (
+        <blockquote class="quote" {...createDataSanityAttrs(fieldInfo('quote'))}>
+          <p class="quote-text">{quote?.quoteText}</p>
+          {(quote?.quoterName || quote?.quoterPosition || logoSrc) && (
+            <footer class="quote-footer">
+              {logoSrc && (
+                <figure class="logo-wrap" {...createDataSanityAttrs(fieldInfo('quote.quoterLogo'))}>
+                  <img class="logo" src={logoSrc} alt={logoAlt} loading="lazy" width="91" height="48" />
+                  {rawLogoAlt && <span class="sr-only">{rawLogoAlt}</span>}
+                </figure>
+              )}
+              <div class="attribution">
+                {quote?.quoterName && <cite class="attribution-name">{quote.quoterName}</cite>}
+                {quote?.quoterPosition && <span class="attribution-role">{quote.quoterPosition}</span>}
+              </div>
+            </footer>
+          )}
+        </blockquote>
+      )}
+
+      {visibleButtons.length > 0 && (
+        <nav class="actions" aria-label="Actions">
+          {visibleButtons.map((btn) => {
+            const style = resolveStandaloneTwoColumnButtonStyle(cleanStega(btn.style));
+            const href = buttonHref(btn);
+            const openInNewTab = btn.link?.openInNewTab ?? false;
+            const noFollow = btn.link?.noFollow ?? false;
+            const relParts: string[] = [];
+            if (noFollow) relParts.push('nofollow');
+            if (openInNewTab) relParts.push('noopener');
+            const isArrow = isStandaloneTwoColumnArrowButton(style);
+            const btnEdit = fieldInfo('buttons') && btn._key
+              ? { id: documentId!, type: documentType!, path: `${blockPath}.buttons[_key=="${btn._key}"]` }
+              : null;
+
+            return (
+              <a
+                class={`btn btn--${style}`}
+                href={href}
+                target={openInNewTab ? '_blank' : undefined}
+                rel={relParts.length ? relParts.join(' ') : undefined}
+                {...createDataSanityAttrs(btnEdit)}
+              >
+                <span class="btn-label">{btn.label}</span>
+                {isArrow && (
+                  <span class="btn-arrow" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
+                      <rect width="40" height="40" rx="20" fill="currentColor"/>
+                      <path fill="var(--neutral-white, #fff)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+                    </svg>
+                  </span>
+                )}
+              </a>
+            );
+          })}
+        </nav>
+      )}
+    </div>
+
+    {hasMedia && (
+      <div class="media">
+        {mediaType === 'image' && imageSrc && (
+          <figure class="figure" {...createDataSanityAttrs(fieldInfo('image'))}>
+            <img
+              class="image"
+              src={imageSrc}
+              alt={imageAlt}
+              loading={imageLoading}
+              decoding="async"
+              fetchpriority={imageLoading === 'eager' ? 'high' : undefined}
+            />
+            {image?.alt && <span class="sr-only">{image.alt}</span>}
+          </figure>
+        )}
+        {mediaType === 'wistia' && (
+          <MediaVideo wistiaId={wistiaId} posterImage={posterImage} editInfo={fieldInfo('wistiaId')} />
+        )}
+        {showMediaStat && (
+          <aside class="media-stat" {...createDataSanityAttrs(fieldInfo('stat'))}>
+            <p class="media-stat-text">
+              {stat?.number}
+              {stat?.label ? ` ${stat.label}` : ''}
+            </p>
+          </aside>
+        )}
+      </div>
+    )}
+  </div>
+  )}
+</section>
+
+<style>
+  /* ─── Section root ──────────────────────────────────────────────────────── */
+  section {
+    container-type: inline-size;
+    display: flex;
+    justify-content: center;
+    padding-block: var(--spacing-20);
+    padding-inline: var(--spacing-12);
+  }
+
+  /* Section itself is the container root, so padding responds to the viewport. */
+  @media (min-width: 48rem) {
+    section {
+      padding-inline: var(--spacing-16);
+    }
+  }
+
+  /* ─── Surface tokens ─────────────────────────────────────────────────────
+     Each modifier class sets the section background and cascades color to
+     all descendants via the text-* modifier below.                         */
+  section.bg-white     { background-color: var(--neutral-white); }
+  section.bg-lightBlue { background-color: var(--blue-99); }
+  section.bg-navy      { background-color: var(--primary-50); }
+  section.bg-darkBlue  { background-color: var(--blue-10); }
+
+  section.text-navy      { color: var(--primary-50); }
+  section.text-dark      { color: var(--blue-10); }
+  section.text-white     { color: var(--neutral-white); }
+  section.text-lightBlue { color: var(--primary-20); }
+
+  /* ─── Two-column layout grid ────────────────────────────────────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-8);
+    max-width: var(--container-xl, 1312px);
+    width: 100%;
+  }
+
+  .content,
+  .media {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--spacing-8);
+  }
+
+  .copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-6);
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Mobile stacking order */
+  section.media-top .media   { order: 1; }
+  section.media-top .content { order: 2; }
+  section.content-top .content { order: 1; }
+  section.content-top .media   { order: 2; }
+
+  @container (min-width: 36rem) {
+    section.equal .layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    section.biggerLeft.media-right .layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, min(26rem, 38%));
+    }
+
+    section.biggerLeft.media-left .layout {
+      grid-template-columns: minmax(0, min(26rem, 38%)) minmax(0, 1fr);
+    }
+
+    section.equal.media-left .media,
+    section.biggerLeft.media-left .media    { order: 1; }
+    section.equal.media-left .content,
+    section.biggerLeft.media-left .content  { order: 2; }
+    section.equal.media-right .content,
+    section.biggerLeft.media-right .content { order: 1; }
+    section.equal.media-right .media,
+    section.biggerLeft.media-right .media   { order: 2; }
+
+    .content {
+      gap: var(--spacing-12);
+    }
+  }
+
+  /* ─── Loop layout ───────────────────────────────────────────────────────── */
+  .loop-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+    max-width: var(--container-xl, 1312px);
+    width: 100%;
+    min-width: 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--spacing-6);
+    padding-inline-start: var(--spacing-8);
+    border-inline-start: 3px solid var(--blue-90, #cedffd);
+    min-width: 0;
+  }
+
+  .row-copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+    min-width: 0;
+    width: 100%;
+  }
+
+  .row-heading {
+    font-size: var(--font-size-32);
+    font-weight: var(--font-weight-800);
+    line-height: var(--line-height-20);
+    letter-spacing: var(--letter-spacing-snug);
+    overflow-wrap: break-word;
+    color: inherit;
+  }
+
+  .row-body {
+    margin: 0;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-400);
+    line-height: var(--line-height-24);
+    overflow-wrap: break-word;
+    color: inherit;
+  }
+
+  .row-media {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0;
+    width: auto;
+    max-width: min(10.75rem, 100%);
+  }
+
+  .row-img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  section.dark .row {
+    border-inline-start-color: var(--white-alpha-24);
+  }
+
+  @container (min-width: 36rem) {
+    .loop-items {
+      gap: 0;
+    }
+
+    .row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, min(26rem, 38%));
+      align-items: center;
+      gap: var(--spacing-8);
+      padding-block: var(--spacing-6);
+      padding-inline-start: 0;
+      border-inline-start: 0;
+      border-block-start: 1px solid var(--blue-90, #cedffd);
+    }
+
+    .row:last-child {
+      border-block-end: 1px solid var(--blue-90, #cedffd);
+    }
+
+    section.dark .row {
+      border-block-start-color: var(--white-alpha-24);
+      border-block-end-color: var(--white-alpha-24);
+    }
+
+    .row-media {
+      width: 100%;
+      max-width: none;
+      justify-content: center;
+    }
+
+    .row-img {
+      max-height: 16.25rem;
+    }
+  }
+
+  @container (min-width: 52rem) {
+    .row-heading {
+      font-size: var(--font-size-48);
+    }
+
+    .row-body {
+      font-size: var(--font-size-18);
+    }
+  }
+
+  /* ─── Eyebrow ───────────────────────────────────────────────────────────── */
+  .eyebrow {
+    display: block;
+    font-size: var(--font-size-18);
+    font-weight: var(--font-weight-800);
+    letter-spacing: 0;
+    text-transform: uppercase;
+    line-height: var(--line-height-24);
+  }
+
+  .eyebrow--red       { color: var(--red-55); }
+  .eyebrow--blue      { color: var(--blue-50); }
+  .eyebrow--navy      { color: var(--primary-50); }
+  .eyebrow--dark      { color: var(--blue-10); }
+  .eyebrow--lightBlue { color: var(--primary-20); }
+  .eyebrow--white     { color: var(--neutral-white); }
+  .eyebrow--gradient {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background: linear-gradient(90deg, var(--primary-50), var(--secondary-50));
+    background-clip: text;
+  }
+
+  /* ─── Heading ───────────────────────────────────────────────────────────── */
+  .heading {
+    font-weight: var(--font-weight-800);
+    letter-spacing: var(--letter-spacing-snug);
+    overflow-wrap: break-word;
+    color: inherit;
+  }
+
+  /* Note: --big and --bigger currently match --normal visually.
+     Differentiate here once design specs for those sizes are confirmed. */
+  .heading--normal,
+  .heading--big,
+  .heading--bigger {
+    font-size: var(--font-size-32);
+    line-height: var(--line-height-20);
+  }
+
+  @container (min-width: 40rem) {
+    .heading--normal,
+    .heading--big,
+    .heading--bigger {
+      font-size: var(--font-size-48);
+    }
+  }
+
+  /* ─── Body ──────────────────────────────────────────────────────────────── */
+  .body {
+    width: 100%;
+    color: inherit;
+  }
+
+  .body--small  { font-size: var(--font-size-14); line-height: var(--line-height-24); }
+  .body--normal { font-size: var(--font-size-16); line-height: var(--line-height-24); }
+  .body--large  { font-size: var(--font-size-18); line-height: var(--line-height-24); }
+
+  .body :global(p),
+  .body :global(ul),
+  .body :global(ol),
+  .body :global(li),
+  .body :global(h3),
+  .body :global(h4) {
+    margin: 0;
+  }
+
+  .body :global(p + p),
+  .body :global(p + ul),
+  .body :global(p + ol),
+  .body :global(ul + p),
+  .body :global(ol + p) {
+    padding-block-start: var(--spacing-4);
+  }
+
+  .body :global(ul),
+  .body :global(ol) {
+    padding-inline-start: 1.25em;
+  }
+
+  .body :global(li + li) {
+    padding-block-start: var(--spacing-2);
+  }
+
+  .body :global(strong) { font-weight: var(--font-weight-700); }
+  .body :global(em) { font-style: italic; }
+  .body :global(a) {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ─── Stat ──────────────────────────────────────────────────────────────── */
+  .stat {
+    padding-inline-start: var(--spacing-4);
+    border-inline-start: 2px solid var(--red-55);
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .stat-number {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--font-size-48);
+    font-weight: var(--font-weight-800);
+    line-height: var(--line-height-20);
+    letter-spacing: var(--letter-spacing-snug);
+    color: inherit;
+  }
+
+  .stat-arrow { color: var(--green-60); }
+
+  .stat-label {
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+  }
+
+  /* ─── Quote ─────────────────────────────────────────────────────────────── */
+  .quote {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+    margin: 0;
+    padding-inline-start: var(--spacing-4);
+    /* Reset physical border-left from global blockquote styles; use logical property. */
+    border-left: 0;
+    border-inline-start: 2px solid var(--red-55);
+    width: 100%;
+  }
+
+  .quote-text {
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
+    font-style: normal;
+    color: inherit;
+  }
+
+  .quote-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .logo-wrap {
+    position: relative;
+    display: block;
+    margin: 0;
+    flex-shrink: 0;
+    width: 91px;
+    height: 48px;
+  }
+
+  .logo {
+    display: block;
+    width: 91px;
+    height: 48px;
+    object-fit: contain;
+  }
+
+  .attribution {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .attribution-name {
+    font-style: normal;
+    font-weight: var(--font-weight-600);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+  }
+
+  .attribution-role {
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+  }
+
+  /* ─── Actions ───────────────────────────────────────────────────────────── */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-4);
+    width: 100%;
+  }
+
+  /* ─── Buttons ───────────────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    text-decoration: none;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-600);
+    line-height: var(--line-height-24);
+    letter-spacing: 0;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn {
+      transition:
+        background-color var(--transition-duration, 200ms) var(--transition-easing, ease),
+        color var(--transition-duration, 200ms) var(--transition-easing, ease),
+        border-color var(--transition-duration, 200ms) var(--transition-easing, ease);
+    }
+  }
+
+  .btn--red,
+  .btn--blue,
+  .btn--outlined {
+    border-radius: var(--radius-pill, 9999px);
+    padding-block: var(--spacing-2);
+    padding-inline: var(--spacing-6);
+  }
+
+  .btn--red {
+    background-color: var(--red-55);
+    color: var(--neutral-white);
+  }
+
+  .btn--red:hover { background-color: var(--secondary-60); }
+
+  .btn--blue {
+    background-color: var(--blue-50);
+    color: var(--neutral-white);
+  }
+
+  .btn--blue:hover { background-color: var(--primary-40); }
+
+  .btn--outlined {
+    background-color: transparent;
+    color: var(--primary-50);
+    border: 1px solid var(--primary-50);
+  }
+
+  section.dark .btn--outlined {
+    color: var(--neutral-white);
+    border-color: var(--neutral-white);
+  }
+
+  .btn--outlined:hover {
+    background-color: var(--primary-50);
+    color: var(--neutral-white);
+  }
+
+  section.dark .btn--outlined:hover {
+    background-color: var(--neutral-white);
+    color: var(--blue-10);
+  }
+
+  .btn--transparentRedArrow,
+  .btn--transparentBlueArrow {
+    padding-block: 0;
+    padding-inline: 0;
+    color: inherit;
+  }
+
+  .btn--transparentRedArrow .btn-arrow  { color: var(--red-55); }
+  .btn--transparentBlueArrow .btn-arrow { color: var(--blue-50); }
+
+  .btn-arrow {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  /* Full-width buttons below the two-column threshold */
+  @container (width < 40rem) {
+    .btn--red,
+    .btn--blue,
+    .btn--outlined {
+      flex: 1 1 100%;
+    }
+  }
+
+  /* ─── Media column ──────────────────────────────────────────────────────── */
+  .media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .figure {
+    display: block;
+    width: 100%;
+  }
+
+  .image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    box-shadow: var(--shadow-image);
+  }
+
+  .media-stat {
+    position: absolute;
+    right: var(--spacing-4);
+    bottom: var(--spacing-4);
+    background-color: var(--neutral-white);
+    color: var(--blue-10);
+    border-radius: var(--radius-md, 0.75rem);
+    padding-block: var(--spacing-3);
+    padding-inline: var(--spacing-4);
+    box-shadow: var(--shadow-card-overlay);
+    max-width: 70%;
+  }
+
+  .media-stat-text {
+    margin: 0;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-700);
+    line-height: var(--line-height-22);
+  }
+</style>

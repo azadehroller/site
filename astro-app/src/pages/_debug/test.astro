@@ -1,11 +1,13 @@
 ---
 import Columns from "@components/blocks/Columns.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
+import StandaloneTwoColumnBlock from "@components/StandaloneTwoColumnBlock.astro";
 import Layout from "@layouts/Layout.astro";
 import { loadQuery } from "@utils/loadQuery";
 import { getLayoutData } from "@utils/sanity";
 import groq from "groq";
-import type { ColumnsBlock, Divider } from "@utils/sanity";
+import { standaloneTwoColumnFields } from "../../sanity/queries/standaloneTwoColumn";
+import type { ColumnsBlock, Divider, StandaloneTwoColumnBlock as StandaloneTwoColumnBlockType } from "@utils/sanity";
 
 // SSR enabled for preview/draft mode
 export const prerender = false;
@@ -20,7 +22,7 @@ interface TestPage {
   _id: string;
   _type: "testPage";
   title?: string;
-  sections?: (ColumnsBlock | Divider)[];
+  sections?: (ColumnsBlock | Divider | StandaloneTwoColumnBlockType)[];
 }
 
 const [{ data: testPage }, layoutSanity] = await Promise.all([
@@ -30,6 +32,9 @@ const [{ data: testPage }, layoutSanity] = await Promise.all([
     title,
     sections[]{
       ...,
+      _type == 'standaloneTwoColumnBlock' => {
+        ${standaloneTwoColumnFields}
+      },
       _type == 'columnsBlock' => {
         _type,
         _key,
@@ -136,7 +141,10 @@ const documentType = 'testPage';
 
 <Layout title={testPage?.title || "Test Page"} layoutSanity={layoutSanity}>
   <div class="test-page-container">
-    {testPage?.sections?.map((section: ColumnsBlock | Divider) => {
+    {testPage?.sections?.map((section: ColumnsBlock | Divider | StandaloneTwoColumnBlockType) => {
+      if (section._type === "standaloneTwoColumnBlock") {
+        return <StandaloneTwoColumnBlock {...section} documentId={documentId} documentType={documentType} />;
+      }
       if (section._type === "columnsBlock") {
         const columnsBlock = section as ColumnsBlock;
         const sectionKey = columnsBlock._key;

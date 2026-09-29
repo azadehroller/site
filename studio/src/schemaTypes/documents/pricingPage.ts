@@ -41,6 +41,9 @@ export default defineType({
           type: 'columnsBlock',
         },
         {
+          type: 'standaloneTwoColumnBlock',
+        },
+        {
           type: 'divider',
         },
       ],

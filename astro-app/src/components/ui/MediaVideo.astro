@@ -1,0 +1,286 @@
+---
+import { urlFor } from '@utils/image';
+import { cleanStega } from '@utils/stega';
+import { createDataSanityAttrs, isVisualEditingEnabled } from '@utils/visualEditing';
+import type { SanityEditInfo } from '@utils/visualEditing';
+
+interface SanityAsset {
+  _ref?: string;
+  url?: string;
+}
+
+interface Props {
+  wistiaId?: string;
+  posterImage?: {
+    asset?: SanityAsset;
+    alt?: string;
+  };
+  editInfo?: SanityEditInfo | null;
+}
+
+const { wistiaId: rawWistiaId, posterImage, editInfo } = Astro.props;
+const wistiaId = cleanStega(rawWistiaId) || '';
+const visualEditing = isVisualEditingEnabled();
+
+const posterAsset = posterImage?.asset;
+const posterSrc = cleanStega(posterAsset?.url || '')
+  || (posterAsset?._ref ? urlFor(posterImage as any).width(1264).auto('format').url() : '');
+const posterAlt = cleanStega(posterImage?.alt) || '';
+---
+
+{wistiaId && (
+  <div id={`image-video-modal-${wistiaId}`} class="video-image-main-wrapper" {...(editInfo ? createDataSanityAttrs(editInfo) : {})}>
+    <div class="video-image-container relative">
+
+      <div class="flex justify-center image-wrapper">
+        {posterSrc
+          ? <img src={posterSrc} alt={posterAlt} class="video-image relative" width="1264" height="710" loading="lazy" decoding="async" />
+          : <div class="video-image video-placeholder" />
+        }
+      </div>
+
+      <div
+        class={`wistia_embed wistia_async_${wistiaId} popover=true`}
+        aria-hidden="true"
+        style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"
+      />
+
+      {/*
+        In visual-editing mode the play overlay is made non-interactive: no
+        `data-video` (so the play script below never binds it) and
+        pointer-events:none (so clicks fall through to the wrapper, where
+        Sanity's overlay handles click-to-edit and focuses the video field).
+        On the live site it stays a fully interactive play button.
+      */}
+      <div
+        class:list={['mv-play-overlay', visualEditing && 'mv-play-overlay--ve']}
+        id={`wistia-${wistiaId}-`}
+        role={visualEditing ? undefined : 'button'}
+        tabindex={visualEditing ? undefined : 0}
+        aria-label="Play video"
+        aria-hidden={visualEditing ? 'true' : undefined}
+        data-video={visualEditing ? undefined : wistiaId}
+      >
+        {/* Stega span: Sanity VE scanner detects encoded wistiaId for click-to-edit */}
+        <span class="mv-stega">{rawWistiaId}</span>
+        <button class="media-frame-play-button" aria-label="Play video" type="button" tabindex="-1">
+          <span class="mv-play-icon" aria-hidden="true">
+            <svg width="22" height="26" viewBox="0 0 20 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 2L18 12L2 22V2Z" fill="currentColor" />
+            </svg>
+          </span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+<style>
+  /* Glass-frame outer wrapper */
+  .video-image-main-wrapper {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 52px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.40);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.459px solid rgba(1, 24, 64, 0.00);
+  }
+
+  .video-image-main-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(0deg, rgba(1, 24, 64, 0.02), rgba(1, 24, 64, 0.02));
+  }
+
+  /* Inner container */
+  .video-image-container {
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+  }
+
+  /* Image wrapper */
+  .image-wrapper {
+    display: flex;
+    justify-content: center;
+    border-radius: 28px;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: var(--primary-30, #011840);
+  }
+
+  .video-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Play overlay — full cover, centred content */
+  .mv-play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(1, 24, 64, 0.25);
+    transition: background 0.2s ease;
+  }
+
+  .mv-play-overlay:hover {
+    background: rgba(1, 24, 64, 0.08);
+  }
+
+  /* Visual-editing mode: let clicks pass through to the wrapper so Sanity's
+     overlay handles click-to-edit instead of opening the video popover. */
+  .mv-play-overlay--ve {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  /* Play button */
+  .media-frame-play-button {
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .media-frame-play-button:hover {
+    transform: scale(1.1);
+  }
+
+  .mv-play-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+  }
+
+  .mv-play-icon svg {
+    margin-left: 3px;
+  }
+
+  /* Stega span — hidden, keeps encoded text for Sanity VE scanner */
+  .mv-stega {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    pointer-events: none;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .video-image-main-wrapper {
+      border-radius: 24px;
+      padding: 8px;
+    }
+    .video-image-container {
+      border-radius: 20px;
+    }
+    .mv-play-icon {
+      width: 48px;
+      height: 48px;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var triggers = document.querySelectorAll('[data-video]');
+    console.log('[MediaVideo] script running — triggers found:', triggers.length);
+    triggers.forEach(function (el) {
+      console.log('[MediaVideo] trigger element:', el, 'data-video:', el.getAttribute('data-video'));
+    });
+
+    window._mv = window._mv || { loaded: false, loading: new Set(), handles: new Map() };
+
+    function loadWistiaScript() {
+      if (window._mv.loaded) return Promise.resolve();
+      return new Promise(function (resolve) {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://fast.wistia.com/assets/external/E-v1.js';
+        s.onload = function () { window._mv.loaded = true; console.log('[MediaVideo] E-v1.js loaded'); resolve(); };
+        s.onerror = function () { console.error('[MediaVideo] E-v1.js FAILED to load'); };
+        document.body.appendChild(s);
+      });
+    }
+
+    triggers.forEach(function (element) {
+      element.addEventListener('click', async function (e) {
+        console.log('[MediaVideo] click fired, target:', e.target);
+        var videoElement = e.target.closest('[data-video]');
+        console.log('[MediaVideo] closest [data-video]:', videoElement);
+        if (!videoElement) return;
+
+        var videoId = videoElement.getAttribute('data-video');
+        console.log('[MediaVideo] videoId:', videoId);
+
+        if (window._mv.handles.has(videoId)) {
+          var cached = window._mv.handles.get(videoId);
+          cached.popover.show();
+          cached.play();
+          return;
+        }
+
+        if (window._mv.loading.has(videoId)) { console.log('[MediaVideo] already loading'); return; }
+        window._mv.loading.add(videoId);
+
+        console.log('[MediaVideo] loading Wistia scripts…');
+        await loadWistiaScript();
+
+        var jsonp = document.createElement('script');
+        jsonp.async = true;
+        jsonp.src = 'https://fast.wistia.com/embed/medias/' + videoId + '.jsonp';
+        jsonp.onerror = function () { console.error('[MediaVideo] JSONP failed for', videoId); };
+        document.body.appendChild(jsonp);
+
+        window._wq = window._wq || [];
+        window._wq.push({
+          id: videoId,
+          options: { popover: true, playerColor: '011840' },
+          onReady: function (video) {
+            console.log('[MediaVideo] onReady fired, video:', video);
+            window._mv.handles.set(videoId, video);
+            video.popover.show();
+            video.play();
+          }
+        });
+      });
+    });
+  })();
+</script>

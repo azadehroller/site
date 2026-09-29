@@ -1,5 +1,7 @@
 ---
 import Columns from "@components/blocks/Columns.astro";
+import TwoColumnSection from "@components/blocks/TwoColumnSection.astro";
+import StandaloneTwoColumnBlock from "@components/StandaloneTwoColumnBlock.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import type { ColumnsBlock } from "@utils/sanity";
 
@@ -72,7 +74,11 @@ const { competitorsLanding, documentId, documentType } = Astro.props;
           documentType={documentType}
         />}
       </Columns>
-    );
+      );
+  } else if (section._type === "standaloneTwoColumnBlock") {
+    return <StandaloneTwoColumnBlock {...section} documentId={documentId} documentType={documentType} />;
+  } else if (section._type === "twoColumnSection") {
+    return <TwoColumnSection {...section} documentId={documentId} documentType={documentType} />;
   }
 })}
 

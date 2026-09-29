@@ -45,6 +45,8 @@ export default defineType({
       group: 'content',
       of: [
         { type: 'columnsBlock' },
+        { type: 'standaloneTwoColumnBlock' },
+        { type: 'twoColumnSection' },
         { type: 'divider' },
         {
           type: 'reference',

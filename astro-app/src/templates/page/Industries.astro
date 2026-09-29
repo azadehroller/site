@@ -5,6 +5,8 @@
  */
 import Layout from "@layouts/Layout.astro";
 import Columns from "@components/blocks/Columns.astro";
+import TwoColumnSection from "@components/blocks/TwoColumnSection.astro";
+import StandaloneTwoColumnBlock from "@components/StandaloneTwoColumnBlock.astro";
 import ColumnContent from "@components/blocks/ColumnContent.astro";
 import Divider from "@components/blocks/Divider.astro";
 import type { IndustriesLandingPage, ColumnsBlock, Divider as DividerType, LayoutSanityResult } from "@utils/sanity";
@@ -109,7 +111,11 @@ const getDividerBgClass = (divider: DividerType): string => {
                 documentType={documentType}
               />}
             </Columns>
-          );
+            );
+        } else if (section._type === "standaloneTwoColumnBlock") {
+          return <StandaloneTwoColumnBlock {...section} documentId={documentId} documentType={documentType} />;
+        } else if (section._type === "twoColumnSection") {
+          return <TwoColumnSection {...section} documentId={documentId} documentType={documentType} />;
         } else if (section._type === 'divider') {
           const divider = section as DividerType;
           const bgClass = getDividerBgClass(divider);

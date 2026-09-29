@@ -157,6 +157,7 @@
 
   --white-alpha-10:    rgba(255, 255, 255, 0.10);
   --white-alpha-20:    rgba(255, 255, 255, 0.20);
+  --white-alpha-24:    rgba(255, 255, 255, 0.24);
   --white-alpha-30:    rgba(255, 255, 255, 0.30);
   --white-alpha-70:    rgba(255, 255, 255, 0.70);
   --white-alpha-80:    rgba(255, 255, 255, 0.80);
@@ -200,4 +201,9 @@
 
   --shadown-gxscore:            0px 24px 40px rgba(201, 128, 255, 0.1),
                                 0px 8px 16px rgba(201, 128, 255, 0.05);
+
+  /* Component-level named shadows */
+  --shadow-image:               0 0 72px 0 rgba(18, 77, 178, 0.2),
+                                0 16px 16px 0 rgba(18, 77, 178, 0.1);
+  --shadow-card-overlay:        0 8px 24px rgba(1, 24, 64, 0.12);
 }

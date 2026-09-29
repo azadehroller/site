@@ -1,0 +1,75 @@
+---
+import { createDataSanityAttrs, type SanityEditInfo } from '@utils/visualEditing';
+
+interface Props {
+  stats?: {
+    number?: string;
+    label?: string;
+  };
+  editInfo?: SanityEditInfo | null;
+}
+
+const { stats, editInfo } = Astro.props;
+const editAttrs = editInfo ? createDataSanityAttrs(editInfo) : {};
+---
+
+{(stats?.number || stats?.label) && (
+  <dl class="stats" {...editAttrs}>
+    <div class="stats-item">
+      <span class="stats-icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L12.09 7.26L18 8.18L14 12.08L14.94 18L10 15.27L5.06 18L6 12.08L2 8.18L7.91 7.26L10 2Z" fill="currentColor"/>
+        </svg>
+      </span>
+      <dd class="stats-number">{stats.number}</dd>
+      <dt class="stats-label">{stats.label}</dt>
+    </div>
+  </dl>
+)}
+
+<style>
+  .stats {
+    margin: 0;
+    padding: 0;
+  }
+
+  .stats-item {
+    display: grid;
+    grid-template-areas:
+      "icon number"
+      "icon label";
+    grid-template-columns: auto 1fr;
+    column-gap: var(--spacing-3);
+    align-items: center;
+  }
+
+  .stats-icon {
+    grid-area: icon;
+    color: var(--secondary-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: color-mix(in srgb, var(--secondary-50) 15%, transparent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stats-number {
+    grid-area: number;
+    margin: 0;
+    font-size: var(--font-size-40);
+    font-weight: var(--font-weight-800);
+    line-height: 1.1;
+    color: inherit;
+  }
+
+  .stats-label {
+    grid-area: label;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-16);
+    opacity: 0.8;
+    color: inherit;
+  }
+</style>

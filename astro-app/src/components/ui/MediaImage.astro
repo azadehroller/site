@@ -1,0 +1,74 @@
+---
+import { urlFor } from '@utils/image';
+import { cleanStega } from '@utils/stega';
+import { createDataSanityAttrs } from '@utils/visualEditing';
+import type { SanityEditInfo } from '@utils/visualEditing';
+
+interface SanityAsset {
+  _ref?: string;
+  url?: string;
+}
+
+interface Props {
+  image?: {
+    asset?: SanityAsset;
+    alt?: string;
+  };
+  editInfo?: SanityEditInfo | null;
+}
+
+const { image, editInfo } = Astro.props;
+
+// Clean stega for the rendered alt attribute (accessible, no invisible chars)
+const alt = cleanStega(image?.alt) || '';
+
+// Preserve raw stega in image?.alt — used in the hidden <span> below so Sanity's
+// overlay can detect a click on the image and open the matching field in Studio.
+const rawAlt = image?.alt;
+
+const asset = image?.asset;
+const src = asset?.url || (asset?._ref ? urlFor(image as any).width(800).auto('format').url() : '');
+---
+
+{src && (
+  <figure class="media-img-figure" {...createDataSanityAttrs(editInfo)}>
+    <img
+      class="media-img"
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+    />
+    {rawAlt && (
+      <span class="ve-sr-only">{rawAlt}</span>
+    )}
+  </figure>
+)}
+
+<style>
+  .media-img-figure {
+    display: block;
+    margin: 0;
+    width: 100%;
+  }
+
+  .media-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md, 8px);
+  }
+
+  /* Visually hidden — stega chars preserved for Sanity overlay click detection */
+  .ve-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

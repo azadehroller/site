@@ -1,6 +1,7 @@
 import groq from "groq";
 import { loadQuery } from "../../utils/loadQuery";
 import type { GetStartedPage } from "../types";
+import { standaloneTwoColumnFields } from "./standaloneTwoColumn";
 
 export async function getGetStartedPage(request?: Request) {
   return await loadQuery<GetStartedPage | null>({
@@ -12,6 +13,9 @@ export async function getGetStartedPage(request?: Request) {
       seoDescription,
       sections[]{
         ...,
+        _type == 'standaloneTwoColumnBlock' => {
+          ${standaloneTwoColumnFields}
+        },
         _type == 'columnsBlock' => {
           _type,
           _key,
@@ -1584,6 +1588,36 @@ export async function getGetStartedPage(request?: Request) {
               items[]{ _key, title, content },
               theme,
               expandFirst
+            }
+          }
+        },
+        _type == 'twoColumnSection' => {
+          _type, _key, theme, columnLayout,
+          background { type, colourOptionLight, colourOptionDark, imageOption },
+          cards[] {
+            _key, mediaSide, mediaOnTopMobile,
+            media {
+              mediaType,
+              image { asset->{ _id, url }, alt },
+              wistiaId,
+              posterImage { asset->{ _id, url }, alt }
+            },
+            richTextBlock {
+              eyebrow { text, colourStyleLight, colourStyleDark },
+              title { text, headingSize },
+              body[]{ ..., markDefs[]{ ..., _type == 'link' => { href, openInNewTab } } }
+            },
+            stats { number, label },
+            quote {
+              quoteText, quoterName, quoterPosition,
+              quoterLogo { asset->{ _id, url }, alt }
+            },
+            buttons[] {
+              _key, label, hasIcon, iconType, styleDefault, styleWithIcon,
+              link {
+                urlType, href, openInNewTab, noFollow,
+                contentReference->{ _type, title, slug{ current } }
+              }
             }
           }
         },

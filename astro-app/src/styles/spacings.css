@@ -46,6 +46,21 @@
   --size-15: 15rem;     /* 240px */
 
 
+  /* ─── BORDER RADIUS ──────────────────────────────────────────────────────
+     Prefer these tokens over raw values in component styles.               */
+  --radius-sm:   0.375rem;  /*  6px — subtle rounding                       */
+  --radius-md:   0.75rem;   /* 12px — cards, overlay badges                 */
+  --radius-lg:   1rem;      /* 16px — large cards                           */
+  --radius-pill: 9999px;    /* buttons, tags — guarantees fully-rounded ends */
+
+
+  /* ─── TRANSITIONS ────────────────────────────────────────────────────────
+     Use these tokens in component transition shorthand so timing is
+     consistent system-wide and easy to change from one place.              */
+  --transition-duration: 200ms;
+  --transition-easing:   ease;
+
+
   /* ─── CONTENT OFFSETS ──────────────────────────────────────────────────
      Vertical offset used to push content below the fixed Header at each
      breakpoint. Driven by Header height — keep in sync with Header.astro.  */

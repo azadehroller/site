@@ -1,0 +1,286 @@
+---
+/**
+ * Local preview of Standalone Two Column Block variations.
+ * Dev-only — returns 404 in production.
+ */
+import Layout from '@layouts/Layout.astro';
+import StandaloneTwoColumnBlock from '@components/StandaloneTwoColumnBlock.astro';
+import { getLayoutData } from '@utils/sanity';
+import type { PortableTextBlock } from '@portabletext/types';
+
+export const prerender = false;
+
+if (import.meta.env.MODE === 'production') {
+  return new Response(null, { status: 404 });
+}
+
+const layoutSanity = await getLayoutData(Astro.request);
+
+function paragraph(...texts: string[]): PortableTextBlock[] {
+  return texts.map((text, i) => ({
+    _type: 'block',
+    _key: `p${i}`,
+    style: 'normal',
+    markDefs: [],
+    children: [{ _type: 'span', _key: `s${i}`, text, marks: [] }],
+  }));
+}
+
+function bullets(items: string[]): PortableTextBlock[] {
+  return items.map((text, i) => ({
+    _type: 'block',
+    _key: `li${i}`,
+    style: 'normal',
+    listItem: 'bullet',
+    level: 1,
+    markDefs: [],
+    children: [{ _type: 'span', _key: `lis${i}`, text, marks: [] }],
+  }));
+}
+
+const placeholder = (id: number) => ({
+  asset: { url: `https://picsum.photos/id/${id}/1200/900` },
+  alt: 'Preview image',
+});
+
+const variations = [
+  {
+    label: 'Var 1 — content left, quote, red-arrow CTA, media overlay stat',
+    props: {
+      background: 'white',
+      mediaSide: 'right',
+      mediaOnTopMobile: false,
+      mediaType: 'image',
+      image: placeholder(1015),
+      imageLoading: 'eager',
+      eyebrow: { text: 'Online ticket booking system', color: 'red' },
+      heading: { text: 'Increase your online conversion rate', size: 'bigger' },
+      body: paragraph(
+        'Sell more tickets online with a booking flow designed for attractions — less friction for guests, more revenue for you.',
+      ),
+      bodySize: 'normal',
+      quote: {
+        quoteText:
+          'We are making money while we sleep! We get an extra $600–$700 per day from online bookings, and we don’t have to chase them up since all of it is straightforward for the guest.',
+        quoterName: 'Jessica McDonald',
+        quoterPosition: 'Owner & Operator, Lollipops Playland Penrith',
+      },
+      stat: { number: '50%', label: 'increase in basket size', placement: 'mediaOverlay' },
+      buttons: [{ label: 'Learn more', style: 'transparentRedArrow', link: { href: '#' } }],
+    },
+  },
+  {
+    label: 'Var 2 — media left, big heading, red-arrow CTA',
+    props: {
+      background: 'white',
+      mediaSide: 'left',
+      mediaOnTopMobile: true,
+      mediaType: 'image',
+      image: placeholder(180),
+      eyebrow: { text: 'Lorem ipsum pulvinar', color: 'red' },
+      heading: { text: 'Intelligence built for attractions: grow faster and run smarter', size: 'big' },
+      body: paragraph(
+        'ROLLER’s May 2026 Product Launch brings intelligence into everyday operations so venues can grow faster and run smarter.',
+      ),
+      bodySize: 'normal',
+      buttons: [{ label: 'Explore product launch', style: 'transparentRedArrow', link: { href: '#' } }],
+    },
+  },
+  {
+    label: 'Var 3 — content left, two pill buttons (red + outlined)',
+    props: {
+      background: 'white',
+      mediaSide: 'right',
+      mediaOnTopMobile: false,
+      mediaType: 'image',
+      image: placeholder(1011),
+      eyebrow: { text: 'Always-on guest service, without the overhead', color: 'red' },
+      heading: { text: 'Never miss a guest inquiry or booking opportunity', size: 'normal' },
+      body: paragraph(
+        'Answer questions, take bookings, and keep guests moving — even when your team is busy on the floor.',
+        'Guests get instant help. Your staff stay focused on the experience in front of them.',
+        'Set it up once and keep service running around the clock.',
+      ),
+      bodySize: 'normal',
+      buttons: [
+        { label: 'Join the waitlist', style: 'red', link: { href: '#' } },
+        { label: 'Watch a demo', style: 'outlined', link: { href: '#' } },
+      ],
+    },
+  },
+  {
+    label: 'Var 4 — media left, content stat, red + outlined buttons',
+    props: {
+      background: 'white',
+      mediaSide: 'left',
+      mediaOnTopMobile: true,
+      mediaType: 'image',
+      image: placeholder(292),
+      eyebrow: { text: 'Velit urna montes', color: 'red' },
+      heading: { text: 'Tempor lorem pharetra velit interdum purus', size: 'normal' },
+      body: paragraph('A two-column layout with a stat in the content column and a pair of pill buttons.'),
+      bodySize: 'normal',
+      stat: { number: '$2B', label: 'commodo vitae 12', placement: 'content' },
+      buttons: [
+        { label: 'Get started', style: 'red', link: { href: '#' } },
+        { label: 'Watch a demo', style: 'outlined', link: { href: '#' } },
+      ],
+    },
+  },
+  {
+    label: 'Var 5 — media left, two body paragraphs, red-arrow CTA',
+    props: {
+      background: 'white',
+      mediaSide: 'left',
+      mediaOnTopMobile: true,
+      mediaType: 'image',
+      image: placeholder(326),
+      eyebrow: { text: 'Seamless for guests', color: 'red' },
+      heading: { text: 'Keep guests engaged between visits', size: 'big' },
+      body: paragraph(
+        'Guests can easily see their rewards and progress in their online account, giving them clear visibility into what they’ve earned and what they can redeem.',
+        'Plus, automated email reminders ensure guests stay connected to your program between visits, encouraging them to return and make the most of their rewards.',
+      ),
+      bodySize: 'normal',
+      buttons: [{ label: 'Request a demo', style: 'transparentRedArrow', link: { href: '#' } }],
+    },
+  },
+  {
+    label: 'Var 6 — light blue background, bullets, red-arrow CTA',
+    props: {
+      background: 'lightBlue',
+      mediaSide: 'right',
+      mediaOnTopMobile: false,
+      mediaType: 'image',
+      image: placeholder(201),
+      eyebrow: { text: 'Flexible ways to reward loyalty', color: 'red' },
+      heading: { text: 'Create incentives that encourage repeat visits', size: 'normal' },
+      body: [
+        ...paragraph('Reward the behaviour that grows your venue — spend, visits, or both.'),
+        ...bullets([
+          'Points for spend: guests earn as they buy',
+          'Visit-based rewards: come back more, unlock more',
+          'Bonus campaigns: time-limited offers when you need them',
+        ]),
+        ...paragraph('Keep the program simple for guests and flexible for your team.'),
+      ],
+      bodySize: 'normal',
+      buttons: [{ label: 'Get started', style: 'transparentRedArrow', link: { href: '#' } }],
+    },
+  },
+  {
+    label: 'Mobile A — content first, full-width pill buttons',
+    props: {
+      background: 'white',
+      mediaSide: 'right',
+      mediaOnTopMobile: false,
+      mediaType: 'image',
+      image: placeholder(1011),
+      eyebrow: { text: 'Funding to help your attraction grow', color: 'red' },
+      heading: { text: 'Capital, fast and flexible funding built for attractions', size: 'normal' },
+      body: paragraph(
+        'ROLLER Capital gives venues access to funding designed around seasonal cash flow.',
+        'Apply, review, and move — without slowing down day-to-day operations.',
+      ),
+      bodySize: 'normal',
+      buttons: [
+        { label: 'Get started', style: 'red', link: { href: '#' } },
+        { label: 'Watch a demo', style: 'outlined', link: { href: '#' } },
+      ],
+    },
+  },
+  {
+    label: 'Mobile B — media on top, bullets, red-arrow CTA',
+    props: {
+      background: 'lightBlue',
+      mediaSide: 'left',
+      mediaOnTopMobile: true,
+      mediaType: 'image',
+      image: placeholder(201),
+      eyebrow: { text: 'Support growth when opportunities arise', color: 'red' },
+      heading: { text: 'Act when the moment is right', size: 'normal' },
+      body: [
+        ...paragraph('When growth windows are short, Capital helps you move without friction.'),
+        ...bullets([
+          'Expanding with a new venue or attraction',
+          'Preparing for peak periods',
+          'Investing in upgrades',
+          'Managing seasonal cash flow',
+        ]),
+        ...paragraph('When the window to act is short, Capital helps remove friction so you can focus on running your venue.'),
+      ],
+      bodySize: 'normal',
+      buttons: [{ label: 'Request a demo', style: 'transparentRedArrow', link: { href: '#' } }],
+    },
+  },
+  {
+    label: 'Bigger left — stacked until the 416px media column can fit',
+    props: {
+      layout: 'biggerLeft',
+      rowMode: 'single',
+      background: 'white',
+      mediaSide: 'right',
+      mediaOnTopMobile: false,
+      mediaType: 'image',
+      image: placeholder(201),
+      eyebrow: { text: 'Make the most of ROLLER', color: 'red' },
+      heading: { text: 'Accelerate your success', size: 'big' },
+      body: paragraph(
+        'ROLLER’s professional services team is here to help you during every step of your journey with us.',
+        'Whether you’re new to ROLLER or an existing customer looking to refresh your strategy, we’re here to partner with you.',
+      ),
+      bodySize: 'normal',
+      buttons: [{ label: 'Request more information', style: 'red', link: { href: '#' } }],
+    },
+  },
+  {
+    label: 'Column loop — stacked on small containers, split when wide',
+    props: {
+      background: 'white',
+      layout: 'biggerLeft',
+      rowMode: 'loop',
+      columnLoop: [
+        {
+          heading: 'Obsess over customer success',
+          body: 'We put the customer first in everything we do. To truly align with our customers, we listen intently, we empathise deeply, and we go above and beyond for them.',
+          image: placeholder(201),
+        },
+        {
+          heading: 'Keep it real',
+          body: 'We are genuine. We are open. We call it how it is, no sugar coating. We are candid with each other, at all times.',
+          image: placeholder(1011),
+        },
+        {
+          heading: 'Make it happen',
+          body: 'We are energetic, focused, and results driven, in pursuit of achieving greatness.',
+          image: placeholder(201),
+        },
+      ],
+    },
+  },
+];
+---
+
+<Layout title="Standalone Two Column Block — preview" layoutSanity={layoutSanity}>
+  <main>
+    {variations.map((variation, index) => (
+      <div>
+        <p class="preview-label">{index + 1}. {variation.label}</p>
+        <StandaloneTwoColumnBlock {...variation.props} />
+      </div>
+    ))}
+  </main>
+</Layout>
+
+<style>
+  .preview-label {
+    padding-block: var(--spacing-3);
+    padding-inline: var(--spacing-8);
+    font-size: var(--font-size-12);
+    font-weight: var(--font-weight-700);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: uppercase;
+    background: var(--blue-10);
+    color: var(--neutral-white);
+  }
+</style>

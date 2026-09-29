@@ -1,0 +1,127 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { PortableTextBlock } from '@portabletext/types';
+import { cleanStega } from '@utils/stega';
+import { createDataSanityAttrs, type SanityEditInfo } from '@utils/visualEditing';
+
+interface Props {
+  richTextBlock?: {
+    eyebrow?: {
+      text?: string;
+      colourStyleLight?: string;
+      colourStyleDark?: string;
+    };
+    title?: {
+      text?: string;
+      headingSize?: string;
+    };
+    body?: PortableTextBlock[];
+  };
+  theme?: string;
+  editInfo?: SanityEditInfo | null;
+}
+
+const { richTextBlock, theme: rawTheme, editInfo } = Astro.props;
+const theme = cleanStega(rawTheme) || 'light';
+
+const eyebrow = richTextBlock?.eyebrow;
+const title = richTextBlock?.title;
+const body = richTextBlock?.body;
+
+const eyebrowText = eyebrow?.text;
+const headingSize = cleanStega(title?.headingSize) || 'medium';
+
+const eyebrowColour = theme === 'dark'
+  ? cleanStega(eyebrow?.colourStyleDark) || 'white'
+  : cleanStega(eyebrow?.colourStyleLight) || 'navy';
+
+const eyebrowEditAttrs = editInfo ? createDataSanityAttrs({ ...editInfo, path: `${editInfo.path}.eyebrow` }) : {};
+const titleEditAttrs   = editInfo ? createDataSanityAttrs({ ...editInfo, path: `${editInfo.path}.title` })   : {};
+const bodyEditAttrs    = editInfo ? createDataSanityAttrs({ ...editInfo, path: `${editInfo.path}.body` })    : {};
+---
+
+{(eyebrowText || title?.text || body?.length) && (
+  <div class="rich-text-block">
+    {eyebrowText && (
+      <strong class={`eyebrow eyebrow--${eyebrowColour}`} {...eyebrowEditAttrs}>{eyebrowText}</strong>
+    )}
+    {title?.text && (
+      <h2 class={`heading heading--${headingSize}`} {...titleEditAttrs}>{title.text}</h2>
+    )}
+    {body && body.length > 0 && (
+      <div class="body" {...bodyEditAttrs}>
+        <PortableText value={body} />
+      </div>
+    )}
+  </div>
+)}
+
+<style>
+  .rich-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+
+  .eyebrow {
+    display: block;
+    font-size: var(--font-size-12);
+    font-weight: var(--font-weight-700);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: var(--line-height-16);
+
+    &.eyebrow--red { color: var(--secondary-50); }
+    &.eyebrow--navy { color: var(--primary-30); }
+    &.eyebrow--dark { color: var(--blue-10); }
+    &.eyebrow--lightBlue { color: var(--primary-20); }
+    &.eyebrow--white { color: var(--neutral-white); }
+    &.eyebrow--orange { color: var(--secondary-50); }
+    &.eyebrow--gradient {
+      background: linear-gradient(90deg, var(--primary-50), var(--secondary-50));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  .heading {
+    margin: 0;
+    font-weight: var(--font-weight-700);
+    line-height: var(--line-height-19);
+    color: inherit;
+
+    &.heading--medium {
+      font-size: var(--font-size-32);
+
+      @media (min-width: 768px) {
+        font-size: var(--font-size-40);
+      }
+    }
+
+    &.heading--big {
+      font-size: var(--font-size-40);
+
+      @media (min-width: 768px) {
+        font-size: var(--font-size-56);
+      }
+    }
+  }
+
+  .body {
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-24);
+    color: inherit;
+
+    & :global(p) { margin-block: 0.5em; }
+    & :global(ul), & :global(ol) { padding-inline-start: 1.25em; }
+    & :global(li) { margin-block: 0.25em; }
+    & :global(strong) { font-weight: var(--font-weight-700); }
+    & :global(em) { font-style: italic; }
+    & :global(a) {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+</style>

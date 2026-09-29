@@ -1,0 +1,58 @@
+---
+import { cleanStega } from '@utils/stega';
+import type { SanityEditInfo } from '@utils/visualEditing';
+import MediaImage from './MediaImage.astro';
+import MediaVideo from './MediaVideo.astro';
+
+interface SanityAsset {
+  _ref?: string;
+  url?: string;
+}
+
+interface Props {
+  media?: {
+    mediaType?: string;
+    image?: {
+      asset?: SanityAsset;
+      alt?: string;
+    };
+    wistiaId?: string;
+    posterImage?: {
+      asset?: SanityAsset;
+      alt?: string;
+    };
+  };
+  mediaEditInfo?: SanityEditInfo | null;
+}
+
+const { media, mediaEditInfo } = Astro.props;
+const mediaType = cleanStega(media?.mediaType) || 'image';
+
+// Point click-to-edit at the specific media sub-field rather than the `media`
+// object, so "Open in Studio" focuses the image picker / video ID directly
+// instead of just landing on the (expanded) Media group.
+const imageEditInfo: SanityEditInfo | null = mediaEditInfo
+  ? { ...mediaEditInfo, path: `${mediaEditInfo.path}.image` }
+  : null;
+const videoEditInfo: SanityEditInfo | null = mediaEditInfo
+  ? { ...mediaEditInfo, path: `${mediaEditInfo.path}.wistiaId` }
+  : null;
+---
+
+<div class="media-col">
+  {mediaType === 'image' && (
+    <MediaImage image={media?.image} editInfo={imageEditInfo} />
+  )}
+  {mediaType === 'wistia' && (
+    <MediaVideo wistiaId={media?.wistiaId} posterImage={media?.posterImage} editInfo={videoEditInfo} />
+  )}
+</div>
+
+<style>
+  .media-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+</style>
