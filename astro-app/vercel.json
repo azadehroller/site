@@ -5,7 +5,7 @@
   "redirects": [
     {
       "source": "/admin",
-      "destination": "http://roller-software.sanity.studio",
+      "destination": "https://roller-software.sanity.studio",
       "statusCode": 302
     }
   ],
