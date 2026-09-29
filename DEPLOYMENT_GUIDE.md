@@ -1,226 +1,87 @@
-# Production Deployment Guide
+# Deployment Guide
 
-This guide explains how to deploy the Sanity Studio and Astro frontend to production with visual editing and presentation tool support.
+How the frontend and the Studio are deployed, and how preview, visual editing and cache purging are connected.
 
 ## Overview
 
-- **Astro Frontend**: Hosted on Netlify at `https://sa-rolls.netlify.app`
-- **Sanity Studio**: Hosted on Sanity at `https://sa-rolls.sanity.studio`
-- **Project ID**: `rh0t6x75`
-- **Dataset**: `production`
+| Piece | Host | Config |
+|---|---|---|
+| Astro frontend (primary) | Vercel: `https://site-studio-sanity-astro.vercel.app` | `astro-app/vercel.json` |
+| Astro frontend (fallback) | Netlify: `https://sa-rolls.netlify.app` | root `netlify.toml` |
+| Sanity Studio | `https://roller-software.sanity.studio` | `studio/sanity.config.ts`, `studio/sanity.cli.ts` |
+| Content | Sanity project `rh0t6x75`, dataset `production` | |
 
-## Prerequisites
+The site is in a Netlify → Vercel migration. Both frontends build from the same code. `astro.config.mjs` `selectAdapter()` picks the adapter automatically: `DEPLOY_TARGET` first, then `VERCEL`, then `NETLIFY`, with Vercel as the default. Both hosts send `X-Robots-Tag: noindex` until launch.
 
-1. Netlify account with access to the project
-2. Sanity account with access to project `rh0t6x75`
-3. Sanity CLI installed: `npm install -g @sanity/cli`
+The production domain is `www.roller.software`. Analytics, consent and HubSpot scripts run only on that hostname (`astro-app/src/utils/host.ts`).
 
 ---
 
-## Step 1: Configure Netlify Environment Variables
+## 1. Frontend environment variables
 
-Go to your Netlify dashboard and set the following environment variables:
-
-### Required Variables
+Set these in the Vercel project, and in Netlify if you're keeping it in sync:
 
 | Variable | Value | Purpose |
-|----------|-------|---------|
-| `PUBLIC_SANITY_PROJECT_ID` | `rh0t6x75` | Sanity project identifier |
-| `PUBLIC_SANITY_DATASET` | `production` | Dataset name |
-| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | `true` | Enable visual editing features |
-| `PUBLIC_SANITY_STUDIO_URL` | `https://sa-rolls.sanity.studio` | URL where Studio is hosted |
-| `SANITY_API_READ_TOKEN` | (copy from `astro-app/.env`) | API token for reading content |
+|---|---|---|
+| `PUBLIC_SANITY_PROJECT_ID` | `rh0t6x75` | Sanity project |
+| `PUBLIC_SANITY_DATASET` | `production` | Dataset |
+| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | `true` | Allow visual editing for editors (normal visitors are unaffected) |
+| `PUBLIC_SANITY_STUDIO_URL` | `https://roller-software.sanity.studio` | Target of the stega "Open in Studio" links |
+| `SANITY_API_READ_TOKEN` | Viewer token | Reading drafts in preview (server-only) |
+| `SANITY_WEBHOOK_SECRET` | random string | Verifies `/api/revalidate` calls |
+| `SITE` | full site URL | Builds absolute URLs for cache purges |
+| `VERCEL_TOKEN` (+ `VERCEL_TEAM_ID` if team-scoped) | Vercel PAT | CDN purge on Vercel. `VERCEL_PROJECT_ID` is injected automatically. |
+| `NETLIFY_CACHE_PURGE_TOKEN`, `NETLIFY_SITE_ID` | Netlify PAT + site ID | CDN purge on Netlify |
 
-### How to Set Variables
+Create tokens at sanity.io/manage → project → API → Tokens. Never paste tokens into a committed file.
 
-1. Go to Netlify Dashboard → Your Site → Site Settings → Environment Variables
-2. Click "Add a variable"
-3. Add each variable from the table above
-4. Click "Save"
+## 2. Deploy the frontend
 
----
+Push to `main`. Vercel (and Netlify, if connected) builds automatically.
 
-## Step 2: Configure Sanity Environment Variables
+- **Vercel:** the root directory is `astro-app`. `vercel.json` installs from the repo root with `npm install --legacy-peer-deps --include=optional`, then runs `npm run build`.
+- **Netlify:** `netlify.toml` builds with `npm run build --workspace=astro-app` and publishes `astro-app/dist`.
 
-You need to set the preview URL in Sanity so the Studio knows where to load previews from.
-
-### Method 1: Using Sanity Dashboard (Recommended)
-
-1. Go to https://sanity.io/manage
-2. Select project `rh0t6x75`
-3. Navigate to **API** → **Environment Variables**
-4. Add a new variable:
-   - **Key**: `SANITY_STUDIO_PREVIEW_URL`
-   - **Value**: `https://sa-rolls.netlify.app`
-5. Save the variable
-
-### Method 2: Using Sanity CLI
-
-From the `studio` directory, run:
-
-```bash
-cd studio
-npx sanity env:add SANITY_STUDIO_PREVIEW_URL
-# When prompted, enter: https://sa-rolls.netlify.app
-```
-
----
-
-## Step 3: Deploy Sanity Studio
-
-After setting the environment variable, deploy the Studio:
+## 3. Deploy the Studio
 
 ```bash
 npm run deploy --workspace=studio
 ```
 
-Or from the `studio` directory:
+The Studio's Presentation preview URL comes from `SANITY_STUDIO_PREVIEW_URL`, or falls back to the Vercel URL. It is compiled into the bundle, so **redeploy the Studio after changing it**. A Studio running on localhost always previews `http://localhost:4321`.
 
-```bash
-cd studio
-npm run deploy
-```
+Presentation may iframe `localhost`, both deployed frontends, `*.vercel.app` (branch previews) and `*.sanity.studio` (`allowOrigins` in `sanity.config.ts`).
 
-**Important**: The Studio must be redeployed after setting `SANITY_STUDIO_PREVIEW_URL` because the variable is compiled into the bundle at build time.
+### Studio host
 
----
+The Studio lives at `https://roller-software.sanity.studio`. Deploys target it through the pinned `appId` in `studio/sanity.cli.ts`. `/admin` on either frontend redirects there.
 
-## Step 4: Deploy Astro App to Netlify
+## 4. Cache purge webhook
 
-### Option 1: Git Push (Automatic)
+Pages are cached at the CDN (headers are set in `astro-app/src/middleware.ts`). A Sanity webhook purges them on publish. Create one webhook per frontend at sanity.io/manage → API → Webhooks:
 
-Simply push to your main branch:
+- **URL:** `https://<host>/api/revalidate`
+- **Trigger:** Create, Update, Delete
+- **Secret:** the same value as `SANITY_WEBHOOK_SECRET`
+- **Filter:** see the header comment in `astro-app/src/pages/api/revalidate.ts`
 
-```bash
-git push origin main
-```
+## 5. CORS
 
-Netlify will automatically build and deploy.
+At sanity.io/manage → API → CORS origins, add each frontend origin with **credentials allowed**. For branch previews, also add `https://*.vercel.app`.
 
-### Option 2: Manual Deploy
+## 6. Verify
 
-```bash
-npm run build --workspace=astro-app
-netlify deploy --prod --dir=astro-app/dist
-```
-
----
-
-## Step 5: Verify Deployment
-
-### Check Environment Variables
-
-Visit: `https://sa-rolls.netlify.app/api/debug-preview`
-
-You should see:
-- ✅ `SANITY_API_READ_TOKEN`: SET
-- ✅ `PUBLIC_SANITY_PROJECT_ID`: rh0t6x75
-- ✅ `PUBLIC_SANITY_DATASET`: production
-- ✅ `PUBLIC_SANITY_VISUAL_EDITING_ENABLED`: true
-- ✅ `PUBLIC_SANITY_STUDIO_URL`: https://sa-rolls.sanity.studio
-
-### Test Visual Editing
-
-1. Go to https://sa-rolls.sanity.studio
-2. Open the **Presentation** tool from the sidebar
-3. Select a post to preview
-4. Verify:
-   - ✅ Preview loads from `https://sa-rolls.netlify.app` (not localhost)
-   - ✅ Draft changes appear without publishing
-   - ✅ Visual editing overlays appear when clicking content
-   - ✅ No CORS errors in browser console
-
----
+1. Open the deployed Studio, then **Presentation**.
+2. Check that the preview loads the deployed frontend (not localhost), that draft edits show without publishing, that clicking content focuses the right field, and that the console shows no CORS errors.
+3. `/api/debug-preview` reports which preview env vars are set.
 
 ## Troubleshooting
 
-### Issue: Studio shows "Unable to connect to preview"
-
-**Cause**: `SANITY_STUDIO_PREVIEW_URL` is not set or Studio wasn't redeployed after setting it.
-
-**Fix**:
-1. Verify the environment variable is set in Sanity dashboard
-2. Redeploy Studio: `npm run deploy --workspace=studio`
-
-### Issue: Preview loads localhost instead of production
-
-**Cause**: Environment variable wasn't available during Studio build.
-
-**Fix**:
-1. Check that `SANITY_STUDIO_PREVIEW_URL` is set in Sanity dashboard
-2. Redeploy Studio to pick up the variable
-
-### Issue: Visual editing overlays don't appear
-
-**Cause**: `PUBLIC_SANITY_STUDIO_URL` not set in Netlify.
-
-**Fix**:
-1. Add `PUBLIC_SANITY_STUDIO_URL=https://sa-rolls.sanity.studio` in Netlify
-2. Redeploy the Astro app
-
-### Issue: CORS errors in browser console
-
-**Cause**: Netlify site URL not added to Sanity CORS origins.
-
-**Fix**:
-1. Go to https://sanity.io/manage
-2. Select project `rh0t6x75`
-3. Navigate to **API** → **CORS origins**
-4. Add `https://sa-rolls.netlify.app` with credentials enabled
-5. Add `https://*.netlify.app` for deploy previews (optional)
-
-### Issue: Draft mode cookie not set
-
-**Cause**: Missing CORS headers or cookie security settings.
-
-**Fix**: This should be resolved by the code changes in this project. Ensure you've deployed the latest version with:
-- CORS headers in `/api/draft-mode/enable.ts` and `/api/draft-mode/disable.ts`
-- Production-aware cookie settings (`secure: true`, `sameSite: 'none'` for HTTPS)
-
----
-
-## Local Development
-
-For local development, the app defaults to:
-- Astro: `http://localhost:4321`
-- Studio: `http://localhost:3333`
-
-Run both servers:
-
-```bash
-npm run dev
-```
-
-This will start both the Astro app and Sanity Studio concurrently.
-
----
-
-## Alternative: Deploy with Environment Variable
-
-If you prefer not to use Sanity's dashboard environment variables, you can deploy with the variable set in the command:
-
-```bash
-SANITY_STUDIO_PREVIEW_URL=https://sa-rolls.netlify.app npm run deploy --workspace=studio
-```
-
-**Note**: This requires setting the variable every time you deploy, which is error-prone. Using Sanity's dashboard is recommended.
-
----
-
-## Summary Checklist
-
-- [ ] Set all required environment variables in Netlify
-- [ ] Set `SANITY_STUDIO_PREVIEW_URL` in Sanity dashboard
-- [ ] Deploy Sanity Studio with `npm run deploy --workspace=studio`
-- [ ] Deploy Astro app (git push or manual deploy)
-- [ ] Verify environment variables at `/api/debug-preview`
-- [ ] Test presentation tool and visual editing in production
-- [ ] Check browser console for any errors
-
----
-
-## Need Help?
-
-- Check the [Sanity Presentation documentation](https://www.sanity.io/docs/presentation)
-- Review `VISUAL_EDITING_TROUBLESHOOTING.md` for common issues
-- Verify environment variables are correctly set in both platforms
+| Symptom | Likely cause → fix |
+|---|---|
+| Presentation says "Unable to connect" | Preview URL wrong or Studio not redeployed → check `SANITY_STUDIO_PREVIEW_URL`, redeploy the Studio |
+| Preview loads localhost in the deployed Studio | Env var missing at Studio build time → set it and redeploy |
+| No click-to-edit overlays | `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` / `SANITY_API_READ_TOKEN` missing, or no `sanity-preview` cookie → check env vars and CORS credentials |
+| "Open in Studio" goes to the wrong Studio | `PUBLIC_SANITY_STUDIO_URL` not set to `https://roller-software.sanity.studio` on that platform |
+| Published content is stale | Webhook missing or failing → check webhook delivery logs and the purge tokens |
+| A/B cookies or geo missing on Vercel | Middleware moved to the Edge runtime → keep `edgeMiddleware: false` (see `astro.config.mjs`) |
