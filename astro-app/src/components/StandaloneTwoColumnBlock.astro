@@ -298,7 +298,7 @@ const sectionClass = [
                   <span class="btn-arrow" aria-hidden="true">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
                       <rect width="40" height="40" rx="20" fill="currentColor"/>
-                      <path fill="var(--neutral-white, #fff)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
+                      <path fill="var(--neutral-white)" d="m20 12-1.41 1.41L24.17 19H12v2h12.17l-5.58 5.59L20 28l8-8-8-8Z"/>
                     </svg>
                   </span>
                 )}
@@ -342,34 +342,61 @@ const sectionClass = [
 </section>
 
 <style>
+  /* Nesting rule for this file: nested rules always target `&` (the scoped
+     element), with any ancestor condition written as `section.x & {}`.
+     Astro's compiler (2.x) does not scope nested descendant selectors and
+     leaves nested `:global()` unprocessed (invalid CSS), so both stay top-level. */
+
   /* ─── Section root ──────────────────────────────────────────────────────── */
   section {
+    /* Component-scoped sizes with no design-system token. */
+    --stc-media-col-width: min(26rem, 38%);
+    --stc-row-media-max-width: min(10.75rem, 100%);
+    --stc-row-img-max-height: 16.25rem;
+    --stc-logo-width: 91px;
+    --stc-logo-height: 48px;
+    --stc-media-stat-max-width: 70%;
+    --stc-list-indent: 1.25em;
+    --stc-underline-offset: 2px;
+    --stc-rule-width: 1px;
+    --stc-accent-width: 2px;
+    --stc-loop-accent-width: 3px;
+
+    /* Theme hooks — light defaults, overridden by .dark below. */
+    --stc-rule-color: var(--blue-90);
+    --stc-outlined-color: var(--primary-50);
+    --stc-outlined-hover-bg: var(--primary-50);
+    --stc-outlined-hover-color: var(--neutral-white);
+
     container-type: inline-size;
     display: flex;
     justify-content: center;
     padding-block: var(--spacing-20);
     padding-inline: var(--spacing-12);
-  }
 
-  /* Section itself is the container root, so padding responds to the viewport. */
-  @media (min-width: 48rem) {
-    section {
+    /* Section itself is the container root, so padding responds to the viewport. */
+    @media (min-width: 48rem) {
       padding-inline: var(--spacing-16);
     }
+
+    &.dark {
+      --stc-rule-color: var(--white-alpha-24);
+      --stc-outlined-color: var(--neutral-white);
+      --stc-outlined-hover-bg: var(--neutral-white);
+      --stc-outlined-hover-color: var(--blue-10);
+    }
+
+    /* Surfaces: background from bg-*, cascading text color from text-*. */
+    &.bg-white     { background-color: var(--neutral-white); }
+    &.bg-lightBlue { background-color: var(--blue-99); }
+    &.bg-navy      { background-color: var(--primary-50); }
+    &.bg-darkBlue  { background-color: var(--blue-10); }
+
+    &.text-navy      { color: var(--primary-50); }
+    &.text-dark      { color: var(--blue-10); }
+    &.text-white     { color: var(--neutral-white); }
+    &.text-lightBlue { color: var(--primary-20); }
   }
-
-  /* ─── Surface tokens ─────────────────────────────────────────────────────
-     Each modifier class sets the section background and cascades color to
-     all descendants via the text-* modifier below.                         */
-  section.bg-white     { background-color: var(--neutral-white); }
-  section.bg-lightBlue { background-color: var(--blue-99); }
-  section.bg-navy      { background-color: var(--primary-50); }
-  section.bg-darkBlue  { background-color: var(--blue-10); }
-
-  section.text-navy      { color: var(--primary-50); }
-  section.text-dark      { color: var(--blue-10); }
-  section.text-white     { color: var(--neutral-white); }
-  section.text-lightBlue { color: var(--primary-20); }
 
   /* ─── Two-column layout grid ────────────────────────────────────────────── */
   .layout {
@@ -377,8 +404,22 @@ const sectionClass = [
     grid-template-columns: minmax(0, 1fr);
     align-items: center;
     gap: var(--spacing-8);
-    max-width: var(--container-xl, 1312px);
+    max-width: var(--container-xl);
     width: 100%;
+
+    @container (min-width: 36rem) {
+      section.equal & {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      section.biggerLeft.media-right & {
+        grid-template-columns: minmax(0, 1fr) minmax(0, var(--stc-media-col-width));
+      }
+
+      section.biggerLeft.media-left & {
+        grid-template-columns: minmax(0, var(--stc-media-col-width)) minmax(0, 1fr);
+      }
+    }
   }
 
   .content,
@@ -387,12 +428,39 @@ const sectionClass = [
     min-width: 0;
   }
 
+  /* Stacking order: media-top/content-top on mobile, media-left/right once
+     the columns sit side by side. */
   .content {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
     gap: var(--spacing-8);
+
+    section.media-top &   { order: 2; }
+    section.content-top & { order: 1; }
+
+    @container (min-width: 36rem) {
+      gap: var(--spacing-12);
+
+      section:is(.equal, .biggerLeft).media-left &  { order: 2; }
+      section:is(.equal, .biggerLeft).media-right & { order: 1; }
+    }
+  }
+
+  .media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    section.media-top &   { order: 1; }
+    section.content-top & { order: 2; }
+
+    @container (min-width: 36rem) {
+      section:is(.equal, .biggerLeft).media-left &  { order: 1; }
+      section:is(.equal, .biggerLeft).media-right & { order: 2; }
+    }
   }
 
   .copy {
@@ -404,47 +472,18 @@ const sectionClass = [
     min-width: 0;
   }
 
-  /* Mobile stacking order */
-  section.media-top .media   { order: 1; }
-  section.media-top .content { order: 2; }
-  section.content-top .content { order: 1; }
-  section.content-top .media   { order: 2; }
-
-  @container (min-width: 36rem) {
-    section.equal .layout {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    }
-
-    section.biggerLeft.media-right .layout {
-      grid-template-columns: minmax(0, 1fr) minmax(0, min(26rem, 38%));
-    }
-
-    section.biggerLeft.media-left .layout {
-      grid-template-columns: minmax(0, min(26rem, 38%)) minmax(0, 1fr);
-    }
-
-    section.equal.media-left .media,
-    section.biggerLeft.media-left .media    { order: 1; }
-    section.equal.media-left .content,
-    section.biggerLeft.media-left .content  { order: 2; }
-    section.equal.media-right .content,
-    section.biggerLeft.media-right .content { order: 1; }
-    section.equal.media-right .media,
-    section.biggerLeft.media-right .media   { order: 2; }
-
-    .content {
-      gap: var(--spacing-12);
-    }
-  }
-
   /* ─── Loop layout ───────────────────────────────────────────────────────── */
   .loop-items {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-6);
-    max-width: var(--container-xl, 1312px);
+    max-width: var(--container-xl);
     width: 100%;
     min-width: 0;
+
+    @container (min-width: 36rem) {
+      gap: 0;
+    }
   }
 
   .row {
@@ -453,8 +492,22 @@ const sectionClass = [
     align-items: start;
     gap: var(--spacing-6);
     padding-inline-start: var(--spacing-8);
-    border-inline-start: 3px solid var(--blue-90, #cedffd);
+    border-inline-start: var(--stc-loop-accent-width) solid var(--stc-rule-color);
     min-width: 0;
+
+    @container (min-width: 36rem) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--stc-media-col-width));
+      align-items: center;
+      gap: var(--spacing-8);
+      padding-block: var(--spacing-6);
+      padding-inline-start: 0;
+      border-inline-start: 0;
+      border-block-start: var(--stc-rule-width) solid var(--stc-rule-color);
+
+      &:last-child {
+        border-block-end: var(--stc-rule-width) solid var(--stc-rule-color);
+      }
+    }
   }
 
   .row-copy {
@@ -472,6 +525,10 @@ const sectionClass = [
     letter-spacing: var(--letter-spacing-snug);
     overflow-wrap: break-word;
     color: inherit;
+
+    @container (min-width: 52rem) {
+      font-size: var(--font-size-48);
+    }
   }
 
   .row-body {
@@ -481,6 +538,10 @@ const sectionClass = [
     line-height: var(--line-height-24);
     overflow-wrap: break-word;
     color: inherit;
+
+    @container (min-width: 52rem) {
+      font-size: var(--font-size-18);
+    }
   }
 
   .row-media {
@@ -489,7 +550,13 @@ const sectionClass = [
     justify-content: flex-start;
     margin: 0;
     width: auto;
-    max-width: min(10.75rem, 100%);
+    max-width: var(--stc-row-media-max-width);
+
+    @container (min-width: 36rem) {
+      width: 100%;
+      max-width: none;
+      justify-content: center;
+    }
   }
 
   .row-img {
@@ -498,54 +565,9 @@ const sectionClass = [
     max-width: 100%;
     height: auto;
     object-fit: contain;
-  }
 
-  section.dark .row {
-    border-inline-start-color: var(--white-alpha-24);
-  }
-
-  @container (min-width: 36rem) {
-    .loop-items {
-      gap: 0;
-    }
-
-    .row {
-      grid-template-columns: minmax(0, 1fr) minmax(0, min(26rem, 38%));
-      align-items: center;
-      gap: var(--spacing-8);
-      padding-block: var(--spacing-6);
-      padding-inline-start: 0;
-      border-inline-start: 0;
-      border-block-start: 1px solid var(--blue-90, #cedffd);
-    }
-
-    .row:last-child {
-      border-block-end: 1px solid var(--blue-90, #cedffd);
-    }
-
-    section.dark .row {
-      border-block-start-color: var(--white-alpha-24);
-      border-block-end-color: var(--white-alpha-24);
-    }
-
-    .row-media {
-      width: 100%;
-      max-width: none;
-      justify-content: center;
-    }
-
-    .row-img {
-      max-height: 16.25rem;
-    }
-  }
-
-  @container (min-width: 52rem) {
-    .row-heading {
-      font-size: var(--font-size-48);
-    }
-
-    .row-body {
-      font-size: var(--font-size-18);
+    @container (min-width: 36rem) {
+      max-height: var(--stc-row-img-max-height);
     }
   }
 
@@ -557,19 +579,20 @@ const sectionClass = [
     letter-spacing: 0;
     text-transform: uppercase;
     line-height: var(--line-height-24);
-  }
 
-  .eyebrow--red       { color: var(--red-55); }
-  .eyebrow--blue      { color: var(--blue-50); }
-  .eyebrow--navy      { color: var(--primary-50); }
-  .eyebrow--dark      { color: var(--blue-10); }
-  .eyebrow--lightBlue { color: var(--primary-20); }
-  .eyebrow--white     { color: var(--neutral-white); }
-  .eyebrow--gradient {
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background: linear-gradient(90deg, var(--primary-50), var(--secondary-50));
-    background-clip: text;
+    &.eyebrow--red       { color: var(--red-55); }
+    &.eyebrow--blue      { color: var(--blue-50); }
+    &.eyebrow--navy      { color: var(--primary-50); }
+    &.eyebrow--dark      { color: var(--blue-10); }
+    &.eyebrow--lightBlue { color: var(--primary-20); }
+    &.eyebrow--white     { color: var(--neutral-white); }
+
+    &.eyebrow--gradient {
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background: linear-gradient(90deg, var(--primary-50), var(--secondary-50));
+      background-clip: text;
+    }
   }
 
   /* ─── Heading ───────────────────────────────────────────────────────────── */
@@ -578,22 +601,16 @@ const sectionClass = [
     letter-spacing: var(--letter-spacing-snug);
     overflow-wrap: break-word;
     color: inherit;
-  }
 
-  /* Note: --big and --bigger currently match --normal visually.
-     Differentiate here once design specs for those sizes are confirmed. */
-  .heading--normal,
-  .heading--big,
-  .heading--bigger {
-    font-size: var(--font-size-32);
-    line-height: var(--line-height-20);
-  }
+    /* Note: --big and --bigger currently match --normal visually.
+       Differentiate here once design specs for those sizes are confirmed. */
+    &:is(.heading--normal, .heading--big, .heading--bigger) {
+      font-size: var(--font-size-32);
+      line-height: var(--line-height-20);
 
-  @container (min-width: 40rem) {
-    .heading--normal,
-    .heading--big,
-    .heading--bigger {
-      font-size: var(--font-size-48);
+      @container (min-width: 40rem) {
+        font-size: var(--font-size-48);
+      }
     }
   }
 
@@ -601,12 +618,13 @@ const sectionClass = [
   .body {
     width: 100%;
     color: inherit;
+
+    &.body--small  { font-size: var(--font-size-14); line-height: var(--line-height-24); }
+    &.body--normal { font-size: var(--font-size-16); line-height: var(--line-height-24); }
+    &.body--large  { font-size: var(--font-size-18); line-height: var(--line-height-24); }
   }
 
-  .body--small  { font-size: var(--font-size-14); line-height: var(--line-height-24); }
-  .body--normal { font-size: var(--font-size-16); line-height: var(--line-height-24); }
-  .body--large  { font-size: var(--font-size-18); line-height: var(--line-height-24); }
-
+  /* Portable Text output — :global() must stay un-nested (see top of file). */
   .body :global(p),
   .body :global(ul),
   .body :global(ol),
@@ -626,7 +644,7 @@ const sectionClass = [
 
   .body :global(ul),
   .body :global(ol) {
-    padding-inline-start: 1.25em;
+    padding-inline-start: var(--stc-list-indent);
   }
 
   .body :global(li + li) {
@@ -638,13 +656,13 @@ const sectionClass = [
   .body :global(a) {
     color: inherit;
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-underline-offset: var(--stc-underline-offset);
   }
 
   /* ─── Stat ──────────────────────────────────────────────────────────────── */
   .stat {
     padding-inline-start: var(--spacing-4);
-    border-inline-start: 2px solid var(--red-55);
+    border-inline-start: var(--stc-accent-width) solid var(--red-55);
   }
 
   .stat-item {
@@ -680,7 +698,7 @@ const sectionClass = [
     padding-inline-start: var(--spacing-4);
     /* Reset physical border-left from global blockquote styles; use logical property. */
     border-left: 0;
-    border-inline-start: 2px solid var(--red-55);
+    border-inline-start: var(--stc-accent-width) solid var(--red-55);
     width: 100%;
   }
 
@@ -704,14 +722,14 @@ const sectionClass = [
     display: block;
     margin: 0;
     flex-shrink: 0;
-    width: 91px;
-    height: 48px;
+    width: var(--stc-logo-width);
+    height: var(--stc-logo-height);
   }
 
   .logo {
     display: block;
-    width: 91px;
-    height: 48px;
+    width: var(--stc-logo-width);
+    height: var(--stc-logo-height);
     object-fit: contain;
   }
 
@@ -744,6 +762,8 @@ const sectionClass = [
 
   /* ─── Buttons ───────────────────────────────────────────────────────────── */
   .btn {
+    --stc-arrow-color: currentColor;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -755,92 +775,69 @@ const sectionClass = [
     letter-spacing: 0;
     white-space: nowrap;
     cursor: pointer;
-  }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .btn {
+    @media (prefers-reduced-motion: no-preference) {
       transition:
-        background-color var(--transition-duration, 200ms) var(--transition-easing, ease),
-        color var(--transition-duration, 200ms) var(--transition-easing, ease),
-        border-color var(--transition-duration, 200ms) var(--transition-easing, ease);
+        background-color var(--transition-duration) var(--transition-easing),
+        color var(--transition-duration) var(--transition-easing),
+        border-color var(--transition-duration) var(--transition-easing);
     }
+
+    /* Filled + outlined pills */
+    &:is(.btn--red, .btn--blue, .btn--outlined) {
+      border-radius: var(--radius-pill);
+      padding-block: var(--spacing-2);
+      padding-inline: var(--spacing-6);
+
+      /* Full-width below the two-column threshold */
+      @container (width < 40rem) {
+        flex: 1 1 100%;
+      }
+    }
+
+    &.btn--red {
+      background-color: var(--red-55);
+      color: var(--neutral-white);
+
+      &:hover { background-color: var(--secondary-60); }
+    }
+
+    &.btn--blue {
+      background-color: var(--blue-50);
+      color: var(--neutral-white);
+
+      &:hover { background-color: var(--primary-40); }
+    }
+
+    &.btn--outlined {
+      background-color: transparent;
+      color: var(--stc-outlined-color);
+      border: var(--stc-rule-width) solid var(--stc-outlined-color);
+
+      &:hover {
+        background-color: var(--stc-outlined-hover-bg);
+        color: var(--stc-outlined-hover-color);
+      }
+    }
+
+    /* Text-only buttons with a circular arrow */
+    &:is(.btn--transparentRedArrow, .btn--transparentBlueArrow) {
+      padding-block: 0;
+      padding-inline: 0;
+      color: inherit;
+    }
+
+    &.btn--transparentRedArrow  { --stc-arrow-color: var(--red-55); }
+    &.btn--transparentBlueArrow { --stc-arrow-color: var(--blue-50); }
   }
-
-  .btn--red,
-  .btn--blue,
-  .btn--outlined {
-    border-radius: var(--radius-pill, 9999px);
-    padding-block: var(--spacing-2);
-    padding-inline: var(--spacing-6);
-  }
-
-  .btn--red {
-    background-color: var(--red-55);
-    color: var(--neutral-white);
-  }
-
-  .btn--red:hover { background-color: var(--secondary-60); }
-
-  .btn--blue {
-    background-color: var(--blue-50);
-    color: var(--neutral-white);
-  }
-
-  .btn--blue:hover { background-color: var(--primary-40); }
-
-  .btn--outlined {
-    background-color: transparent;
-    color: var(--primary-50);
-    border: 1px solid var(--primary-50);
-  }
-
-  section.dark .btn--outlined {
-    color: var(--neutral-white);
-    border-color: var(--neutral-white);
-  }
-
-  .btn--outlined:hover {
-    background-color: var(--primary-50);
-    color: var(--neutral-white);
-  }
-
-  section.dark .btn--outlined:hover {
-    background-color: var(--neutral-white);
-    color: var(--blue-10);
-  }
-
-  .btn--transparentRedArrow,
-  .btn--transparentBlueArrow {
-    padding-block: 0;
-    padding-inline: 0;
-    color: inherit;
-  }
-
-  .btn--transparentRedArrow .btn-arrow  { color: var(--red-55); }
-  .btn--transparentBlueArrow .btn-arrow { color: var(--blue-50); }
 
   .btn-arrow {
     display: inline-flex;
     flex-shrink: 0;
-  }
-
-  /* Full-width buttons below the two-column threshold */
-  @container (width < 40rem) {
-    .btn--red,
-    .btn--blue,
-    .btn--outlined {
-      flex: 1 1 100%;
-    }
+    color: var(--stc-arrow-color);
   }
 
   /* ─── Media column ──────────────────────────────────────────────────────── */
-  .media {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   .figure {
     display: block;
     width: 100%;
@@ -860,11 +857,11 @@ const sectionClass = [
     bottom: var(--spacing-4);
     background-color: var(--neutral-white);
     color: var(--blue-10);
-    border-radius: var(--radius-md, 0.75rem);
+    border-radius: var(--radius-md);
     padding-block: var(--spacing-3);
     padding-inline: var(--spacing-4);
     box-shadow: var(--shadow-card-overlay);
-    max-width: 70%;
+    max-width: var(--stc-media-stat-max-width);
   }
 
   .media-stat-text {
