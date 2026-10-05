@@ -82,11 +82,11 @@ const showAnnouncementBar = announcementBar?.enabled && announcementBar?.text;
 const viewTransitionsEnabled = import.meta.env.PUBLIC_VIEW_TRANSITIONS_ENABLED !== 'false';
 const enableThirdPartyScripts = (import.meta.env.PROD && isProdHost) || import.meta.env.PUBLIC_ENABLE_THIRD_PARTY_SCRIPTS === 'true';
 
-// Usercentrics draft testing (dev): see comments next to the CMP script in <head>
-const usercentricsClearStorage =
-  import.meta.env.DEV && import.meta.env.PUBLIC_USERCENTRICS_CLEAR_STORAGE === 'true'
-const usercentricsDebug =
-  import.meta.env.DEV && import.meta.env.PUBLIC_USERCENTRICS_DEBUG === 'true'
+// Usercentrics is commented out in <head> and must not load.
+// const usercentricsClearStorage =
+//   import.meta.env.DEV && import.meta.env.PUBLIC_USERCENTRICS_CLEAR_STORAGE === 'true'
+// const usercentricsDebug =
+//   import.meta.env.DEV && import.meta.env.PUBLIC_USERCENTRICS_DEBUG === 'true'
 
 // Fetch header/footer/chatbot unless the page already loaded it in parallel (see layoutSanity prop)
 const { data: layoutData, perspective } = layoutSanity ?? (await getLayoutData(Astro.request));
@@ -163,67 +163,25 @@ const organizationJsonLd = {
     <meta name="generator" content={Astro.generator} />
 
     <!--
-      Usercentrics CMP (draft): load early in <head> per https://usercentrics.com/docs/web/implementation/ui/
-      If the SDK loads but no banner: (1) existing consent in storage — use PUBLIC_USERCENTRICS_CLEAR_STORAGE=true
-      (2) Admin geolocation/rules — isConsentRequired is false outside target regions (3) draft not saved in Admin
-      (4) domain not allowlisted for localhost — add in Usercentrics Admin → Implementation
+      Usercentrics CMP is disabled.
+      <script src="https://web.cmp.usercentrics.eu/tcf/stub.js"></script>
+      <script
+        id="usercentrics-cmp"
+        src="https://web.cmp.usercentrics.eu/ui/loader.js"
+        data-draft="true"
+        data-ruleset-id="qGrm9FASmetPSa"
+        async
+      ></script>
     -->
-    {usercentricsClearStorage && (
-      <script is:inline>
-        (function () {
-          try {
-            function clearKeys(store) {
-              for (var i = store.length - 1; i >= 0; i--) {
-                var k = store.key(i)
-                if (k && (/^uc/i.test(k) || /usercentrics/i.test(k))) store.removeItem(k)
-              }
-            }
-            clearKeys(localStorage)
-            clearKeys(sessionStorage)
-          } catch (e) {}
-        })()
-      </script>
-    )}
-    <script is:inline src="https://web.cmp.usercentrics.eu/tcf/stub.js"></script>
-    <script
-      is:inline
-      id="usercentrics-cmp"
-      src="https://web.cmp.usercentrics.eu/ui/loader.js"
-      data-draft="true"
-      data-ruleset-id="qGrm9FASmetPSa"
-      async
-    ></script>
-    {usercentricsDebug && (
-      <script is:inline>
-        window.addEventListener('UC_UI_INITIALIZED', function () {
-          var cmp = window.__ucCmp
-          if (!cmp) {
-            console.warn('[Usercentrics] UC_UI_INITIALIZED fired but window.__ucCmp is missing')
-            return
-          }
-          cmp
-            .isConsentRequired()
-            .then(function (required) {
-              console.info(
-                '[Usercentrics] isConsentRequired =',
-                required,
-                '— if false, your Admin rules/geolocation usually mean no banner in this region/browser; draft must also be saved in Admin.'
-              )
-            })
-            .catch(function (err) {
-              console.warn('[Usercentrics] isConsentRequired failed', err)
-            })
-        })
-      </script>
-    )}
 
     <!-- Preconnect to critical origins for faster resource loading -->
     <!-- Sanity CDN serves all CMS images — preconnect saves ~100-200ms on first image load -->
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
     <link rel="dns-prefetch" href="https://cdn.sanity.io" />
-    <!-- Usercentrics CMP script domain -->
+    <!-- Usercentrics CMP script domain (disabled)
     <link rel="preconnect" href="https://web.cmp.usercentrics.eu" crossorigin />
     <link rel="dns-prefetch" href="https://web.cmp.usercentrics.eu" />
+    -->
     {enableThirdPartyScripts && (
       <>
         <!-- Preconnects for deferred trackers so the post-load fetch is faster (no full TLS round-trip when the script finally runs). -->
