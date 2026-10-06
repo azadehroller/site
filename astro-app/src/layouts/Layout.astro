@@ -162,26 +162,13 @@ const organizationJsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content={Astro.generator} />
 
-    <!--
-      Usercentrics CMP is disabled.
-      <script src="https://web.cmp.usercentrics.eu/tcf/stub.js"></script>
-      <script
-        id="usercentrics-cmp"
-        src="https://web.cmp.usercentrics.eu/ui/loader.js"
-        data-draft="true"
-        data-ruleset-id="qGrm9FASmetPSa"
-        async
-      ></script>
-    -->
+    <!-- Usercentrics CMP disabled. Do not restore the stub or loader scripts until consent should load again. -->
 
     <!-- Preconnect to critical origins for faster resource loading -->
     <!-- Sanity CDN serves all CMS images — preconnect saves ~100-200ms on first image load -->
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
     <link rel="dns-prefetch" href="https://cdn.sanity.io" />
-    <!-- Usercentrics CMP script domain (disabled)
-    <link rel="preconnect" href="https://web.cmp.usercentrics.eu" crossorigin />
-    <link rel="dns-prefetch" href="https://web.cmp.usercentrics.eu" />
-    -->
+    <!-- Usercentrics preconnect disabled. -->
     {enableThirdPartyScripts && (
       <>
         <!-- Preconnects for deferred trackers so the post-load fetch is faster (no full TLS round-trip when the script finally runs). -->
